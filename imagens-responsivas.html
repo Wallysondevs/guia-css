@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Imagens Responsivas — max-width, height: auto e object-fit | Guia CSS</title>
+<meta name="description" content="Imagens que se adaptam à tela com CSS: max-width: 100% e height: auto, a diferença para width: 100%, object-fit (fill, contain, cover, none, scale-down) e object-position, com os resultados ao vivo e os erros mais comuns.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Imagens Responsivas</span></h1>
+
+<p class="intro">Uma foto de 800 pixels de largura cabe numa tela de computador, mas não numa tela de celular de 360. Sem CSS, ela passa da borda e a página ganha uma rolagem para o lado. Nesta aula você vai fazer as imagens do site da Ana <strong>encolherem junto com a página</strong>, sem ficarem achatadas, e vai aprender a encaixar uma foto numa moldura de tamanho fixo, como as miniaturas de uma galeria.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A dupla <code>max-width: 100%</code> + <code>height: auto</code>, a regra mais usada em imagens.</li>
+  <li>Por que só o <code>max-width</code> achata a foto.</li>
+  <li>A diferença entre <code>width: 100%</code> e <code>max-width: 100%</code>.</li>
+  <li><code>object-fit</code>: como a foto ocupa uma moldura de tamanho fixo (<code>fill</code>, <code>contain</code>, <code>cover</code>, <code>none</code>, <code>scale-down</code>).</li>
+  <li><code>object-position</code>: qual pedaço da foto fica à mostra.</li>
+  <li>Os erros mais comuns e o que o validador W3C diz deles.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador. Para não depender do tamanho da sua tela, os exemplos colocam a imagem numa coluna de largura fixa (<code>.coluna</code>, 300 pixels, com uma borda tracejada), que faz o papel da "tela pequena". As fotos são da pasta de mídia do guia (<code>assets/midia/</code>).</p>
+
+<hr>
+
+<h2>A ideia: a foto e o porta-retrato</h2>
+<p>Pense numa foto impressa e num porta-retrato. Se a foto é maior que a moldura, você tem três saídas:</p>
+<ul>
+  <li><strong>Reduzir</strong> a foto inteira até caber, mantendo a proporção. É o que <code>max-width: 100%</code> + <code>height: auto</code> faz.</li>
+  <li><strong>Cortar as sobras</strong> com uma tesoura, para a foto ocupar a moldura toda. É o <code>object-fit: cover</code>.</li>
+  <li><strong>Esticar</strong> a foto até ela ter o formato da moldura. Ninguém faz isso com uma foto de verdade, mas é o que o navegador faz quando você muda a largura e a altura sem cuidado.</li>
+</ul>
+<p>Esta aula é sobre escolher a saída certa, e nunca cair na terceira sem querer.</p>
+
+<hr>
+
+<h2>1. O problema: a imagem maior que a coluna</h2>
+<p>Aqui está a foto do bolo, com 800×600 pixels, dentro da coluna de 300 pixels. Ainda sem nenhuma regra para a imagem:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="coluna"&gt;
+  &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="800" height="600"&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.coluna {
+  width: 300px;
+  border: 2px dashed gray;
+}
+</pre>
+</div>
+
+<p>A foto <strong>passa da borda tracejada</strong> e continua para a direita, até sair do quadro: ela tem 800 pixels e ninguém disse que precisava caber. Num celular, é a página inteira que ganha rolagem para o lado e fica "dançando".</p>
+<p>Os atributos <code>width="800"</code> e <code>height="600"</code> do HTML (aula <a href="https://wallysondevs.github.io/guia-html/imagens.html">Imagens</a> do Guia HTML) são uma boa prática: eles dizem ao navegador o tamanho da foto antes de ela chegar, e o espaço fica reservado. Mas eles também viram o tamanho desenhado, e é aí que entra o CSS.</p>
+
+<hr>
+
+<h2>2. <code>max-width: 100%</code>: no máximo a largura de quem a contém</h2>
+<p><code>max-width</code> é a "largura máxima" (aula <a href="width-height.html">Largura e Altura</a>). Com <code>100%</code>, a imagem pode ter a largura dela, <strong>desde que não passe</strong> da largura do elemento onde ela está (o "pai", aqui a <code>.coluna</code>):</p>
+
+<pre class="file" data-file="style.css">img {
+  max-width: 100%;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>img</dt><dd>O seletor: vale para todas as imagens da página.</dd>
+  <dt>max-width</dt><dd>A largura máxima. A imagem pode ficar menor do que isso, nunca maior.</dd>
+  <dt>100%</dt><dd>Cem por cento da largura do pai. Numa coluna de 300 pixels, no máximo 300; numa tela de celular, no máximo a tela.</dd>
+</dl>
+
+<p>Só que, sozinha, essa regra deixa um problema. Veja o resultado:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="coluna"&gt;
+  &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="800" height="600"&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.coluna {
+  width: 300px;
+  border: 2px dashed gray;
+}
+
+img {
+  max-width: 100%;
+}
+</pre>
+</div>
+
+<p>A foto cabe na coluna, mas ficou <strong>alta e magra</strong>: o bolo parece um bolo de festa de três andares. A largura caiu para 300 pixels, mas a altura continuou nos 600 do atributo <code>height="600"</code>. A foto, que era mais larga que alta (4 por 3), virou mais alta que larga.</p>
+
+<hr>
+
+<h2>3. <code>height: auto</code>: a altura acompanha a largura</h2>
+<p>A segunda metade da regra manda o navegador <strong>calcular</strong> a altura a partir da largura, mantendo a proporção da foto:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="coluna"&gt;
+  &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="800" height="600"&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.coluna {
+  width: 300px;
+  border: 2px dashed gray;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+</pre>
+</div>
+
+<p>Agora o bolo voltou ao normal: 300 pixels de largura e <strong>225 de altura</strong> (300 × 600 ÷ 800), conferido no Chromium. A proporção 4 por 3 foi mantida.</p>
+
+<dl class="anatomy">
+  <dt>height: auto</dt><dd>"Altura automática": o navegador calcula a altura a partir da largura e da proporção da imagem. Ela vence o <code>height="600"</code> do HTML, porque <strong>o CSS manda mais que os atributos de tamanho</strong>.</dd>
+</dl>
+
+<div class="tip">
+<strong>Continue pondo <code>width</code> e <code>height</code> no HTML</strong>
+<p>Com <code>height: auto</code>, o navegador ainda usa os dois atributos para saber a <strong>proporção</strong> da foto antes de ela baixar. No F12, na aba <em>Computed</em>, a imagem mostra <code>aspect-ratio: auto 800 / 600</code>, vindo dos atributos. O espaço certo fica reservado e o texto de baixo não "pula" quando a foto chega. É por isso que a dupla <code>max-width: 100%</code> + <code>height: auto</code> combina tão bem com os atributos.</p>
+</div>
+
+<p>Muitos sites começam o CSS com essa regra para todas as imagens (e os vídeos), porque ela não atrapalha as fotos pequenas e salva as grandes:</p>
+
+<pre class="file" data-file="style.css">img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+</pre>
+
+<div class="tryhtml" data-goal="css:.coluna img{max-width}=100%,css:.coluna img{height}=225px">
+<p class="try-task"><strong>Missão:</strong> a foto do bolo está saindo da coluna. Escreva a regra para a imagem caber na coluna <strong>sem ficar achatada</strong> (ela deve ficar com 225 pixels de altura).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="coluna"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="800" height="600"&gt;
+  &lt;p&gt;Fofinho, com cobertura de chocolate.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.coluna {
+  width: 300px;
+  border: 2px dashed gray;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.coluna {
+  width: 300px;
+  border: 2px dashed gray;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>4. <code>width: 100%</code> ou <code>max-width: 100%</code>?</h2>
+<p>As duas parecem iguais com uma foto grande: ela fica com a largura da coluna. A diferença aparece com uma imagem <strong>pequena</strong>. Aqui, o avatar da Ana, que tem só 96×96 pixels:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="coluna"&gt;
+  &lt;img class="maxima" src="assets/midia/avatar-ana-96.png" alt="Avatar da Ana" width="96" height="96"&gt;
+&lt;/div&gt;
+&lt;div class="coluna"&gt;
+  &lt;img class="cheia" src="assets/midia/avatar-ana-96.png" alt="Avatar da Ana" width="96" height="96"&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.coluna {
+  width: 300px;
+  border: 2px dashed gray;
+  margin-bottom: 8px;
+}
+
+.maxima {
+  max-width: 100%;
+  height: auto;
+}
+
+.cheia {
+  width: 100%;
+  height: auto;
+}
+</pre>
+</div>
+
+<ul>
+  <li>Com <code>max-width: 100%</code>, o avatar continua com os seus <strong>96 pixels</strong>: ele já cabia, então nada muda.</li>
+  <li>Com <code>width: 100%</code>, ele é <strong>esticado</strong> até 300×300 e fica <strong>borrado</strong>: o navegador inventa os pixels que faltam.</li>
+</ul>
+<p>Apague o <code>height: auto</code> da regra <code>.cheia</code> e veja o pior caso: o avatar fica com 300 de largura e 96 de altura, achatado.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Regra</th><th>Foto maior que o pai</th><th>Foto menor que o pai</th><th>Quando usar</th></tr>
+<tr><td><code>max-width: 100%</code> + <code>height: auto</code></td><td>Encolhe até caber</td><td>Fica do tamanho dela</td><td>Quase sempre: fotos dentro do texto, receitas, posts</td></tr>
+<tr><td><code>width: 100%</code> + <code>height: auto</code></td><td>Encolhe até caber</td><td><strong>Estica</strong> (pode borrar)</td><td>Quando a imagem <strong>tem</strong> de ocupar a largura toda (um banner) e você sabe que o arquivo é grande o bastante</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>5. <code>object-fit</code>: a foto numa moldura de tamanho fixo</h2>
+<p>Às vezes o tamanho não vem da foto, vem do layout: numa galeria, todas as miniaturas devem ser quadrados de 150×150, mesmo que uma foto seja deitada e a outra em pé. Quando você dá <strong>largura e altura</strong> a uma imagem, a propriedade <code>object-fit</code> ("encaixe do objeto") decide como a foto ocupa essa moldura.</p>
+
+<p>A foto do bolo tem 400×300 (deitada). Cada quadro abaixo tem 150×150 e um valor diferente, escrito embaixo dele:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;figure&gt;
+    &lt;img class="fill" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura"&gt;
+    &lt;figcaption&gt;fill&lt;/figcaption&gt;
+  &lt;/figure&gt;
+  &lt;figure&gt;
+    &lt;img class="contain" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura"&gt;
+    &lt;figcaption&gt;contain&lt;/figcaption&gt;
+  &lt;/figure&gt;
+  &lt;figure&gt;
+    &lt;img class="cover" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura"&gt;
+    &lt;figcaption&gt;cover&lt;/figcaption&gt;
+  &lt;/figure&gt;
+  &lt;figure&gt;
+    &lt;img class="none" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura"&gt;
+    &lt;figcaption&gt;none&lt;/figcaption&gt;
+  &lt;/figure&gt;
+  &lt;figure&gt;
+    &lt;img class="scale-down" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura"&gt;
+    &lt;figcaption&gt;scale-down&lt;/figcaption&gt;
+  &lt;/figure&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+figure {
+  margin: 0;
+  font-family: sans-serif;
+  text-align: center;
+}
+
+img {
+  width: 150px;
+  height: 150px;
+  border: 1px solid black;
+  display: block;
+}
+
+.fill {
+  object-fit: fill;
+}
+
+.contain {
+  object-fit: contain;
+}
+
+.cover {
+  object-fit: cover;
+}
+
+.none {
+  object-fit: none;
+}
+
+.scale-down {
+  object-fit: scale-down;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que faz</th><th>No porta-retrato</th></tr>
+<tr><td><code>fill</code></td><td><strong>O padrão.</strong> Estica a foto até preencher a moldura, sem respeitar a proporção. O bolo deitado ficou espremido num quadrado.</td><td>Esticar a foto</td></tr>
+<tr><td><code>contain</code></td><td>Reduz a foto até ela caber <strong>inteira</strong>, mantendo a proporção. Sobram faixas vazias (aqui, em cima e embaixo).</td><td>Reduzir até caber</td></tr>
+<tr><td><code>cover</code></td><td>Aumenta ou reduz a foto até ela <strong>cobrir</strong> a moldura toda, mantendo a proporção, e corta o que sobra (aqui, as laterais).</td><td>Cortar as sobras</td></tr>
+<tr><td><code>none</code></td><td>Não muda o tamanho da foto: mostra o pedaço do meio, em tamanho natural (400×300), recortado pela moldura.</td><td>Olhar por uma janelinha</td></tr>
+<tr><td><code>scale-down</code></td><td>Escolhe o menor resultado entre <code>none</code> e <code>contain</code>. Aqui a foto é maior que a moldura, então ficou igual ao <code>contain</code>; uma foto pequena ficaria em tamanho natural.</td><td>Reduzir, mas nunca aumentar</td></tr>
+</table>
+</div>
+
+<p>Na prática, <strong><code>cover</code></strong> é o mais usado (miniaturas, avatares, capas), e <code>contain</code> vem em segundo (logotipos e fotos de produto, que não podem ser cortados).</p>
+
+<div class="note">
+<strong>Só funciona com moldura</strong>
+<p>O <code>object-fit</code> só tem efeito quando a imagem tem <strong>largura e altura</strong> que não são as dela (por CSS ou pelos atributos). E ele só vale para elementos que mostram um conteúdo de fora, como <code>&lt;img&gt;</code> e <code>&lt;video&gt;</code>. Os dois enganos estão em <a href="#errado">Quando dá errado</a>.</p>
+</div>
+
+<hr>
+
+<h2>6. <code>object-position</code>: qual pedaço fica à mostra</h2>
+<p>Com <code>cover</code> (e <code>none</code>), parte da foto é cortada. Por padrão, o navegador mantém o <strong>centro</strong>: o valor calculado de <code>object-position</code> é <code>50% 50%</code>. Para guardar outro pedaço, diga qual:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;center (o padrão)&lt;/p&gt;
+&lt;img class="capa" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura"&gt;
+&lt;p&gt;top&lt;/p&gt;
+&lt;img class="capa topo" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura"&gt;
+&lt;p&gt;bottom&lt;/p&gt;
+&lt;img class="capa base" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura"&gt;
+</pre>
+<pre class="script" data-file="style.css">.capa {
+  width: 300px;
+  height: 120px;
+  object-fit: cover;
+}
+
+.topo {
+  object-position: top;
+}
+
+.base {
+  object-position: bottom;
+}
+</pre>
+</div>
+
+<p>As três faixas têm 300×120 e mostram pedaços diferentes da mesma foto: a primeira, o corpo do bolo; a do meio (<code>top</code>), a parede da cozinha e só o alto do bolo; a de baixo (<code>bottom</code>), a parte de baixo do bolo, o prato e a mesa. Troque <code>top</code> por <code>left</code>, <code>right</code> ou por porcentagens, como <code>50% 80%</code> (80% da altura: mais perto de baixo).</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que fica à mostra</th></tr>
+<tr><td><code>center</code> (padrão, <code>50% 50%</code>)</td><td>O meio da foto</td></tr>
+<tr><td><code>top</code>, <code>bottom</code></td><td>A parte de cima, a de baixo</td></tr>
+<tr><td><code>left</code>, <code>right</code></td><td>O lado esquerdo, o direito</td></tr>
+<tr><td><code>left top</code></td><td>O canto de cima, à esquerda</td></tr>
+<tr><td><code>30% 70%</code></td><td>Um ponto exato: 30% da largura, 70% da altura</td></tr>
+</table>
+</div>
+
+<p>São os mesmos valores do <code>background-position</code> (aula <a href="background-posicao.html">Repetição e Posição do Fundo</a>).</p>
+
+<hr>
+
+<h2>7. Qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Use</th></tr>
+<tr><td>Foto no meio do texto (receita, post, notícia)</td><td><code>max-width: 100%</code> + <code>height: auto</code></td></tr>
+<tr><td>Banner que tem de ocupar a largura toda</td><td><code>width: 100%</code> + <code>height: auto</code></td></tr>
+<tr><td>Miniaturas iguais numa galeria, avatares redondos</td><td><code>width</code> e <code>height</code> fixos (ou <a href="aspect-ratio.html"><code>aspect-ratio</code></a>) + <code>object-fit: cover</code></td></tr>
+<tr><td>Logotipo ou produto numa caixa fixa, sem cortar nada</td><td><code>object-fit: contain</code></td></tr>
+<tr><td>Imagem só decorativa, atrás de um texto</td><td>Imagem de fundo, com <code>background-size: cover</code> (aula <a href="background-size.html">Tamanho do Fundo</a>)</td></tr>
+<tr><td>Mandar um arquivo menor para o celular</td><td>Isso é HTML: <code>srcset</code> e <code>&lt;picture&gt;</code> (Guia HTML, <a href="https://wallysondevs.github.io/guia-html/imagens-responsivas.html">Imagens Responsivas</a>). O CSS muda o tamanho <strong>desenhado</strong>; o arquivo baixado é o mesmo.</td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> as três miniaturas são arquivos diferentes (um deitado, um quadrado, um avatar), mas ficam do mesmo tamanho. Troque <code>cover</code> por <code>contain</code> e por <code>fill</code>; tire o <code>border-radius</code>; mude o tamanho para <code>120px</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="galeria"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura"&gt;
+  &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Fatia de bolo de cenoura"&gt;
+  &lt;img src="assets/midia/avatar-ana-192.png" alt="Avatar da Ana"&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria {
+  display: flex;
+  gap: 8px;
+}
+
+.galeria img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Só <code>max-width</code>, sem <code>height: auto</code>: a foto fica achatada</strong>
+<pre class="file" data-file="style.css">img {
+  max-width: 100%;
+}
+</pre>
+<p><strong>O que você vê:</strong> a foto cabe na largura, mas fica deformada (veja o resultado da seção 2): a altura continua a do atributo <code>height</code> do HTML.</p>
+<p><strong>Por quê:</strong> o <code>max-width</code> só mexe na largura. Quem cuida da altura é o atributo <code>height="600"</code>, que continua valendo.</p>
+<p><strong>O que o validador diz:</strong> nada. As duas coisas são válidas; o problema é a combinação.</p>
+<p><strong>Como consertar:</strong> ponha <code>height: auto</code> junto. Não tire os atributos <code>width</code> e <code>height</code> do HTML: eles reservam o espaço da foto.</p>
+</div>
+
+<div class="cenario">
+<strong><code>object-fit</code> sem moldura: nada muda</strong>
+<pre class="file" data-file="style.css">.foto {
+  object-fit: cover;
+}
+</pre>
+<p><strong>O que você vê:</strong> a foto fica exatamente como estava, no tamanho natural (400×300, conferido no Chromium).</p>
+<p><strong>Por quê:</strong> a imagem não tem uma largura e uma altura diferentes das dela. A moldura é do tamanho da foto, então não há nada para encaixar.</p>
+<p><strong>Como consertar:</strong> dê os dois tamanhos (<code>width: 150px;</code> e <code>height: 150px;</code>), ou uma largura e um <a href="aspect-ratio.html"><code>aspect-ratio</code></a>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>object-fit</code> numa <code>div</code> com imagem de fundo: também nada muda</strong>
+<pre class="file" data-file="style.css">.destaque {
+  width: 150px;
+  height: 150px;
+  background-image: url("assets/midia/bolo-400.jpg");
+  object-fit: cover;
+}
+</pre>
+<p><strong>O que você vê:</strong> a <code>div</code> mostra só o canto de cima, à esquerda, da foto (a parede da cozinha), em tamanho natural. O <code>object-fit</code> foi ignorado.</p>
+<p><strong>Por quê:</strong> <code>object-fit</code> vale para o <strong>conteúdo</strong> de elementos como <code>&lt;img&gt;</code> e <code>&lt;video&gt;</code>. Uma imagem de fundo é outra coisa, com propriedades próprias.</p>
+<p><strong>Como consertar:</strong> no fundo, o equivalente é <code>background-size: cover;</code> e <code>background-position</code> (aula <a href="background-size.html">Tamanho do Fundo</a>).</p>
+</div>
+
+<div class="cenario">
+<strong>Valor que não existe: <code>“crop” is not a “object-fit” value</code></strong>
+<pre class="file" data-file="estilo.css">img {
+  object-fit: crop;
+}
+.foto {
+  max-width: 100;
+}
+.capa {
+  object-position: centro;
+}
+</pre>
+<p><strong>O que você vê:</strong> nada muda. O navegador ignora em silêncio cada declaração que não entende; no F12, na aba <em>Elements</em>, o painel de estilos mostra a declaração <strong>riscada</strong>, com um ícone de aviso.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css estilo.css
+"file:/home/ana/site/estilo.css":2.15-2.18: error: CSS: “object-fit”: “crop” is not a “object-fit” value.
+"file:/home/ana/site/estilo.css":5.14-5.16: error: CSS: “max-width”: only “0” can be a “unit”. You must put a unit after your number.
+"file:/home/ana/site/estilo.css":8.20-8.25: error: CSS: “object-position”: “centro” is not a “object-position” value.</pre>
+<p><strong>O que significa:</strong></p>
+<ul>
+  <li>"<code>crop</code> não é um valor de <code>object-fit</code>". Cortar é <code>cover</code>.</li>
+  <li>"Só o <code>0</code> pode ficar sem unidade. Você precisa pôr uma unidade depois do número": <code>max-width: 100</code> não é nem 100 pixels nem 100%. Escreva <code>100%</code>.</li>
+  <li>"<code>centro</code> não é um valor de <code>object-position</code>": os nomes são em inglês, <code>center</code>.</li>
+</ul>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>max-width: 100%;</code></td><td>A imagem nunca passa da largura do pai</td></tr>
+<tr><td><code>height: auto;</code></td><td>A altura acompanha a largura, mantendo a proporção (vence o atributo <code>height</code>)</td></tr>
+<tr><td><code>width: 100%;</code></td><td>A imagem sempre tem a largura do pai (estica as pequenas)</td></tr>
+<tr><td><code>object-fit: fill;</code></td><td>Padrão: estica para preencher a moldura</td></tr>
+<tr><td><code>object-fit: contain;</code></td><td>Cabe inteira, com sobras vazias</td></tr>
+<tr><td><code>object-fit: cover;</code></td><td>Cobre a moldura toda, cortando as sobras</td></tr>
+<tr><td><code>object-fit: none;</code></td><td>Tamanho natural, recortado pela moldura</td></tr>
+<tr><td><code>object-fit: scale-down;</code></td><td>O menor entre <code>none</code> e <code>contain</code></td></tr>
+<tr><td><code>object-position: top;</code></td><td>Qual parte fica à mostra (padrão <code>50% 50%</code>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A largura máxima</h3>
+<p>Complete para a imagem nunca passar da largura do pai:</p>
+<div class="ex-code">img { <input data-answer="max-width" aria-label="propriedade">: 100%; height: auto; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. A altura</h3>
+<p>Complete para a foto não ficar achatada:</p>
+<div class="ex-code">img { max-width: 100%; height: <input data-answer="auto" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Cortar as sobras</h3>
+<p>Complete para a foto cobrir a moldura de 150×150, cortando o que sobra:</p>
+<div class="ex-code">.miniatura { width: 150px; height: 150px; object-fit: <input data-answer="cover" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Um avatar de 96×96 está numa coluna de 300 pixels. Com <code>max-width: 100%; height: auto;</code>, que tamanho ele fica?</p>
+<label><input type="radio" name="q4"> 300×300</label>
+<label><input type="radio" name="q4"> 96×96, o tamanho dele</label>
+<label><input type="radio" name="q4"> 300×96</label>
+<label><input type="radio" name="q4"> 100×100</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Qual valor de <code>object-fit</code> mostra o logotipo <strong>inteiro</strong> numa caixa fixa, sem cortar nem deformar?</p>
+<label><input type="radio" name="q5"> <code>fill</code></label>
+<label><input type="radio" name="q5"> <code>cover</code></label>
+<label><input type="radio" name="q5"> <code>contain</code></label>
+<label><input type="radio" name="q5"> <code>none</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. A Ana escreveu <code>object-fit: cover;</code> numa imagem sem <code>width</code> nem <code>height</code>. O que acontece?</p>
+<label><input type="radio" name="q6"> Nada: a imagem não tem moldura diferente do tamanho dela</label>
+<label><input type="radio" name="q6"> A imagem ocupa a tela toda</label>
+<label><input type="radio" name="q6"> A imagem é cortada pela metade</label>
+<label><input type="radio" name="q6"> O validador acusa erro</label>
+</div>
+
+<h3>Missão final: a receita com galeria</h3>
+
+<div class="tryhtml" data-goal="css:.principal{max-width}=100%,css:.principal{height}=225px,css:.miniaturas img{object-fit}=cover,css:.miniaturas img{width}=90px,css:.miniaturas img{height}=90px">
+<p class="try-task"><strong>Missão:</strong> monte a página da receita. (1) A foto <code>.principal</code> deve caber na coluna sem deformar (225 pixels de altura). (2) As imagens de <code>.miniaturas</code> devem virar quadrados de 90×90, <strong>cobrindo</strong> a moldura sem esticar.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="coluna"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;img class="principal" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="800" height="600"&gt;
+  &lt;div class="miniaturas"&gt;
+    &lt;img src="assets/midia/bolo-400.jpg" alt="O bolo inteiro"&gt;
+    &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Detalhe da cobertura"&gt;
+    &lt;img src="assets/midia/avatar-ana-192.png" alt="A Ana, que fez o bolo"&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.coluna {
+  width: 300px;
+  border: 2px dashed gray;
+}
+
+.miniaturas {
+  display: flex;
+  gap: 8px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.coluna {
+  width: 300px;
+  border: 2px dashed gray;
+}
+
+.principal {
+  max-width: 100%;
+  height: auto;
+}
+
+.miniaturas {
+  display: flex;
+  gap: 8px;
+}
+
+.miniaturas img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>max-width: 100%</code> + <code>height: auto</code>: a imagem encolhe para caber no pai e mantém a proporção. É a regra para quase toda foto.</li>
+  <li>Sem o <code>height: auto</code>, a altura do atributo <code>height</code> continua valendo e a foto fica achatada. Mantenha os atributos <code>width</code> e <code>height</code> no HTML: eles reservam o espaço.</li>
+  <li><code>width: 100%</code> estica as imagens pequenas (e borra); use só quando a imagem tem de ocupar a largura toda.</li>
+  <li><code>object-fit</code> encaixa a foto numa moldura de largura e altura fixas: <code>fill</code> (padrão, estica), <code>contain</code> (inteira), <code>cover</code> (cobre e corta), <code>none</code>, <code>scale-down</code>.</li>
+  <li><code>object-position</code> escolhe o pedaço que fica à mostra (padrão: o centro).</li>
+  <li><code>object-fit</code> não faz nada sem moldura, nem em imagem de fundo (lá, é <code>background-size</code>).</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
