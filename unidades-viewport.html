@@ -110,7 +110,7 @@
 <pre class="file" data-file="capa.html">&lt;style&gt;
   .capa {
     min-height: 100vh;
-    background-color: tomato;
+    background-color: firebrick;
     color: white;
   }
 &lt;/style&gt;
@@ -124,11 +124,11 @@
 
 <div class="warning">
 <strong>O <code>vh</code> no quadro do editor</strong>
-<p>A altura do quadro do editor <strong>acompanha o conteúdo</strong> (até um limite, e depois rola). Então, dentro dele, a "altura da janela" muda conforme a própria página cresce, e o <code>vh</code> não dá um número confiável. No Chromium, uma capa com <code>height: 100vh</code> esticou o quadro até o limite, 460px. Para ver o <code>vh</code> de verdade, abra o resultado numa aba nova com o botão <strong>↗</strong> e mude o tamanho da janela do navegador. Por isso, nesta aula, as missões só conferem <code>vh</code> pelo código.</p>
+<p>Normalmente, a altura do quadro do editor <strong>acompanha o conteúdo</strong> (até um limite, e depois rola). Então, dentro dele, a "altura da janela" muda conforme a própria página cresce, e o <code>vh</code> não dá um número confiável. Por isso, a próxima caixa tem o quadro com <strong>altura fixa</strong> de 300px: lá dentro, <code>100vh</code> = 300px e <code>50vh</code> = 150px. Para ver o <code>vh</code> com a altura da sua janela, abra o resultado numa aba nova com o botão <strong>↗</strong> e mude o tamanho da janela do navegador.</p>
 </div>
 
-<div class="tryhtml" data-largura="400">
-<p class="try-task"><strong>Experimente:</strong> a capa tem <code>100vh</code> e enche o quadro inteiro; o parágrafo ficou escondido embaixo (role dentro do quadro). Clique em <strong>↗</strong> para abrir numa aba nova: lá, a capa tem a altura da sua janela.</p>
+<div class="tryhtml" data-largura="400" data-altura="300">
+<p class="try-task"><strong>Experimente:</strong> o quadro tem 300px de altura, e a capa tem <code>100vh</code>: 300px, o quadro inteiro; o parágrafo ficou escondido embaixo (role dentro do quadro). Troque por <code>50vh</code> e veja a capa ficar com 150px e o parágrafo aparecer. Clique em <strong>↗</strong> para abrir numa aba nova: lá, a capa tem a altura da sua janela.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;section class="capa"&gt;
   &lt;h1&gt;Padaria da Ana&lt;/h1&gt;
@@ -137,7 +137,7 @@
 </pre>
 <pre class="script" data-file="style.css">.capa {
   min-height: 100vh;
-  background-color: tomato;
+  background-color: firebrick;
   color: white;
 }
 </pre>
