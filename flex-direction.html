@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS flex-direction — itens em linha ou em coluna | Guia CSS</title>
+<meta name="description" content="flex-direction em CSS para quem está começando: row, row-reverse, column e column-reverse lado a lado, como a direção principal e a cruzada giram, a coluna no celular e a linha no computador, o cuidado com a ordem do teclado no reverse e as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">flex-direction</span></h1>
+
+<p class="intro">Ao ligar o Flexbox, os itens ficam lado a lado, em linha. Mas e se você quiser os itens <strong>um embaixo do outro</strong>, arrumados pelo Flexbox? Ou de trás para frente? É o trabalho do <code>flex-direction</code> ("direção flex"): ele escolhe para onde vai a fila de itens. Nesta aula você vai ver os quatro valores lado a lado, montar o cartão de receita da Ana em coluna, fazer um menu que vira coluna no celular e entender por que o <code>reverse</code> pede cuidado.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Os quatro valores: <code>row</code>, <code>row-reverse</code>, <code>column</code> e <code>column-reverse</code>.</li>
+  <li>Como a direção principal e a cruzada <strong>trocam de lugar</strong> numa coluna.</li>
+  <li>Quando usar a coluna em vez de deixar os blocos empilhados sozinhos.</li>
+  <li>Como trocar de coluna para linha conforme a largura da tela.</li>
+  <li>Por que o <code>reverse</code> confunde quem usa o teclado.</li>
+  <li>As mensagens reais do validador.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="flexbox.html">Introdução ao Flexbox</a> (o pai flex, os itens, a direção principal e a cruzada). Os resultados são desenhados pelo <strong>seu</strong> navegador; os números em pixels do texto foram medidos no Chromium. As mensagens do validador saíram do validador W3C (<code>vnu</code>), na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: a fila e a pilha</h2>
+<p>Os mesmos três potes de doce podem ser arrumados de dois jeitos: <strong>em fila</strong>, numa prateleira, um ao lado do outro; ou <strong>em pilha</strong>, um em cima do outro. E, nos dois casos, você pode começar pela ponta de cá ou pela de lá. O <code>flex-direction</code> é essa escolha, feita no pai, valendo para todos os itens.</p>
+
+<hr>
+
+<h2>1. Os quatro valores</h2>
+<p>Cada caixa abaixo tem os mesmos três itens, na mesma ordem no HTML (1, 2, 3). Só muda o <code>flex-direction</code> do pai, escrito no alto de cada caixa:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .caixa { margin-bottom: 12px; padding: 4px; border: 2px dashed gray; font-family: sans-serif; }
+  .caixa p { margin: 0 0 4px; font-weight: bold; }
+  .pai { display: flex; }
+  .item { margin: 2px; padding: 8px 16px; background-color: tomato; color: white; }
+  .row { flex-direction: row; }
+  .row-reverse { flex-direction: row-reverse; }
+  .column { flex-direction: column; }
+  .column-reverse { flex-direction: column-reverse; }
+&lt;/style&gt;
+&lt;div class="caixa"&gt;
+  &lt;p&gt;flex-direction: row&lt;/p&gt;
+  &lt;div class="pai row"&gt;&lt;div class="item"&gt;1&lt;/div&gt;&lt;div class="item"&gt;2&lt;/div&gt;&lt;div class="item"&gt;3&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="caixa"&gt;
+  &lt;p&gt;flex-direction: row-reverse&lt;/p&gt;
+  &lt;div class="pai row-reverse"&gt;&lt;div class="item"&gt;1&lt;/div&gt;&lt;div class="item"&gt;2&lt;/div&gt;&lt;div class="item"&gt;3&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="caixa"&gt;
+  &lt;p&gt;flex-direction: column&lt;/p&gt;
+  &lt;div class="pai column"&gt;&lt;div class="item"&gt;1&lt;/div&gt;&lt;div class="item"&gt;2&lt;/div&gt;&lt;div class="item"&gt;3&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="caixa"&gt;
+  &lt;p&gt;flex-direction: column-reverse&lt;/p&gt;
+  &lt;div class="pai column-reverse"&gt;&lt;div class="item"&gt;1&lt;/div&gt;&lt;div class="item"&gt;2&lt;/div&gt;&lt;div class="item"&gt;3&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>Em português</th><th>Os itens vão</th></tr>
+<tr><td><code>row</code> (o padrão)</td><td>"linha"</td><td>Da esquerda para a direita, começando encostados à esquerda</td></tr>
+<tr><td><code>row-reverse</code></td><td>"linha invertida"</td><td>Da direita para a esquerda, começando encostados à <strong>direita</strong>: o 1 fica na ponta direita</td></tr>
+<tr><td><code>column</code></td><td>"coluna"</td><td>De cima para baixo</td></tr>
+<tr><td><code>column-reverse</code></td><td>"coluna invertida"</td><td>De baixo para cima: o 3 fica em cima e o 1 embaixo</td></tr>
+</table>
+</div>
+
+<p>Repare em duas coisas nas colunas: os itens ficam da <strong>largura toda</strong> da caixa (eles esticam na direção cruzada, que agora é a deitada), e o <code>row-reverse</code> não só inverte a ordem, como também empurra os itens para a <strong>outra ponta</strong>.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque o valor do <code>flex-direction</code> pelos outros três e veja o menu mudar.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul class="menu"&gt;
+  &lt;li&gt;Início&lt;/li&gt;
+  &lt;li&gt;Bolos&lt;/li&gt;
+  &lt;li&gt;Doces&lt;/li&gt;
+  &lt;li&gt;Contato&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu {
+  display: flex;
+  flex-direction: row;
+  list-style: none;
+  padding: 0;
+  background-color: navy;
+}
+
+.menu li {
+  padding: 12px 16px;
+  color: white;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>flex-direction</dt><dd>Vai no <strong>pai</strong>, junto com o <code>display: flex</code>. Sem o <code>display: flex</code>, não faz nada.</dd>
+  <dt>row</dt><dd>O valor: em que direção a fila de itens corre. Como <code>row</code> é o padrão, você só escreve <code>flex-direction</code> quando quer outra direção.</dd>
+</dl>
+
+<hr>
+
+<h2>2. Numa coluna, as direções giram</h2>
+<p>Na aula anterior, a direção <strong>principal</strong> era a deitada e a <strong>cruzada</strong>, a em pé. O <code>flex-direction</code> escolhe justamente qual é a principal. Numa coluna, elas trocam de lugar:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th><code>row</code></th><th><code>column</code></th></tr>
+<tr><td>Direção principal (onde os itens se enfileiram)</td><td>Deitada ↔</td><td>Em pé ↕</td></tr>
+<tr><td>Direção cruzada</td><td>Em pé ↕</td><td>Deitada ↔</td></tr>
+<tr><td><code>justify-content</code> alinha</td><td>Na horizontal</td><td>Na <strong>vertical</strong></td></tr>
+<tr><td><code>align-items</code> alinha</td><td>Na vertical</td><td>Na <strong>horizontal</strong></td></tr>
+<tr><td>Os itens esticam (por padrão)</td><td>Na altura</td><td>Na <strong>largura</strong></td></tr>
+</table>
+</div>
+
+<p>Por isso os itens da coluna ocuparam a largura toda: o "esticar" acontece na direção cruzada, que virou a deitada. Veja o efeito no alinhamento, com um <code>align-items: center</code> (aula <a href="align-items.html">align-items</a>), que alinha na cruzada:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> em coluna, o <code>align-items: center</code> centraliza os botões <strong>na horizontal</strong>. Troque <code>column</code> por <code>row</code>: o mesmo <code>align-items: center</code> passa a alinhar na vertical, e como a caixa não tem altura sobrando, nada parece mudar de altura.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="painel"&gt;
+  &lt;a class="botao" href="bolos.html"&gt;Ver os bolos&lt;/a&gt;
+  &lt;a class="botao" href="doces.html"&gt;Ver os doces&lt;/a&gt;
+  &lt;a class="botao" href="contato.html"&gt;Encomendar&lt;/a&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.painel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+  background-color: linen;
+}
+
+.botao {
+  margin: 4px;
+  padding: 8px 16px;
+  background-color: seagreen;
+  color: white;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Para que serve a coluna</h2>
+<p>Se blocos já ficam um embaixo do outro sem CSS nenhum, por que usar <code>flex-direction: column</code>? Porque, com ela, os itens empilhados ganham os poderes do Flexbox:</p>
+<ul>
+  <li>alinhar todos de uma vez (como os botões centralizados acima);</li>
+  <li>espaçar com <code>gap</code> (aula <a href="gap.html">gap</a>);</li>
+  <li>fazer um item crescer para ocupar a altura que sobra (aula <a href="flex-grow.html">Crescer e Encolher</a>);</li>
+  <li>e trocar para linha com uma única declaração, na tela larga (próxima seção).</li>
+</ul>
+
+<p>O cartão de receita da Ana é um caso típico: foto, título e texto empilhados.</p>
+
+<div class="tryhtml" data-goal="css:.cartao{display}=flex,css:.cartao{flex-direction}=column">
+<p class="try-task"><strong>Missão:</strong> o cartão já tem <code>display: flex</code>, então a foto, o título e o texto estão em linha, e o título e o texto, espremidos, vazam para fora do cartão. Faça a foto, o título e o texto ficarem <strong>um embaixo do outro</strong>, ainda com Flexbox.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="cartao"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="200" height="150"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Fofinho, com cobertura de chocolate. 50 minutos.&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  display: flex;
+  width: 220px;
+  padding: 10px;
+  border: 2px solid peru;
+  background-color: linen;
+}
+
+.cartao h2,
+.cartao p {
+  margin: 8px 0 0;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  display: flex;
+  flex-direction: column;
+  width: 220px;
+  padding: 10px;
+  border: 2px solid peru;
+  background-color: linen;
+}
+
+.cartao h2,
+.cartao p {
+  margin: 8px 0 0;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>4. Coluna no celular, linha no computador</h2>
+<p>Um uso muito comum: no celular, a tela é estreita e o menu fica melhor em coluna; numa tela larga, em linha. Com uma media query (aula <a href="media-queries.html">Media Queries</a>), basta trocar o <code>flex-direction</code>:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> use os botões de largura da barra do quadro (<strong>375</strong>, <strong>768</strong> e <strong>cheia</strong>). Em 375 pixels, o menu fica em coluna; a partir de 600 pixels, em linha.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul class="menu"&gt;
+  &lt;li&gt;Início&lt;/li&gt;
+  &lt;li&gt;Bolos&lt;/li&gt;
+  &lt;li&gt;Doces&lt;/li&gt;
+  &lt;li&gt;Contato&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  padding: 0;
+  background-color: navy;
+}
+
+.menu li {
+  padding: 12px 16px;
+  color: white;
+}
+
+@media (min-width: 600px) {
+  .menu {
+    flex-direction: row;
+  }
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>flex-direction: column;</dt><dd>O padrão deste menu, pensado para o celular (o jeito <a href="mobile-first.html">Mobile First</a>: primeiro a tela pequena).</dd>
+  <dt>@media (min-width: 600px) { … }</dt><dd>"Se a janela tiver pelo menos 600 pixels de largura": aí o menu vira linha. Só o <code>flex-direction</code> muda; o resto continua valendo.</dd>
+</dl>
+
+<hr>
+
+<h2>5. O <code>reverse</code> e a ordem do teclado</h2>
+<p>O <code>row-reverse</code> e o <code>column-reverse</code> mudam só a <strong>aparência</strong>. A ordem do HTML continua a mesma, e é ela que o teclado e os leitores de tela seguem.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> clique no resultado e aperte <kbd>Tab</kbd> várias vezes. Na tela, a ordem é 3, 2, 1, mas o contorno do foco vai no 1 primeiro, depois no 2 e no 3: da direita para a esquerda.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav class="passos"&gt;
+  &lt;a href="passo1.html"&gt;Passo 1&lt;/a&gt;
+  &lt;a href="passo2.html"&gt;Passo 2&lt;/a&gt;
+  &lt;a href="passo3.html"&gt;Passo 3&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+<pre class="script" data-file="style.css">.passos {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.passos a {
+  margin: 4px;
+  padding: 8px 16px;
+  background-color: linen;
+}
+</pre>
+</div>
+
+<div class="warning">
+<strong>Use o reverse com cuidado</strong>
+<p>Quem enxerga a tela lê "Passo 3, Passo 2, Passo 1"; quem usa o teclado ou um leitor de tela percorre "Passo 1, Passo 2, Passo 3". Quando a ordem tem <strong>significado</strong> (passos, datas, um texto), mude a ordem <strong>no HTML</strong>, e não com <code>reverse</code>. O <code>reverse</code> serve bem quando a ordem não importa para entender a página, como inverter a posição de uma foto e um texto em cartões alternados.</p>
+</div>
+
+<hr>
+
+<h2>Atalho: <code>flex-flow</code></h2>
+<p>O <code>flex-direction</code> tem um parceiro, o <code>flex-wrap</code> (aula <a href="flex-wrap.html">Quebrando Linha</a>). Os dois podem ir juntos no atalho <code>flex-flow</code> ("fluxo flex"):</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Atalho</th><th>É o mesmo que</th></tr>
+<tr><td><code>flex-flow: column;</code></td><td><code>flex-direction: column;</code></td></tr>
+<tr><td><code>flex-flow: row wrap;</code></td><td><code>flex-direction: row;</code> + <code>flex-wrap: wrap;</code></td></tr>
+</table>
+</div>
+<p>Escrever as duas propriedades separadas é mais claro para quem está começando; o atalho aparece muito em códigos prontos.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Nome inventado: <code>“vertical” is not a “flex-direction” value</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.menu {
+  display: flex;
+  flex-direction: vertical;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.19-3.26: error: CSS: “flex-direction”: “vertical” is not a “flex-direction” value.</pre>
+<p><strong>O que o leitor vê:</strong> o menu continua em linha (o padrão). A declaração foi ignorada e aparece riscada no F12.</p>
+<p><strong>Como consertar:</strong> os valores são só quatro: <code>row</code>, <code>row-reverse</code>, <code>column</code> e <code>column-reverse</code>. "Vertical" é <code>column</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Sem o <code>display: flex</code>: nada muda</strong>
+<pre class="file" data-file="style.css · erro de propósito">.menu {
+  flex-direction: row;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> a lista continua em pé, um item por linha.</p>
+<p><strong>Por quê:</strong> o <code>flex-direction</code> só vale num pai flex. A declaração é válida, então o validador não reclama e o F12 não a risca.</p>
+<p><strong>Como consertar:</strong> <code>display: flex;</code> no mesmo elemento.</p>
+</div>
+
+<div class="cenario">
+<strong>Em coluna, o <code>justify-content: center</code> "não centraliza"</strong>
+<pre class="file" data-file="style.css · erro de propósito">.painel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> os itens continuam encostados à esquerda, e esticados na largura toda.</p>
+<p><strong>Por quê:</strong> em coluna, o <code>justify-content</code> trabalha na <strong>vertical</strong> (a principal girou, seção 2). E, sem uma altura maior que o conteúdo, não há sobra para dividir em cima e embaixo. Para centralizar na horizontal numa coluna, o certo é o <code>align-items: center</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>flex-direction: row;</code></td><td>O padrão: em linha, da esquerda para a direita</td></tr>
+<tr><td><code>flex-direction: row-reverse;</code></td><td>Em linha, da direita para a esquerda, encostados à direita</td></tr>
+<tr><td><code>flex-direction: column;</code></td><td>Em coluna, de cima para baixo; os itens esticam na largura</td></tr>
+<tr><td><code>flex-direction: column-reverse;</code></td><td>Em coluna, de baixo para cima</td></tr>
+<tr><td>Em coluna</td><td><code>justify-content</code> alinha na vertical; <code>align-items</code>, na horizontal</td></tr>
+<tr><td><code>flex-flow: column wrap;</code></td><td>Atalho para <code>flex-direction</code> + <code>flex-wrap</code></td></tr>
+<tr><td><code>reverse</code></td><td>Muda só a aparência; o teclado segue o HTML</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Em coluna</h3>
+<p>Complete para os itens ficarem um embaixo do outro:</p>
+<div class="ex-code">.cartao { display: flex; flex-direction: <input data-answer="column" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. O padrão</h3>
+<p>Complete com o valor padrão do <code>flex-direction</code>:</p>
+<div class="ex-code">.menu { display: flex; flex-direction: <input data-answer="row" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. De baixo para cima</h3>
+<p>Complete para o primeiro item do HTML ficar embaixo de todos:</p>
+<div class="ex-code">.lista { display: flex; flex-direction: <input data-answer="column-reverse" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Num pai com <code>flex-direction: column</code>, qual propriedade centraliza os itens na horizontal?</p>
+<label><input type="radio" name="q4"> <code>justify-content: center</code></label>
+<label><input type="radio" name="q4"> <code>text-align: center</code> no pai</label>
+<label><input type="radio" name="q4"> <code>align-items: center</code></label>
+<label><input type="radio" name="q4"> <code>flex-direction: center</code></label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Com <code>flex-direction: row-reverse</code>, em que ordem a tecla <kbd>Tab</kbd> percorre os links?</p>
+<label><input type="radio" name="q5"> Na ordem da tela, da esquerda para a direita</label>
+<label><input type="radio" name="q5"> Na ordem do HTML, que na tela fica da direita para a esquerda</label>
+<label><input type="radio" name="q5"> Em ordem aleatória</label>
+<label><input type="radio" name="q5"> O <kbd>Tab</kbd> pula os itens invertidos</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Numa coluna flex, por que os itens ficam da largura toda do pai?</p>
+<label><input type="radio" name="q6"> Porque eles esticam na direção cruzada, que numa coluna é a deitada</label>
+<label><input type="radio" name="q6"> Porque o <code>column</code> põe <code>width: 100%</code> em cada item</label>
+<label><input type="radio" name="q6"> Porque viraram <code>display: block</code></label>
+<label><input type="radio" name="q6"> Não ficam: cada um fica da largura do texto</label>
+</div>
+
+<h3>Missão final: o rodapé da lojinha</h3>
+
+<div class="tryhtml" data-goal="css:.rodape{display}=flex,css:.rodape{flex-direction}=column,css:.redes{display}=flex,css:.redes{flex-direction}=row">
+<p class="try-task"><strong>Missão:</strong> no rodapé, os três blocos (endereço, horário e redes) devem ficar <strong>em coluna</strong>, com Flexbox. Dentro do bloco das redes, os três links devem ficar <strong>em linha</strong>, também com Flexbox, escrevendo o <code>flex-direction: row</code> de propósito.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;footer class="rodape"&gt;
+  &lt;p&gt;Rua das Flores, 120&lt;/p&gt;
+  &lt;p&gt;Terça a sábado, das 8h às 18h&lt;/p&gt;
+  &lt;div class="redes"&gt;
+    &lt;a href="https://example.com/instagram"&gt;Instagram&lt;/a&gt;
+    &lt;a href="https://example.com/whatsapp"&gt;WhatsApp&lt;/a&gt;
+    &lt;a href="https://example.com/facebook"&gt;Facebook&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/footer&gt;
+</pre>
+<pre class="script" data-file="style.css">.rodape {
+  padding: 12px;
+  background-color: darkslateblue;
+  color: white;
+}
+
+.rodape p {
+  margin: 4px 0;
+}
+
+.redes a {
+  display: block;
+  margin-right: 16px;
+  color: white;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.rodape {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  background-color: darkslateblue;
+  color: white;
+}
+
+.rodape p {
+  margin: 4px 0;
+}
+
+.redes {
+  display: flex;
+  flex-direction: row;
+}
+
+.redes a {
+  display: block;
+  margin-right: 16px;
+  color: white;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>flex-direction</code> vai no pai flex e escolhe a direção principal: <code>row</code> (padrão), <code>row-reverse</code>, <code>column</code>, <code>column-reverse</code>.</li>
+  <li>Numa coluna, as direções giram: <code>justify-content</code> passa a alinhar na vertical, <code>align-items</code> na horizontal, e os itens esticam na largura.</li>
+  <li>A coluna dá aos itens empilhados os poderes do Flexbox (alinhar, <code>gap</code>, crescer) e troca para linha com uma declaração numa media query.</li>
+  <li>O <code>reverse</code> muda só a aparência: o teclado e o leitor de tela seguem o HTML. Para ordens com significado, mude o HTML.</li>
+  <li>Sem <code>display: flex</code>, o <code>flex-direction</code> não faz nada. Valores inventados, como <code>vertical</code>, o validador recusa.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
