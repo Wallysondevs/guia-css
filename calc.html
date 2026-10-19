@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS calc() — contas com unidades diferentes | Guia CSS</title>
+<meta name="description" content="A função calc() do CSS para quem está começando: somar, subtrair, multiplicar e dividir tamanhos, misturar % com px e rem, os espaços obrigatórios, parênteses, calc() com variáveis, usos comuns, e os erros reais do validador W3C (e os que ele não pega).">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">calc()</span></h1>
+
+<p class="intro">"A largura toda, menos 40 pixels." "Dois rem e mais 4 pixels." "Um terço do espaço, descontando os vãos." Medidas assim aparecem o tempo todo num layout, e misturam unidades diferentes: <code>%</code> com <code>px</code>, <code>rem</code> com <code>vw</code>. Você não sabe quanto é 100% em pixels (depende da tela), então não dá para fazer a conta de cabeça. A função <code>calc()</code> deixa a conta para o navegador, que faz na hora de desenhar.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A forma de <code>calc()</code> e as quatro operações: <code>+</code>, <code>-</code>, <code>*</code> e <code>/</code>.</li>
+  <li>A regra dos espaços em volta do <code>+</code> e do <code>-</code>.</li>
+  <li>As regras da multiplicação e da divisão.</li>
+  <li>Parênteses e a ordem das contas.</li>
+  <li><code>calc()</code> com variáveis.</li>
+  <li>Usos comuns, e quando <code>min()</code>, <code>max()</code>, <code>clamp()</code> ou o <code>gap</code> fazem melhor.</li>
+  <li>Os erros que o validador W3C pega e os que ele deixa passar.</li>
+</ul>
+</div>
+
+<hr>
+
+<h2>A ideia: a prateleira do marceneiro</h2>
+<p>A Ana pede ao marceneiro: "uma prateleira da largura da parede, menos 2 centímetros de cada lado". Ele não precisa saber a largura da parede antes: mede na hora, tira os 4 centímetros e corta. O <code>calc()</code> é esse pedido: você escreve a <strong>conta</strong>, e o navegador mede o espaço e faz a conta quando desenha a página, de novo a cada vez que a janela muda de tamanho.</p>
+
+<hr>
+
+<h2>1. A primeira conta</h2>
+
+<pre class="file" data-file="style.css">.aviso {
+  width: calc(100% - 40px);
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>calc(</dt><dd>A função de conta (<em>calculate</em>, "calcular"). Ela pode ir em qualquer lugar onde caberia um número, um tamanho, um ângulo ou um tempo.</dd>
+  <dt>100%</dt><dd>A largura toda do pai.</dd>
+  <dt> - </dt><dd>A operação: menos. Com <strong>espaço dos dois lados</strong>, sempre (veja a seção 2).</dd>
+  <dt>40px)</dt><dd>Quarenta pixels, e o parêntese que fecha a função.</dd>
+</dl>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> a coluna tracejada tem 300 pixels. Troque o <code>40px</code> por <code>100px</code>, ou o <code>-</code> por <code>+</code> (e veja o aviso passar da coluna).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="coluna"&gt;
+  &lt;p class="aviso"&gt;Encomendas com um dia de antecedência.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.coluna {
+  width: 300px;
+  border: 2px dashed gray;
+}
+
+.aviso {
+  width: calc(100% - 40px);
+  background-color: lightyellow;
+}
+</pre>
+</div>
+
+<p>O aviso fica com <strong>260px</strong> (300 − 40, conferido no Chromium): a faixa amarela termina antes da borda tracejada, deixando 40 pixels livres à direita. Na aba <em>Computed</em> do F12 aparece só o resultado, <code>260px</code>; a conta fica na aba de estilos, como você escreveu.</p>
+
+<hr>
+
+<h2>2. As quatro operações</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Operação</th><th>Exemplo</th><th>Regra</th></tr>
+<tr><td><code>+</code> somar</td><td><code>calc(2rem + 4px)</code></td><td><strong>Espaço dos dois lados</strong>. Os dois lados têm de ser do mesmo tipo (dois tamanhos, ou dois números)</td></tr>
+<tr><td><code>-</code> subtrair</td><td><code>calc(100% - 40px)</code></td><td>O mesmo: espaço dos dois lados, tipos iguais</td></tr>
+<tr><td><code>*</code> multiplicar</td><td><code>calc(16px * 2)</code></td><td>Um dos lados tem de ser um <strong>número puro</strong> (sem unidade)</td></tr>
+<tr><td><code>/</code> dividir</td><td><code>calc(100% / 3)</code></td><td>Divida por um <strong>número puro</strong>; nunca por zero</td></tr>
+</table>
+</div>
+
+<p>Por que o espaço no <code>+</code> e no <code>-</code>? Porque o hífen também faz parte de nomes e de números negativos. <code>100%-40px</code>, grudado, é lido como "100%" seguido de "−40px" (um número negativo), sem conta entre eles. No <code>*</code> e no <code>/</code>, o espaço é opcional, mas use igual, para ler melhor.</p>
+
+<p>Alguns resultados, conferidos no Chromium:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Valor calculado</th></tr>
+<tr><td><code>width: calc(100% - 40px)</code>, num pai de 300px</td><td><code>260px</code></td></tr>
+<tr><td><code>margin-top: calc(2rem + 4px)</code></td><td><code>36px</code> (32 + 4)</td></tr>
+<tr><td><code>height: calc((100px - 60px) / 2)</code></td><td><code>20px</code></td></tr>
+</table>
+</div>
+
+<div class="tryhtml" data-goal="css:.faixa{width}=260px,src:calc\(">
+<p class="try-task"><strong>Missão:</strong> a faixa do topo está com a largura toda da coluna (300px). Com <code>calc()</code>, deixe-a com a largura toda <strong>menos 40px</strong>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="coluna"&gt;
+  &lt;p class="faixa"&gt;Promoção: bolo de fubá com 10% de desconto.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.coluna {
+  width: 300px;
+  border: 2px dashed gray;
+}
+
+.faixa {
+  width: 100%;
+  background-color: gold;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.coluna {
+  width: 300px;
+  border: 2px dashed gray;
+}
+
+.faixa {
+  width: calc(100% - 40px);
+  background-color: gold;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Parênteses e a ordem das contas</h2>
+<p>Como na matemática da escola: multiplicação e divisão primeiro, depois soma e subtração. Para mudar a ordem, use parênteses (sem escrever <code>calc</code> de novo):</p>
+
+<pre class="file" data-file="style.css">.cartao {
+  /* três cartões numa linha, com dois vãos de 16px entre eles */
+  width: calc((100% - 2 * 16px) / 3);
+}
+</pre>
+
+<p>Lendo de dentro para fora: <code>2 * 16px</code> = 32px (os dois vãos); <code>100% - 32px</code> = o espaço que sobra para os cartões; dividido por 3 = a largura de cada um. Num pai de 300px, cada cartão fica com (300 − 32) ÷ 3 = 89,33 pixels.</p>
+
+<div class="tip">
+<strong>Para colunas, prefira Flexbox e Grid</strong>
+<p>A conta acima era o jeito de fazer colunas antes do Flexbox e do Grid. Hoje, <code>display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;</code> faz a mesma coisa sem conta nenhuma (aula <a href="grid-colunas.html">Colunas</a>). O <code>calc()</code> continua útil para os casos em que não há uma propriedade pronta.</p>
+</div>
+
+<hr>
+
+<h2>4. <code>calc()</code> com variáveis</h2>
+<p>Com <a href="variaveis.html">variáveis</a>, o <code>calc()</code> mostra o seu melhor: um valor guardado numa variável e outros valores derivados dele por conta.</p>
+
+<pre class="file" data-file="style.css">:root {
+  --espaco: 12px;
+}
+
+.cartao {
+  padding: var(--espaco);
+  margin-bottom: calc(var(--espaco) * 2);
+}
+
+.faixa {
+  margin-left: calc(-1 * var(--espaco));
+  width: calc(100% + 2 * var(--espaco));
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>calc(var(--espaco) * 2)</dt><dd>O dobro do espaço: 24px. Mude <code>--espaco</code> e a margem acompanha.</dd>
+  <dt>calc(-1 * var(--espaco))</dt><dd>O espaço com sinal trocado: −12px. Uma margem negativa puxa a faixa para a esquerda, por cima do <code>padding</code> do cartão.</dd>
+  <dt>calc(100% + 2 * var(--espaco))</dt><dd>A largura do conteúdo do cartão mais os dois <code>padding</code>s: a faixa vai de uma borda à outra do cartão.</dd>
+</dl>
+
+<p>E se a variável guarda só um número, é o <code>calc()</code> que dá a unidade: <code>calc(var(--colunas) * 1px)</code>. Escrever <code>var(--colunas)px</code> não funciona.</p>
+
+<hr>
+
+<h2>5. Usos comuns</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Para quê</th></tr>
+<tr><td><code>width: calc(100% - 2rem);</code></td><td>A largura toda, descontando um respiro</td></tr>
+<tr><td><code>min-height: calc(100dvh - 60px);</code></td><td>A altura da tela menos um cabeçalho fixo de 60px (aula <a href="unidades-viewport.html">Unidades da Tela</a>)</td></tr>
+<tr><td><code>font-size: calc(1rem + 0.5vw);</code></td><td>Letra que cresce um pouco com a tela (sem limite: veja <code>clamp()</code> abaixo)</td></tr>
+<tr><td><code>margin-left: calc(-1 * var(--espaco));</code></td><td>Uma variável com sinal trocado</td></tr>
+<tr><td><code>top: calc(50% - 20px);</code></td><td>Quase no meio: metade, menos metade da altura (40px) do elemento</td></tr>
+</table>
+</div>
+
+<h3><code>calc()</code> ou <code>min()</code>, <code>max()</code> e <code>clamp()</code>?</h3>
+<p>As funções da aula <a href="clamp.html">min(), max() e clamp()</a> já aceitam contas por dentro, sem escrever <code>calc</code>: <code>clamp(1rem, 0.9rem + 1vw, 2rem)</code>. Use <code>calc()</code> quando você quer <strong>uma</strong> conta; use as outras quando quer escolher entre valores ou pôr limites.</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quero…</th><th>Use</th></tr>
+<tr><td>Uma conta com unidades diferentes</td><td><code>calc(100% - 40px)</code></td></tr>
+<tr><td>Uma conta com teto</td><td><code>min(100% - 40px, 600px)</code></td></tr>
+<tr><td>Uma conta com piso e teto</td><td><code>clamp(1rem, 0.9rem + 1vw, 2rem)</code></td></tr>
+<tr><td>Espaço entre itens de uma linha ou grade</td><td><code>gap</code>, sem conta (aula <a href="gap.html">gap</a>)</td></tr>
+</table>
+</div>
+
+<div class="note">
+<strong>Suporte</strong>
+<p><code>calc()</code> funciona em todos os navegadores há mais de dez anos (o MDN marca "Baseline: amplamente disponível"). Pode usar sem preocupação.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Com <code>calc()</code> errado, o navegador ignora a declaração inteira e o elemento fica como se ela não existisse. Nos exemplos abaixo, cada caixa está dentro de um pai de 300px; com o erro, todas ficam com a largura toda, <code>300px</code> (conferido no Chromium).</p>
+
+<pre class="file" data-file="calc.css">.a {
+  width: calc(100%-40px);
+}
+.b {
+  width: calc(100% - 40);
+}
+.c {
+  width: calc(10px * 2px);
+}
+.d {
+  width: calc(100% - 40px;
+}
+.e {
+  width: calc(100% - 40px);
+  margin-top: calc(2rem + 4px);
+  padding: calc(var(--espaco) * 2);
+  height: calc((100vh - 60px) / 2);
+}
+</pre>
+
+<pre class="term" data-cwd="~/site">$ vnu --css calc.css
+"file:/home/ana/site/calc.css":2.24-2.24: error: CSS: “width”: Parse Error.
+"file:/home/ana/site/calc.css":8.25-8.25: error: CSS: “width”: One operand must be a number.
+"file:/home/ana/site/calc.css":11.22-11.25: error: CSS: “width”: Parse Error.</pre>
+
+<div class="cenario">
+<strong>Sem espaços em volta do <code>-</code> (linha 2): <code>Parse Error</code></strong>
+<p><code>100%-40px</code> não é uma conta: são dois valores lado a lado. "Erro de leitura" na linha 2. <strong>Como consertar:</strong> <code>calc(100% - 40px)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Número sem unidade numa soma (linha 5): o validador não pega</strong>
+<p><code>100% - 40</code> tenta tirar um <strong>número</strong> de um <strong>tamanho</strong>: 40 o quê? O navegador recusa a declaração (a caixa fica com os 300px), mas o validador <code>vnu</code> não mostra erro nenhum para essa linha. Repare: o arquivo tem quatro linhas com problema, e o validador acusa três. Não confie só no validador; confira o resultado. <strong>Como consertar:</strong> <code>calc(100% - 40px)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Multiplicar dois tamanhos (linha 8): <code>One operand must be a number</code></strong>
+<p>"Um dos operandos tem de ser um número": <code>10px * 2px</code> daria "20 pixels quadrados", que não é uma largura. <strong>Como consertar:</strong> <code>calc(10px * 2)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Faltou fechar o parêntese (linha 11): a regra seguinte também some</strong>
+<p><strong>O que você vê:</strong> a caixa <code>.d</code> fica com 300px, e a caixa <code>.e</code>, que estava certa, também perde os estilos. Num teste com <code>.e { width: 100px; background-color: gold; }</code> logo depois, a caixa <code>.e</code> ficou com 300px e sem o fundo dourado (conferido no Chromium).</p>
+<p><strong>Por quê:</strong> enquanto um parêntese está aberto, o navegador acha que ainda está dentro da função: o <code>;</code>, o <code>}</code> e a regra seguinte inteira viram "parte da conta". O validador acusa a linha 11 (<code>Parse Error</code>), mas não diz que a regra de baixo foi engolida.</p>
+<p><strong>Como consertar:</strong> conte os parênteses: cada <code>(</code> precisa do seu <code>)</code>. Quando uma regra "certa" para de funcionar sem motivo, olhe a regra <strong>de cima</strong>.</p>
+</div>
+
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>calc(100% - 40px)</code></td><td>Subtrai, misturando unidades</td></tr>
+<tr><td><code>calc(2rem + 4px)</code></td><td>Soma (espaço dos dois lados do <code>+</code> e do <code>-</code>)</td></tr>
+<tr><td><code>calc(16px * 2)</code></td><td>Multiplica (um lado é número puro)</td></tr>
+<tr><td><code>calc(100% / 3)</code></td><td>Divide (por número puro, nunca por zero)</td></tr>
+<tr><td><code>calc((100% - 32px) / 3)</code></td><td>Parênteses mudam a ordem</td></tr>
+<tr><td><code>calc(var(--espaco) * 2)</code></td><td>Conta com variável</td></tr>
+<tr><td><code>calc(-1 * var(--espaco))</code></td><td>Troca o sinal</td></tr>
+<tr><td><code>calc(var(--n) * 1px)</code></td><td>Número puro vira tamanho</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A função</h3>
+<p>Complete para a largura ser "toda, menos 2rem":</p>
+<div class="ex-code">main { width: <input data-answer="calc" aria-label="função">(100% - 2rem); }</div>
+</div>
+
+<div class="exercise">
+<h3>2. O dobro</h3>
+<p>Complete a operação que dobra o espaço:</p>
+<div class="ex-code">.cartao { margin-bottom: calc(var(--espaco) <input data-answer="*" aria-label="operação" size="2"> 2); }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Quanto dá?</h3>
+<p>Num pai de 500 pixels, quantos pixels tem <code>width: calc(100% - 60px)</code>? (só o número)</p>
+<div class="ex-code"><input data-answer="440|440px" aria-label="resultado"></div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Por que <code>calc(100%-40px)</code> não funciona?</p>
+<label><input type="radio" name="q4"> Porque não dá para misturar % com px</label>
+<label><input type="radio" name="q4"> Porque falta o <code>;</code> dentro dos parênteses</label>
+<label><input type="radio" name="q4"> Porque o <code>-</code> precisa de espaço dos dois lados</label>
+<label><input type="radio" name="q4"> Porque <code>calc</code> só aceita px</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Qual destas contas é válida?</p>
+<label><input type="radio" name="q5"> <code>calc(10px * 2px)</code></label>
+<label><input type="radio" name="q5"> <code>calc(10px * 2)</code></label>
+<label><input type="radio" name="q5"> <code>calc(100% - 40)</code></label>
+<label><input type="radio" name="q5"> <code>calc(100px / 0)</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. Uma regra que estava certa parou de funcionar depois que a Ana escreveu <code>width: calc(100% - 40px;</code> na regra de cima. Por quê?</p>
+<label><input type="radio" name="q6"> Porque o navegador só aceita um <code>calc()</code> por arquivo</label>
+<label><input type="radio" name="q6"> Porque a regra de baixo tem especificidade menor</label>
+<label><input type="radio" name="q6"> Porque o validador desligou a regra</label>
+<label><input type="radio" name="q6"> Porque o parêntese aberto "engoliu" o resto, até a regra de baixo</label>
+</div>
+
+<h3>Missão final: a faixa de ponta a ponta</h3>
+
+<div class="tryhtml" data-goal="css:.cartao{margin-bottom}=24px,css:.faixa{margin-left}=-12px,css:.faixa{width}=298px,src:calc\([^)]*var\(--espaco\)">
+<p class="try-task"><strong>Missão:</strong> o cartão tem <code>padding: var(--espaco)</code> (12px). (1) Dê ao <code>.cartao</code> uma margem de baixo com o <strong>dobro</strong> do espaço: <code>calc(var(--espaco) * 2)</code>. (2) Faça a <code>.faixa</code> ir de uma borda à outra do cartão, por cima do <code>padding</code>: <code>margin-left: calc(-1 * var(--espaco));</code> e <code>width: calc(100% + 2 * var(--espaco));</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="coluna"&gt;
+  &lt;div class="cartao"&gt;
+    &lt;p class="faixa"&gt;Mais vendido&lt;/p&gt;
+    &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+    &lt;p&gt;Com cobertura de chocolate.&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="cartao"&gt;
+    &lt;h2&gt;Bolo de fubá&lt;/h2&gt;
+    &lt;p&gt;Com erva-doce.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --espaco: 12px;
+}
+
+.coluna {
+  width: 300px;
+  font-family: sans-serif;
+}
+
+.cartao {
+  padding: var(--espaco);
+  border: 1px solid silver;
+  box-sizing: border-box;
+}
+
+.faixa {
+  margin-top: 0;
+  background-color: #c2410c;
+  color: white;
+  text-align: center;
+}
+</pre>
+<pre class="solucao" data-file="style.css">:root {
+  --espaco: 12px;
+}
+
+.coluna {
+  width: 300px;
+  font-family: sans-serif;
+}
+
+.cartao {
+  padding: var(--espaco);
+  margin-bottom: calc(var(--espaco) * 2);
+  border: 1px solid silver;
+  box-sizing: border-box;
+}
+
+.faixa {
+  margin-top: 0;
+  margin-left: calc(-1 * var(--espaco));
+  width: calc(100% + 2 * var(--espaco));
+  background-color: #c2410c;
+  color: white;
+  text-align: center;
+}
+</pre>
+</div>
+
+<p>Depois de cumprir a missão, mude <code>--espaco</code> para <code>20px</code>: o <code>padding</code>, a margem entre os cartões e a faixa se ajustam juntos, e a faixa continua de ponta a ponta.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>calc()</code> faz contas com unidades diferentes (<code>100% - 40px</code>); o navegador resolve na hora de desenhar, e de novo quando a tela muda.</li>
+  <li><code>+</code> e <code>-</code> com espaço dos dois lados e tipos iguais; <code>*</code> com um número puro de um lado; <code>/</code> por um número puro.</li>
+  <li>Parênteses mudam a ordem: <code>calc((100% - 32px) / 3)</code>.</li>
+  <li>Com variáveis: <code>calc(var(--espaco) * 2)</code>, <code>calc(-1 * var(--espaco))</code>, <code>calc(var(--n) * 1px)</code>.</li>
+  <li><code>min()</code>, <code>max()</code> e <code>clamp()</code> aceitam contas direto; para vãos entre itens, <code>gap</code> é melhor que conta.</li>
+  <li>Erro na conta: a declaração é ignorada. O validador pega o <code>-</code> grudado e a multiplicação de tamanhos, mas não o número sem unidade (<code>100% - 40</code>). Um parêntese sem fechar engole até a regra seguinte.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
