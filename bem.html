@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Organizando Classes (BEM) — bloco, elemento e modificador | Guia CSS</title>
+<meta name="description" content="BEM em CSS para quem está começando: por que classes com nomes soltos (.titulo, .vermelho) brigam entre si, como nomear com bloco (.cartao), elemento (.cartao__titulo) e modificador (.cartao--destaque), a especificidade baixa e igual, o &amp;__titulo que não funciona no CSS aninhado de verdade, e os erros reais.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Organizando Classes (BEM)</span></h1>
+
+<p class="intro">No começo, dar nome às classes é fácil: <code>.titulo</code>, <code>.caixa</code>, <code>.vermelho</code>. Mas o site da Ana cresceu: tem cartões de receita, um menu, um rodapé, um formulário. Um dia ela muda a cor do <code>.titulo</code> do cartão, e o título do menu muda junto, porque os dois usavam a mesma classe. O <strong>BEM</strong> é uma convenção de nomes (uma combinação entre as pessoas do projeto, não um recurso do CSS) que evita isso: cada classe diz <strong>a que parte do site</strong> ela pertence.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Por que nomes soltos (<code>.titulo</code>) brigam entre si num site grande.</li>
+  <li>As três partes do BEM: <strong>Bloco</strong> (<code>.cartao</code>), <strong>Elemento</strong> (<code>.cartao__titulo</code>) e <strong>Modificador</strong> (<code>.cartao--destaque</code>).</li>
+  <li>Por que o modificador vem <strong>junto</strong> com a classe base.</li>
+  <li>A vantagem escondida: todas as regras com a mesma especificidade.</li>
+  <li>Quando o BEM ajuda, e as outras formas (<code>@scope</code>, classes utilitárias).</li>
+  <li>Os erros comuns, inclusive o <code>&amp;__titulo</code> que não funciona no CSS aninhado de verdade.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador; os valores calculados foram conferidos no Chromium, e as mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (<code>ana@notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: as etiquetas da mudança</h2>
+<p>Na mudança da padaria, a Ana escreveu "PANELAS" numa caixa. Só que tem panela da cozinha, panela da vitrine e panela do depósito: no caminhão, ninguém sabe onde cada caixa vai. Na segunda vez, ela escreveu etiquetas completas:</p>
+<ul>
+  <li><strong>COZINHA</strong>: o cômodo, que existe por si só. É o <strong>bloco</strong>.</li>
+  <li><strong>COZINHA — panelas</strong>: uma coisa que pertence à cozinha. É o <strong>elemento</strong>.</li>
+  <li><strong>COZINHA — panelas (frágil)</strong>: as mesmas panelas, numa versão especial. É o <strong>modificador</strong>.</li>
+</ul>
+<p>A etiqueta é mais comprida, mas não tem como errar o lugar. O BEM faz o mesmo com as classes.</p>
+
+<hr>
+
+<h2>1. O problema: dois <code>.titulo</code></h2>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> a Ana queria só o título do cartão em <code>tomato</code>, mas o título do menu também mudou. Troque <code>tomato</code> por <code>navy</code> e veja os dois mudarem juntos.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav class="menu"&gt;
+  &lt;p class="titulo"&gt;Padaria da Ana&lt;/p&gt;
+&lt;/nav&gt;
+&lt;article class="caixa"&gt;
+  &lt;h2 class="titulo"&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p class="preco"&gt;R$ 35,00&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu {
+  padding: 8px;
+  background-color: #eee;
+}
+
+/* Para o título do cartão... */
+.titulo {
+  color: tomato;
+}
+</pre>
+</div>
+
+<p>O nome <code>.titulo</code> não diz <strong>de quem</strong> é o título. Num site com dez componentes, cada um com um título, a regra de um vaza para os outros. Uma saída é escrever <code>.caixa .titulo</code> (só os títulos dentro da caixa), mas isso aumenta a especificidade e cria outros problemas (veja a seção 4).</p>
+
+<hr>
+
+<h2>2. As três partes do BEM</h2>
+<p>BEM vem de <strong>B</strong>loco, <strong>E</strong>lemento, <strong>M</strong>odificador. A convenção nasceu na empresa russa Yandex e hoje é uma das mais usadas.</p>
+
+<pre class="file" data-file="index.html">&lt;article class="cartao cartao--destaque"&gt;
+  &lt;h2 class="cartao__titulo"&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p class="cartao__preco"&gt;R$ 35,00&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>cartao</dt><dd>O <strong>bloco</strong>: um pedaço da página que faz sentido sozinho e pode ser reaproveitado (um cartão, um menu, um formulário de busca). Nome simples, em minúsculas, com hífen se tiver duas palavras: <code>cartao-receita</code>.</dd>
+  <dt>cartao__titulo</dt><dd>Um <strong>elemento</strong>: uma parte do bloco que não faz sentido fora dele. O nome é o do bloco, <strong>dois sublinhados</strong> (<code>__</code>) e o nome da parte. Lê-se "o título do cartão".</dd>
+  <dt>cartao--destaque</dt><dd>Um <strong>modificador</strong>: uma versão diferente do bloco (ou do elemento). O nome é o do bloco, <strong>dois hífens</strong> (<code>--</code>) e a variação. Lê-se "cartão, versão destaque".</dd>
+  <dt>class="cartao cartao--destaque"</dt><dd>O modificador vem <strong>junto</strong> com a classe base, separado por espaço. O <code>.cartao</code> dá o visual normal; o <code>.cartao--destaque</code> só acrescenta o que muda.</dd>
+</dl>
+
+<p>E o CSS, com uma classe por regra:</p>
+
+<pre class="file" data-file="style.css">/* Bloco */
+.cartao {
+  padding: 16px;
+  border: 2px solid #ccc;
+}
+
+/* Elementos */
+.cartao__titulo {
+  margin: 0;
+  color: navy;
+}
+
+.cartao__preco {
+  font-weight: bold;
+}
+
+/* Modificador */
+.cartao--destaque {
+  border-color: tomato;
+}
+</pre>
+
+<p>Agora o título do cartão (<code>.cartao__titulo</code>) e o título do menu (<code>.menu__titulo</code>) têm nomes diferentes e nunca se misturam, mesmo que alguém escreva o menu daqui a um ano.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Parte</th><th>Formato</th><th>Exemplos</th></tr>
+<tr><td>Bloco</td><td><code>.bloco</code></td><td><code>.cartao</code>, <code>.menu</code>, <code>.busca</code>, <code>.cartao-receita</code></td></tr>
+<tr><td>Elemento</td><td><code>.bloco__elemento</code></td><td><code>.cartao__titulo</code>, <code>.menu__link</code>, <code>.busca__campo</code></td></tr>
+<tr><td>Modificador do bloco</td><td><code>.bloco--modificador</code></td><td><code>.cartao--destaque</code>, <code>.menu--escuro</code></td></tr>
+<tr><td>Modificador do elemento</td><td><code>.bloco__elemento--modificador</code></td><td><code>.cartao__preco--promocao</code>, <code>.menu__link--ativo</code></td></tr>
+</table>
+</div>
+
+<div class="tryhtml" data-goal="sel:.cartao__titulo,sel:.cartao__preco,css:.cartao__titulo{color}=rgb(0, 0, 128),css:nav .titulo{color}=rgb(0, 0, 0)">
+<p class="try-task"><strong>Missão:</strong> conserte o vazamento com BEM. No cartão, troque <code>class="caixa"</code> por <code>class="cartao"</code>, <code>class="titulo"</code> por <code>class="cartao__titulo"</code> e <code>class="preco"</code> por <code>class="cartao__preco"</code>. No CSS, troque o seletor <code>.titulo</code> por <code>.cartao__titulo</code> e use a cor <code>navy</code>. O título do menu deve voltar a ser preto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav class="menu"&gt;
+  &lt;p class="titulo"&gt;Padaria da Ana&lt;/p&gt;
+&lt;/nav&gt;
+&lt;article class="caixa"&gt;
+  &lt;h2 class="titulo"&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p class="preco"&gt;R$ 35,00&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu {
+  padding: 8px;
+  background-color: #eee;
+}
+
+.titulo {
+  color: navy;
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav class="menu"&gt;
+  &lt;p class="titulo"&gt;Padaria da Ana&lt;/p&gt;
+&lt;/nav&gt;
+&lt;article class="cartao"&gt;
+  &lt;h2 class="cartao__titulo"&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p class="cartao__preco"&gt;R$ 35,00&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="solucao" data-file="style.css">.menu {
+  padding: 8px;
+  background-color: #eee;
+}
+
+.cartao__titulo {
+  color: navy;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. O modificador: uma versão diferente</h2>
+<p>A Ana quer que o bolo da semana tenha a borda laranja e o preço em promoção, em vermelho. Em vez de criar um cartão novo inteiro, ela acrescenta modificadores:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> os dois cartões usam o mesmo bloco. O segundo tem dois modificadores a mais. Tire o <code>cartao--destaque</code> do segundo e ele volta ao normal; ponha no primeiro e ele ganha a borda.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="cartao"&gt;
+  &lt;h2 class="cartao__titulo"&gt;Pão de queijo&lt;/h2&gt;
+  &lt;p class="cartao__preco"&gt;R$ 2,50&lt;/p&gt;
+&lt;/article&gt;
+&lt;article class="cartao cartao--destaque"&gt;
+  &lt;h2 class="cartao__titulo"&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p class="cartao__preco cartao__preco--promocao"&gt;R$ 29,90&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  margin-bottom: 12px;
+  padding: 16px;
+  border: 2px solid #ccc;
+}
+
+.cartao--destaque {
+  border-color: tomato;
+}
+
+.cartao__titulo {
+  margin: 0;
+  color: navy;
+}
+
+.cartao__preco {
+  font-weight: bold;
+}
+
+.cartao__preco--promocao {
+  color: firebrick;
+}
+</pre>
+</div>
+
+<p>No Chromium, os dois cartões têm o mesmo preenchimento, o mesmo título azul-marinho e o preço em negrito; só o segundo tem a borda cor de tomate e o preço vermelho-escuro (<code>firebrick</code>). O <code>.cartao--destaque</code> só escreve o que muda (<code>border-color</code>); o resto vem do <code>.cartao</code>.</p>
+
+<hr>
+
+<h2>4. A vantagem escondida: especificidade igual</h2>
+<p>Sem BEM, para mirar no título do cartão, é comum escrever seletores compostos:</p>
+
+<pre class="file" data-file="style.css">.caixa .titulo { color: navy; }        /* especificidade 0,2,0 */
+.caixa.destaque .titulo { color: red; } /* especificidade 0,3,0 */
+</pre>
+
+<p>Cada regra nova precisa de um seletor mais "forte" para vencer a anterior, e logo aparece um <code>!important</code> (aula <a href="important.html">!important</a>). Com BEM, <strong>toda regra é uma classe só</strong>, com especificidade <code>0,1,0</code> (aula <a href="especificidade.html">Especificidade</a>). Quem vence é simplesmente quem vem depois no arquivo. Por isso, no CSS, os modificadores ficam <strong>depois</strong> das classes que eles modificam.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Regra do BEM</th><th>Por quê</th></tr>
+<tr><td>Uma classe por seletor (<code>.cartao__titulo</code>, e não <code>.cartao .cartao__titulo</code>)</td><td>Especificidade baixa e igual; o nome já diz a quem pertence</td></tr>
+<tr><td>Sem seletor de elemento (<code>.cartao h2</code>) nem de id</td><td>Trocar o <code>h2</code> por <code>h3</code> no HTML não quebra o CSS</td></tr>
+<tr><td>Elemento de elemento é só elemento: <code>.cartao__titulo</code>, e não <code>.cartao__corpo__titulo</code></td><td>Nomes curtos, e o HTML pode mudar de estrutura sem renomear</td></tr>
+<tr><td>Modificador sempre junto da base (<code>class="cartao cartao--destaque"</code>)</td><td>O modificador só acrescenta; a base dá o resto</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>5. BEM e as outras formas</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Como evita o vazamento</th><th>Quando usar</th></tr>
+<tr><td><strong>BEM</strong></td><td>Nomes únicos por bloco: <code>.cartao__titulo</code></td><td>Sites e equipes de qualquer tamanho; funciona em qualquer navegador, sem ferramenta.</td></tr>
+<tr><td><strong>CSS aninhado</strong> (<code>.cartao { &amp; .titulo { … } }</code>)</td><td>O seletor final é <code>.cartao .titulo</code>: só os títulos dentro do cartão</td><td>Para agrupar no arquivo (aula <a href="aninhamento.html">CSS Aninhado</a>); a especificidade sobe.</td></tr>
+<tr><td><strong><code>@scope</code></strong></td><td>As regras valem só dentro de um bloco (aula <a href="scope.html">Escopo</a>)</td><td>Recurso recente; nomes curtos (<code>.titulo</code>) sem vazar.</td></tr>
+<tr><td><strong>Classes utilitárias</strong> (<code>.texto-vermelho</code>, <code>.p-4</code>)</td><td>Cada classe faz uma coisa só, em qualquer lugar</td><td>Frameworks como o Tailwind (aula <a href="frameworks.html">Frameworks</a>).</td></tr>
+</table>
+</div>
+
+<p>Não existe uma escolha certa para todos. O importante é que o projeto inteiro use <strong>a mesma</strong> convenção: um CSS com metade dos nomes em BEM e metade soltos tem os problemas dos dois.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Só o modificador, sem a classe base</strong>
+<pre class="file" data-file="index.html · erro de propósito">&lt;article class="cartao--destaque"&gt;
+  &lt;h2 class="cartao__titulo"&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;/article&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> com o CSS da seção 3, o cartão perde o preenchimento, a margem e a borda inteira: sobra só o título e o texto, soltos. No Chromium, o <code>padding-top</code> ficou <code>0px</code> e a borda, <code>border-top-style: none</code>.</p>
+<p><strong>Por quê:</strong> o <code>.cartao--destaque</code> só tem o <code>border-color</code>, e uma cor de borda sem a borda (o estilo e a largura, que estão no <code>.cartao</code>) não desenha nada. O preenchimento também mora no <code>.cartao</code>, que não está mais no elemento. O validador não reclama: para o HTML, qualquer nome de classe é válido.</p>
+<p><strong>Como consertar:</strong> <code>class="cartao cartao--destaque"</code>, sempre a base junto.</p>
+</div>
+
+<div class="cenario">
+<strong><code>&amp;__titulo</code> no CSS aninhado: a regra some</strong>
+<pre class="file" data-file="estilo.css · erro de propósito">.cartao {
+  padding: 1rem;
+  &amp;__titulo {
+    color: navy;
+  }
+}
+</pre>
+<p>Quem vem do Sass (uma ferramenta que gera CSS) está acostumado a escrever <code>&amp;__titulo</code> para gerar <code>.cartao__titulo</code>. No Sass, funciona. No <strong>CSS aninhado de verdade</strong>, que o navegador entende sozinho, não: o <code>&amp;</code> representa o seletor de fora inteiro, e não um pedaço de texto para colar.</p>
+<p><strong>O que o leitor vê:</strong> o título continua preto. No Chromium, a regra aninhada <code>&amp;__titulo</code> foi descartada (só sobrou o <code>padding</code> do cartão), e o estilo calculado do <code>.cartao__titulo</code> ficou <code>color: rgb(0, 0, 0)</code>.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css estilo.css
+"file:/home/ana/site/estilo.css":5.4-6.2: error: CSS: Parse Error.</pre>
+<p><strong>O que significa:</strong> "erro de leitura": o validador não entendeu o bloco aninhado e só se acha de novo no fim dele (linhas 5 e 6).</p>
+<p><strong>Como consertar:</strong> no CSS do navegador, escreva o nome inteiro, numa regra própria: <code>.cartao__titulo { color: navy; }</code>. Com BEM, aninhar nem é necessário: os nomes já dizem a quem cada classe pertence.</p>
+</div>
+
+<div class="cenario">
+<strong>Um sublinhado só, ou nomes diferentes no HTML e no CSS</strong>
+<p><strong>O que acontece:</strong> o HTML tem <code>class="cartao_titulo"</code> (um sublinhado) e o CSS tem <code>.cartao__titulo</code> (dois). Para o navegador, são nomes completamente diferentes, e a regra não pega. Nenhum validador avisa: o do HTML não olha o CSS, e o do CSS não olha o HTML.</p>
+<p><strong>Como achar:</strong> no F12, clique no elemento: o painel de estilos não mostra a regra <code>.cartao__titulo</code>, porque ela não casa com ele. Compare o nome da classe, letra por letra. Copiar e colar o nome, em vez de redigitar, evita o problema.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que é</th></tr>
+<tr><td><code>.cartao</code></td><td>Bloco: um componente independente</td></tr>
+<tr><td><code>.cartao__titulo</code></td><td>Elemento: parte do bloco (dois sublinhados)</td></tr>
+<tr><td><code>.cartao--destaque</code></td><td>Modificador do bloco (dois hífens)</td></tr>
+<tr><td><code>.cartao__preco--promocao</code></td><td>Modificador do elemento</td></tr>
+<tr><td><code>class="cartao cartao--destaque"</code></td><td>O modificador sempre junto da base</td></tr>
+<tr><td><code>.cartao-receita</code></td><td>Nome de duas palavras: um hífen só</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O elemento</h3>
+<p>Complete o nome da classe do preço que pertence ao bloco <code>cartao</code>:</p>
+<div class="ex-code">&lt;p class="<input data-answer="cartao__preco" aria-label="classe">"&gt;R$ 35,00&lt;/p&gt;</div>
+</div>
+
+<div class="exercise">
+<h3>2. O modificador</h3>
+<p>Complete a classe do menu na versão escura:</p>
+<div class="ex-code">&lt;nav class="menu <input data-answer="menu--escuro" aria-label="classe">"&gt;</div>
+</div>
+
+<div class="exercise">
+<h3>3. Os separadores</h3>
+<p>Complete: o elemento usa dois sublinhados; o modificador usa dois…</p>
+<div class="ex-code"><input data-answer="hífens|hifens|-|--|traços|tracos" aria-label="separador"></div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Qual destes nomes segue o BEM para o link ativo do menu?</p>
+<label><input type="radio" name="q4"> <code>.menu .ativo</code></label>
+<label><input type="radio" name="q4"> <code>.menu__link--ativo</code></label>
+<label><input type="radio" name="q4"> <code>.link-ativo-menu</code></label>
+<label><input type="radio" name="q4"> <code>#menu-ativo</code></label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. A Ana escreveu <code>&lt;article class="cartao--destaque"&gt;</code> e o cartão perdeu o preenchimento. Por quê?</p>
+<label><input type="radio" name="q5"> O validador rejeitou a classe</label>
+<label><input type="radio" name="q5"> Dois hífens não são permitidos em classes</label>
+<label><input type="radio" name="q5"> Faltou a classe base <code>cartao</code>, onde mora o preenchimento</label>
+<label><input type="radio" name="q5"> O modificador apaga os estilos do bloco</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. No CSS aninhado do navegador, <code>.cartao { &amp;__titulo { … } }</code>…</p>
+<label><input type="radio" name="q6"> Não funciona: o <code>&amp;</code> não cola texto, e a regra é descartada</label>
+<label><input type="radio" name="q6"> Vira <code>.cartao__titulo</code>, como no Sass</label>
+<label><input type="radio" name="q6"> Vira <code>.cartao .__titulo</code></label>
+<label><input type="radio" name="q6"> Só funciona no Firefox</label>
+</div>
+
+<h3>Missão final: o bloco botão</h3>
+
+<div class="tryhtml" data-goal="sel:button.botao.botao--grande,css:.botao{background-color}=rgb(255, 99, 71),css:.botao--grande{font-size}=20px,css:.botao:not(.botao--grande){font-size}=16px">
+<p class="try-task"><strong>Missão:</strong> crie o bloco <code>botao</code> em BEM. No CSS: <code>.botao</code> com fundo <code>tomato</code>, texto branco, sem borda e com <code>padding: 8px 16px</code> e <code>font-size: 1rem</code>; e o modificador <code>.botao--grande</code>, <strong>depois</strong>, com <code>font-size: 1.25rem</code>. No HTML, os dois botões ganham <code>class="botao"</code>, e o "Encomendar" também o modificador.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button&gt;Ver receita&lt;/button&gt;
+&lt;button&gt;Encomendar&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">/* Bloco: botao */
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button class="botao"&gt;Ver receita&lt;/button&gt;
+&lt;button class="botao botao--grande"&gt;Encomendar&lt;/button&gt;
+</pre>
+<pre class="solucao" data-file="style.css">/* Bloco: botao */
+.botao {
+  padding: 8px 16px;
+  border: none;
+  background-color: tomato;
+  color: white;
+  font-size: 1rem;
+}
+
+/* Modificador */
+.botao--grande {
+  font-size: 1.25rem;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Nomes soltos (<code>.titulo</code>) vazam entre partes do site. O BEM dá a cada classe um "sobrenome": o bloco a que ela pertence.</li>
+  <li><strong>Bloco</strong> <code>.cartao</code>; <strong>elemento</strong> <code>.cartao__titulo</code> (dois sublinhados); <strong>modificador</strong> <code>.cartao--destaque</code> (dois hífens), sempre junto com a base.</li>
+  <li>Uma classe por seletor: especificidade igual em tudo, sem guerra de seletores nem <code>!important</code>. Modificadores depois da base, no arquivo.</li>
+  <li>No CSS aninhado do navegador, <code>&amp;__titulo</code> não funciona (é coisa do Sass): escreva o nome inteiro.</li>
+  <li>Os validadores não conferem se o nome no HTML é o mesmo do CSS: use o F12.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
