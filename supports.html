@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS @supports e Compatibilidade — usar o novo sem quebrar o antigo | Guia CSS</title>
+<meta name="description" content="Compatibilidade em CSS para quem está começando: a declaração reserva (o navegador ignora o que não entende), a regra @supports com not, and, or e selector(), o CSS.supports() do JavaScript, como ler o Baseline e a tabela de compatibilidade do MDN, prefixos -webkit-, e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">@supports e Compatibilidade</span></h1>
+
+<p class="intro">O CSS ganha recursos novos todo ano, mas o site da Ana é aberto em celulares e computadores com navegadores de várias idades. Como usar o recurso novo <strong>sem quebrar</strong> a página de quem tem um navegador mais velho? O CSS tem duas respostas. A primeira já vem de graça: o navegador <strong>ignora</strong> o que não entende. A segunda é uma pergunta que você faz ao navegador antes de aplicar as regras: <code>@supports</code>, "você entende isto?".</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A declaração reserva: escrever o valor antigo e, logo depois, o novo.</li>
+  <li><code>@supports (propriedade: valor) { … }</code>: regras que só valem se o navegador entende a declaração.</li>
+  <li><code>not</code>, <code>and</code>, <code>or</code> e <code>selector()</code>.</li>
+  <li>A mesma pergunta no JavaScript: <code>CSS.supports()</code>.</li>
+  <li>Como descobrir se um recurso funciona em todos os navegadores: o Baseline e a tabela do MDN.</li>
+  <li>O que são os prefixos <code>-webkit-</code>, e por que não escrevê-los à mão.</li>
+  <li>O que o <code>@supports</code> não sabe responder, e os erros reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador. Os valores do estilo calculado foram conferidos no Chromium; as mensagens de erro são do validador W3C (<code>vnu</code>) rodado na máquina fictícia da Ana (<code>ana@notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: "aceita Pix?"</h2>
+<p>Na padaria, antes de pagar, você pergunta: "aceita Pix?". Se aceita, você paga com Pix. Se não, paga em dinheiro. Você não chega com o celular na mão e fica parado esperando.</p>
+<p>No CSS é igual:</p>
+<ul>
+  <li><strong>A reserva:</strong> leve o dinheiro <strong>e</strong> o Pix. Escreva a declaração antiga e logo depois a nova. Quem entende a nova usa a nova; quem não entende fica com a antiga.</li>
+  <li><strong>A pergunta:</strong> <code>@supports</code> pergunta antes, e aplica um <strong>bloco inteiro</strong> de regras só se a resposta for "sim".</li>
+</ul>
+
+<hr>
+
+<h2>1. A reserva: o navegador ignora o que não entende</h2>
+<p>Você já viu nas aulas anteriores: uma declaração que o navegador não entende é <strong>jogada fora</strong>, sem mensagem, e as outras continuam valendo. Isso vira uma ferramenta. Escreva duas vezes a mesma propriedade, a conhecida primeiro e a nova depois:</p>
+
+<pre class="file" data-file="style.css">.botao {
+  background-color: tomato;
+  background-color: oklch(70% 0.2 30);
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>background-color: tomato;</dt><dd>A <strong>reserva</strong>: uma cor que todo navegador conhece desde sempre.</dd>
+  <dt>background-color: oklch(…);</dt><dd>A cor <strong>nova</strong>, num formato mais recente (aula <a href="cores-modernas.html">Cores Modernas</a>). Pela cascata, a declaração de baixo vence a de cima (aula <a href="cascata.html">Cascata</a>).</dd>
+</dl>
+
+<p>Um navegador que entende <code>oklch()</code> usa a segunda; no Chromium, o estilo calculado ficou <code>oklch(0.7 0.2 30)</code>. Um navegador que não entende joga a segunda fora e fica com <code>tomato</code>. Para conferir o que acontece no navegador antigo, basta estragar o valor novo: com <code>oklch(70% 0.2 30 / zzz)</code>, que nenhum navegador entende, o Chromium ficou com <code>rgb(255, 99, 71)</code>, o <code>tomato</code>.</p>
+
+<div class="tip">
+<strong>A ordem importa</strong>
+<p>A reserva vem <strong>antes</strong>. Na ordem contrária, a cor antiga, que todo mundo entende, sempre venceria, e ninguém veria a nova.</p>
+</div>
+
+<p>Para uma declaração, a reserva resolve. Mas às vezes o recurso novo pede <strong>várias</strong> mudanças juntas. Um layout com subgrid, por exemplo, precisa de <code>display: grid</code>, <code>grid-row: span 3</code> e <code>grid-template-rows: subgrid</code>. Se só a última for ignorada, as outras duas ficam lá, e o resultado pode ficar pior que o original. É para isso que existe o <code>@supports</code>.</p>
+
+<hr>
+
+<h2>2. A pergunta: <code>@supports</code></h2>
+
+<pre class="file" data-file="style.css">@supports (display: grid) {
+  .galeria {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>@supports</dt><dd>"Suporta". Uma <strong>regra com arroba</strong>, como a <code>@media</code>: ela não estiliza nada sozinha, ela embrulha outras regras.</dd>
+  <dt>(display: grid)</dt><dd>A <strong>condição</strong>: uma declaração inteira, propriedade e valor, <strong>entre parênteses</strong> e sem o <code>;</code>. A pergunta é: "você entende <code>display: grid</code>?".</dd>
+  <dt>{ … }</dt><dd>As regras de dentro, escritas normalmente. Só valem se a resposta for "sim". Se for "não", o navegador pula o bloco inteiro.</dd>
+</dl>
+
+<p>Abaixo, cada linha só fica <strong>verde</strong> se o seu navegador entende a condição escrita nela. As duas últimas são falsas de propósito: <code>inexistente</code> não é um valor de <code>display</code>, em nenhum navegador.</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  p {
+    padding: 6px 10px;
+    background-color: #ddd;
+    font-family: monospace;
+  }
+  @supports (display: grid) {
+    .t1 { background-color: lightgreen; }
+  }
+  @supports (grid-template-rows: subgrid) {
+    .t2 { background-color: lightgreen; }
+  }
+  @supports selector(:has(a)) {
+    .t3 { background-color: lightgreen; }
+  }
+  @supports (display: inexistente) {
+    .t4 { background-color: lightgreen; }
+  }
+  @supports (subgrid) {
+    .t5 { background-color: lightgreen; }
+  }
+&lt;/style&gt;
+&lt;p class="t1"&gt;(display: grid)&lt;/p&gt;
+&lt;p class="t2"&gt;(grid-template-rows: subgrid)&lt;/p&gt;
+&lt;p class="t3"&gt;selector(:has(a))&lt;/p&gt;
+&lt;p class="t4"&gt;(display: inexistente)&lt;/p&gt;
+&lt;p class="t5"&gt;(subgrid)&lt;/p&gt;
+</pre>
+
+<p>No Chromium, as três primeiras ficaram verdes e as duas últimas, cinza. A última é um erro comum: <code>(subgrid)</code> não é uma declaração, falta a propriedade. A condição precisa ser <code>(propriedade: valor)</code>, completa.</p>
+
+<div class="tryhtml" data-goal="css:.galeria{display}=grid,src:@supports\s*\(\s*display:\s*grid\s*\)">
+<p class="try-task"><strong>Missão:</strong> a galeria da Ana é uma lista simples, uma foto embaixo da outra. Dentro de um <code>@supports (display: grid)</code>, transforme a <code>.galeria</code> num grid de 2 colunas (<code>grid-template-columns: 1fr 1fr</code>), com <code>gap: 12px</code>. Quem não entende grid continua vendo a lista, que também funciona.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Galeria&lt;/h1&gt;
+&lt;div class="galeria"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura inteiro" width="400" height="300"&gt;
+  &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Fatia quadrada do bolo" width="400" height="400"&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 12px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 12px;
+}
+
+@supports (display: grid) {
+  .galeria {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. <code>not</code>, <code>and</code>, <code>or</code> e <code>selector()</code></h2>
+<p>A condição pode ser combinada, como numa frase:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Verdade quando…</th><th>Exemplo de uso</th></tr>
+<tr><td><code>@supports not (A)</code></td><td>o navegador <strong>não</strong> entende A</td><td>Mostrar um aviso, ou um ajuste, só para os navegadores antigos</td></tr>
+<tr><td><code>@supports (A) and (B)</code></td><td>entende A <strong>e</strong> B</td><td>Um layout que precisa das duas coisas</td></tr>
+<tr><td><code>@supports (A) or (B)</code></td><td>entende A <strong>ou</strong> B (pelo menos uma)</td><td>Duas formas de escrever a mesma coisa</td></tr>
+<tr><td><code>@supports selector(:has(a))</code></td><td>entende o <strong>seletor</strong> <code>:has(a)</code></td><td>Usar um seletor novo (aula <a href="has.html">:has()</a>) com segurança</td></tr>
+</table>
+</div>
+
+<p>Duas regras de escrita:</p>
+<ul>
+  <li><strong>Cada parte entre parênteses</strong>, e um espaço antes e depois de <code>and</code>/<code>or</code>/<code>not</code>.</li>
+  <li><strong>Não misture <code>and</code> e <code>or</code> no mesmo nível.</strong> <code>(A) and (B) or (C)</code> é ambíguo, e o navegador descarta a regra inteira; no Chromium, o bloco não foi aplicado. Use parênteses para dizer a ordem: <code>((A) and (B)) or (C)</code>, que funcionou.</li>
+</ul>
+
+<p>O <code>selector()</code> pergunta por um <strong>seletor</strong>, e não por uma declaração. No Chromium, <code>selector(:has(a))</code> deu "sim", e <code>selector(:inexistente)</code> deu "não".</p>
+
+<h3>A mesma pergunta no JavaScript: <code>CSS.supports()</code></h3>
+<p>Se um script precisa saber a resposta, ele pergunta ao objeto <code>CSS</code> do navegador:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> veja as respostas no console, embaixo do quadro. Troque <code>grid</code> por outro valor e veja o <code>true</code> virar <code>false</code>.</p>
+<pre class="script" data-file="index.html">&lt;p&gt;Veja o console.&lt;/p&gt;
+&lt;script&gt;
+  console.log(CSS.supports("display", "grid"));
+  console.log(CSS.supports("display: inexistente"));
+  console.log(CSS.supports("selector(:has(a))"));
+&lt;/script&gt;
+</pre>
+</div>
+
+<p>No Chromium, o console mostrou <code>true</code>, <code>false</code> e <code>true</code>. Repare nas duas formas: com <strong>dois</strong> textos (a propriedade e o valor separados) ou com <strong>um</strong> texto igual à condição do <code>@supports</code>, sem os parênteses de fora. Para estilo, prefira o <code>@supports</code> no CSS; o JavaScript é para quando o script muda de comportamento.</p>
+
+<hr>
+
+<h2>4. Como saber se um recurso funciona em todo lugar</h2>
+<p>Antes de usar um recurso, confira a compatibilidade. Os dois lugares de sempre:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Onde</th><th>O que olhar</th></tr>
+<tr><td><a href="https://developer.mozilla.org/pt-BR/">MDN</a> (developer.mozilla.org)</td><td>No topo da página de cada propriedade, o selo <strong>Baseline</strong>. No fim, a tabela "Compatibilidade com navegadores", com a versão de cada navegador.</td></tr>
+<tr><td><a href="https://caniuse.com/">caniuse.com</a> ("posso usar?")</td><td>Busque o nome do recurso: verde é suportado, vermelho não, amarelo é suporte parcial (leia a nota).</td></tr>
+</table>
+</div>
+
+<p>O selo <strong>Baseline</strong> resume a tabela numa frase:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Selo</th><th>Quer dizer</th><th>O que fazer</th></tr>
+<tr><td><strong>Amplamente disponível</strong> (<em>widely available</em>)</td><td>Funciona nos navegadores principais (Chrome, Edge, Firefox, Safari) há mais de dois anos e meio.</td><td>Use sem medo.</td></tr>
+<tr><td><strong>Recentemente disponível</strong> (<em>newly available</em>)</td><td>Acabou de chegar ao último dos navegadores principais. Quem não atualiza ainda não tem.</td><td>Use com uma reserva ou dentro de <code>@supports</code>.</td></tr>
+<tr><td><strong>Disponibilidade limitada</strong> (<em>limited availability</em>)</td><td>Falta pelo menos um navegador principal.</td><td>Só como melhoria: a página tem de funcionar sem ele.</td></tr>
+</table>
+</div>
+
+<p>Um exemplo real: o <code>subgrid</code> está marcado no MDN como <em>amplamente disponível</em>, em todos os navegadores desde setembro de 2023. O <code>@supports selector()</code> funciona nos três motores principais desde 2021 (Chrome 83, Firefox 69, Safari 14.1, pela tabela do MDN).</p>
+
+<div class="note">
+<strong>Melhoria progressiva</strong>
+<p>A ideia por trás desta aula tem nome: <strong>melhoria progressiva</strong> (<em>progressive enhancement</em>). Primeiro, uma página que funciona em qualquer navegador, com o CSS mais simples. Depois, por cima, as melhorias para quem as entende. Ninguém fica com a página quebrada; quem tem o navegador novo ganha um pouco mais.</p>
+</div>
+
+<h3>Os prefixos: <code>-webkit-</code>, <code>-moz-</code></h3>
+<p>Em CSS antigo, você vai ver propriedades com um prefixo na frente:</p>
+
+<pre class="file" data-file="estilo-antigo.css">.botao {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+</pre>
+
+<p>Por muitos anos, cada navegador lançava os recursos novos <strong>com o seu prefixo</strong> (<code>-webkit-</code> no Safari e no Chrome, <code>-moz-</code> no Firefox), e os sites escreviam a mesma coisa três vezes. Hoje os recursos saem sem prefixo: o <code>appearance</code> sem prefixo funciona em todos os navegadores principais desde março de 2022 (MDN). Por isso:</p>
+<ul>
+  <li><strong>Reconheça</strong> os prefixos quando aparecerem em código antigo ou copiado.</li>
+  <li><strong>Não escreva à mão.</strong> Quando um prefixo ainda é necessário, uma ferramenta (como o Autoprefixer) os acrescenta sozinha, consultando a mesma base de dados do caniuse.</li>
+  <li>Se escrever, a versão sem prefixo vem <strong>por último</strong>, pelo mesmo motivo da reserva.</li>
+</ul>
+
+<hr>
+
+<h2>5. Qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Use</th></tr>
+<tr><td>Uma declaração nova com uma alternativa antiga (uma cor, uma unidade)</td><td>A <strong>reserva</strong>: a antiga, depois a nova</td></tr>
+<tr><td>Várias declarações que só fazem sentido juntas (um layout novo)</td><td><code>@supports (…) { … }</code></td></tr>
+<tr><td>Um ajuste só para navegadores antigos</td><td><code>@supports not (…) { … }</code></td></tr>
+<tr><td>Um seletor novo (<code>:has()</code>)</td><td><code>@supports selector(…) { … }</code></td></tr>
+<tr><td>Um script que precisa decidir</td><td><code>CSS.supports(…)</code></td></tr>
+<tr><td>Recurso marcado como "amplamente disponível"</td><td>Nenhum dos dois: use direto</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Sem parênteses ou com <code>;</code>: <code>Parse Error</code></strong>
+<pre class="file" data-file="estilo.css · erro de propósito">@supports display: grid {
+  .e { color: green; }
+}
+@supports (display: grid;) {
+  .f { color: green; }
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css estilo.css
+"file:/home/ana/site/estilo.css":3.2-3.2: error: CSS: Parse Error.
+"file:/home/ana/site/estilo.css":4.25-4.25: error: CSS: “display”: Parse Error.
+"file:/home/ana/site/estilo.css":6.2-7.1: error: CSS: “display”: Parse Error.</pre>
+<p><strong>O que significa:</strong> "erro de leitura": o validador não conseguiu entender a regra. A primeira não tem os parênteses em volta da declaração (ele percebe no fim do bloco, na linha 3); a segunda tem um <code>;</code> dentro deles (a coluna 25 da linha 4 é justamente o <code>;</code>), e o validador se perde até o fim do bloco (linhas 6 e 7).</p>
+<p><strong>O que o leitor vê:</strong> nada muda. No Chromium, os dois blocos foram ignorados por inteiro: o <code>.e</code> e o <code>.f</code> continuaram pretos. Uma condição mal escrita é tratada como "não suporta".</p>
+<p><strong>Como consertar:</strong> <code>@supports (display: grid) {</code>: a declaração entre parênteses, sem <code>;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O validador reclama de uma condição <code>not</code> que está certa</strong>
+<pre class="file" data-file="estilo.css">@supports not (display: inexistente) {
+  .b { color: green; }
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css estilo.css
+"file:/home/ana/site/estilo.css":1.25-1.35: error: CSS: “display”: “inexistente” is not a “display” value.</pre>
+<p><strong>O que significa:</strong> "<code>inexistente</code> não é um valor de <code>display</code>". O validador confere a declaração de dentro da condição como se fosse uma declaração comum. Mas, num <code>@supports not</code>, testar algo que o navegador não entende é justamente a ideia, e no Chromium a regra funcionou (o <code>.b</code> ficou verde). O mesmo acontece ao testar um recurso que o validador ainda não conhece.</p>
+<p><strong>O que fazer:</strong> leia a mensagem e decida. Se a declaração da condição está escrita certo e você <strong>quer</strong> testar algo que pode não existir, o aviso pode ser ignorado. Se foi um erro de digitação (<code>dispaly</code>, <code>gird</code>), conserte.</p>
+</div>
+
+<div class="cenario">
+<strong>"Suporta" não quer dizer "funciona do jeito que eu quero"</strong>
+<p><strong>O que acontece:</strong> o <code>@supports</code> só pergunta se o navegador <strong>entende</strong> a declaração. Ele não sabe se ela funciona em todos os casos. O exemplo clássico: por alguns anos, o Safari entendia <code>gap</code> no Grid, mas ainda não no Flexbox (o <code>gap</code> no Flexbox chegou no Safari 14.1, em 2021). <code>@supports (gap: 1rem)</code> respondia "sim", e os itens de um flex ficavam grudados.</p>
+<p><strong>O que fazer:</strong> confira a compatibilidade <strong>do caso que você vai usar</strong> no MDN ou no caniuse (o MDN separa, na tabela, linhas como "suporte em layout flex"). E teste no navegador.</p>
+</div>
+
+<div class="cenario">
+<strong>A reserva na ordem errada: o recurso novo nunca aparece</strong>
+<pre class="file" data-file="style.css · erro de propósito">.botao {
+  background-color: oklch(70% 0.2 30);
+  background-color: tomato;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> o botão sempre <code>tomato</code>, em qualquer navegador. A última declaração válida vence, e todos entendem <code>tomato</code>. Nenhum validador acusa: as duas declarações estão corretas. Ponha a reserva <strong>antes</strong>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>prop: antigo; prop: novo;</code></td><td>Reserva: quem não entende o novo fica com o antigo</td></tr>
+<tr><td><code>@supports (prop: valor) { … }</code></td><td>Regras só para quem entende a declaração</td></tr>
+<tr><td><code>@supports not (…) { … }</code></td><td>Regras só para quem <strong>não</strong> entende</td></tr>
+<tr><td><code>(A) and (B)</code> · <code>(A) or (B)</code></td><td>As duas · pelo menos uma. Para misturar, parênteses: <code>((A) and (B)) or (C)</code></td></tr>
+<tr><td><code>@supports selector(:has(a)) { … }</code></td><td>Regras só para quem entende o seletor</td></tr>
+<tr><td><code>CSS.supports("display", "grid")</code></td><td>A mesma pergunta no JavaScript (<code>true</code>/<code>false</code>)</td></tr>
+<tr><td>Baseline "amplamente disponível"</td><td>Pode usar direto</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A arroba</h3>
+<p>Complete a regra que pergunta se o navegador entende grid:</p>
+<div class="ex-code"><input data-answer="@supports" aria-label="regra"> (display: grid) {
+  .galeria { display: grid; }
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. Só para os antigos</h3>
+<p>Complete para as regras valerem só em quem <strong>não</strong> entende subgrid:</p>
+<div class="ex-code">@supports <input data-answer="not" aria-label="palavra"> (grid-template-rows: subgrid) {
+  .cartao h3 { min-height: 4.5em; }
+}</div>
+</div>
+
+<div class="exercise">
+<h3>3. Um seletor</h3>
+<p>Complete a função que pergunta por um seletor:</p>
+<div class="ex-code">@supports <input data-answer="selector" aria-label="função">(:has(a)) {
+  .cartao:has(a) { cursor: pointer; }
+}</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Em <code>color: tomato; color: oklch(70% 0.2 30);</code>, o que um navegador que não entende <code>oklch()</code> faz?</p>
+<label><input type="radio" name="q4"> Mostra o texto preto</label>
+<label><input type="radio" name="q4"> Ignora a segunda declaração e fica com <code>tomato</code></label>
+<label><input type="radio" name="q4"> Ignora as duas</label>
+<label><input type="radio" name="q4"> Mostra uma mensagem de erro na página</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. Qual condição está escrita certo?</p>
+<label><input type="radio" name="q5"> <code>@supports display: grid</code></label>
+<label><input type="radio" name="q5"> <code>@supports (display: grid;)</code></label>
+<label><input type="radio" name="q5"> <code>@supports (subgrid)</code></label>
+<label><input type="radio" name="q5"> <code>@supports (grid-template-rows: subgrid)</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. O MDN marca um recurso como "Baseline: amplamente disponível". O que isso quer dizer?</p>
+<label><input type="radio" name="q6"> Funciona nos navegadores principais há mais de dois anos e meio: pode usar direto</label>
+<label><input type="radio" name="q6"> Só funciona no Chrome</label>
+<label><input type="radio" name="q6"> Precisa do prefixo <code>-webkit-</code></label>
+<label><input type="radio" name="q6"> Precisa estar dentro de <code>@supports</code></label>
+</div>
+
+<h3>Missão final: o aviso para os navegadores antigos</h3>
+
+<div class="tryhtml" data-goal="css:.aviso{display}=none,src:@supports\s+not\s*\(">
+<p class="try-task"><strong>Missão:</strong> o cardápio da Ana usa subgrid. Para quem tem um navegador sem subgrid, ela quer mostrar um aviso. Esconda o <code>.aviso</code> (<code>display: none</code>) e, dentro de um <code>@supports not (grid-template-rows: subgrid)</code>, mostre-o de novo (<code>display: block</code>). No seu navegador, que entende subgrid, o aviso deve sumir.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Cardápio&lt;/h1&gt;
+&lt;p class="aviso"&gt;Atualize o seu navegador para ver o cardápio alinhado.&lt;/p&gt;
+&lt;p&gt;Pão francês: R$ 0,90&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.aviso {
+  padding: 8px;
+  background-color: lightyellow;
+  border: 1px solid goldenrod;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.aviso {
+  display: none;
+  padding: 8px;
+  background-color: lightyellow;
+  border: 1px solid goldenrod;
+}
+
+@supports not (grid-template-rows: subgrid) {
+  .aviso {
+    display: block;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O navegador ignora a declaração que não entende. Use isso como <strong>reserva</strong>: a declaração antiga primeiro, a nova depois.</li>
+  <li><code>@supports (propriedade: valor) { … }</code> aplica um bloco inteiro só se o navegador entende a declaração. Parênteses obrigatórios, sem <code>;</code>.</li>
+  <li><code>not</code>, <code>and</code>, <code>or</code> combinam condições (parênteses para misturar); <code>selector()</code> pergunta por um seletor; <code>CSS.supports()</code> faz a mesma pergunta no JavaScript.</li>
+  <li>"Suporta" quer dizer "entende", e não "funciona em todos os casos". Confira no MDN (selo Baseline) e no caniuse.</li>
+  <li>Prefixos (<code>-webkit-</code>) são coisa do passado: reconheça, não escreva à mão.</li>
+  <li>O validador acusa <code>Parse Error</code> numa condição mal escrita, e às vezes reclama de uma condição certa que testa algo desconhecido.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
