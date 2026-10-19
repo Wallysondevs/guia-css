@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Filtros — filter e backdrop-filter | Guia CSS</title>
+<meta name="description" content="Filtros em CSS para quem está começando: filter com grayscale, sepia, blur, brightness, contrast, saturate, hue-rotate, invert, opacity e drop-shadow, como juntar vários, a ordem que muda o resultado, o efeito de vidro com backdrop-filter e os erros que o navegador ignora em silêncio.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Filtros</span></h1>
+
+<p class="intro">A Ana tirou fotos dos bolos para o site de receitas. Ela quer a foto de um bolo esgotado em preto e branco, uma versão "antiga" (sépia) para a página de receitas da avó e uma sombra que acompanhe o desenho do logo da lojinha. Nada disso precisa de um programa de edição de imagens: a propriedade <code>filter</code> ("filtro") aplica o efeito na hora, no navegador. E a <code>backdrop-filter</code> ("filtro do que está atrás") faz o famoso efeito de <strong>vidro fosco</strong>.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que a propriedade <code>filter</code> faz e as dez funções de filtro, vistas lado a lado na mesma foto.</li>
+  <li>Como escrever cada valor: <code>%</code>, número, <code>px</code> e <code>deg</code>.</li>
+  <li>Como juntar vários filtros, e por que a <strong>ordem</strong> muda o resultado.</li>
+  <li>A diferença entre <code>drop-shadow()</code> e <code>box-shadow</code>.</li>
+  <li>O efeito de vidro fosco com <code>backdrop-filter</code>.</li>
+  <li>Os erros mais comuns: vírgula entre os filtros, número sem unidade, <code>brightness(150)</code>, e o que o validador pega (e o que ele não pega).</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="opacity.html">Transparência</a> e <a href="box-shadow.html">Sombra (box-shadow)</a>. Os exemplos usam as fotos de exemplo do guia, e o seu navegador desenha cada resultado agora. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>, o mesmo do validator.w3.org) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: uma lente na frente da foto</h2>
+<p>Pense numa câmera com lentes coloridas de encaixar: a foto continua a mesma, mas você vê através de uma lente amarelada, ou embaçada, ou escura. Tirou a lente, a foto volta ao normal. O arquivo da foto nunca é alterado.</p>
+
+<p>O <code>filter</code> é essa lente. Ele não muda o arquivo <code>bolo.jpg</code>: o navegador desenha o elemento normalmente e, <strong>antes de mostrar na tela</strong>, passa o desenho pelo filtro. Por isso dá para usar a mesma foto em preto e branco numa página e colorida em outra, e até trocar o filtro quando o mouse passa por cima.</p>
+
+<p>E vale para qualquer elemento, não só para imagens: um <code>&lt;div&gt;</code> com texto, um botão, um vídeo. O filtro pega <strong>tudo</strong> o que o elemento desenha, inclusive os filhos.</p>
+
+<hr>
+
+<h2>1. O primeiro filtro: preto e branco</h2>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .foto {
+    width: 200px;
+  }
+  .esgotado {
+    filter: grayscale(100%);
+  }
+&lt;/style&gt;
+&lt;img class="foto" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate"&gt;
+&lt;img class="foto esgotado" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura (esgotado)"&gt;
+</pre>
+
+<p>A mesma foto, duas vezes. A da direita perdeu todas as cores: o bolo, a cobertura e o fundo viraram tons de cinza.</p>
+
+<dl class="anatomy">
+  <dt>.esgotado</dt><dd>O seletor: os elementos com a classe <code>esgotado</code>.</dd>
+  <dt>filter</dt><dd>A propriedade: "filtro".</dd>
+  <dt>grayscale(…)</dt><dd>Uma <strong>função de filtro</strong>: o nome, e entre parênteses o quanto. <em>Grayscale</em> = "escala de cinza".</dd>
+  <dt>100%</dt><dd>A força do filtro. <code>100%</code> = cinza total; <code>50%</code> = meio caminho; <code>0%</code> = sem efeito.</dd>
+  <dt>;</dt><dd>Fim da declaração, como sempre.</dd>
+</dl>
+
+<p>A força também pode ser um número: <code>grayscale(1)</code> é o mesmo que <code>grayscale(100%)</code>, e <code>grayscale(0.5)</code> é o mesmo que <code>grayscale(50%)</code>. Na aba <em>Computed</em> do F12 (e no <code>getComputedStyle</code>), o navegador guarda a forma com número: o calculado de <code>grayscale(100%)</code> é <code>grayscale(1)</code>.</p>
+
+<div class="tryhtml" data-goal="css:.foto{filter}=grayscale(1)">
+<p class="try-task"><strong>Missão:</strong> o bolo de cenoura esgotou. Deixe a foto toda em preto e branco com um <code>filter</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;img class="foto" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate"&gt;
+&lt;p&gt;Esgotado hoje. Volta amanhã!&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.foto {
+  width: 300px;
+  max-width: 100%;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.foto {
+  width: 300px;
+  max-width: 100%;
+  filter: grayscale(100%);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. As dez funções de filtro, lado a lado</h2>
+<p>Cada caixa abaixo é a mesma foto com um filtro diferente, e o nome dele embaixo. A última usa o logo da lojinha, que tem fundo transparente, para mostrar a sombra.</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .galeria {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-family: sans-serif;
+  }
+  figure {
+    margin: 0;
+    width: 150px;
+    text-align: center;
+    font-size: 13px;
+  }
+  figure img {
+    width: 150px;
+    display: block;
+  }
+  .normal img     { filter: none; }
+  .cinza img      { filter: grayscale(100%); }
+  .sepia img      { filter: sepia(100%); }
+  .borrado img    { filter: blur(3px); }
+  .claro img      { filter: brightness(150%); }
+  .escuro img     { filter: brightness(50%); }
+  .contraste img  { filter: contrast(200%); }
+  .saturado img   { filter: saturate(300%); }
+  .matiz img      { filter: hue-rotate(180deg); }
+  .invertido img  { filter: invert(100%); }
+  .transp img     { filter: opacity(40%); }
+  .sombra img     { filter: drop-shadow(4px 4px 4px black); }
+&lt;/style&gt;
+&lt;div class="galeria"&gt;
+  &lt;figure class="normal"&gt;&lt;img src="assets/midia/bolo-400.jpg" alt="Bolo sem filtro"&gt;&lt;figcaption&gt;none&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="cinza"&gt;&lt;img src="assets/midia/bolo-400.jpg" alt="Bolo em tons de cinza"&gt;&lt;figcaption&gt;grayscale(100%)&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="sepia"&gt;&lt;img src="assets/midia/bolo-400.jpg" alt="Bolo em sépia"&gt;&lt;figcaption&gt;sepia(100%)&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="borrado"&gt;&lt;img src="assets/midia/bolo-400.jpg" alt="Bolo desfocado"&gt;&lt;figcaption&gt;blur(3px)&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="claro"&gt;&lt;img src="assets/midia/bolo-400.jpg" alt="Bolo mais claro"&gt;&lt;figcaption&gt;brightness(150%)&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="escuro"&gt;&lt;img src="assets/midia/bolo-400.jpg" alt="Bolo mais escuro"&gt;&lt;figcaption&gt;brightness(50%)&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="contraste"&gt;&lt;img src="assets/midia/bolo-400.jpg" alt="Bolo com mais contraste"&gt;&lt;figcaption&gt;contrast(200%)&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="saturado"&gt;&lt;img src="assets/midia/bolo-400.jpg" alt="Bolo com cores fortes"&gt;&lt;figcaption&gt;saturate(300%)&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="matiz"&gt;&lt;img src="assets/midia/bolo-400.jpg" alt="Bolo com as cores giradas"&gt;&lt;figcaption&gt;hue-rotate(180deg)&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="invertido"&gt;&lt;img src="assets/midia/bolo-400.jpg" alt="Bolo com as cores invertidas"&gt;&lt;figcaption&gt;invert(100%)&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="transp"&gt;&lt;img src="assets/midia/bolo-400.jpg" alt="Bolo quase transparente"&gt;&lt;figcaption&gt;opacity(40%)&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="sombra"&gt;&lt;img src="assets/midia/logo-lojinha-400.png" alt="Logo da Lojinha da Ana com sombra"&gt;&lt;figcaption&gt;drop-shadow(…)&lt;/figcaption&gt;&lt;/figure&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Repare em alguns detalhes que só aparecem olhando: o <code>blur</code> espalha a foto para fora da borda dela (a beirada fica esfumaçada); o <code>brightness(150%)</code> "estoura" o fundo, que fica quase branco; o <code>hue-rotate(180deg)</code> deixou o bolo laranja <strong>azul</strong>; o <code>invert</code> virou um negativo de filme; e a sombra do logo acompanha o toldo, a porta e as letras, e não um retângulo.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Função</th><th>O que faz</th><th>Sem efeito</th><th>Valor que você vai usar</th></tr>
+<tr><td><code>grayscale()</code></td><td>tira as cores ("escala de cinza")</td><td><code>0%</code></td><td><code>100%</code> = preto e branco</td></tr>
+<tr><td><code>sepia()</code></td><td>tom marrom-amarelado de foto antiga</td><td><code>0%</code></td><td><code>100%</code> = sépia total</td></tr>
+<tr><td><code>blur()</code></td><td>desfoca ("borrão"); o valor é o raio do borrão, em <code>px</code>, <code>rem</code>…</td><td><code>0</code></td><td><code>2px</code> a <code>10px</code></td></tr>
+<tr><td><code>brightness()</code></td><td>brilho: menos de 100% escurece, mais clareia</td><td><code>100%</code></td><td><code>50%</code> (escuro) a <code>150%</code> (claro)</td></tr>
+<tr><td><code>contrast()</code></td><td>contraste: menos acinzenta, mais "endurece" as cores</td><td><code>100%</code></td><td><code>80%</code> a <code>200%</code></td></tr>
+<tr><td><code>saturate()</code></td><td>saturação: a força das cores</td><td><code>100%</code></td><td><code>0%</code> (sem cor) a <code>300%</code> (berrante)</td></tr>
+<tr><td><code>hue-rotate()</code></td><td>gira todas as cores na roda de cores; o valor é um ângulo</td><td><code>0deg</code></td><td><code>90deg</code>, <code>180deg</code>…</td></tr>
+<tr><td><code>invert()</code></td><td>inverte as cores (negativo)</td><td><code>0%</code></td><td><code>100%</code></td></tr>
+<tr><td><code>opacity()</code></td><td>transparência, como a propriedade <code>opacity</code></td><td><code>100%</code></td><td><code>0%</code> (invisível) a <code>100%</code></td></tr>
+<tr><td><code>drop-shadow()</code></td><td>sombra que segue o desenho: deslocamento x, y, desfoque e cor</td><td>—</td><td><code>drop-shadow(4px 4px 4px black)</code></td></tr>
+</table>
+</div>
+
+<p>E o valor <code>filter: none</code>, que é o padrão: nenhum filtro.</p>
+
+<h3>Os três jeitos de escrever a força</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Funções</th><th>Escreva</th><th>Exemplo</th></tr>
+<tr><td><code>grayscale</code>, <code>sepia</code>, <code>brightness</code>, <code>contrast</code>, <code>saturate</code>, <code>invert</code>, <code>opacity</code></td><td>porcentagem <strong>ou</strong> número (1 = 100%)</td><td><code>sepia(60%)</code> = <code>sepia(0.6)</code></td></tr>
+<tr><td><code>blur</code>, e os deslocamentos do <code>drop-shadow</code></td><td>um tamanho, com unidade</td><td><code>blur(4px)</code>, <code>blur(0.25rem)</code></td></tr>
+<tr><td><code>hue-rotate</code></td><td>um ângulo (<code>deg</code> = graus; uma volta = <code>360deg</code>)</td><td><code>hue-rotate(90deg)</code></td></tr>
+</table>
+</div>
+
+<p>Brinque com os valores. Troque o <code>filter</code> da classe <code>.foto</code> por cada função da tabela, e mude os números:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;img class="foto" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate"&gt;
+</pre>
+<pre class="script" data-file="style.css">.foto {
+  width: 300px;
+  max-width: 100%;
+  filter: sepia(60%);
+}
+
+/* experimente:
+   filter: blur(2px);
+   filter: brightness(70%);
+   filter: saturate(200%);
+   filter: hue-rotate(90deg);
+*/
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Vários filtros de uma vez (e a ordem)</h2>
+<p>Para juntar filtros, escreva um depois do outro, separados por <strong>espaço</strong>, na mesma declaração:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .foto {
+    width: 200px;
+  }
+  .antiga {
+    filter: sepia(100%) contrast(120%) blur(1px);
+  }
+&lt;/style&gt;
+&lt;img class="foto" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura"&gt;
+&lt;img class="foto antiga" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura em foto antiga"&gt;
+</pre>
+
+<p>A foto da direita parece uma fotografia velha: sépia, um pouco mais de contraste e levemente fora de foco.</p>
+
+<p>O navegador aplica os filtros <strong>da esquerda para a direita</strong>: o segundo filtro recebe o resultado do primeiro. Às vezes a ordem não muda nada; às vezes muda tudo. Veja os mesmos dois filtros, em ordens diferentes:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .foto {
+    width: 200px;
+  }
+  .primeiro-sepia {
+    filter: sepia(100%) hue-rotate(90deg);
+  }
+  .primeiro-giro {
+    filter: hue-rotate(90deg) sepia(100%);
+  }
+&lt;/style&gt;
+&lt;img class="foto primeiro-sepia" src="assets/midia/bolo-400.jpg" alt="Bolo em tons verdes"&gt;
+&lt;img class="foto primeiro-giro" src="assets/midia/bolo-400.jpg" alt="Bolo em sépia"&gt;
+</pre>
+
+<p>Na esquerda, a foto virou sépia e <strong>depois</strong> as cores giraram 90 graus: o marrom-amarelado virou um verde-água. Na direita, as cores giraram primeiro, mas o sépia veio depois e pintou tudo de marrom-amarelado de novo: o giro "sumiu".</p>
+
+<div class="warning">
+<p><strong>Uma declaração só.</strong> Duas linhas <code>filter</code> na mesma regra não somam: a segunda <strong>substitui</strong> a primeira (é a <a href="cascata.html">cascata</a>). Com <code>filter: grayscale(100%);</code> e, na linha de baixo, <code>filter: blur(2px);</code>, a foto fica só borrada, colorida. Para os dois, escreva <code>filter: grayscale(100%) blur(2px);</code>.</p>
+</div>
+
+<hr>
+
+<h2>4. drop-shadow() × box-shadow</h2>
+<p>A propriedade <a href="box-shadow.html"><code>box-shadow</code></a> desenha a sombra da <strong>caixa</strong> do elemento, um retângulo. O <code>drop-shadow()</code> desenha a sombra do <strong>desenho</strong>: as partes transparentes da imagem não fazem sombra. A diferença só aparece em imagens com fundo transparente (PNG, WebP, SVG), como o logo da lojinha:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .logo {
+    width: 200px;
+    margin: 8px;
+  }
+  .caixa {
+    box-shadow: 4px 4px 4px black;
+  }
+  .desenho {
+    filter: drop-shadow(4px 4px 4px black);
+  }
+&lt;/style&gt;
+&lt;img class="logo caixa" src="assets/midia/logo-lojinha-400.png" alt="Logo da Lojinha da Ana com box-shadow"&gt;
+&lt;img class="logo desenho" src="assets/midia/logo-lojinha-400.png" alt="Logo da Lojinha da Ana com drop-shadow"&gt;
+</pre>
+
+<p>À esquerda, uma sombra retangular embaixo e à direita da imagem inteira, como se o logo estivesse colado num cartão. À direita, a sombra contorna o toldo, a lojinha e cada letra.</p>
+
+<dl class="anatomy">
+  <dt>drop-shadow(</dt><dd>"Sombra projetada".</dd>
+  <dt>4px</dt><dd>Deslocamento para a direita (negativo = para a esquerda).</dd>
+  <dt>4px</dt><dd>Deslocamento para baixo (negativo = para cima).</dd>
+  <dt>4px</dt><dd>O desfoque da sombra (opcional; sem ele, a sombra tem borda dura).</dd>
+  <dt>black)</dt><dd>A cor (opcional; sem ela, a sombra usa a cor do texto, <code>currentColor</code>). Uma cor com transparência, como <code>rgba(0, 0, 0, 0.4)</code>, fica mais natural.</dd>
+</dl>
+
+<p>O <code>drop-shadow()</code> não tem o <code>inset</code> (sombra para dentro) nem o quarto tamanho, o "espalhamento", do <code>box-shadow</code>.</p>
+
+<hr>
+
+<h2>5. O filtro pega o elemento inteiro</h2>
+<p>O filtro não escolhe partes: tudo o que o elemento desenha passa por ele, inclusive o texto e os filhos. Um <code>blur</code> num cartão borra o título e o parágrafo juntos:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .cartao {
+    width: 220px;
+    padding: 8px 12px;
+    border: 2px solid tomato;
+    font-family: sans-serif;
+  }
+  .carregando {
+    filter: blur(2px) grayscale(100%);
+  }
+&lt;/style&gt;
+&lt;div class="cartao carregando"&gt;
+  &lt;h3&gt;Bolo de cenoura&lt;/h3&gt;
+  &lt;p&gt;R$ 35,00&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<p>A borda <code>tomato</code> ficou cinza, e o título e o preço ficaram borrados. Isso é útil de propósito (um cartão "carregando", um conteúdo bloqueado), mas atrapalha quando você queria borrar só a imagem de fundo: aplique o filtro só no elemento certo (a <code>&lt;img&gt;</code>), ou use o <code>backdrop-filter</code>, da próxima seção.</p>
+
+<div class="tip">
+<p><strong>Filtro com o mouse por cima.</strong> Uma galeria em preto e branco que ganha cor quando o mouse passa: <code>.foto { filter: grayscale(100%); }</code> e <code>.foto:hover { filter: none; }</code>. Com uma <a href="transition.html">transição</a> (<code>transition: filter 0.3s;</code>), a cor aparece aos poucos. Experimente na missão final. (O <code>:hover</code> é da aula <a href="hover-focus.html">Estados</a>.)</p>
+</div>
+
+<hr>
+
+<h2>6. backdrop-filter: o vidro fosco</h2>
+<p>O <code>filter</code> muda o próprio elemento. O <code>backdrop-filter</code> muda o que está <strong>atrás</strong> dele (<em>backdrop</em> = "pano de fundo"): é como pôr um vidro fosco na frente da foto. O texto em cima continua nítido, e só o que se vê através do vidro fica borrado.</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .capa {
+    position: relative;
+    max-width: 400px;
+    font-family: sans-serif;
+  }
+  .capa img {
+    width: 100%;
+    display: block;
+  }
+  .legenda {
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    top: 40%;
+    margin: 0;
+    padding: 16px;
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+  .vidro {
+    backdrop-filter: blur(8px);
+  }
+&lt;/style&gt;
+&lt;div class="capa"&gt;
+  &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate"&gt;
+  &lt;p class="legenda"&gt;Sem backdrop-filter&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="capa"&gt;
+  &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate"&gt;
+  &lt;p class="legenda vidro"&gt;Com backdrop-filter: blur(8px)&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<p>As duas legendas estão em cima do bolo, com o mesmo fundo branco bem transparente. Na de cima, o bolo aparece nítido atrás das letras e disputa com elas. Na de baixo, o bolo aparece borrado atrás da legenda, e o texto fica fácil de ler.</p>
+
+<dl class="anatomy">
+  <dt>backdrop-filter</dt><dd>Aceita as <strong>mesmas funções</strong> do <code>filter</code>: <code>blur()</code>, <code>brightness()</code>, <code>grayscale()</code>… e várias juntas, separadas por espaço.</dd>
+  <dt>background-color: rgba(…, 0.3)</dt><dd>O vidro precisa ser <strong>transparente</strong> (ou meio transparente). Com fundo opaco, o leitor não vê o que está atrás, e o filtro não aparece.</dd>
+  <dt>position: absolute</dt><dd>Aqui serve só para pôr a legenda em cima da foto (aula <a href="position-absolute.html">position: absolute</a>). O <code>backdrop-filter</code> funciona com qualquer coisa atrás: um menu fixo no topo, por cima do texto que rola, também ganha o vidro.</dd>
+</dl>
+
+<div class="note">
+<p><strong>Suporte:</strong> o <code>filter</code> funciona em todos os navegadores desde 2016. O <code>backdrop-filter</code> é mais novo: o MDN o marca como <em>Baseline 2024</em> (todos os navegadores atuais desde setembro de 2024). Chrome e Edge têm desde a versão 76/79, Firefox desde a 103 e o Safari a partir da 18; Safaris mais antigos só entendem o nome com prefixo, <code>-webkit-backdrop-filter</code>. Se você quer alcançar iPhones antigos, escreva as duas linhas, a com prefixo primeiro:</p>
+<pre class="file" data-file="style.css">.vidro {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+</pre>
+<p>Num navegador sem suporte, a legenda continua lá, só sem o vidro: por isso escolha um fundo que, sozinho, já deixe o texto legível.</p>
+</div>
+
+<hr>
+
+<h2>7. Formas diferentes de fazer a mesma coisa</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você quer…</th><th>Opções</th><th>Qual usar</th></tr>
+<tr><td>Foto em preto e branco</td><td>editar a foto num programa; <code>filter: grayscale(100%)</code></td><td>O <code>filter</code>, quando o efeito muda (esgotado, <code>:hover</code>) ou quando você quer as duas versões. Editar o arquivo, quando ela é sempre cinza.</td></tr>
+<tr><td>Deixar algo meio transparente</td><td><code>opacity: 0.4</code>; <code>filter: opacity(40%)</code></td><td>A propriedade <code>opacity</code> (aula <a href="opacity.html">Transparência</a>): mais simples e mais conhecida. O <code>opacity()</code> é útil junto de outros filtros, numa declaração só.</td></tr>
+<tr><td>Escurecer uma foto para pôr texto em cima</td><td><code>filter: brightness(60%)</code> na foto; um fundo escuro meio transparente na legenda; <code>backdrop-filter</code></td><td>Para a foto inteira, <code>brightness()</code>. Para só a área do texto, a legenda com fundo meio transparente, e o <code>backdrop-filter</code> por cima, se quiser o vidro.</td></tr>
+<tr><td>Sombra</td><td><code>box-shadow</code>; <code>filter: drop-shadow()</code></td><td><code>box-shadow</code> para caixas (cartões, botões); <code>drop-shadow()</code> para imagens com fundo transparente e ícones.</td></tr>
+<tr><td>Borrar o que está atrás</td><td><code>filter: blur()</code> na imagem de trás; <code>backdrop-filter: blur()</code> no elemento da frente</td><td>O <code>backdrop-filter</code>: só a parte atrás do vidro fica borrada, e o texto do vidro continua nítido.</td></tr>
+</table>
+</div>
+
+<div class="note">
+<p><strong>Você vai ver por aí:</strong> <code>-webkit-filter: grayscale(100%);</code>, com prefixo, de quando o Chrome e o Safari ainda não tinham o nome oficial; hoje, o <code>filter</code> sozinho basta. E, em CSS muito antigo (para o Internet Explorer), <code>filter: alpha(opacity=50);</code>: não é a mesma propriedade, e os navegadores de hoje a ignoram.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Lembre: o CSS quase nunca mostra mensagem. Com um <code>filter</code> errado, o navegador <strong>ignora a declaração inteira</strong> e a foto fica como estava, sem filtro nenhum. No F12, na aba <em>Elements</em> (Elementos), o painel <em>Styles</em> (Estilos) mostra a declaração riscada, com um ícone de aviso.</p>
+
+<div class="cenario">
+<strong>Vírgula entre os filtros: nada acontece (e o validador não avisa)</strong>
+<p><strong>O que aconteceu:</strong> <code>filter: grayscale(100%), blur(2px);</code>. A vírgula parece natural, mas os filtros se separam por <strong>espaço</strong>.</p>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  .foto {
+    width: 200px;
+    filter: grayscale(100%), blur(2px);
+  }
+&lt;/style&gt;
+&lt;img class="foto" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura"&gt;
+</pre>
+<p>A foto aparece colorida e nítida, como se a linha não existisse. O valor calculado do <code>filter</code> é <code>none</code>. E o validador W3C <strong>não reclama</strong> desta linha:</p>
+<pre class="term" data-cwd="~/filtros">$ vnu --css virgula.css
+$ </pre>
+<p>Nenhuma mensagem. Por isso o F12 é o melhor amigo aqui: a declaração aparece riscada.</p>
+<p><strong>Como consertar:</strong> <code>filter: grayscale(100%) blur(2px);</code>, só com espaço.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “filter”: “5” is not a “filter” value.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>filter: blur(5);</code>, um número sem unidade. O <code>blur()</code> precisa de um tamanho: <code>px</code>, <code>rem</code>… (só o <code>0</code> pode ficar sem unidade).</p>
+<pre class="term" data-cwd="~/filtros">$ vnu --css sem-unidade.css
+"file:/home/ana/filtros/sem-unidade.css":2.17-2.17: error: CSS: “filter”: “5” is not a “filter” value.</pre>
+<p>"“5” não é um valor de <code>filter</code>." No navegador, a foto fica nítida: a declaração inteira foi ignorada.</p>
+<p><strong>Como consertar:</strong> <code>filter: blur(5px);</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “filter”: “greyscale(100%)” is not a “filter” value.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>greyscale</code>, com <strong>e</strong>, é como os ingleses escrevem "cinza". O CSS usa a grafia americana: <code>grayscale</code>, com <strong>a</strong>.</p>
+<pre class="term" data-cwd="~/filtros">$ vnu --css grey.css
+"file:/home/ana/filtros/grey.css":2.25-2.25: error: CSS: “filter”: “greyscale(100%)” is not a “filter” value.</pre>
+<p>A foto continua colorida.</p>
+<p><strong>Como consertar:</strong> <code>grayscale(100%)</code>. A mesma pegadinha existe em <code>color</code> (nunca <code>colour</code>) e na cor <code>gray</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>A foto sumiu: <code>brightness(150)</code></strong>
+<p><strong>O que aconteceu:</strong> a Ana queria 150% de brilho e escreveu só o número.</p>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  .foto {
+    width: 200px;
+    border: 1px solid gray;
+  }
+  .clara {
+    filter: brightness(150);
+  }
+&lt;/style&gt;
+&lt;img class="foto clara" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura"&gt;
+</pre>
+<p>Dentro da borda cinza, um retângulo todo branco: o bolo desapareceu. Desta vez a declaração é <strong>válida</strong> (o validador não diz nada), e o navegador fez o que estava escrito: número sem <code>%</code> é multiplicador, e <code>150</code> é 150 <strong>vezes</strong> mais claro (15000%). Tudo vira branco.</p>
+<p><strong>Como consertar:</strong> <code>brightness(150%)</code> ou <code>brightness(1.5)</code>. Lembre: número <code>1</code> = <code>100%</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>backdrop-filter</code> não aparece</strong>
+<p><strong>O que aconteceu:</strong> a legenda tem <code>background-color: white;</code>, um fundo <strong>opaco</strong>. O vidro borra o que está atrás, mas o fundo branco cobre tudo: não há nada para ver através dele. (Num Safari antigo, o motivo pode ser outro: faltou a linha com <code>-webkit-</code>.)</p>
+<p><strong>Como consertar:</strong> um fundo meio transparente, como <code>rgba(255, 255, 255, 0.3)</code>, ou nenhum fundo.</p>
+</div>
+
+<div class="cenario">
+<strong>Duas linhas <code>filter</code>: só a última vale</strong>
+<p><strong>O que aconteceu:</strong> <code>filter: sepia(100%);</code> e, embaixo, <code>filter: blur(2px);</code>. A foto ficou borrada, mas colorida: a segunda declaração substituiu a primeira. O validador não reclama, porque as duas são válidas.</p>
+<p><strong>Como consertar:</strong> uma linha só, <code>filter: sepia(100%) blur(2px);</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Código</th><th>O que faz</th></tr>
+<tr><td><code>filter: none;</code></td><td>Sem filtro (o padrão)</td></tr>
+<tr><td><code>filter: grayscale(100%);</code></td><td>Preto e branco</td></tr>
+<tr><td><code>filter: sepia(100%);</code></td><td>Foto antiga</td></tr>
+<tr><td><code>filter: blur(4px);</code></td><td>Desfoca; o valor tem unidade</td></tr>
+<tr><td><code>filter: brightness(70%);</code></td><td>Escurece (mais de 100% clareia)</td></tr>
+<tr><td><code>filter: contrast(150%);</code></td><td>Mais contraste</td></tr>
+<tr><td><code>filter: saturate(200%);</code></td><td>Cores mais fortes (0% = sem cor)</td></tr>
+<tr><td><code>filter: hue-rotate(90deg);</code></td><td>Gira as cores</td></tr>
+<tr><td><code>filter: invert(100%);</code></td><td>Negativo</td></tr>
+<tr><td><code>filter: opacity(50%);</code></td><td>Transparência</td></tr>
+<tr><td><code>filter: drop-shadow(2px 2px 4px black);</code></td><td>Sombra que segue o desenho</td></tr>
+<tr><td><code>filter: sepia(100%) blur(1px);</code></td><td>Vários filtros: separados por espaço, aplicados da esquerda para a direita</td></tr>
+<tr><td><code>backdrop-filter: blur(8px);</code></td><td>Vidro fosco: filtra o que está atrás; precisa de fundo transparente</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Foto antiga</h3>
+<p>Complete com a função que dá o tom marrom-amarelado de foto antiga:</p>
+<div class="ex-code">.antiga { filter: <input data-answer="sepia" aria-label="função">(100%); }</div>
+</div>
+
+<div class="exercise">
+<h3>2. O vidro fosco</h3>
+<p>Complete com a propriedade que borra o que está <strong>atrás</strong> do elemento:</p>
+<div class="ex-code">.menu { <input data-answer="backdrop-filter" aria-label="propriedade">: blur(10px); }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. Como juntar preto e branco e desfoque numa foto?</p>
+<label><input type="radio" name="q3"> <code>filter: grayscale(100%), blur(2px);</code></label>
+<label><input type="radio" name="q3"> <code>filter: grayscale(100%); filter: blur(2px);</code></label>
+<label><input type="radio" name="q3"> <code>filter: grayscale(100%) blur(2px);</code></label>
+<label><input type="radio" name="q3"> <code>filter: grayscale(100%) + blur(2px);</code></label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. O logo da lojinha é um PNG com fundo transparente. Qual sombra contorna o desenho, e não um retângulo?</p>
+<label><input type="radio" name="q4"> <code>box-shadow: 4px 4px 4px black;</code></label>
+<label><input type="radio" name="q4"> <code>filter: drop-shadow(4px 4px 4px black);</code></label>
+<label><input type="radio" name="q4"> <code>text-shadow: 4px 4px 4px black;</code></label>
+<label><input type="radio" name="q4"> <code>backdrop-filter: blur(4px);</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Com <code>filter: brightness(150);</code>, a foto ficou toda branca. Por quê?</p>
+<label><input type="radio" name="q5"> O número sem <code>%</code> multiplica: 150 vezes mais claro. O certo é <code>150%</code> ou <code>1.5</code></label>
+<label><input type="radio" name="q5"> O navegador ignorou a declaração, que tem um erro</label>
+<label><input type="radio" name="q5"> O <code>brightness</code> só aceita valores até 100</label>
+<label><input type="radio" name="q5"> Faltou o <code>backdrop-filter</code></label>
+</div>
+
+<h3>Missão final: a vitrine da lojinha</h3>
+
+<div class="tryhtml" data-goal="css:.esgotado img{filter}=grayscale(1),src:\.logo\s*\{[^}]*drop-shadow\(,nsrc:\.logo\s*\{[^}]*box-shadow,src:\.legenda\s*\{[^}]*backdrop-filter:\s*blur\(,src::hover\s*\{[^}]*filter">
+<p class="try-task"><strong>Missão:</strong> (1) dê ao <code>.logo</code> uma sombra que contorne o desenho, com <code>drop-shadow()</code> (tire o <code>box-shadow</code>); (2) deixe em preto e branco a foto do produto <code>.esgotado</code>; (3) faça a foto esgotada mostrar as cores quando o mouse passar por cima (<code>:hover</code>); (4) ponha o efeito de vidro (<code>backdrop-filter</code> com <code>blur</code>) na <code>.legenda</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;img class="logo" src="assets/midia/logo-lojinha-400.png" alt="Lojinha da Ana"&gt;
+&lt;div class="produto"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate"&gt;
+  &lt;p class="legenda"&gt;Bolo de cenoura · R$ 35,00&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="produto esgotado"&gt;
+  &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo de cenoura, fatia grande (esgotado)"&gt;
+  &lt;p class="legenda"&gt;Fatia grande · esgotado&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: sans-serif;
+}
+
+.logo {
+  width: 200px;
+  box-shadow: 4px 4px 4px black;
+}
+
+.produto {
+  position: relative;
+  max-width: 300px;
+  margin-bottom: 16px;
+}
+
+.produto img {
+  width: 100%;
+  display: block;
+}
+
+.legenda {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.4);
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: sans-serif;
+}
+
+.logo {
+  width: 200px;
+  filter: drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.4));
+}
+
+.produto {
+  position: relative;
+  max-width: 300px;
+  margin-bottom: 16px;
+}
+
+.produto img {
+  width: 100%;
+  display: block;
+}
+
+.esgotado img {
+  filter: grayscale(100%);
+  transition: filter 0.3s;
+}
+
+.esgotado img:hover {
+  filter: none;
+}
+
+.legenda {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(6px);
+}
+</pre>
+</div>
+
+<p>Passe o mouse na foto esgotada: as cores voltam aos poucos, por causa do <code>transition</code>. E repare que a legenda está <strong>fora</strong> da <code>&lt;img&gt;</code>: por isso ela continua nítida e colorida, mesmo com a foto cinza.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>filter</code> passa o elemento inteiro (com o texto e os filhos) por uma "lente" na hora de desenhar. O arquivo da imagem não muda.</li>
+  <li>As funções: <code>grayscale</code>, <code>sepia</code>, <code>blur</code>, <code>brightness</code>, <code>contrast</code>, <code>saturate</code>, <code>hue-rotate</code>, <code>invert</code>, <code>opacity</code> e <code>drop-shadow</code>. Porcentagem ou número (<code>1</code> = <code>100%</code>); <code>blur</code> com unidade; <code>hue-rotate</code> com <code>deg</code>.</li>
+  <li>Vários filtros: <strong>espaço</strong> entre eles, numa declaração só. São aplicados da esquerda para a direita, e a ordem pode mudar o resultado.</li>
+  <li><code>drop-shadow()</code> faz a sombra do desenho (bom para PNG transparente); <code>box-shadow</code>, a da caixa.</li>
+  <li><code>backdrop-filter</code> filtra o que está <strong>atrás</strong> do elemento (vidro fosco). Precisa de fundo transparente. Baseline 2024; Safari antigo pede <code>-webkit-backdrop-filter</code>.</li>
+  <li>Com erro, o navegador ignora a declaração e a foto fica sem filtro. O validador pega <code>blur(5)</code> e <code>greyscale</code>, mas não a vírgula entre filtros. E <code>brightness(150)</code> é válido, só que 150 vezes mais claro.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
