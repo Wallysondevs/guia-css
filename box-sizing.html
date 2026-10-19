@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS box-sizing — border-box: a largura que inclui padding e borda | Guia CSS</title>
+<meta name="description" content="A propriedade box-sizing do CSS para quem nunca escreveu CSS: content-box (o padrão, que soma padding e borda ao width) e border-box (a largura que você escreve é a largura que a caixa ocupa), lado a lado; as colunas de 50% que não cabem; a regra universal que quase todo site usa; e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">box-sizing</span></h1>
+
+<p class="intro">Nas aulas de <a href="padding.html">padding</a>, <a href="border.html">borda</a> e <a href="width-height.html">largura</a>, uma coisa se repetiu: você escreve <code>width: 200px</code>, põe um padding, e a caixa fica maior que 200px. Isso confunde todo mundo que começa, e atrapalha até quem já sabe. O <code>box-sizing</code> ("dimensionamento da caixa") muda essa conta, e uma única regra, que você vai copiar no começo de todo CSS, resolve o problema de vez.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Os dois valores: <code>content-box</code> (o padrão) e <code>border-box</code>, lado a lado.</li>
+  <li>A conta de cada um: quanto a caixa ocupa de verdade.</li>
+  <li>O caso clássico: duas colunas de 50% que não cabem lado a lado.</li>
+  <li>A regra universal com <code>*</code>, <code>::before</code> e <code>::after</code>, e por que quase todo site a usa.</li>
+  <li>Onde ver o <code>box-sizing</code> no F12.</li>
+  <li>Os erros reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a mala de mão</h2>
+<p>A companhia aérea diz: "a mala de mão pode ter no máximo 55 cm". Você compra uma mala cujo espaço interno tem 55 cm, chega no aeroporto e ela não passa no medidor: com as rodinhas, as alças e o forro, ela tem 62 cm por fora.</p>
+<p>A companhia mede <strong>por fora</strong>. A loja mediu <strong>por dentro</strong>. As duas estão "certas"; só usam regras diferentes.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>Na mala</th><th>O <code>width</code> mede…</th></tr>
+<tr><td><code>content-box</code> (o padrão)</td><td>Por dentro: só o espaço para as roupas</td><td>Só o <strong>conteúdo</strong>. Padding e borda são somados por fora.</td></tr>
+<tr><td><code>border-box</code></td><td>Por fora: a mala inteira, com rodinhas e alças</td><td>Conteúdo + padding + borda. O que você escreve é o que a caixa ocupa.</td></tr>
+</table>
+</div>
+
+<p>Nos dois casos, a <code>margin</code> fica de fora da conta: ela é o espaço <strong>entre</strong> as malas na esteira, não faz parte de nenhuma.</p>
+
+<hr>
+
+<h2>1. Os dois valores lado a lado</h2>
+<p>As duas caixas têm exatamente as mesmas medidas escritas. Só o <code>box-sizing</code> muda:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .caixa {
+    width: 200px;
+    padding: 20px;
+    border: 5px solid darkcyan;
+    background-color: lightcyan;
+    margin-bottom: 10px;
+    font-family: monospace;
+  }
+  .content { box-sizing: content-box; }
+  .border  { box-sizing: border-box; }
+&lt;/style&gt;
+&lt;div class="caixa content"&gt;content-box&lt;/div&gt;
+&lt;div class="caixa border"&gt;border-box&lt;/div&gt;
+</pre>
+
+<p>A primeira caixa ficou visivelmente mais larga que a segunda. As contas:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th><code>content-box</code></th><th><code>border-box</code></th></tr>
+<tr><td>O que você escreveu</td><td colspan="2"><code>width: 200px; padding: 20px; border: 5px</code></td></tr>
+<tr><td>Largura do conteúdo</td><td>200px</td><td>200 − 20 − 20 − 5 − 5 = <strong>150px</strong></td></tr>
+<tr><td>Largura que a caixa ocupa</td><td>200 + 20 + 20 + 5 + 5 = <strong>250px</strong></td><td><strong>200px</strong>, o que você escreveu</td></tr>
+</table>
+</div>
+
+<dl class="anatomy">
+  <dt>box-sizing</dt><dd>A propriedade: diz o que o <code>width</code> e o <code>height</code> medem. <em>Box sizing</em> = "dimensionamento da caixa".</dd>
+  <dt>content-box</dt><dd>"Caixa do conteúdo": <code>width</code> e <code>height</code> medem só o conteúdo. É o valor inicial, por razões históricas.</dd>
+  <dt>border-box</dt><dd>"Caixa da borda": <code>width</code> e <code>height</code> medem até a borda, por fora. O conteúdo encolhe para dar lugar ao padding e à borda.</dd>
+</dl>
+
+<p>Com <code>border-box</code>, você pode mudar o padding ou a borda à vontade, e a caixa <strong>não muda de tamanho</strong> na página: só o espaço de dentro muda. Isso deixa o layout previsível.</p>
+
+<hr>
+
+<h2>2. O caso clássico: as colunas que não cabem</h2>
+<p>A Ana quer duas colunas lado a lado, cada uma com metade da largura (<code>50%</code>) e um padding para o texto não encostar. Parece simples:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .coluna {
+    display: inline-block;
+    vertical-align: top;
+    width: 50%;
+    padding: 12px;
+    background-color: lavender;
+    border: 1px solid slateblue;
+  }
+&lt;/style&gt;
+&lt;div class="coluna"&gt;Doces: bolo, brigadeiro, pudim.&lt;/div&gt;&lt;div class="coluna"&gt;Salgados: coxinha, pão de queijo, empada.&lt;/div&gt;
+</pre>
+
+<p>A segunda coluna <strong>caiu para a linha de baixo</strong>. Cada coluna ocupa 50% + 24px de padding + 2px de borda, e duas delas passam de 100%. (As duas <code>div</code> estão coladas no código, sem espaço entre elas, de propósito: com <code>inline-block</code>, um espaço vira um espacinho na tela e atrapalharia a conta.)</p>
+
+<div class="tryhtml" data-goal="css:.coluna{box-sizing}=border-box">
+<p class="try-task"><strong>Missão:</strong> faça as duas colunas caberem lado a lado, <strong>sem</strong> tirar o padding nem a borda: acrescente uma declaração ao <code>.coluna</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="coluna"&gt;Doces: bolo, brigadeiro, pudim.&lt;/div&gt;&lt;div class="coluna"&gt;Salgados: coxinha, pão de queijo, empada.&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.coluna {
+  display: inline-block;
+  vertical-align: top;
+  width: 50%;
+  padding: 12px;
+  background-color: lavender;
+  border: 1px solid slateblue;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.coluna {
+  display: inline-block;
+  vertical-align: top;
+  width: 50%;
+  padding: 12px;
+  background-color: lavender;
+  border: 1px solid slateblue;
+  box-sizing: border-box;
+}
+</pre>
+</div>
+
+<p>Com <code>border-box</code>, cada coluna ocupa exatamente 50%, padding e borda incluídos. Hoje, colunas se fazem com <a href="flexbox.html">Flexbox</a> e <a href="grid.html">Grid</a>, mas o mesmo problema aparece neles e em qualquer caixa com largura em <code>%</code> e padding: um campo de formulário com <code>width: 100%</code> e padding, por exemplo, passa da borda do formulário.</p>
+
+<hr>
+
+<h2>3. A regra universal</h2>
+<p>Como <code>border-box</code> é mais fácil de pensar, quase todo site moderno o liga para <strong>todos</strong> os elementos, logo no começo do <code>style.css</code>:</p>
+
+<pre class="file" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>*</dt><dd>O seletor universal: casa com <strong>todos</strong> os elementos da página (aula <a href="seletor-universal.html">Seletor Universal</a>).</dd>
+  <dt>*::before, *::after</dt><dd>Os pseudo-elementos, "caixas de mentira" que o CSS pode criar antes e depois do conteúdo de um elemento (aula <a href="before-after.html">::before e ::after</a>). O <code>*</code> sozinho não os alcança, por isso entram na lista.</dd>
+  <dt>,</dt><dd>A vírgula junta os três seletores numa regra só (aula <a href="seletor-grupo.html">Agrupando Seletores</a>).</dd>
+  <dt>box-sizing: border-box;</dt><dd>A partir daqui, todo <code>width</code> e <code>height</code> do site mede por fora.</dd>
+</dl>
+
+<p>Ela é tão comum que faz parte dos "resets", os trechos de CSS que zeram as diferenças entre navegadores (aula <a href="reset.html">Reset e Normalize</a>). O seletor <code>*</code> tem especificidade zero, então qualquer regra sua com classe passa por cima dela, se um dia você precisar de <code>content-box</code> numa caixa específica.</p>
+
+<h3>A variação com <code>inherit</code></h3>
+<p>Você também vai encontrar esta versão:</p>
+
+<pre class="file" data-file="style.css">html {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+</pre>
+
+<p>Aqui, o <code>&lt;html&gt;</code> ganha <code>border-box</code> e todo o resto <strong>herda</strong> o valor do pai (<code>inherit</code> = "herdar", aula <a href="heranca.html">Herança</a>). O resultado é o mesmo; a vantagem é que, se um componente inteiro precisar de <code>content-box</code>, basta pôr no elemento de fora, e os de dentro o seguem. As duas versões funcionam em todos os navegadores; escolha uma e use sempre.</p>
+
+<div class="note">
+<strong>Os campos de formulário já vêm diferentes</strong>
+<p>No Chromium que o guia usa para conferir, botões, <code>&lt;input&gt;</code>, <code>&lt;select&gt;</code> e <code>&lt;textarea&gt;</code> já vêm com <code>box-sizing: border-box</code> do próprio navegador, enquanto <code>&lt;div&gt;</code>, <code>&lt;p&gt;</code> e os outros vêm com <code>content-box</code>. Os padrões dos campos variam de navegador para navegador, e essa mistura é mais um motivo para a regra universal: com ela, todo mundo segue a mesma conta.</p>
+</div>
+
+<hr>
+
+<h2>4. O <code>box-sizing</code> no F12</h2>
+<p>No F12 (aula <a href="devtools.html">DevTools</a>), escolha um elemento na aba <em>Elements</em> (Elementos) e abra a aba <em>Computed</em> (Calculado). Lá estão:</p>
+<ul>
+  <li>a propriedade <code>box-sizing</code>, com o valor que está valendo;</li>
+  <li>o desenho do modelo de caixa: retângulos um dentro do outro (margem, borda, padding e conteúdo), com os números de cada um. Com <code>border-box</code>, o número do meio, o do conteúdo, fica menor que o <code>width</code> que você escreveu;</li>
+  <li>o <code>width</code>, que o Chrome mostra como o tamanho que você deu à caixa (os 200px do exemplo, nos dois casos).</li>
+</ul>
+<p>(Os nomes das abas mudam um pouco entre o Chrome, o Edge e o Firefox, e entre as versões em inglês e em português.)</p>
+
+<hr>
+
+<h2>5. O que o <code>border-box</code> não faz</h2>
+<ul>
+  <li><strong>Não inclui a margem.</strong> Uma caixa de <code>width: 50%</code> com <code>margin: 10px</code> continua passando de 50%. Para espaço entre colunas, use o <code>gap</code> do Flexbox e do Grid (aula <a href="gap.html">gap</a>).</li>
+  <li><strong>Não faz mágica com padding grande demais.</strong> Se padding + borda passarem da largura (<code>width: 30px; padding: 20px</code>, 40px de padding numa caixa de 30), o conteúdo vai a zero e a caixa cresce mesmo assim.</li>
+  <li><strong>Vale também para a altura.</strong> Com <code>height: 100px</code> e <code>padding: 20px</code>, sobram só 60px para o conteúdo. Se o texto não couber, ele vaza (aula <a href="width-height.html">Largura e Altura</a>).</li>
+  <li><strong>Não muda nada em caixas sem <code>width</code> nem <code>height</code>.</strong> Uma caixa automática já ocupa o espaço que tem, com padding e tudo. O <code>box-sizing</code> só entra na conta quando você dá um tamanho.</li>
+</ul>
+
+<hr>
+
+<h2>6. Qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Quando usar</th></tr>
+<tr><td><code>*, *::before, *::after { box-sizing: border-box; }</code></td><td>No começo de <strong>todo</strong> projeto novo. É a recomendação do guia.</td></tr>
+<tr><td><code>html { box-sizing: border-box; }</code> + <code>* { box-sizing: inherit; }</code></td><td>A mesma ideia, com herança. Útil se você usa componentes de terceiros que esperam <code>content-box</code>.</td></tr>
+<tr><td><code>.caixa { box-sizing: border-box; }</code></td><td>Só numa caixa: para consertar um caso isolado num site antigo, sem mexer no resto.</td></tr>
+<tr><td><code>box-sizing: content-box;</code></td><td>Raro: quando o tamanho do <strong>conteúdo</strong> tem de ser exato (uma imagem de 300px com moldura em volta, por exemplo).</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>A declaração inválida é ignorada, em silêncio, e a caixa continua em <code>content-box</code>. No F12, ela aparece <strong>riscada</strong> no painel de estilos.</p>
+
+<div class="cenario">
+<strong>Valor errado: <code>is not a “box-sizing” value</code></strong>
+<pre class="term" data-cwd="~/site">$ cat bs1.css
+.caixa {
+  box-sizing: border;
+}
+$ vnu --css bs1.css
+"file:/home/ana/site/bs1.css":2.15-2.20: error: CSS: “box-sizing”: “border” is not a “box-sizing” value.
+$ vnu --css bs2.css
+"file:/home/ana/site/bs2.css":2.15-2.23: error: CSS: “box-sizing”: “borderbox” is not a “box-sizing” value.</pre>
+<p><strong>O que você vê:</strong> a caixa continua somando padding e borda, como se a linha não existisse.</p>
+<p><strong>O que significa:</strong> "<code>border</code> não é um valor de <code>box-sizing</code>" (e <code>borderbox</code>, sem o hífen, também não). Os únicos valores são <code>content-box</code> e <code>border-box</code>, com hífen.</p>
+<p><strong>Como consertar:</strong> <code>box-sizing: border-box;</code>.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:.campo{box-sizing}=border-box,nsrc:borderbox">
+<p class="try-task"><strong>Missão:</strong> o campo deveria caber no formulário (<code>width: 100%</code> com padding), mas passa da borda à direita. A Ana até escreveu o <code>box-sizing</code>, mas o navegador o ignorou. Conserte.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;form class="formulario"&gt;
+  &lt;div class="campo"&gt;Seu nome&lt;/div&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">.formulario {
+  max-width: 300px;
+  border: 2px solid teal;
+  padding: 10px;
+}
+
+.campo {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid gray;
+  box-sizing: borderbox;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.formulario {
+  max-width: 300px;
+  border: 2px solid teal;
+  padding: 10px;
+}
+
+.campo {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid gray;
+  box-sizing: border-box;
+}
+</pre>
+</div>
+
+<p>(O "campo" aqui é um <code>&lt;div&gt;</code> desenhado como campo, para o exemplo funcionar igual em todos os navegadores: os campos de verdade, <code>&lt;input&gt;</code>, já vêm com regras próprias, como você viu na nota da seção 3.)</p>
+
+<div class="cenario">
+<strong>Pus o <code>border-box</code> e as colunas ainda não cabem</strong>
+<p><strong>O que você vê:</strong> duas caixas de <code>width: 50%</code> com <code>box-sizing: border-box</code>, mas a segunda continua caindo para a linha de baixo.</p>
+<p><strong>Por quê:</strong> confira três coisas. (1) Uma <code>margin</code>: ela nunca entra no <code>border-box</code>. (2) Um espaço no HTML entre duas caixas <code>inline-block</code>, que vira um espacinho na tela. (3) A regra foi escrita num seletor que não casa com as caixas (um erro de digitação na classe), e o F12, na aba <em>Computed</em>, mostra <code>box-sizing: content-box</code>.</p>
+<p><strong>O que o validador diz:</strong> nada. Nos três casos, o CSS é válido.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>box-sizing: content-box;</code></td><td><code>width</code>/<code>height</code> medem só o conteúdo; padding e borda são somados (o valor inicial)</td></tr>
+<tr><td><code>box-sizing: border-box;</code></td><td><code>width</code>/<code>height</code> medem até a borda; o conteúdo encolhe</td></tr>
+<tr><td><code>*, *::before, *::after { box-sizing: border-box; }</code></td><td>A regra universal, no começo do CSS</td></tr>
+<tr><td>Margem</td><td>Nunca entra na conta</td></tr>
+<tr><td>Herdado?</td><td>Não (a não ser com <code>box-sizing: inherit</code>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O valor</h3>
+<p>Complete para o <code>width</code> incluir o padding e a borda:</p>
+<div class="ex-code">.cartao { box-sizing: <input data-answer="border-box" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. O seletor de todos</h3>
+<p>Complete o seletor que casa com todos os elementos:</p>
+<div class="ex-code"><input data-answer="*" aria-label="seletor">, *::before, *::after { box-sizing: border-box; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. A conta</h3>
+<p>Uma caixa com <code>box-sizing: content-box</code>, <code>width: 100px</code>, <code>padding: 10px</code> e <code>border: 5px solid</code>. Quantos pixels de largura ela ocupa? (só o número)</p>
+<div class="ex-code">ocupa <input data-answer="130" aria-label="largura"> px</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. A mesma caixa do exercício 3, agora com <code>box-sizing: border-box</code>. Qual a largura do <strong>conteúdo</strong>?</p>
+<label><input type="radio" name="q4"> 100px</label>
+<label><input type="radio" name="q4"> 70px</label>
+<label><input type="radio" name="q4"> 130px</label>
+<label><input type="radio" name="q4"> 80px</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. O que o <code>border-box</code> <strong>não</strong> inclui na largura?</p>
+<label><input type="radio" name="q5"> O padding</label>
+<label><input type="radio" name="q5"> A borda</label>
+<label><input type="radio" name="q5"> A margem</label>
+<label><input type="radio" name="q5"> O conteúdo</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Por que a regra universal lista <code>*::before</code> e <code>*::after</code> além do <code>*</code>?</p>
+<label><input type="radio" name="q6"> Porque o <code>*</code> sozinho não alcança os pseudo-elementos</label>
+<label><input type="radio" name="q6"> Porque sem eles a regra é inválida</label>
+<label><input type="radio" name="q6"> Para aumentar a especificidade</label>
+<label><input type="radio" name="q6"> Só por costume: não faz diferença</label>
+</div>
+
+<h3>Missão final: a regra universal</h3>
+
+<div class="tryhtml" data-goal="css:.cartao{box-sizing}=border-box,css:.selo{box-sizing}=border-box,css:.cartao::before{box-sizing}=border-box,src:\*\s*\{|\*\s*\,|\*::before">
+<p class="try-task"><strong>Missão:</strong> os dois cartões têm <code>width: 50%</code>, padding e borda, e o selo tem <code>width: 100%</code>: tudo passa do lugar. Em vez de pôr <code>box-sizing</code> em cada classe, escreva no começo do CSS a <strong>regra universal</strong> (<code>*</code>, <code>*::before</code> e <code>*::after</code>) com <code>border-box</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;&lt;div class="selo"&gt;Novo&lt;/div&gt;Bolo de cenoura&lt;/div&gt;&lt;div class="cartao"&gt;&lt;div class="selo"&gt;Clássico&lt;/div&gt;Pão de queijo&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  display: inline-block;
+  vertical-align: top;
+  width: 50%;
+  padding: 16px;
+  border: 3px solid peru;
+  background-color: oldlace;
+}
+
+.cartao::before {
+  content: "★ ";
+  color: peru;
+}
+
+.selo {
+  width: 100%;
+  padding: 4px 8px;
+  border: 2px solid saddlebrown;
+  margin-bottom: 8px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.cartao {
+  display: inline-block;
+  vertical-align: top;
+  width: 50%;
+  padding: 16px;
+  border: 3px solid peru;
+  background-color: oldlace;
+}
+
+.cartao::before {
+  content: "★ ";
+  color: peru;
+}
+
+.selo {
+  width: 100%;
+  padding: 4px 8px;
+  border: 2px solid saddlebrown;
+  margin-bottom: 8px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>box-sizing</code> diz o que o <code>width</code> e o <code>height</code> medem.</li>
+  <li><code>content-box</code> (o padrão): só o conteúdo; padding e borda são somados por fora. <code>border-box</code>: até a borda; o que você escreve é o que a caixa ocupa.</li>
+  <li>O caso clássico: colunas de <code>50%</code> com padding não cabem lado a lado em <code>content-box</code>.</li>
+  <li>Comece todo CSS com <code>*, *::before, *::after { box-sizing: border-box; }</code> (ou a versão com <code>inherit</code>).</li>
+  <li>A margem nunca entra na conta.</li>
+  <li>Erros: <code>border</code> ou <code>borderbox</code> no lugar de <code>border-box</code>; o navegador ignora e a caixa continua somando.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
