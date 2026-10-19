@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS float — o texto em volta da imagem e o jeito antigo de fazer layout | Guia CSS</title>
+<meta name="description" content="float em CSS para quem está começando: o texto que contorna uma imagem (o uso certo hoje), float left, right e none, clear, o pai que encolhe e o display: flow-root, o layout antigo de colunas com float e por que trocá-lo por Flexbox e Grid, e as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">float</span></h1>
+
+<p class="intro">Abra uma revista: a foto fica num canto e o texto <strong>contorna</strong> a foto, linha por linha. É para isso que a propriedade <code>float</code> ("flutuar") foi criada, e é para isso que ela serve até hoje. Durante uns quinze anos, porém, ela foi usada para uma coisa bem diferente: montar colunas e layouts inteiros, porque o CSS não tinha nada melhor. Nesta aula você vai usar o <code>float</code> do jeito certo, na receita da Ana, e aprender a <strong>reconhecer</strong> o jeito antigo, para entender códigos velhos e saber trocá-los por Flexbox e Grid.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que <code>float: left</code> e <code>float: right</code> fazem com uma imagem e com o texto em volta.</li>
+  <li>Como dar um respiro entre a imagem e o texto.</li>
+  <li>A propriedade <code>clear</code>, que faz um elemento parar de contornar.</li>
+  <li>Por que um pai só com filhos flutuantes "encolhe", e o conserto moderno: <code>display: flow-root</code>.</li>
+  <li>Como era o layout antigo de colunas com <code>float</code>, e por que hoje se usa Flexbox ou Grid.</li>
+  <li>A mensagem real do validador para <code>float: center</code>.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador. A foto é a ilustração do bolo que acompanha o guia (<code>assets/midia/bolo-400.jpg</code>).</p>
+
+<hr>
+
+<h2>A ideia: a pedra no rio</h2>
+<p>Ponha uma pedra na beira de um rio. A água não para: ela <strong>contorna</strong> a pedra e continua correndo do lado. Com <code>float</code>, a imagem é a pedra, empurrada para a margem esquerda ou direita, e o texto é a água, que passa ao lado dela e volta a ocupar a largura toda quando a pedra acaba.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>No rio</th><th>Na página</th></tr>
+<tr><td>A pedra encostada na margem</td><td>O elemento com <code>float: left</code> ou <code>float: right</code></td></tr>
+<tr><td>A água que contorna a pedra</td><td>O texto (as linhas) que vem depois</td></tr>
+<tr><td>Uma barragem: daqui para baixo, a água não passa mais ao lado da pedra</td><td><code>clear</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. A imagem que flutua</h2>
+<p>Sem <code>float</code>, uma imagem fica numa linha, e o parágrafo começa embaixo dela. Com <code>float: left</code>, ela vai para a esquerda, e o texto sobe e corre do lado:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o texto contorna a foto pela direita e, quando a foto acaba, volta a ocupar a largura toda. Troque <code>left</code> por <code>right</code> e depois por <code>none</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;img class="foto" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="200" height="150"&gt;
+&lt;p&gt;Este é o bolo que a minha avó fazia todo domingo. A massa é fofinha, laranja por causa da cenoura, e a cobertura de chocolate fica durinha por fora e cremosa por dentro.&lt;/p&gt;
+&lt;p&gt;Bata no liquidificador 3 cenouras médias, 3 ovos e 1 xícara de óleo. Despeje numa tigela e misture 2 xícaras de açúcar, 2 xícaras de farinha de trigo e 1 colher de sopa de fermento. Asse em forma untada, no forno a 180 graus, por cerca de 40 minutos.&lt;/p&gt;
+&lt;p&gt;Para a cobertura, leve ao fogo 1 colher de manteiga, 3 colheres de chocolate em pó, 1 xícara de açúcar e 5 colheres de leite, até engrossar. Espalhe sobre o bolo ainda quente.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.foto {
+  float: left;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>float</dt><dd>"Flutuar": tira o elemento da linha normal e o empurra para uma das margens do pai. O que vem depois sobe e passa ao lado dele.</dd>
+  <dt>left</dt><dd>Encosta na margem <strong>esquerda</strong>; o texto corre pela direita.</dd>
+</dl>
+
+<p>Os três valores, cada um numa caixa com o nome escrito (o <code>display: flow-root</code> das caixas faz cada uma conter a sua foto; ele é explicado na seção 3):</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .caixa { display: flow-root; border: 2px solid gray; padding: 8px; margin-bottom: 12px; }
+  .caixa img { width: 100px; height: 75px; }
+  .esquerda img { float: left; }
+  .direita img { float: right; }
+  .nenhum img { float: none; }
+&lt;/style&gt;
+&lt;div class="caixa esquerda"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura"&gt;
+  &lt;strong&gt;float: left&lt;/strong&gt; — a foto vai para a esquerda e o texto corre pela direita, ao lado dela, linha após linha, até a foto acabar.
+&lt;/div&gt;
+&lt;div class="caixa direita"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura"&gt;
+  &lt;strong&gt;float: right&lt;/strong&gt; — a foto vai para a direita e o texto corre pela esquerda, ao lado dela, linha após linha, até a foto acabar.
+&lt;/div&gt;
+&lt;div class="caixa nenhum"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura"&gt;
+  &lt;strong&gt;float: none&lt;/strong&gt; (o padrão) — a foto fica na linha do texto, como uma letra grande, e o texto continua depois dela.
+&lt;/div&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que faz</th></tr>
+<tr><td><code>float: left</code></td><td>Encosta na esquerda; o conteúdo seguinte contorna pela direita</td></tr>
+<tr><td><code>float: right</code></td><td>Encosta na direita; o conteúdo seguinte contorna pela esquerda</td></tr>
+<tr><td><code>float: none</code></td><td>O padrão: não flutua</td></tr>
+<tr><td><code>float: inline-start</code> / <code>inline-end</code></td><td>O começo / o fim da linha. Em português, que se lê da esquerda para a direita, é o mesmo que <code>left</code> / <code>right</code>; num idioma escrito da direita para a esquerda, como o árabe, inverte sozinho (aula <a href="propriedades-logicas.html">Propriedades Lógicas</a>)</td></tr>
+</table>
+</div>
+
+<h3>O respiro entre a foto e o texto</h3>
+<p>Repare que, no primeiro exemplo, o texto encosta na foto. Uma <code>margin</code> (aula <a href="margin.html">margin</a>) no lado de dentro resolve: numa foto à esquerda, margem à direita; numa foto à direita, margem à esquerda.</p>
+
+<div class="tryhtml" data-goal="css:.foto{float}=right,css:.foto{margin-left}=16px">
+<p class="try-task"><strong>Missão:</strong> ponha a foto do bolo à <strong>direita</strong>, com o texto contornando pela esquerda, e dê a ela uma margem esquerda de <code>16px</code>, para o texto não encostar.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;img class="foto" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="200" height="150"&gt;
+&lt;p&gt;Este é o bolo que a minha avó fazia todo domingo. A massa é fofinha, laranja por causa da cenoura, e a cobertura de chocolate fica durinha por fora e cremosa por dentro.&lt;/p&gt;
+&lt;p&gt;Bata no liquidificador 3 cenouras médias, 3 ovos e 1 xícara de óleo. Despeje numa tigela e misture 2 xícaras de açúcar, 2 xícaras de farinha de trigo e 1 colher de sopa de fermento. Asse em forma untada, no forno a 180 graus, por cerca de 40 minutos.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.foto {
+  border-radius: 8px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.foto {
+  float: right;
+  margin-left: 16px;
+  border-radius: 8px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. clear: parar de contornar</h2>
+<p>Às vezes o texto contorna mais do que devia. Na receita abaixo, a foto é alta e o título "Modo de preparo" sobe para o lado dela, em vez de começar uma parte nova embaixo:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o título "Modo de preparo" está ao lado da foto. A regra <code>h2 { clear: left; }</code> já está no <code>style.css</code>, mas comentada (entre <code>/*</code> e <code>*/</code>): tire o comentário e veja o título descer para baixo da foto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;img class="foto" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="200" height="150"&gt;
+&lt;p&gt;Rende 12 fatias. Tempo: 1 hora.&lt;/p&gt;
+&lt;h2&gt;Modo de preparo&lt;/h2&gt;
+&lt;p&gt;Bata as cenouras, os ovos e o óleo. Misture o açúcar, a farinha e o fermento. Asse por 40 minutos.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.foto {
+  float: left;
+  margin-right: 16px;
+}
+
+/* h2 {
+  clear: left;
+} */
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>clear</dt><dd>"Limpar": o elemento <strong>não aceita</strong> flutuantes ao lado dele e desce até ficar abaixo deles.</dd>
+  <dt>left</dt><dd>Desce abaixo dos flutuantes da <strong>esquerda</strong>. <code>right</code>: abaixo dos da direita. <code>both</code> ("ambos"): abaixo de todos, o mais usado.</dd>
+</dl>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O elemento desce abaixo de</th></tr>
+<tr><td><code>clear: left</code></td><td>Flutuantes à esquerda</td></tr>
+<tr><td><code>clear: right</code></td><td>Flutuantes à direita</td></tr>
+<tr><td><code>clear: both</code></td><td>Todos os flutuantes</td></tr>
+<tr><td><code>clear: none</code></td><td>Nenhum (o padrão)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>3. O pai que encolhe</h2>
+<p>Um elemento flutuante sai do fluxo normal, e o pai dele <strong>não conta</strong> a altura dele. Se o flutuante for mais alto que o resto do conteúdo, ele "vaza" pelo fundo do pai. Veja o cartão de receita da Ana, com borda e fundo:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> a borda e o fundo do cartão terminam logo depois do texto curto, e a foto vaza para fora, e até o parágrafo "Veja também", que nem faz parte do cartão, contorna a foto. Ponha <code>display: flow-root;</code> no <code>.cartao</code> e veja o cartão crescer para conter a foto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;img class="foto" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="160" height="120"&gt;
+  &lt;p&gt;&lt;strong&gt;Bolo de cenoura&lt;/strong&gt;: 50 minutos.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Veja também: bolo de fubá, pudim e brigadeiro.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  border: 2px solid peru;
+  background-color: linen;
+  padding: 0 12px;
+}
+
+.foto {
+  float: left;
+  margin-right: 12px;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>display: flow-root;</dt><dd>Faz o cartão "abraçar" os flutuantes de dentro: a altura dele passa a incluir a foto. O nome vem de <em>flow root</em>, "raiz do fluxo": o cartão vira um ambiente fechado, e o que flutua dentro dele fica dentro dele.</dd>
+</dl>
+
+<p>Em códigos antigos, você vai encontrar outros consertos para o mesmo problema, todos do tempo em que não havia o <code>flow-root</code>:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Conserto</th><th>Como era</th><th>Hoje</th></tr>
+<tr><td><code>display: flow-root</code></td><td>(o moderno)</td><td>Use este</td></tr>
+<tr><td>O "clearfix"</td><td><code>.cartao::after { content: ""; display: table; clear: both; }</code>: um elemento invisível no fim do pai, com <code>clear</code></td><td>Reconheça; troque por <code>flow-root</code></td></tr>
+<tr><td><code>overflow: hidden</code> no pai</td><td>Funciona, mas corta o que passar das bordas (sombras, menus)</td><td>Evite</td></tr>
+<tr><td><code>&lt;div style="clear: both"&gt;&lt;/div&gt;</code></td><td>Um <code>div</code> vazio no fim, só para limpar</td><td>Evite: HTML sem conteúdo, só para a aparência</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>4. O jeito antigo: colunas com float</h2>
+<p>Até por volta de 2015, quase todo site montava as colunas assim: cada coluna com <code>float: left</code> e uma largura em porcentagem, e um "clearfix" no pai. Você vai encontrar isso em temas antigos e em códigos copiados da internet:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> as duas colunas ficam lado a lado com <code>float</code>. Agora mude o <code>padding</code> do <code>.coluna</code> para <code>0 12px</code>: a coluna da direita cai para baixo, porque 70% + 30% + o preenchimento passa de 100%.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="linha"&gt;
+  &lt;main class="coluna principal"&gt;Receitas da semana&lt;/main&gt;
+  &lt;aside class="coluna lateral"&gt;Mais lidas&lt;/aside&gt;
+&lt;/div&gt;
+&lt;footer&gt;Receitas da Ana&lt;/footer&gt;
+</pre>
+<pre class="script" data-file="style.css">.linha {
+  display: flow-root;
+}
+
+.coluna {
+  float: left;
+  padding: 0;
+  height: 100px;
+}
+
+.principal {
+  width: 70%;
+  background-color: lightblue;
+}
+
+.lateral {
+  width: 30%;
+  background-color: wheat;
+}
+</pre>
+</div>
+
+<p>O mesmo layout, hoje, com Flexbox (assunto da próxima aula, <a href="flexbox.html">Introdução ao Flexbox</a>). O <code>display: flex</code> no pai põe os filhos lado a lado, sem <code>float</code>, sem conserto do pai e sem a conta de porcentagens: a lateral tem largura fixa e a principal ocupa o resto.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> mude o <code>padding</code> do <code>.coluna</code> para <code>0 12px</code> aqui também: nada cai.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="linha"&gt;
+  &lt;main class="coluna principal"&gt;Receitas da semana&lt;/main&gt;
+  &lt;aside class="coluna lateral"&gt;Mais lidas&lt;/aside&gt;
+&lt;/div&gt;
+&lt;footer&gt;Receitas da Ana&lt;/footer&gt;
+</pre>
+<pre class="script" data-file="style.css">.linha {
+  display: flex;
+}
+
+.coluna {
+  padding: 0;
+  height: 100px;
+}
+
+.principal {
+  flex: 1;
+  background-color: lightblue;
+}
+
+.lateral {
+  width: 200px;
+  background-color: wheat;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Para</th><th>Use</th><th>Não use</th></tr>
+<tr><td>Texto contornando uma imagem</td><td><code>float</code></td><td>—</td></tr>
+<tr><td>Itens lado a lado numa linha (menu, botões, cartões)</td><td><a href="flexbox.html">Flexbox</a></td><td><code>float</code></td></tr>
+<tr><td>Colunas e grades de página</td><td><a href="grid.html">Grid</a> ou Flexbox</td><td><code>float</code></td></tr>
+<tr><td>Um elemento por cima de outro</td><td><a href="position-absolute.html"><code>position: absolute</code></a></td><td><code>float</code></td></tr>
+</table>
+</div>
+
+<div class="note">
+<strong>Por que o float saiu de moda para layout</strong>
+<ul>
+  <li>Ele não foi feito para isso: é um truque, e por isso precisa de consertos (o pai que encolhe, o <code>clear</code>).</li>
+  <li>As colunas não têm a mesma altura: cada uma é do tamanho do próprio conteúdo.</li>
+  <li>Centralizar na vertical é quase impossível.</li>
+  <li>Qualquer pixel a mais na conta de larguras derruba uma coluna para a linha de baixo.</li>
+</ul>
+<p>Flexbox e Grid resolvem tudo isso e funcionam em todos os navegadores atuais.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong><code>float: center</code> não existe: <code>“center” is not a “float” value</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.foto {
+  float: center;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":2.10-2.15: error: CSS: “float”: “center” is not a “float” value.</pre>
+<p><strong>O que o leitor vê:</strong> a foto na posição normal, sem flutuar; a declaração foi ignorada (no F12, ela aparece riscada).</p>
+<p><strong>Por quê:</strong> flutuar é ir para uma margem, e não há margem no meio. Não existe texto contornando uma foto pelos dois lados.</p>
+<p><strong>Como consertar:</strong> para centralizar uma imagem sozinha na linha, use <code>display: block; margin: 0 auto;</code> (aula <a href="centralizar.html">Centralizando Qualquer Coisa</a>).</p>
+</div>
+
+<div class="cenario">
+<strong>A foto vaza para fora do cartão</strong>
+<p><strong>O que o leitor vê:</strong> a borda e o fundo do pai terminam antes da foto, e ela invade o que vem depois, que passa a contorná-la (seção 3).</p>
+<p><strong>Por quê:</strong> o pai não conta a altura dos filhos flutuantes. O validador não reclama: o código é válido.</p>
+<p><strong>Como consertar:</strong> <code>display: flow-root;</code> no pai.</p>
+</div>
+
+<div class="cenario">
+<strong><code>float</code> dentro de um Flexbox: ignorado</strong>
+<pre class="file" data-file="style.css · erro de propósito">.linha {
+  display: flex;
+}
+
+.lateral {
+  float: right;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> a lateral continua onde estava, como se não houvesse <code>float</code>.</p>
+<p><strong>Por quê:</strong> os filhos de um elemento com <code>display: flex</code> (ou <code>grid</code>) não flutuam: quem os arruma é o Flexbox. O validador não reclama.</p>
+<p><strong>Como consertar:</strong> use as ferramentas do Flexbox para mover o item (por exemplo, <code>margin-left: auto</code> empurra a lateral para a direita; veja a aula <a href="justify-content.html">justify-content</a>).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>float: left;</code> / <code>float: right;</code></td><td>Encosta o elemento numa margem; o conteúdo seguinte contorna</td></tr>
+<tr><td><code>float: none;</code></td><td>O padrão: não flutua</td></tr>
+<tr><td><code>margin-right</code> (foto à esquerda) / <code>margin-left</code> (à direita)</td><td>O respiro entre a foto e o texto</td></tr>
+<tr><td><code>clear: both;</code></td><td>O elemento desce abaixo dos flutuantes</td></tr>
+<tr><td><code>display: flow-root;</code> no pai</td><td>O pai passa a conter os filhos flutuantes</td></tr>
+<tr><td>Layout de colunas</td><td>Hoje: Flexbox ou Grid, não <code>float</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Foto à esquerda</h3>
+<p>Complete para o texto contornar a foto pela direita:</p>
+<div class="ex-code">.foto { float: <input data-answer="left" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Parar de contornar</h3>
+<p>Complete para o título descer abaixo de todos os flutuantes:</p>
+<div class="ex-code">h2 { clear: <input data-answer="both" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. O pai que contém</h3>
+<p>Complete para o cartão crescer até conter a foto flutuante:</p>
+<div class="ex-code">.cartao { display: <input data-answer="flow-root" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Para que o <code>float</code> ainda é a escolha certa hoje?</p>
+<label><input type="radio" name="q4"> Montar as colunas da página</label>
+<label><input type="radio" name="q4"> Centralizar um botão</label>
+<label><input type="radio" name="q4"> Fazer o texto contornar uma imagem</label>
+<label><input type="radio" name="q4"> Pôr um menu lado a lado</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. O que o validador diz de <code>float: center</code>?</p>
+<label><input type="radio" name="q5"> Nada: é válido e centraliza</label>
+<label><input type="radio" name="q5"> Que <code>center</code> não é um valor de <code>float</code></label>
+<label><input type="radio" name="q5"> Que falta o <code>clear</code></label>
+<label><input type="radio" name="q5"> Que precisa de <code>position</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. O cartão tem borda e uma foto com <code>float: left</code>, e a foto passa da borda de baixo. Por quê?</p>
+<label><input type="radio" name="q6"> A foto é grande demais para a página</label>
+<label><input type="radio" name="q6"> Faltou <code>z-index</code></label>
+<label><input type="radio" name="q6"> O navegador não suporta <code>float</code> em imagens</label>
+<label><input type="radio" name="q6"> O pai não conta a altura dos filhos flutuantes</label>
+</div>
+
+<h3>Missão final: o cartão de receita</h3>
+
+<div class="tryhtml" data-goal="css:.foto{float}=left,css:.foto{margin-right}=12px,css:.cartao{display}=flow-root">
+<p class="try-task"><strong>Missão:</strong> monte o cartão da receita: a foto à <strong>esquerda</strong>, com o texto contornando, uma margem direita de <code>12px</code> na foto e o cartão contendo a foto inteira (com <code>display: flow-root</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;img class="foto" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="160" height="120"&gt;
+  &lt;p&gt;&lt;strong&gt;Bolo de cenoura&lt;/strong&gt;&lt;/p&gt;
+  &lt;p&gt;50 minutos · 12 fatias&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Veja também: bolo de fubá, pudim e brigadeiro.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  border: 2px solid peru;
+  background-color: linen;
+  padding: 0 12px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  display: flow-root;
+  border: 2px solid peru;
+  background-color: linen;
+  padding: 0 12px;
+}
+
+.foto {
+  float: left;
+  margin-right: 12px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>float: left</code>/<code>right</code> encosta o elemento numa margem, e o conteúdo seguinte o contorna. É o jeito certo, hoje, de fazer o texto correr em volta de uma imagem.</li>
+  <li>Dê um respiro com <code>margin</code> no lado do texto. Não existe <code>float: center</code>.</li>
+  <li><code>clear</code> (<code>left</code>, <code>right</code>, <code>both</code>) faz um elemento descer abaixo dos flutuantes.</li>
+  <li>O pai não conta a altura dos filhos flutuantes; <code>display: flow-root</code> no pai resolve. O "clearfix" é o conserto antigo.</li>
+  <li>Colunas com <code>float</code> são o jeito antigo: reconheça, e use <a href="flexbox.html">Flexbox</a> ou <a href="grid.html">Grid</a> no lugar. Dentro de um Flexbox ou Grid, o <code>float</code> é ignorado.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
