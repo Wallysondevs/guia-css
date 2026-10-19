@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Subgrid — cartões e listas alinhados com grid-template-rows: subgrid | Guia CSS</title>
+<meta name="description" content="Subgrid em CSS para quem está começando: por que os cartões lado a lado ficam desalinhados, como grid-template-rows: subgrid e grid-template-columns: subgrid fazem os filhos usarem as linhas do grid pai, o gap herdado, o span que não pode faltar, e as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Subgrid</span></h1>
+
+<p class="intro">A Ana pôs três cartões de receita lado a lado com Grid. Ficou quase bonito: como um título tem três linhas e os outros têm uma, as descrições começam em alturas diferentes e os links "Ver receita" ficam desencontrados. Cada cartão monta a sua arrumação sozinho, sem olhar para os vizinhos. O <strong>subgrid</strong> ("subgrade") faz o contrário: os filhos de cada cartão passam a usar as <strong>linhas do grid de fora</strong>, e tudo se alinha de um cartão para o outro.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Por que cartões vizinhos ficam desalinhados, mesmo dentro de um grid.</li>
+  <li><code>grid-template-rows: subgrid</code>: os cartões usando as linhas do grid pai.</li>
+  <li>O <code>grid-row: span 3</code>, a parte que todo mundo esquece.</li>
+  <li><code>grid-template-columns: subgrid</code>: colunas alinhadas numa lista (o cardápio da padaria).</li>
+  <li>O <code>gap</code> que vem do pai, e como trocar.</li>
+  <li>Os três jeitos de o subgrid "não funcionar", com as fotos e a mensagem do validador.</li>
+</ul>
+</div>
+
+<p>Esta aula usa o Grid das aulas <a href="grid.html">Introdução ao Grid</a>, <a href="grid-linhas.html">Linhas</a> e <a href="grid-posicionar.html">Posicionando Itens</a>. Os resultados são desenhados pelo <strong>seu</strong> navegador; as mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (<code>ana@notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a estante com prateleiras corridas</h2>
+<p>Imagine três caixas de feira lado a lado, cada uma com as suas divisórias. Numa, a divisória está a 10 cm; na outra, a 25 cm, porque o pote de cima é mais alto. Olhando de frente, nada se alinha.</p>
+<p>Agora troque as divisórias por <strong>prateleiras corridas</strong>, que atravessam as três caixas. Se um pote é alto, a prateleira inteira sobe, nas três caixas ao mesmo tempo. O subgrid é isso: o grid pai define as prateleiras (as linhas), e cada cartão, em vez de ter as suas, <strong>usa as do pai</strong>.</p>
+
+<hr>
+
+<h2>1. O problema: cada cartão por si</h2>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> repare que "Crocante por fora." começa mais embaixo que as outras descrições, e que os três "Ver receita" não estão na mesma altura. Mude o título do pão de queijo para só "Pão de queijo" e veja tudo mudar de novo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartoes"&gt;
+  &lt;article class="cartao"&gt;
+    &lt;h3&gt;Bolo de cenoura&lt;/h3&gt;
+    &lt;p&gt;Fofinho, com cobertura de chocolate.&lt;/p&gt;
+    &lt;a href="bolo.html"&gt;Ver receita&lt;/a&gt;
+  &lt;/article&gt;
+  &lt;article class="cartao"&gt;
+    &lt;h3&gt;Pão de queijo mineiro da vó Teresa, com polvilho azedo&lt;/h3&gt;
+    &lt;p&gt;Crocante por fora.&lt;/p&gt;
+    &lt;a href="pao.html"&gt;Ver receita&lt;/a&gt;
+  &lt;/article&gt;
+  &lt;article class="cartao"&gt;
+    &lt;h3&gt;Brigadeiro&lt;/h3&gt;
+    &lt;p&gt;O clássico das festas, com granulado de chocolate meio amargo.&lt;/p&gt;
+    &lt;a href="brigadeiro.html"&gt;Ver receita&lt;/a&gt;
+  &lt;/article&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartoes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.cartao {
+  display: grid;
+  padding: 12px;
+  border: 2px solid tomato;
+}
+
+.cartao h3,
+.cartao p {
+  margin: 0;
+}
+</pre>
+</div>
+
+<p>O grid de fora (<code>.cartoes</code>) só cuida de <strong>onde fica cada cartão</strong>: três colunas, uma linha. O que acontece <strong>dentro</strong> de cada cartão é outro grid, independente. No primeiro cartão, o título tem uma linha; no segundo, três. Cada um calcula as suas linhas sozinho, e as descrições caem em alturas diferentes.</p>
+
+<hr>
+
+<h2>2. A solução: <code>grid-template-rows: subgrid</code></h2>
+<p>São duas mudanças no cartão:</p>
+
+<pre class="file" data-file="style.css">.cartao {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  padding: 12px;
+  border: 2px solid tomato;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>display: grid</dt><dd>O cartão continua sendo um grid: só um grid pode ter subgrid.</dd>
+  <dt>grid-row: span 3</dt><dd>"Ocupe <strong>3 linhas</strong> do grid pai." O cartão tem três filhos (título, descrição, link), então precisa de três "prateleiras". Sem isso, ele ocupa uma linha só, e o subgrid tem uma prateleira para três coisas (veja <a href="#errado">Quando dá errado</a>). O <code>span</code> ("abranger") vem da aula <a href="grid-posicionar.html">Posicionando Itens</a>.</dd>
+  <dt>grid-template-rows: subgrid</dt><dd>"As minhas linhas são <strong>as do pai</strong>." Em vez de inventar linhas novas, o cartão usa as 3 linhas do <code>.cartoes</code> que ele ocupa. Como os três cartões ocupam <strong>as mesmas</strong> 3 linhas, a linha do título tem a altura do <strong>maior</strong> título, e as descrições começam juntas.</dd>
+</dl>
+
+<p>O resultado, com o mesmo HTML do exemplo de cima: os três títulos na primeira faixa, as três descrições começando na mesma altura, e os três "Ver receita" lado a lado na última faixa. No Chromium, o estilo calculado do cartão mostra <code>grid-template-rows: subgrid [] [] [] []</code> (os <code>[]</code> são as 4 divisas das 3 linhas, sem nome) e <code>grid-row-start: span 3</code>.</p>
+
+<div class="tryhtml" data-goal="src:grid-template-rows:\s*subgrid,css:.cartao{grid-row-start}=span 3">
+<p class="try-task"><strong>Missão:</strong> alinhe os cartões. No <code>.cartao</code>, faça cada cartão ocupar <strong>3 linhas</strong> do grid pai e usar as linhas dele com <code>subgrid</code>. Os três "Ver receita" devem ficar na mesma altura.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartoes"&gt;
+  &lt;article class="cartao"&gt;
+    &lt;h3&gt;Bolo de cenoura&lt;/h3&gt;
+    &lt;p&gt;Fofinho, com cobertura de chocolate.&lt;/p&gt;
+    &lt;a href="bolo.html"&gt;Ver receita&lt;/a&gt;
+  &lt;/article&gt;
+  &lt;article class="cartao"&gt;
+    &lt;h3&gt;Pão de queijo mineiro da vó Teresa, com polvilho azedo&lt;/h3&gt;
+    &lt;p&gt;Crocante por fora.&lt;/p&gt;
+    &lt;a href="pao.html"&gt;Ver receita&lt;/a&gt;
+  &lt;/article&gt;
+  &lt;article class="cartao"&gt;
+    &lt;h3&gt;Brigadeiro&lt;/h3&gt;
+    &lt;p&gt;O clássico das festas, com granulado de chocolate meio amargo.&lt;/p&gt;
+    &lt;a href="brigadeiro.html"&gt;Ver receita&lt;/a&gt;
+  &lt;/article&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartoes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.cartao {
+  display: grid;
+  padding: 12px;
+  border: 2px solid tomato;
+}
+
+.cartao h3,
+.cartao p {
+  margin: 0;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartoes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.cartao {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  padding: 12px;
+  border: 2px solid tomato;
+}
+
+.cartao h3,
+.cartao p {
+  margin: 0;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. O <code>gap</code> vem junto</h2>
+<p>Depois da missão, repare no espaço entre o título e a descrição: ficou bem maior. É o <code>gap: 16px</code> do <code>.cartoes</code>. O subgrid herda do pai as linhas <strong>e</strong> o espaço entre elas, então os 16 px que separavam os cartões agora separam também o título da descrição.</p>
+<p>Para um espaço diferente dentro do cartão, declare o seu próprio <code>row-gap</code> ("espaço entre linhas") no subgrid. Ele vale só dentro do cartão:</p>
+
+<pre class="file" data-file="style.css">.cartao {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: 4px;
+}
+</pre>
+
+<p>No Chromium, com o <code>row-gap: 4px</code>, os itens continuam alinhados de um cartão para o outro, mas mais próximos: o título do pão de queijo fica a poucos pixels da descrição, e os cartões continuam separados pelos 16 px do pai.</p>
+
+<hr>
+
+<h2>4. Colunas: <code>grid-template-columns: subgrid</code></h2>
+<p>O subgrid funciona nas duas direções. Nas colunas, ele resolve um problema clássico: o cardápio da padaria da Ana é uma lista (<code>&lt;ul&gt;</code>), e cada item tem três partes: o nome, a porção e o preço. Cada <code>&lt;li&gt;</code> é um grid de três colunas, mas cada um calcula a largura das suas colunas sozinho, e os preços ficam em zigue-zague.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> veja os preços desalinhados. Depois apague o <code>/*</code> e o <code>*/</code> da última linha do <code>li</code> e veja as três colunas se alinharem.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Padaria da Ana&lt;/h2&gt;
+&lt;ul class="cardapio"&gt;
+  &lt;li&gt;&lt;span&gt;Pão francês&lt;/span&gt; &lt;span&gt;unidade&lt;/span&gt; &lt;strong&gt;R$ 0,90&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;span&gt;Bolo de cenoura com cobertura&lt;/span&gt; &lt;span&gt;fatia&lt;/span&gt; &lt;strong&gt;R$ 8,00&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;span&gt;Café&lt;/span&gt; &lt;span&gt;xícara&lt;/span&gt; &lt;strong&gt;R$ 5,50&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.cardapio {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: 8px 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.cardapio li {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  /* grid-template-columns: subgrid; */
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>.cardapio</dt><dd>O pai: um grid de três colunas <code>auto</code> (cada coluna fica da largura do conteúdo). <code>gap: 8px 24px</code> é 8 px entre as linhas e 24 px entre as colunas.</dd>
+  <dt>grid-column: 1 / -1</dt><dd>Cada <code>&lt;li&gt;</code> ocupa <strong>da primeira à última</strong> divisa de coluna do pai, ou seja, as três colunas. O <code>-1</code> quer dizer "a última divisa" (aula <a href="grid-posicionar.html">Posicionando Itens</a>). É o mesmo papel do <code>span 3</code> nos cartões.</dd>
+  <dt>grid-template-columns: subgrid</dt><dd>Escrita <strong>depois</strong> do <code>grid-template-columns: auto auto auto</code>, ela vence (aula <a href="cascata.html">Cascata</a>): as colunas do item passam a ser as do pai. A coluna do nome passa a ser <strong>uma só</strong> para a lista inteira, larga o bastante para o maior nome ("Bolo de cenoura com cobertura"), e as porções e os preços se alinham.</dd>
+</dl>
+
+<p>No Chromium, com a linha comentada, os preços de cada item começam numa posição diferente. Com elas, as porções e os preços formam duas colunas retas, como numa tabela. E o HTML continua sendo uma lista de verdade (<code>&lt;ul&gt;</code> e <code>&lt;li&gt;</code>): o alinhamento veio do CSS, sem trocar a lista por uma tabela.</p>
+
+<hr>
+
+<h2>5. Formas de alinhar cartões, e qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Alinha</th><th>Problema</th></tr>
+<tr><td><code>min-height</code> no título (<code>.cartao h3 { min-height: 4.5em; }</code>)</td><td>Os títulos, se você adivinhar a altura</td><td>Um título maior que o previsto, uma fonte maior ou uma tela estreita estragam tudo.</td></tr>
+<tr><td>Cartão com <code>display: flex; flex-direction: column</code> e <code>margin-top: auto</code> no link</td><td>Só a última coisa (o link vai para o fundo)</td><td>As descrições continuam desalinhadas. Serve quando só o botão importa.</td></tr>
+<tr><td><code>grid-template-rows: subgrid</code></td><td><strong>Todas</strong> as partes, cada uma na sua faixa</td><td>O cartão precisa saber quantas partes tem (<code>span 3</code>).</td></tr>
+<tr><td>Uma <code>&lt;table&gt;</code></td><td>Colunas</td><td>Só para dados que são uma tabela de verdade. Para um cardápio em lista, use <code>grid-template-columns: subgrid</code>.</td></tr>
+</table>
+</div>
+
+<div class="note">
+<strong>Suporte</strong>
+<p>O subgrid funciona no Chrome, Edge, Firefox e Safari atuais: o MDN marca <em>Baseline, amplamente disponível</em>, em todos os navegadores principais desde setembro de 2023. Num navegador mais antigo, <code>grid-template-rows: subgrid</code> é ignorado e o cartão volta a ser um grid comum: fica desalinhado como no exemplo 1, mas nada quebra.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Esqueceu o <code>span 3</code>: tudo empilhado no mesmo lugar</strong>
+<pre class="file" data-file="style.css · erro de propósito">.cartao {
+  display: grid;
+  grid-template-rows: subgrid;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> o título, a descrição e o link de cada cartão desenhados <strong>uns por cima dos outros</strong>, numa só faixa: um borrão de letras. Foi o que a foto do Chromium mostrou.</p>
+<p><strong>Por quê:</strong> sem <code>grid-row: span 3</code>, o cartão ocupa <strong>uma</strong> linha do pai, e o subgrid tem uma linha só. Um subgrid não cria linhas novas para quem sobra (o MDN explica: sem linhas implícitas na direção do subgrid), então os três filhos vão para a última linha que existe, a única, e se sobrepõem. O estilo calculado mostra <code>grid-template-rows: subgrid [] []</code>: duas divisas, uma linha.</p>
+<p><strong>Como consertar:</strong> <code>grid-row: span 3</code>, com o número de filhos do cartão.</p>
+</div>
+
+<div class="cenario">
+<strong>O cartão não é grid: o subgrid não faz nada</strong>
+<pre class="file" data-file="style.css · erro de propósito">.cartao {
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> os cartões ficam como no exemplo 1, desalinhados. O cartão ocupa as 3 linhas do pai, mas o que está dentro dele não segue as linhas: título, descrição e link ficam um embaixo do outro, cada um com a sua altura.</p>
+<p><strong>Por quê:</strong> <code>grid-template-rows</code> só vale num elemento com <code>display: grid</code>. Sem ele, o cartão é um bloco comum, e os filhos ficam um embaixo do outro, cada um com a sua altura. A declaração é válida (o validador não reclama e o F12 não a risca): só não tem efeito. O mesmo acontece se o <strong>pai</strong> não for grid: aí não existem linhas para herdar, e o subgrid vira um grid comum.</p>
+<p><strong>Como consertar:</strong> <code>display: grid</code> no pai e no cartão.</p>
+</div>
+
+<div class="cenario">
+<strong>Escreveu errado: <code>“sub-grid” is not a “grid-template-columns” value</code></strong>
+<pre class="term" data-cwd="~/site">$ vnu --css estilo.css
+"file:/home/ana/site/estilo.css":7.26-7.33: error: CSS: “grid-template-columns”: “sub-grid” is not a “grid-template-columns” value.</pre>
+<p><strong>O que significa:</strong> "<code>sub-grid</code> não é um valor de <code>grid-template-columns</code>". A palavra é <code>subgrid</code>, sem hífen. O navegador joga a declaração fora e o item volta às colunas que tinha; no F12, a linha aparece riscada.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>grid-template-rows: subgrid</code></td><td>As linhas do elemento são as linhas do pai que ele ocupa</td></tr>
+<tr><td><code>grid-template-columns: subgrid</code></td><td>O mesmo, com as colunas</td></tr>
+<tr><td><code>grid-row: span N</code> / <code>grid-column: 1 / -1</code></td><td>Quantas linhas ou colunas do pai o subgrid ocupa (obrigatório: sem isso, ele ocupa só uma)</td></tr>
+<tr><td><code>row-gap</code> / <code>column-gap</code> no subgrid</td><td>Troca, só lá dentro, o espaço herdado do pai</td></tr>
+<tr><td>Requisitos</td><td>O pai é <code>display: grid</code>; o subgrid também é <code>display: grid</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O valor</h3>
+<p>Complete para o cartão usar as linhas do pai:</p>
+<div class="ex-code">.cartao {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: <input data-answer="subgrid" aria-label="valor">;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. Quatro partes</h3>
+<p>O cartão agora tem foto, título, descrição e link. Complete:</p>
+<div class="ex-code">.cartao {
+  grid-row: span <input data-answer="4" aria-label="número">;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>3. Todas as colunas</h3>
+<p>Complete para o item ocupar da primeira à última coluna do pai:</p>
+<div class="ex-code">.cardapio li {
+  grid-column: 1 / <input data-answer="-1" aria-label="última divisa">;
+}</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Por que os títulos se alinham com <code>subgrid</code>?</p>
+<label><input type="radio" name="q4"> O subgrid corta os títulos longos</label>
+<label><input type="radio" name="q4"> O subgrid dá a mesma altura fixa a todos os títulos</label>
+<label><input type="radio" name="q4"> Todos os cartões usam as mesmas linhas do pai, que ficam da altura do maior conteúdo</label>
+<label><input type="radio" name="q4"> O subgrid transforma os cartões numa tabela</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Com <code>grid-template-rows: subgrid</code> e sem <code>grid-row: span 3</code>, o que acontece?</p>
+<label><input type="radio" name="q5"> Nada muda, o cartão funciona igual</label>
+<label><input type="radio" name="q5"> O subgrid fica com uma linha só, e os filhos se sobrepõem</label>
+<label><input type="radio" name="q5"> O navegador cria as linhas que faltam</label>
+<label><input type="radio" name="q5"> O validador mostra um erro</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. O espaço entre o título e a descrição ficou grande depois do subgrid. De onde ele veio?</p>
+<label><input type="radio" name="q6"> Do <code>gap</code> do grid pai, que o subgrid herda</label>
+<label><input type="radio" name="q6"> Da margem padrão do <code>h3</code></label>
+<label><input type="radio" name="q6"> Do <code>padding</code> do cartão</label>
+<label><input type="radio" name="q6"> É um erro do navegador</label>
+</div>
+
+<h3>Missão final: o cardápio alinhado</h3>
+
+<div class="tryhtml" data-goal="css:.cardapio li{display}=grid,src:grid-template-columns:\s*subgrid">
+<p class="try-task"><strong>Missão:</strong> aqui cada <code>li</code> é um <code>flex</code>, e os preços ficam em zigue-zague. Troque o flex por um <strong>grid</strong> que use as colunas do pai (<code>subgrid</code>). O <code>li</code> já ocupa todas as colunas (<code>grid-column: 1 / -1</code>). Os preços devem formar uma coluna reta.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Cafés da manhã&lt;/h2&gt;
+&lt;ul class="cardapio"&gt;
+  &lt;li&gt;&lt;span&gt;Pão na chapa&lt;/span&gt; &lt;span&gt;2 fatias&lt;/span&gt; &lt;strong&gt;R$ 6,00&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;span&gt;Misto quente com queijo minas&lt;/span&gt; &lt;span&gt;1 unidade&lt;/span&gt; &lt;strong&gt;R$ 12,00&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;span&gt;Suco de laranja&lt;/span&gt; &lt;span&gt;copo&lt;/span&gt; &lt;strong&gt;R$ 7,50&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.cardapio {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: 8px 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.cardapio li {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 24px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cardapio {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: 8px 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.cardapio li {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Num grid, cada filho que também é grid monta as suas linhas sozinho: cartões vizinhos ficam desalinhados.</li>
+  <li><code>grid-template-rows: subgrid</code> (ou <code>grid-template-columns: subgrid</code>) faz o elemento usar as linhas (ou colunas) do pai. Como os vizinhos usam as mesmas, tudo se alinha pelo maior conteúdo.</li>
+  <li>O subgrid precisa ocupar várias faixas do pai: <code>grid-row: span 3</code> ou <code>grid-column: 1 / -1</code>. Sem isso, os filhos se sobrepõem.</li>
+  <li>O pai e o subgrid são <code>display: grid</code>. O <code>gap</code> vem do pai; um <code>row-gap</code> no subgrid troca só lá dentro.</li>
+  <li>Funciona em todos os navegadores atuais desde setembro de 2023. A palavra é <code>subgrid</code>, sem hífen.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
