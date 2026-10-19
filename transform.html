@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS transform — mover, girar, escalar e inclinar | Guia CSS</title>
+<meta name="description" content="A propriedade transform para quem está começando: translate, rotate, scale e skew, a ordem das funções, o transform-origin, as propriedades separadas translate, rotate e scale, o matrix() que aparece no F12 e os erros mais comuns, com o resultado desenhado no seu navegador.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">transform</span></h1>
+
+<p class="intro">Um selo de "oferta" torto no canto do produto, um botão que cresce um pouquinho quando o mouse passa, uma seta que vira para baixo quando o menu abre. Tudo isso é <code>transform</code> ("transformar"): a propriedade que <strong>move</strong>, <strong>gira</strong>, <strong>aumenta</strong> e <strong>inclina</strong> um elemento depois que ele já está no lugar, sem empurrar nada em volta.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A ideia do <code>transform</code>: o elemento muda, mas o lugar dele na página fica reservado.</li>
+  <li>As quatro funções: <code>translate()</code> (mover), <code>rotate()</code> (girar), <code>scale()</code> (escalar) e <code>skew()</code> (inclinar).</li>
+  <li>Como juntar várias, e por que a <strong>ordem</strong> muda o resultado.</li>
+  <li>O <code>transform-origin</code>: em volta de qual ponto o elemento gira e cresce.</li>
+  <li>As propriedades separadas <code>translate</code>, <code>rotate</code> e <code>scale</code>.</li>
+  <li>O que é aquele <code>matrix(…)</code> que aparece no F12, e os erros mais comuns.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="box-model.html">O Modelo de Caixa</a> e <a href="position-relative.html">position: relative</a>. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana. Os valores calculados foram conferidos no Chromium.</p>
+
+<hr>
+
+<h2>A ideia: o adesivo em cima da página</h2>
+<p>Imagine a vitrine da lojinha da Ana com etiquetas coladas no vidro. Cada etiqueta tem o seu lugar. Agora a Ana pega uma etiqueta, gira, puxa um pouco para o lado, aumenta com uma lupa. As <strong>outras etiquetas não se mexem</strong>: o lugar da primeira continua lá, vazio, do jeito que estava.</p>
+<p>O <code>transform</code> é assim. Primeiro o navegador monta a página normalmente (a caixa de cada elemento, as margens, o fluxo). Depois, só na hora de <strong>pintar</strong>, ele mexe no desenho do elemento transformado. Para o resto da página, o elemento continua no lugar original e do tamanho original. Por isso:</p>
+<ul>
+  <li>mover com <code>transform</code> não empurra os vizinhos (diferente de mudar a <code>margin</code>);</li>
+  <li>um elemento aumentado com <code>scale</code> pode ficar <strong>por cima</strong> dos vizinhos;</li>
+  <li>é ótimo para efeitos e animações: o navegador não precisa recalcular a página inteira a cada passo.</li>
+</ul>
+
+<hr>
+
+<h2>1. <code>translate()</code>: mover</h2>
+<p>Nos exemplos desta aula, a linha tracejada mostra o <strong>lugar original</strong> do elemento, e a caixa colorida mostra onde ele foi desenhado.</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .lugar { display: inline-block; width: 100px; height: 60px; margin: 10px 40px 30px 10px; outline: 2px dashed gray; }
+  .caixa { width: 100px; height: 60px; background-color: tomato; color: white; font: 14px monospace; display: grid; place-items: center; }
+  .movida { transform: translate(30px, 20px); }
+&lt;/style&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa"&gt;original&lt;/div&gt;&lt;/div&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa movida"&gt;movida&lt;/div&gt;&lt;/div&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa"&gt;vizinha&lt;/div&gt;&lt;/div&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>transform:</dt><dd>A propriedade. Ela recebe uma ou mais <strong>funções</strong> de transformação.</dd>
+  <dt>translate(</dt><dd>"transladar", deslocar: mover sem girar.</dd>
+  <dt>30px,</dt><dd>Quanto andar na horizontal: positivo vai para a <strong>direita</strong>, negativo para a esquerda.</dd>
+  <dt>20px)</dt><dd>Quanto andar na vertical: positivo vai para <strong>baixo</strong>, negativo para cima. (Na tela, o eixo vertical cresce para baixo.) Os dois números são separados por <strong>vírgula</strong>.</dd>
+</dl>
+
+<p>A caixa do meio foi desenhada 30 px à direita e 20 px abaixo do lugar tracejado, e a vizinha nem percebeu: continua no mesmo lugar.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>translate(30px, 20px)</code></td><td>30 px para a direita e 20 px para baixo</td></tr>
+<tr><td><code>translate(30px)</code></td><td>só na horizontal (o vertical fica 0)</td></tr>
+<tr><td><code>translateX(-10px)</code></td><td>só na horizontal: 10 px para a esquerda</td></tr>
+<tr><td><code>translateY(-4px)</code></td><td>só na vertical: 4 px para cima (o clássico "botão que sobe")</td></tr>
+<tr><td><code>translate(50%, 0)</code></td><td>em <strong>porcentagem do próprio elemento</strong>: metade da largura dele (e não do pai, como no <code>width</code>)</td></tr>
+</table>
+</div>
+
+<p>A porcentagem do próprio tamanho é muito usada para centralizar: <code>translate(-50%, -50%)</code> puxa o elemento metade da largura e metade da altura dele mesmo de volta. Você verá isso na aula <a href="position-absolute.html">position: absolute</a>.</p>
+
+<div class="tryhtml" data-goal="css:.selo{transform}=matrix(1, 0, 0, 1, 20, 10)">
+<p class="try-task"><strong>Missão:</strong> o selo de oferta está grudado no canto. Use <code>transform: translate()</code> para movê-lo <strong>20 px para a direita</strong> e <strong>10 px para baixo</strong>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="produto"&gt;
+  &lt;span class="selo"&gt;-20%&lt;/span&gt;
+  &lt;p&gt;Bolo de cenoura com cobertura de chocolate.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.produto {
+  border: 2px solid #c2410c;
+  padding: 16px;
+  max-width: 300px;
+}
+
+.selo {
+  display: inline-block;
+  background-color: #c2410c;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.produto {
+  border: 2px solid #c2410c;
+  padding: 16px;
+  max-width: 300px;
+}
+
+.selo {
+  display: inline-block;
+  background-color: #c2410c;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  transform: translate(20px, 10px);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. <code>rotate()</code>: girar</h2>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .lugar { display: inline-block; width: 100px; height: 60px; margin: 24px; outline: 2px dashed gray; }
+  .caixa { width: 100px; height: 60px; background-color: tomato; color: white; font: 14px monospace; display: grid; place-items: center; }
+&lt;/style&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa" style="transform: rotate(15deg)"&gt;15deg&lt;/div&gt;&lt;/div&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa" style="transform: rotate(-15deg)"&gt;-15deg&lt;/div&gt;&lt;/div&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa" style="transform: rotate(90deg)"&gt;90deg&lt;/div&gt;&lt;/div&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa" style="transform: rotate(0.5turn)"&gt;0.5turn&lt;/div&gt;&lt;/div&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>rotate(15deg)</dt><dd>Gira 15 <strong>graus</strong> (<code>deg</code>, de <em>degrees</em>). Positivo gira no sentido do <strong>relógio</strong>; negativo, no sentido contrário.</dd>
+  <dt>rotate(0.5turn)</dt><dd><code>turn</code> = "volta": <code>1turn</code> é a volta inteira (360 graus), <code>0.5turn</code> é meia volta (180 graus). Repare que a caixa de meia volta ficou de cabeça para baixo, com o texto ao contrário.</dd>
+</dl>
+
+<p>A caixa gira em volta do <strong>centro</strong> dela. A seção 6 mostra como mudar esse ponto.</p>
+
+<hr>
+
+<h2>3. <code>scale()</code>: aumentar e diminuir</h2>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .lugar { display: inline-block; width: 100px; height: 60px; margin: 24px; outline: 2px dashed gray; }
+  .caixa { width: 100px; height: 60px; background-color: tomato; color: white; font: 14px monospace; display: grid; place-items: center; }
+&lt;/style&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa" style="transform: scale(0.5)"&gt;0.5&lt;/div&gt;&lt;/div&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa" style="transform: scale(1.3)"&gt;1.3&lt;/div&gt;&lt;/div&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa" style="transform: scale(1.5, 1)"&gt;1.5, 1&lt;/div&gt;&lt;/div&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa" style="transform: scale(-1, 1)"&gt;-1, 1&lt;/div&gt;&lt;/div&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>scale(1)</code></td><td>tamanho normal (não muda nada)</td></tr>
+<tr><td><code>scale(0.5)</code></td><td>metade do tamanho (é um número, e não porcentagem: <code>0.5</code> = 50%)</td></tr>
+<tr><td><code>scale(1.3)</code></td><td>30% maior. Repare que ela passa da linha tracejada, por cima do espaço em volta</td></tr>
+<tr><td><code>scale(1.5, 1)</code></td><td>largura × 1,5 e altura igual: a caixa "estica" para os lados, e o texto junto</td></tr>
+<tr><td><code>scale(-1, 1)</code></td><td>número negativo <strong>espelha</strong>: o texto aparece ao contrário, como num espelho</td></tr>
+<tr><td><code>scaleX(…)</code> / <code>scaleY(…)</code></td><td>só a largura / só a altura</td></tr>
+</table>
+</div>
+
+<div class="warning">
+<strong>Aumentar com <code>scale</code> não é mudar o <code>width</code></strong>
+<p>O <code>scale</code> aumenta o <strong>desenho</strong>, inclusive o texto, a borda e a sombra, e não muda o espaço que o elemento ocupa. Para um cartão maior "de verdade", que empurra os vizinhos, use <code>width</code>, <code>padding</code> ou <code>font-size</code>. O <code>scale</code> é para efeitos: o botão que cresce um pouquinho no hover, a foto que dá um zoom.</p>
+</div>
+
+<hr>
+
+<h2>4. <code>skew()</code>: inclinar</h2>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .lugar { display: inline-block; width: 100px; height: 60px; margin: 24px; outline: 2px dashed gray; }
+  .caixa { width: 100px; height: 60px; background-color: tomato; color: white; font: 14px monospace; display: grid; place-items: center; }
+&lt;/style&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa" style="transform: skew(-15deg)"&gt;skew(-15deg)&lt;/div&gt;&lt;/div&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa" style="transform: skewY(10deg)"&gt;skewY(10deg)&lt;/div&gt;&lt;/div&gt;
+</pre>
+
+<p><code>skew()</code> ("enviesar") puxa os lados do retângulo em direções opostas, e ele vira um paralelogramo. <code>skew(-15deg)</code> (ou <code>skewX</code>) inclina para os lados, como letra itálica; <code>skewY(10deg)</code> inclina para cima e para baixo. É o menos usado dos quatro: aparece em faixas e etiquetas "dinâmicas".</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque a função do <code>.etiqueta</code> por cada uma das quatro (<code>translate(20px, 10px)</code>, <code>rotate(-8deg)</code>, <code>scale(1.4)</code>, <code>skew(-15deg)</code>) e veja que o parágrafo de baixo nunca sai do lugar.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;&lt;span class="etiqueta"&gt;Novidade&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Pão de queijo recheado com goiabada, só às sextas.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.etiqueta {
+  display: inline-block;
+  background-color: #2f7d32;
+  color: white;
+  padding: 4px 12px;
+  transform: rotate(-8deg);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>5. Várias funções juntas, e a ordem</h2>
+<p>Para fazer mais de uma coisa, escreva as funções uma depois da outra, separadas por <strong>espaço</strong>:</p>
+
+<pre class="file" data-file="style.css">.selo {
+  transform: translate(40px, 0) rotate(45deg);
+}
+</pre>
+
+<p>Aqui vem o pulo do gato: a ordem importa. Veja as mesmas duas funções nas duas ordens:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .lugar { display: inline-block; width: 100px; height: 60px; margin: 30px 70px 50px 20px; outline: 2px dashed gray; }
+  .caixa { width: 100px; height: 60px; background-color: tomato; color: white; font: 13px monospace; display: grid; place-items: center; }
+&lt;/style&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa" style="transform: translate(40px, 0) rotate(45deg)"&gt;move e gira&lt;/div&gt;&lt;/div&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa" style="transform: rotate(45deg) translate(40px, 0)"&gt;gira e move&lt;/div&gt;&lt;/div&gt;
+</pre>
+
+<p>As duas giraram 45 graus, mas foram parar em lugares diferentes. Na primeira, a caixa andou 40 px <strong>para a direita</strong> e depois girou no lugar. Na segunda, ela girou primeiro, e o "para a frente" dela passou a apontar na diagonal: os 40 px foram na diagonal, para a direita e para baixo.</p>
+<p>Pense em você andando numa sala: "dê dois passos e vire à direita" não termina no mesmo lugar que "vire à direita e dê dois passos". O navegador aplica as funções <strong>da esquerda para a direita</strong>, cada uma a partir de onde a anterior deixou.</p>
+
+<hr>
+
+<h2>6. <code>transform-origin</code>: o ponto de apoio</h2>
+<p>Por padrão, o elemento gira e cresce em volta do <strong>centro</strong>. O <code>transform-origin</code> ("origem da transformação") muda esse ponto, como trocar o lugar do prego que segura um quadro na parede:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .lugar { display: inline-block; width: 100px; height: 60px; margin: 30px 50px 50px 30px; outline: 2px dashed gray; }
+  .caixa { width: 100px; height: 60px; background-color: tomato; color: white; font: 13px monospace; display: grid; place-items: center; transform: rotate(20deg); }
+&lt;/style&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa"&gt;center&lt;/div&gt;&lt;/div&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa" style="transform-origin: top left"&gt;top left&lt;/div&gt;&lt;/div&gt;
+&lt;div class="lugar"&gt;&lt;div class="caixa" style="transform-origin: bottom right"&gt;bottom right&lt;/div&gt;&lt;/div&gt;
+</pre>
+
+<p>As três giraram 20 graus. A primeira girou em volta do centro. A segunda ficou "presa" pelo canto de cima à esquerda (<code>top left</code>), que não saiu do lugar. A terceira, pelo canto de baixo à direita (<code>bottom right</code>).</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O ponto</th></tr>
+<tr><td><code>center</code> (o padrão)</td><td>o meio do elemento (é o mesmo que <code>50% 50%</code>)</td></tr>
+<tr><td><code>top left</code>, <code>bottom right</code>…</td><td>um canto</td></tr>
+<tr><td><code>left</code>, <code>top</code>…</td><td>o meio de um lado</td></tr>
+<tr><td><code>20px 10px</code> ou <code>0% 100%</code></td><td>um ponto exato (horizontal, depois vertical)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>7. As propriedades separadas: <code>translate</code>, <code>rotate</code> e <code>scale</code></h2>
+<p>Há um jeito mais novo de escrever as três transformações mais comuns: cada uma é uma <strong>propriedade própria</strong>, sem a palavra <code>transform</code>:</p>
+
+<pre class="file" data-file="style.css">.selo {
+  translate: 20px 10px;
+  rotate: -10deg;
+  scale: 1.2;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>translate: 20px 10px;</dt><dd>O mesmo que <code>translate(20px, 10px)</code>. Atenção: aqui os números vão separados por <strong>espaço</strong>, sem vírgula.</dd>
+  <dt>rotate: -10deg;</dt><dd>O mesmo que <code>rotate(-10deg)</code>.</dd>
+  <dt>scale: 1.2;</dt><dd>O mesmo que <code>scale(1.2)</code>. Dois números (<code>scale: 1.5 1;</code>) também vão separados por espaço.</dd>
+</dl>
+
+<p>A vantagem é que elas são <strong>independentes</strong>. Com o <code>transform</code>, se o selo já tem <code>transform: rotate(-10deg)</code> e você escreve, no hover, <code>transform: scale(1.2)</code>, o <code>rotate</code> some (o novo valor substitui o antigo inteiro). Com as propriedades separadas, <code>scale: 1.2</code> no hover não mexe no <code>rotate</code>:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> passe o mouse no primeiro selo: ele "desentorta", porque o <code>transform</code> do hover substituiu o <code>rotate</code>. No segundo, ele cresce e continua torto. Troque <code>scale: 1.2;</code> por <code>rotate: 0deg;</code> no hover do segundo e veja de novo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;&lt;span class="selo antigo"&gt;transform&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class="selo novo"&gt;rotate + scale&lt;/span&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.selo {
+  display: inline-block;
+  background-color: #c2410c;
+  color: white;
+  padding: 6px 12px;
+  margin: 12px;
+}
+
+.antigo {
+  transform: rotate(-10deg);
+}
+
+.antigo:hover {
+  transform: scale(1.2);
+}
+
+.novo {
+  rotate: -10deg;
+}
+
+.novo:hover {
+  scale: 1.2;
+}
+</pre>
+</div>
+
+<div class="note">
+<strong>Suporte</strong>
+<p>As propriedades <code>translate</code>, <code>rotate</code> e <code>scale</code> funcionam no Chrome e no Edge desde a versão 104, no Firefox desde a 72 e no Safari desde a 14.1 (o último a chegar foi o Chrome, em 2022), segundo o MDN. O <code>transform</code> funciona em todos há muitos anos. Quando as duas formas estão no mesmo elemento, o navegador aplica primeiro <code>translate</code>, depois <code>rotate</code>, depois <code>scale</code> e, por último, o <code>transform</code>.</p>
+</div>
+
+<hr>
+
+<h2>8. O que o F12 mostra: <code>matrix(…)</code></h2>
+<p>Abra o F12 num elemento com <code>transform: rotate(45deg)</code> e olhe a aba <strong>Computed</strong> (Calculado). Em vez do que você escreveu, aparece algo assim:</p>
+
+<pre class="file" data-file="valor calculado">transform: matrix(0.707107, 0.707107, -0.707107, 0.707107, 0, 0)</pre>
+
+<p>Não se assuste: o navegador junta <strong>todas</strong> as funções do <code>transform</code> numa conta só, uma <strong>matriz</strong> de seis números, e é ela que fica guardada como valor calculado. A aba Styles (Estilos) continua mostrando o que você escreveu. Conferido no Chromium:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você escreve</th><th>Valor calculado</th></tr>
+<tr><td><code>transform: translate(20px, 10px)</code></td><td><code>matrix(1, 0, 0, 1, 20, 10)</code></td></tr>
+<tr><td><code>transform: translateY(-4px)</code></td><td><code>matrix(1, 0, 0, 1, 0, -4)</code></td></tr>
+<tr><td><code>transform: scale(1.5)</code></td><td><code>matrix(1.5, 0, 0, 1.5, 0, 0)</code></td></tr>
+<tr><td><code>transform: scale(-1, 1)</code></td><td><code>matrix(-1, 0, 0, 1, 0, 0)</code></td></tr>
+<tr><td><code>transform: rotate(45deg)</code></td><td><code>matrix(0.707107, 0.707107, -0.707107, 0.707107, 0, 0)</code></td></tr>
+<tr><td><code>transform: rotate(45deg) translate(40px, 0)</code></td><td><code>matrix(0.707107, 0.707107, -0.707107, 0.707107, 28.2843, 28.2843)</code></td></tr>
+<tr><td><code>rotate: -10deg</code> (a propriedade separada)</td><td><code>-10deg</code> (e o <code>transform</code> continua <code>none</code>)</td></tr>
+</table>
+</div>
+
+<p>Dá para ler os casos simples: os dois últimos números são o <strong>deslocamento</strong> em px (horizontal e vertical); o primeiro e o quarto são a <strong>escala</strong> na horizontal e na vertical quando não há giro. Com giro, entram senos e cossenos (0,707107 é o seno e o cosseno de 45 graus), e não vale a pena fazer a conta de cabeça. Repare na última linha da tabela: a rotação seguida de um passo de 40 px virou um deslocamento de 28,28 px para a direita e 28,28 px para baixo, a diagonal da seção 5. E as propriedades separadas mostram o valor do jeito que você escreveu.</p>
+
+<hr>
+
+<h2>Formas de fazer, e qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Para</th><th>Use</th><th>Evite</th></tr>
+<tr><td>um efeito visual (hover, selo torto, ícone girado)</td><td><code>transform</code> ou <code>translate</code>/<code>rotate</code>/<code>scale</code></td><td>mudar <code>margin</code>, <code>top</code> ou <code>width</code>, que empurram os vizinhos e são mais lentos de animar</td></tr>
+<tr><td>mudar só uma coisa no hover, mantendo as outras</td><td>as propriedades separadas</td><td>repetir o <code>transform</code> inteiro no hover</td></tr>
+<tr><td>uma sequência em que a ordem importa (girar e depois andar)</td><td><code>transform</code> com as funções na ordem certa</td><td>as propriedades separadas (a ordem delas é fixa)</td></tr>
+<tr><td>mudar o tamanho real do elemento, empurrando os vizinhos</td><td><code>width</code>, <code>height</code>, <code>padding</code>, <code>font-size</code></td><td><code>scale</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Nada acontece num <code>&lt;span&gt;</code> (e o validador não reclama)</strong>
+<p><strong>O que aconteceu:</strong> o <code>transform</code> foi posto num elemento <strong>em linha</strong>, como um <code>&lt;span&gt;</code>, um <code>&lt;a&gt;</code> ou um <code>&lt;strong&gt;</code> no meio do texto:</p>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .selo { background-color: #c2410c; color: white; padding: 2px 8px; transform: rotate(-10deg); }
+  .bloco { display: inline-block; }
+&lt;/style&gt;
+&lt;p&gt;Hoje: &lt;span class="selo"&gt;oferta&lt;/span&gt; (span normal)&lt;/p&gt;
+&lt;p&gt;Hoje: &lt;span class="selo bloco"&gt;oferta&lt;/span&gt; (com display: inline-block)&lt;/p&gt;
+</pre>
+<p>O primeiro selo continua reto; o segundo gira. A regra do CSS é que um elemento em linha comum não é "transformável": o navegador simplesmente não aplica o <code>transform</code>. O curioso é que o F12 mostra o valor calculado (<code>matrix(…)</code>) normalmente, sem risco nenhum, e mesmo assim nada gira.</p>
+<p><strong>Como consertar:</strong> dê <code>display: inline-block</code> (ou <code>block</code>, <code>flex</code>…) ao elemento. Veja a aula <a href="display.html">display</a>.</p>
+</div>
+
+<div class="cenario">
+<strong>A primeira transformação sumiu</strong>
+<p><strong>O que aconteceu:</strong> duas declarações <code>transform</code> na mesma regra (ou em regras diferentes):</p>
+<pre class="file" data-file="style.css · erro de propósito">.selo {
+  transform: rotate(-10deg);
+  transform: scale(1.2);
+}
+</pre>
+<p>O selo fica maior, mas reto. Cada <code>transform</code> é um valor inteiro, e pela <a href="cascata.html">cascata</a> o último vence: a primeira linha aparece riscada no F12. O validador não reclama, porque as duas linhas estão certas.</p>
+<p><strong>Como consertar:</strong> junte numa linha só, separada por espaço (<code>transform: rotate(-10deg) scale(1.2);</code>), ou use as propriedades separadas (<code>rotate: -10deg; scale: 1.2;</code>).</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “transform”: only “0” can be a “unit”. You must put a unit after your number.</code></strong>
+<p><strong>O que aconteceu:</strong> o ângulo ficou sem unidade: <code>transform: rotate(45);</code>.</p>
+<pre class="term" data-cwd="~/transf">$ vnu --css semdeg.css
+"file:/home/ana/transf/semdeg.css":2.23-2.23: error: CSS: “transform”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<p>"Só o 0 pode ficar sem unidade. Você precisa pôr uma unidade depois do número." O navegador ignora a declaração inteira, e nada gira.</p>
+<p><strong>Como consertar:</strong> <code>rotate(45deg)</code>. O mesmo vale para o <code>translate</code>: <code>translate(20px, 10px)</code>, com <code>px</code>. Só o <code>scale</code> não tem unidade.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “transform”: “ ” is an incorrect operator.</code></strong>
+<p><strong>O que aconteceu:</strong> os dois números do <code>translate()</code> ficaram sem vírgula: <code>transform: translate(20px 10px);</code>.</p>
+<pre class="term" data-cwd="~/transf">$ vnu --css semvirg.css
+"file:/home/ana/transf/semvirg.css":2.33-2.33: error: CSS: “transform”: “ ” is an incorrect operator.</pre>
+<p>"O espaço é um operador incorreto": dentro da <strong>função</strong> <code>translate()</code>, os números vão separados por vírgula. É fácil confundir, porque na <strong>propriedade</strong> <code>translate</code> é o contrário: <code>translate: 20px, 10px;</code> dá a mesma mensagem, só que com a vírgula: <code>“translate”: “,” is an incorrect operator.</code></p>
+<p><strong>Como consertar:</strong> função com vírgula, <code>transform: translate(20px, 10px)</code>; propriedade com espaço, <code>translate: 20px 10px</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “transform”: “,” is an incorrect operator.</code></strong>
+<p><strong>O que aconteceu:</strong> vírgula <strong>entre</strong> as funções: <code>transform: rotate(10deg), scale(1.2);</code>.</p>
+<pre class="term" data-cwd="~/transf">$ vnu --css virgulas.css
+"file:/home/ana/transf/virgulas.css":2.38-2.38: error: CSS: “transform”: “,” is an incorrect operator.</pre>
+<p>Entre funções vai só espaço. Com a vírgula, a declaração inteira é ignorada: nem gira, nem aumenta.</p>
+<p><strong>Como consertar:</strong> <code>transform: rotate(10deg) scale(1.2);</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O elemento aumentado cobre o vizinho</strong>
+<p><strong>O que aconteceu:</strong> um cartão com <code>scale(1.1)</code> ficou por cima do texto ou do cartão ao lado. Não é erro: o <code>transform</code> não muda o espaço reservado (a ideia do adesivo). Se ele cobrir algo importante, dê mais espaço em volta (<code>gap</code>, <code>margin</code>) ou use um <code>scale</code> menor, como <code>1.05</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>transform: translate(x, y)</code></td><td>Move (positivo: direita e baixo); <code>%</code> é do próprio elemento</td></tr>
+<tr><td><code>translateX(x)</code> / <code>translateY(y)</code></td><td>Move num eixo só</td></tr>
+<tr><td><code>transform: rotate(15deg)</code></td><td>Gira (positivo: sentido do relógio); também <code>turn</code></td></tr>
+<tr><td><code>transform: scale(1.2)</code></td><td>Aumenta (número: 1 = normal); <code>scale(x, y)</code>, negativo espelha</td></tr>
+<tr><td><code>transform: skew(-15deg)</code></td><td>Inclina; também <code>skewX</code>/<code>skewY</code></td></tr>
+<tr><td><code>transform: translate(…) rotate(…)</code></td><td>Várias, separadas por espaço; aplicadas da esquerda para a direita</td></tr>
+<tr><td><code>transform-origin: top left;</code></td><td>Ponto de apoio do giro e da escala (padrão: <code>center</code>)</td></tr>
+<tr><td><code>translate: 20px 10px;</code> <code>rotate: 15deg;</code> <code>scale: 1.2;</code></td><td>As propriedades separadas (sem vírgula), independentes entre si</td></tr>
+<tr><td><code>transform: none;</code></td><td>Sem transformação (o padrão)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Subir 4 pixels</h3>
+<p>Complete para o botão subir 4 px:</p>
+<div class="ex-code">transform: <input data-answer="translateY(-4px)|translate(0, -4px)|translate(0px, -4px)" aria-label="função">;</div>
+</div>
+
+<div class="exercise">
+<h3>2. Meia volta</h3>
+<p>Complete com a unidade de "voltas" para girar 180 graus:</p>
+<div class="ex-code">transform: rotate(0.5<input data-answer="turn" aria-label="unidade">);</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. Um cartão ganhou <code>transform: translate(0, 30px)</code>. O que acontece com o parágrafo logo abaixo dele?</p>
+<label><input type="radio" name="q3"> Desce 30 px junto</label>
+<label><input type="radio" name="q3"> Sobe 30 px</label>
+<label><input type="radio" name="q3"> Fica onde estava; o cartão pode até ficar por cima dele</label>
+<label><input type="radio" name="q3"> Some</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. No F12, a aba Computed mostra <code>transform: matrix(1, 0, 0, 1, 0, -4)</code>. O que foi escrito no CSS?</p>
+<label><input type="radio" name="q4"> <code>scale(4)</code></label>
+<label><input type="radio" name="q4"> <code>translateY(-4px)</code></label>
+<label><input type="radio" name="q4"> <code>rotate(-4deg)</code></label>
+<label><input type="radio" name="q4"> Um erro: o navegador não entendeu</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. <code>transform: rotate(-10deg)</code> num <code>&lt;a&gt;</code> no meio do texto não gira nada. Por quê?</p>
+<label><input type="radio" name="q5"> O <code>&lt;a&gt;</code> é em linha; precisa de <code>display: inline-block</code></label>
+<label><input type="radio" name="q5"> Ângulos negativos não funcionam</label>
+<label><input type="radio" name="q5"> Faltou o <code>transform-origin</code></label>
+<label><input type="radio" name="q5"> Links não aceitam CSS</label>
+</div>
+
+<h3>Missão final: o cartão de produto</h3>
+
+<div class="tryhtml" data-goal="css:.selo{rotate}=-10deg,css:.selo{transform-origin}=0px 0px,hover:.cartao{scale}=1.05,nsrc:transform\s*:">
+<p class="try-task"><strong>Missão:</strong> use só as propriedades separadas (nada de <code>transform:</code>). (1) Gire o <code>.selo</code> <strong>-10 graus</strong>, preso pelo canto de cima à esquerda (<code>transform-origin: top left</code>). (2) Quando o mouse passar no <code>.cartao</code>, ele deve crescer <strong>5%</strong>. Depois, passe o mouse no cartão para conferir.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;span class="selo"&gt;Novo&lt;/span&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="200" height="150"&gt;
+  &lt;p&gt;Bolo de cenoura: R$ 35&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 20px;
+}
+
+.cartao img {
+  display: block;
+}
+
+.selo {
+  display: inline-block;
+  background-color: #c2410c;
+  color: white;
+  padding: 4px 10px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 20px;
+}
+
+.cartao img {
+  display: block;
+}
+
+.cartao:hover {
+  scale: 1.05;
+}
+
+.selo {
+  display: inline-block;
+  background-color: #c2410c;
+  color: white;
+  padding: 4px 10px;
+  rotate: -10deg;
+  transform-origin: top left;
+}
+</pre>
+</div>
+
+<p>Repare que o crescimento do cartão é instantâneo: de um quadro para o outro. Para ele crescer devagar, suave, falta uma peça: a aula <a href="transition.html">Transições</a>.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>transform</code> mexe no <strong>desenho</strong> do elemento depois que a página está montada: o lugar original fica reservado e os vizinhos não se mexem.</li>
+  <li><code>translate(x, y)</code> move, <code>rotate(…deg)</code> gira, <code>scale(n)</code> aumenta ou diminui, <code>skew(…deg)</code> inclina.</li>
+  <li>Várias funções vão separadas por espaço e são aplicadas da esquerda para a direita: a ordem muda o resultado.</li>
+  <li><code>transform-origin</code> escolhe o ponto de apoio (padrão: o centro).</li>
+  <li>As propriedades <code>translate</code>, <code>rotate</code> e <code>scale</code> fazem o mesmo, sem vírgula e independentes entre si.</li>
+  <li>No F12, o <code>transform</code> calculado vira <code>matrix(…)</code>: os dois últimos números são o deslocamento.</li>
+  <li>Erros comuns: <code>transform</code> num elemento em linha, dois <code>transform</code> na mesma regra, ângulo sem <code>deg</code>, vírgula no lugar errado.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
