@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Cursor e Interação — cursor, pointer-events e user-select | Guia CSS</title>
+<meta name="description" content="Como o CSS muda a interação com o mouse: a propriedade cursor e os seus valores (pointer, text, grab, not-allowed…), cursor com imagem, pointer-events: none para deixar o clique passar, e user-select para controlar a seleção de texto, com os cuidados de acessibilidade e os erros do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Cursor e Interação</span></h1>
+
+<p class="intro">A setinha do mouse conversa com quem usa o site: vira mãozinha em cima de um link, vira um "I" em cima de um texto, vira uma mão aberta num mapa que dá para arrastar. Nesta aula você vai escolher o cursor certo para cada coisa na lojinha da Ana e conhecer duas propriedades vizinhas: <code>pointer-events</code>, que deixa o clique "atravessar" um elemento, e <code>user-select</code>, que controla o que dá para selecionar com o mouse.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li><code>cursor</code> e os valores mais usados, lado a lado.</li>
+  <li>Quando usar cada cursor (e quando <strong>não</strong> mudar o cursor).</li>
+  <li>Cursor com imagem própria: <code>url()</code> e o valor reserva obrigatório.</li>
+  <li><code>pointer-events: none</code>: o clique passa para o que está embaixo.</li>
+  <li><code>user-select</code>: impedir a seleção ou selecionar tudo de uma vez.</li>
+  <li>Os erros comuns e as mensagens do validador W3C.</li>
+</ul>
+</div>
+
+<p>Esta aula é feita para o <strong>mouse</strong>: no celular não há cursor. Se estiver num, os exemplos de <code>cursor</code> não vão mostrar diferença; o resto (<code>pointer-events</code> e <code>user-select</code>) funciona com o dedo também.</p>
+
+<hr>
+
+<h2>A ideia: as placas da loja</h2>
+<p>Numa loja física, pequenos sinais dizem o que dá para fazer: "empurre" na porta, "não toque" na vitrine, uma setinha apontando para o caixa. O cursor é a placa do mouse: ele muda de forma para dizer "isto é clicável", "aqui dá para escrever", "isto dá para arrastar", "isto não está disponível". Placas certas ajudam; placas erradas (um "empurre" numa porta de puxar) confundem.</p>
+
+<hr>
+
+<h2>1. A propriedade <code>cursor</code></h2>
+
+<pre class="file" data-file="style.css">.mapa {
+  cursor: grab;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>cursor</dt><dd>"Cursor": a forma da seta do mouse quando ela passa <strong>em cima</strong> do elemento.</dd>
+  <dt>grab</dt><dd>"Agarrar": uma mão aberta, o sinal de "dá para arrastar".</dd>
+</dl>
+
+<p>Passe o mouse em cada caixa abaixo. Cada uma tem um valor de <code>cursor</code>, escrito dentro dela. O desenho exato de cada cursor muda de sistema para sistema (Windows, macOS, Linux), mas a ideia é a mesma em todos:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;div style="cursor: auto"&gt;auto&lt;/div&gt;
+  &lt;div style="cursor: default"&gt;default&lt;/div&gt;
+  &lt;div style="cursor: pointer"&gt;pointer&lt;/div&gt;
+  &lt;div style="cursor: text"&gt;text&lt;/div&gt;
+  &lt;div style="cursor: help"&gt;help&lt;/div&gt;
+  &lt;div style="cursor: wait"&gt;wait&lt;/div&gt;
+  &lt;div style="cursor: progress"&gt;progress&lt;/div&gt;
+  &lt;div style="cursor: not-allowed"&gt;not-allowed&lt;/div&gt;
+  &lt;div style="cursor: grab"&gt;grab&lt;/div&gt;
+  &lt;div style="cursor: grabbing"&gt;grabbing&lt;/div&gt;
+  &lt;div style="cursor: move"&gt;move&lt;/div&gt;
+  &lt;div style="cursor: crosshair"&gt;crosshair&lt;/div&gt;
+  &lt;div style="cursor: zoom-in"&gt;zoom-in&lt;/div&gt;
+  &lt;div style="cursor: zoom-out"&gt;zoom-out&lt;/div&gt;
+  &lt;div style="cursor: col-resize"&gt;col-resize&lt;/div&gt;
+  &lt;div style="cursor: none"&gt;none&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-family: sans-serif;
+}
+
+.vitrine div {
+  width: 110px;
+  padding: 16px 0;
+  text-align: center;
+  background-color: oldlace;
+  border: 1px solid tan;
+}
+</pre>
+</div>
+
+<p>Aqui o <code>style="…"</code> no HTML (aula <a href="onde-colocar.html">Três Jeitos de Usar CSS</a>) serve só para cada caixa mostrar o próprio valor de um jeito compacto. No site de verdade, use classes no <code>style.css</code>.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>Desenho mais comum</th><th>Quando usar</th></tr>
+<tr><td><code>auto</code></td><td>O navegador decide</td><td>O padrão: seta no fundo, "I" no texto, mãozinha nos links</td></tr>
+<tr><td><code>default</code></td><td>A seta</td><td>Forçar a seta normal</td></tr>
+<tr><td><code>pointer</code></td><td>A mãozinha com o dedo apontando</td><td>Coisas clicáveis que não ganham a mãozinha sozinhas: <code>&lt;button&gt;</code>, um cartão inteiro clicável, um <code>&lt;summary&gt;</code></td></tr>
+<tr><td><code>text</code></td><td>Um "I"</td><td>Texto que dá para selecionar ou editar (o padrão no texto)</td></tr>
+<tr><td><code>help</code></td><td>Seta com ponto de interrogação</td><td>Algo que mostra uma explicação (uma abreviação com <code>title</code>)</td></tr>
+<tr><td><code>wait</code> / <code>progress</code></td><td>Ampulheta ou círculo girando / o mesmo, com a seta</td><td>Carregando: <code>wait</code> = "espere, não dá para clicar"; <code>progress</code> = "carregando, mas dá para continuar"</td></tr>
+<tr><td><code>not-allowed</code></td><td>Um círculo cortado</td><td>Ação indisponível: botão desativado</td></tr>
+<tr><td><code>grab</code> / <code>grabbing</code></td><td>Mão aberta / mão fechada</td><td>Algo que dá para arrastar / sendo arrastado (mapa, carrossel)</td></tr>
+<tr><td><code>move</code></td><td>Quatro setas</td><td>Algo que pode ser movido para qualquer lado</td></tr>
+<tr><td><code>crosshair</code></td><td>Uma mira em cruz</td><td>Escolher um ponto exato (desenho, recorte de imagem)</td></tr>
+<tr><td><code>zoom-in</code> / <code>zoom-out</code></td><td>Lupa com + / com −</td><td>Uma foto que amplia ao clicar / que volta ao tamanho</td></tr>
+<tr><td><code>col-resize</code>, <code>row-resize</code></td><td>Setas para os lados / para cima e para baixo</td><td>Uma divisória que muda a largura da coluna / a altura da linha</td></tr>
+<tr><td><code>none</code></td><td>Nenhum: o cursor some</td><td>Quase nunca (jogos, vídeo em tela cheia). Esconder o cursor confunde.</td></tr>
+</table>
+</div>
+
+<div class="warning">
+<strong>Não mude o cursor à toa</strong>
+<p>A mãozinha diz "isto é clicável". Se você puser <code>cursor: pointer</code> num texto comum, a pessoa vai clicar e nada vai acontecer. E se tirar a mãozinha de um link (<code>cursor: default</code>), ela não vai saber que pode clicar. O cursor tem de <strong>dizer a verdade</strong> sobre o elemento.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:.mapa{cursor}=grab,css:.ajuda{cursor}=help,css:.esgotado{cursor}=not-allowed">
+<p class="try-task"><strong>Missão:</strong> ponha o cursor certo em cada parte da página: <code>grab</code> no mapa (dá para arrastar), <code>help</code> na abreviação "CEP" (mostra uma explicação) e <code>not-allowed</code> no botão desativado.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;img class="mapa" src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana na Rua das Flores" width="400" height="250"&gt;
+&lt;p&gt;Entregamos no seu &lt;abbr class="ajuda" title="Código de Endereçamento Postal"&gt;CEP&lt;/abbr&gt;.&lt;/p&gt;
+&lt;button class="esgotado" type="button" disabled&gt;Bolo de fubá: esgotado&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">.mapa {
+  max-width: 100%;
+  height: auto;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.mapa {
+  max-width: 100%;
+  height: auto;
+  cursor: grab;
+}
+
+.ajuda {
+  cursor: help;
+}
+
+.esgotado {
+  cursor: not-allowed;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. Cursor com imagem: <code>url()</code></h2>
+<p>Dá para usar uma imagem pequena como cursor. A regra tem três partes:</p>
+
+<pre class="file" data-file="style.css">.bolo-surpresa {
+  cursor: url("assets/midia/favicon-32.png") 16 16, pointer;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>url("…")</dt><dd>O endereço da imagem. Use uma imagem pequena: 32×32 pixels é o tamanho seguro (o ícone de bolo da pasta de mídia tem exatamente isso).</dd>
+  <dt>16 16</dt><dd>Opcional: o "ponto quente", onde fica a ponta do cursor, contado a partir do canto de cima, à esquerda da imagem. <code>16 16</code> é o meio de uma imagem de 32. Sem ele, a ponta é o canto <code>0 0</code>.</dd>
+  <dt>, pointer</dt><dd><strong>Obrigatório:</strong> depois da vírgula, um cursor comum de reserva, usado se a imagem não carregar. Sem ele, a declaração inteira é inválida (veja <a href="#errado">Quando dá errado</a>).</dd>
+</dl>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> passe o mouse sobre a caixa. Depois troque o <code>16 16</code> por <code>0 0</code> e veja onde fica a "ponta" do cursor.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="bolo-surpresa"&gt;Passe o mouse aqui: hoje tem bolo surpresa!&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.bolo-surpresa {
+  padding: 40px 16px;
+  background-color: oldlace;
+  cursor: url("assets/midia/favicon-32.png") 16 16, pointer;
+}
+</pre>
+</div>
+
+<p>Use com moderação: cursores enfeitados ficam engraçados num jogo ou numa página de festa, mas atrapalham num site de uso diário.</p>
+
+<hr>
+
+<h2>3. <code>pointer-events: none</code>: o clique atravessa</h2>
+<p>Às vezes um elemento decorativo fica <strong>por cima</strong> de outro, e "rouba" o clique. A lojinha tem um selo "Novo!" posicionado em cima do botão "Ver cardápio" (com <a href="position-absolute.html"><code>position: absolute</code></a>). Clique em cima do selo:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="destaque"&gt;
+  &lt;a class="botao" href="cardapio.html"&gt;Ver cardápio&lt;/a&gt;
+  &lt;span class="selo"&gt;Novo!&lt;/span&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="cardapio.html">&lt;h1&gt;Cardápio&lt;/h1&gt;
+&lt;p&gt;Você chegou! O clique passou pelo selo.&lt;/p&gt;
+&lt;p&gt;&lt;a href="index.html"&gt;Voltar&lt;/a&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.destaque {
+  position: relative;
+  display: inline-block;
+  margin: 24px;
+  font-family: sans-serif;
+}
+
+.botao {
+  display: inline-block;
+  padding: 16px 32px;
+  background-color: #c2410c;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+.selo {
+  position: absolute;
+  top: -8px;
+  right: 8px;
+  padding: 8px 12px;
+  background-color: gold;
+  border-radius: 999px;
+  /* pointer-events: none; */
+}
+</pre>
+</div>
+
+<p>Clicando no meio do selo amarelo, que cobre um pedaço do texto do botão, nada acontece: quem recebe o clique é o <strong>selo</strong>, que não é um link. Agora apague o <code>/*</code> e o <code>*/</code> da última linha do CSS (aula <a href="comentarios.html">Comentários</a>) e clique de novo no meio do selo: o clique <strong>atravessa</strong> o selo e chega ao link, e o quadro abre a página do cardápio (o botão ↻ volta).</p>
+
+<dl class="anatomy">
+  <dt>pointer-events</dt><dd>"Eventos do ponteiro": se o elemento pode ser o alvo do mouse (clique, <code>:hover</code>, cursor) e do toque.</dd>
+  <dt>none</dt><dd>"Nenhum": o elemento fica "transparente" para o mouse. O clique e o <code>:hover</code> vão para o que está embaixo dele.</dd>
+  <dt>auto</dt><dd>O padrão: o elemento recebe o mouse normalmente.</dd>
+</dl>
+
+<div class="warning">
+<strong><code>pointer-events: none</code> não desativa nada de verdade</strong>
+<p>Ele só vale para o mouse e o toque. Um link com <code>pointer-events: none</code> não responde ao clique, mas continua recebendo o foco do <kbd>Tab</kbd>, e o <kbd>Enter</kbd> abre o link normalmente (conferido no Chromium). O leitor de tela também continua anunciando o link. Para desativar um botão, use o atributo <code>disabled</code> do HTML; para um link que não deve funcionar, tire o <code>href</code>. E lembre que <code>pointer-events</code> é <strong>herdado</strong>: com <code>none</code> num pai, os filhos também deixam de receber cliques (a não ser que você ponha <code>pointer-events: auto</code> neles).</p>
+</div>
+
+<hr>
+
+<h2>4. <code>user-select</code>: o que dá para selecionar</h2>
+<p>Normalmente, você arrasta o mouse sobre um texto e ele fica selecionado, pronto para copiar. <code>user-select</code> muda isso:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que faz</th><th>Quando usar</th></tr>
+<tr><td><code>auto</code></td><td>O padrão: o texto se seleciona normalmente</td><td>Quase sempre</td></tr>
+<tr><td><code>none</code></td><td>O texto não pode ser selecionado</td><td>Rótulos de controles que a pessoa clica muitas vezes seguidas (as setas de um carrossel), para não selecionar o texto sem querer</td></tr>
+<tr><td><code>all</code></td><td>Um clique seleciona o elemento <strong>inteiro</strong></td><td>Coisas que a pessoa vai copiar inteiras: um código de cupom, uma chave Pix, um comando</td></tr>
+<tr><td><code>text</code></td><td>Pode selecionar, mesmo que o pai tenha <code>none</code></td><td>Liberar um pedaço dentro de uma área com <code>none</code></td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> dê um clique no código do cupom: ele é selecionado inteiro, pronto para o <kbd>Ctrl</kbd>+<kbd>C</kbd>. Depois tente selecionar o texto "Toque para ver o próximo bolo": não dá.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Use o cupom &lt;code class="cupom"&gt;BOLO10&lt;/code&gt; e ganhe 10% de desconto.&lt;/p&gt;
+&lt;p class="controle"&gt;Toque para ver o próximo bolo ›&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.cupom {
+  padding: 4px 8px;
+  background-color: lightyellow;
+  border: 1px dashed orange;
+  -webkit-user-select: all;
+  user-select: all;
+}
+
+.controle {
+  -webkit-user-select: none;
+  user-select: none;
+}
+</pre>
+</div>
+
+<div class="note">
+<strong>Suporte: o Safari ainda pede o prefixo</strong>
+<p>O MDN marca <code>user-select</code> como "disponibilidade limitada": o Chrome, o Edge e o Firefox entendem a propriedade normal, mas o Safari (no Mac e no iPhone) precisa da versão com prefixo, <code>-webkit-user-select</code>. Por isso os exemplos escrevem as duas, primeiro a com prefixo. É um dos poucos casos em que o prefixo <code>-webkit-</code> ainda é necessário hoje.</p>
+</div>
+
+<div class="warning">
+<strong>Não bloqueie a seleção do conteúdo</strong>
+<p><code>user-select: none</code> num texto de verdade (uma receita, um artigo) só atrapalha: quem quer copiar um ingrediente, traduzir uma palavra ou usar uma ferramenta de leitura não consegue. E não protege nada: o texto continua no código da página (F12) e o leitor pode desligar o CSS.</p>
+</div>
+
+<hr>
+
+<h2>5. Qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Use</th></tr>
+<tr><td>Um <code>&lt;button&gt;</code> ou cartão clicável sem a mãozinha</td><td><code>cursor: pointer</code></td></tr>
+<tr><td>Botão desativado</td><td><code>disabled</code> no HTML + <code>cursor: not-allowed</code> no <code>:disabled</code> (aula <a href="botoes.html">Botões</a>)</td></tr>
+<tr><td>Um enfeite por cima de um link ou botão</td><td><code>pointer-events: none</code> no enfeite</td></tr>
+<tr><td>Desativar um controle de verdade</td><td>O atributo <code>disabled</code>, e não <code>pointer-events</code></td></tr>
+<tr><td>Código para copiar inteiro</td><td><code>-webkit-user-select: all;</code> + <code>user-select: all;</code></td></tr>
+<tr><td>Proteger o texto contra cópia</td><td>Nada: não existe proteção com CSS</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Cursor com imagem, sem a reserva: a declaração inteira some</strong>
+<pre class="file" data-file="style.css">.bolo-surpresa {
+  cursor: url("assets/midia/favicon-32.png");
+}
+</pre>
+<p><strong>O que você vê:</strong> o cursor continua o normal. O valor calculado de <code>cursor</code> fica <code>auto</code> (conferido no Chromium): a declaração foi ignorada.</p>
+<p><strong>Por quê:</strong> depois do <code>url()</code>, um cursor comum de reserva é obrigatório. Sem ele, o valor é inválido. O validador mostra a mesma coisa (linha 14 do arquivo abaixo).</p>
+<p><strong>Como consertar:</strong> <code>cursor: url("assets/midia/favicon-32.png"), pointer;</code></p>
+</div>
+
+<div class="cenario">
+<strong>Valores que não existem</strong>
+<pre class="file" data-file="c.css">.cupom {
+  user-select: all;
+}
+.capa {
+  pointer-events: none;
+}
+.mapa {
+  cursor: grab;
+}
+.lixeira {
+  cursor: url("assets/midia/favicon-32.png") 16 16, pointer;
+}
+.ruim {
+  cursor: url("assets/midia/favicon-32.png");
+  cursor: hand;
+  cursor: mao;
+  pointer-events: off;
+  user-select: nenhum;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css c.css
+"file:/home/ana/site/c.css":14.11-14.44: error: CSS: “cursor”: “url("assets/midia/favicon-32.png")” is not a “cursor” value.
+"file:/home/ana/site/c.css":15.11-15.14: error: CSS: “cursor”: “hand” is not a “cursor” value.
+"file:/home/ana/site/c.css":16.11-16.13: error: CSS: “cursor”: “mao” is not a “cursor” value.
+"file:/home/ana/site/c.css":17.19-17.21: error: CSS: “pointer-events”: “off” is not a “pointer-events” value.
+"file:/home/ana/site/c.css":18.16-18.21: error: CSS: “user-select”: “nenhum” is not a “user-select” value.</pre>
+<p><strong>O que significa:</strong> as linhas de 1 a 12 estão certas e não aparecem. Cada erro diz "<em>X</em> não é um valor de <em>propriedade</em>":</p>
+<ul>
+  <li>Linha 14: o <code>url()</code> sem a reserva, o caso acima.</li>
+  <li>Linha 15: <code>hand</code> era um valor do antigo Internet Explorer; o certo é <code>pointer</code>.</li>
+  <li>Linha 16: os valores são em inglês, sempre: <code>mao</code> não existe.</li>
+  <li>Linha 17: para desligar, é <code>none</code>, e não <code>off</code>.</li>
+  <li>Linha 18: o mesmo, <code>none</code>, e não <code>nenhum</code>.</li>
+</ul>
+<p>No navegador, cada uma dessas declarações é ignorada em silêncio; no F12, ela aparece riscada.</p>
+</div>
+
+<div class="cenario">
+<strong><code>pointer-events: none</code> no pai: nada lá dentro funciona</strong>
+<pre class="file" data-file="style.css">.cartao {
+  pointer-events: none;
+}
+</pre>
+<p><strong>O que você vê:</strong> o link e o botão dentro do cartão não respondem ao clique nem ao <code>:hover</code>.</p>
+<p><strong>Por quê:</strong> <code>pointer-events</code> é herdado: os filhos ficam com <code>none</code> também (conferido no Chromium, o link dentro do pai calcula <code>none</code>).</p>
+<p><strong>Como consertar:</strong> ponha o <code>none</code> só no elemento decorativo, ou devolva <code>pointer-events: auto</code> aos filhos que precisam do clique.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>cursor: pointer;</code></td><td>Mãozinha: "clicável"</td></tr>
+<tr><td><code>cursor: not-allowed;</code></td><td>"Indisponível"</td></tr>
+<tr><td><code>cursor: grab;</code> / <code>grabbing</code></td><td>"Dá para arrastar" / "arrastando"</td></tr>
+<tr><td><code>cursor: text;</code> · <code>help;</code> · <code>wait;</code> · <code>zoom-in;</code></td><td>Texto · ajuda · espere · ampliar</td></tr>
+<tr><td><code>cursor: url("img.png") 16 16, pointer;</code></td><td>Imagem com ponto quente e reserva obrigatória</td></tr>
+<tr><td><code>pointer-events: none;</code></td><td>O mouse atravessa o elemento (herdado pelos filhos)</td></tr>
+<tr><td><code>user-select: none;</code></td><td>Não deixa selecionar o texto</td></tr>
+<tr><td><code>user-select: all;</code></td><td>Um clique seleciona o elemento inteiro</td></tr>
+<tr><td><code>-webkit-user-select: …;</code></td><td>A versão com prefixo, para o Safari</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Indisponível</h3>
+<p>Complete o cursor do botão desativado:</p>
+<div class="ex-code">.botao:disabled { cursor: <input data-answer="not-allowed" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. O clique atravessa</h3>
+<p>Complete para o selo decorativo não roubar o clique do botão embaixo dele:</p>
+<div class="ex-code">.selo { pointer-events: <input data-answer="none" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Copiar inteiro</h3>
+<p>Complete para um clique selecionar o código inteiro:</p>
+<div class="ex-code">.cupom { user-select: <input data-answer="all" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Por que <code>cursor: url("bolo.png");</code> não funciona?</p>
+<label><input type="radio" name="q4"> Porque cursor não aceita imagem</label>
+<label><input type="radio" name="q4"> Porque PNG não serve</label>
+<label><input type="radio" name="q4"> Porque falta o cursor de reserva depois da vírgula</label>
+<label><input type="radio" name="q4"> Porque falta o ponto quente</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Um link tem <code>pointer-events: none</code>. O que ainda funciona?</p>
+<label><input type="radio" name="q5"> O clique do mouse</label>
+<label><input type="radio" name="q5"> Chegar nele com <kbd>Tab</kbd> e abrir com <kbd>Enter</kbd></label>
+<label><input type="radio" name="q5"> O <code>:hover</code></label>
+<label><input type="radio" name="q5"> Nada: o link fica desativado de vez</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. Num texto comum, sem link, a Ana pôs <code>cursor: pointer</code>. Qual é o problema?</p>
+<label><input type="radio" name="q6"> O validador acusa erro</label>
+<label><input type="radio" name="q6"> O texto some</label>
+<label><input type="radio" name="q6"> Nenhum</label>
+<label><input type="radio" name="q6"> A mãozinha promete um clique que não faz nada</label>
+</div>
+
+<h3>Missão final: a vitrine da promoção</h3>
+
+<div class="tryhtml" data-goal="css:.selo{pointer-events}=none,css:.cupom{user-select}=all,css:.cartao{cursor}=pointer,src:-webkit-user-select:\s*all">
+<p class="try-task"><strong>Missão:</strong> (1) O selo "Promoção" está roubando o clique do cartão: faça o clique atravessá-lo. (2) O cartão inteiro é clicável (é um <code>&lt;button&gt;</code>): ponha a mãozinha nele. (3) O cupom deve ser selecionado inteiro com um clique, inclusive no Safari (as duas versões da propriedade).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;button class="cartao" type="button"&gt;
+    &lt;img src="assets/midia/bolo-400.jpg" alt="" width="200" height="150"&gt;
+    &lt;span&gt;Bolo de cenoura: adicionar ao carrinho&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;span class="selo"&gt;Promoção&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Cupom: &lt;code class="cupom"&gt;BOLO10&lt;/code&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.vitrine {
+  position: relative;
+  display: inline-block;
+  font-family: sans-serif;
+}
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  font: inherit;
+  background-color: white;
+  border: 1px solid tan;
+}
+
+.selo {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 4px 10px;
+  background-color: gold;
+}
+
+.cupom {
+  padding: 4px 8px;
+  border: 1px dashed orange;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.vitrine {
+  position: relative;
+  display: inline-block;
+  font-family: sans-serif;
+}
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  font: inherit;
+  background-color: white;
+  border: 1px solid tan;
+  cursor: pointer;
+}
+
+.selo {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 4px 10px;
+  background-color: gold;
+  pointer-events: none;
+}
+
+.cupom {
+  padding: 4px 8px;
+  border: 1px dashed orange;
+  -webkit-user-select: all;
+  user-select: all;
+}
+</pre>
+</div>
+
+<p>A imagem do cartão tem <code>alt=""</code> de propósito: o texto do botão já diz tudo, e a foto ali é decoração.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>cursor</code> muda a forma da seta em cima do elemento: <code>pointer</code> (clicável), <code>text</code>, <code>not-allowed</code>, <code>grab</code>/<code>grabbing</code>, <code>help</code>, <code>wait</code>, <code>zoom-in</code>… O desenho exato depende do sistema.</li>
+  <li>O cursor tem de dizer a verdade: mãozinha só no que é clicável.</li>
+  <li>Cursor com imagem: <code>url("…") x y, reserva</code>. Sem a reserva, a declaração é ignorada.</li>
+  <li><code>pointer-events: none</code> deixa o mouse atravessar o elemento (bom para enfeites). Não desativa o teclado e é herdado.</li>
+  <li><code>user-select: none</code> impede a seleção; <code>all</code> seleciona tudo com um clique. O Safari pede <code>-webkit-user-select</code>. Não bloqueie a seleção do conteúdo.</li>
+  <li>Valores em português (<code>mao</code>, <code>nenhum</code>) ou antigos (<code>hand</code>) são ignorados; o validador diz "<em>is not a … value</em>".</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
