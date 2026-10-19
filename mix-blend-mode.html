@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Mistura de Cores — mix-blend-mode | Guia CSS</title>
+<meta name="description" content="Mistura de cores em CSS para quem está começando: mix-blend-mode com multiply, screen, overlay, difference e os outros modos lado a lado, o truque de sumir com o fundo branco de uma imagem, texto que inverte de cor, background-blend-mode, isolation e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Mistura de Cores</span></h1>
+
+<p class="intro">Normalmente, o que está na frente <strong>cobre</strong> o que está atrás: um círculo vermelho em cima da foto esconde o pedaço da foto que fica embaixo dele. A propriedade <code>mix-blend-mode</code> ("modo de mistura") muda isso: as cores da frente e as de trás se <strong>misturam</strong>, como tintas, como luzes ou como transparências de retroprojetor. É o mesmo recurso das "camadas" dos programas de edição de imagem, agora direto no CSS.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A ideia da mistura: o elemento e o que está atrás dele viram uma cor só.</li>
+  <li>Os modos mais usados (<code>multiply</code>, <code>screen</code>, <code>overlay</code>, <code>difference</code>…) e todos os outros, lado a lado, sobre a mesma foto.</li>
+  <li>O truque de sumir com o fundo branco de uma imagem com <code>multiply</code>.</li>
+  <li>Um título que muda de cor conforme o fundo, com <code>difference</code>.</li>
+  <li>A prima <code>background-blend-mode</code>, que mistura as camadas do fundo de um elemento.</li>
+  <li><code>isolation: isolate</code>, para a mistura não "vazar" para o resto da página.</li>
+  <li>Os erros mais comuns e as mensagens reais do validador.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="opacity.html">Transparência</a> e <a href="filter.html">Filtros</a>. Os exemplos usam as imagens de exemplo do guia, e o seu navegador desenha cada resultado agora. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: duas transparências no retroprojetor</h2>
+<p>Pense em duas folhas transparentes pintadas, uma em cima da outra, contra a luz. Onde as duas têm tinta, a luz passa pelas duas, e a cor fica mais escura: azul em cima de amarelo dá verde. Onde só uma tem tinta, aparece só ela. E onde as duas estão em branco (sem tinta), continua branco.</p>
+
+<p>Isso é o modo <code>multiply</code> ("multiplicar"). Os outros modos são outras "regras de mistura": algumas clareiam (como duas lanternas apontadas para a mesma parede), outras aumentam o contraste, outras invertem. Em todos, o navegador olha, ponto por ponto, a cor do elemento e a cor do que está <strong>atrás</strong> dele, e calcula uma cor nova.</p>
+
+<hr>
+
+<h2>1. A primeira mistura: o fundo branco que some</h2>
+<p>O avatar da Ana é um JPG, e JPG não tem transparência: os cantos em volta do círculo são <strong>brancos</strong>. Num fundo branco, ninguém percebe. Num fundo amarelo, aparecem quatro cantos brancos. Veja o mesmo avatar duas vezes, a segunda com <code>multiply</code>:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .faixa {
+    background-color: gold;
+    padding: 10px;
+  }
+  .avatar {
+    width: 96px;
+  }
+  .misturado {
+    mix-blend-mode: multiply;
+  }
+&lt;/style&gt;
+&lt;div class="faixa"&gt;
+  &lt;img class="avatar" src="assets/midia/avatar-ana-192.jpg" alt="Avatar da Ana"&gt;
+  &lt;img class="avatar misturado" src="assets/midia/avatar-ana-192.jpg" alt="Avatar da Ana, misturado ao fundo"&gt;
+&lt;/div&gt;
+</pre>
+
+<p>O primeiro avatar fica dentro de um quadrado branco. No segundo, o quadrado branco sumiu: o amarelo da faixa aparece nos cantos. Mas repare no preço: o rosto e a roupa também se misturaram com o amarelo. O rosto ficou alaranjado e a blusa, que era verde-azulada, ficou mais verde e mais escura.</p>
+
+<dl class="anatomy">
+  <dt>mix-blend-mode</dt><dd>A propriedade: <em>mix</em> = "misturar", <em>blend mode</em> = "modo de mistura". Vai no elemento da <strong>frente</strong>.</dd>
+  <dt>multiply</dt><dd>O modo: "multiplicar". As cores se multiplicam e o resultado é sempre igual ou <strong>mais escuro</strong>. Branco não muda nada (é como multiplicar por 1), e preto vira preto (como multiplicar por 0). Por isso o branco "some".</dd>
+  <dt>com o quê?</dt><dd>Com tudo o que está desenhado <strong>atrás</strong> do elemento: aqui, o fundo <code>gold</code> da <code>.faixa</code>.</dd>
+</dl>
+
+<div class="tryhtml" data-goal="css:.logo{mix-blend-mode}=multiply">
+<p class="try-task"><strong>Missão:</strong> o avatar no cabeçalho do blog está com um quadrado branco em volta. Faça o branco sumir no fundo rosado com <code>mix-blend-mode</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;img class="logo" src="assets/midia/avatar-ana-192.jpg" alt="Avatar da Ana"&gt;
+  &lt;h1&gt;Blog da Ana&lt;/h1&gt;
+&lt;/header&gt;
+</pre>
+<pre class="script" data-file="style.css">.topo {
+  background-color: pink;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  width: 72px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.topo {
+  background-color: pink;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  width: 72px;
+  mix-blend-mode: multiply;
+}
+</pre>
+</div>
+
+<div class="tip">
+<p><strong>O jeito "certo" continua sendo a imagem com transparência.</strong> O <code>multiply</code> é um truque rápido, mas tinge a imagem toda. Se você pode escolher o arquivo, use um PNG, WebP ou SVG com fundo transparente, como o <code>logo-lojinha</code> do guia: ele fica bom em qualquer fundo, sem mistura nenhuma.</p>
+</div>
+
+<hr>
+
+<h2>2. Todos os modos, lado a lado</h2>
+<p>Cada caixa abaixo tem a mesma foto do bolo e, na frente, o mesmo círculo <code>tomato</code>. Só muda o <code>mix-blend-mode</code> do círculo, escrito embaixo:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .galeria {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-family: sans-serif;
+  }
+  figure {
+    margin: 0;
+    width: 150px;
+    text-align: center;
+    font-size: 12px;
+  }
+  .palco {
+    position: relative;
+    height: 112px;
+    background-image: url("assets/midia/bolo-400.jpg");
+    background-size: cover;
+  }
+  .bola {
+    position: absolute;
+    left: 35px;
+    top: 16px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: tomato;
+  }
+&lt;/style&gt;
+&lt;div class="galeria"&gt;
+  &lt;figure&gt;&lt;div class="palco"&gt;&lt;div class="bola" style="mix-blend-mode: normal"&gt;&lt;/div&gt;&lt;/div&gt;&lt;figcaption&gt;normal&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure&gt;&lt;div class="palco"&gt;&lt;div class="bola" style="mix-blend-mode: multiply"&gt;&lt;/div&gt;&lt;/div&gt;&lt;figcaption&gt;multiply&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure&gt;&lt;div class="palco"&gt;&lt;div class="bola" style="mix-blend-mode: screen"&gt;&lt;/div&gt;&lt;/div&gt;&lt;figcaption&gt;screen&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure&gt;&lt;div class="palco"&gt;&lt;div class="bola" style="mix-blend-mode: overlay"&gt;&lt;/div&gt;&lt;/div&gt;&lt;figcaption&gt;overlay&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure&gt;&lt;div class="palco"&gt;&lt;div class="bola" style="mix-blend-mode: darken"&gt;&lt;/div&gt;&lt;/div&gt;&lt;figcaption&gt;darken&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure&gt;&lt;div class="palco"&gt;&lt;div class="bola" style="mix-blend-mode: lighten"&gt;&lt;/div&gt;&lt;/div&gt;&lt;figcaption&gt;lighten&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure&gt;&lt;div class="palco"&gt;&lt;div class="bola" style="mix-blend-mode: color-dodge"&gt;&lt;/div&gt;&lt;/div&gt;&lt;figcaption&gt;color-dodge&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure&gt;&lt;div class="palco"&gt;&lt;div class="bola" style="mix-blend-mode: color-burn"&gt;&lt;/div&gt;&lt;/div&gt;&lt;figcaption&gt;color-burn&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure&gt;&lt;div class="palco"&gt;&lt;div class="bola" style="mix-blend-mode: hard-light"&gt;&lt;/div&gt;&lt;/div&gt;&lt;figcaption&gt;hard-light&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure&gt;&lt;div class="palco"&gt;&lt;div class="bola" style="mix-blend-mode: soft-light"&gt;&lt;/div&gt;&lt;/div&gt;&lt;figcaption&gt;soft-light&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure&gt;&lt;div class="palco"&gt;&lt;div class="bola" style="mix-blend-mode: difference"&gt;&lt;/div&gt;&lt;/div&gt;&lt;figcaption&gt;difference&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure&gt;&lt;div class="palco"&gt;&lt;div class="bola" style="mix-blend-mode: exclusion"&gt;&lt;/div&gt;&lt;/div&gt;&lt;figcaption&gt;exclusion&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure&gt;&lt;div class="palco"&gt;&lt;div class="bola" style="mix-blend-mode: hue"&gt;&lt;/div&gt;&lt;/div&gt;&lt;figcaption&gt;hue&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure&gt;&lt;div class="palco"&gt;&lt;div class="bola" style="mix-blend-mode: saturation"&gt;&lt;/div&gt;&lt;/div&gt;&lt;figcaption&gt;saturation&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure&gt;&lt;div class="palco"&gt;&lt;div class="bola" style="mix-blend-mode: color"&gt;&lt;/div&gt;&lt;/div&gt;&lt;figcaption&gt;color&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure&gt;&lt;div class="palco"&gt;&lt;div class="bola" style="mix-blend-mode: luminosity"&gt;&lt;/div&gt;&lt;/div&gt;&lt;figcaption&gt;luminosity&lt;/figcaption&gt;&lt;/figure&gt;
+&lt;/div&gt;
+</pre>
+
+<p>(Aqui o <code>mix-blend-mode</code> foi escrito no atributo <code>style</code> só para caber um modo por caixa; no seu site, use classes.) Olhando as caixas: com <code>normal</code>, o círculo cobre o bolo. Com <code>multiply</code>, o bolo aparece através do círculo, mais escuro e avermelhado. Com <code>screen</code>, o círculo fica quase invisível sobre o fundo claro, e o bolo aparece clareado. Com <code>difference</code> e <code>exclusion</code>, o círculo vira azul-esverdeado, a "cor oposta" do vermelho. Com <code>color</code>, o bolo ganha o tom do círculo, mas mantém luz e sombra.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Modo</th><th>O que faz</th><th>Bom para</th></tr>
+<tr><td><code>normal</code></td><td>Sem mistura: a frente cobre (o padrão)</td><td>—</td></tr>
+<tr><td><code>multiply</code></td><td>"Multiplicar": escurece; branco some, preto fica preto</td><td>sumir com fundo branco, tingir fotos, efeito de tinta</td></tr>
+<tr><td><code>screen</code></td><td>"Tela" (de projetor): o contrário do <code>multiply</code>; clareia; preto some, branco fica branco</td><td>sumir com fundo preto, efeito de luz</td></tr>
+<tr><td><code>overlay</code></td><td>"Sobrepor": <code>multiply</code> nas partes escuras de trás e <code>screen</code> nas claras; aumenta o contraste</td><td>tingir mantendo o desenho</td></tr>
+<tr><td><code>darken</code> / <code>lighten</code></td><td>"Escurecer" / "clarear": fica a mais escura / a mais clara das duas cores</td><td>combinar fundos</td></tr>
+<tr><td><code>color-dodge</code> / <code>color-burn</code></td><td>"Esquivar" / "queimar" a cor: clareia / escurece com força</td><td>efeitos fortes, brilho</td></tr>
+<tr><td><code>hard-light</code> / <code>soft-light</code></td><td>"Luz dura" / "luz suave": como um holofote forte / fraco da cor da frente</td><td>iluminar, sombrear</td></tr>
+<tr><td><code>difference</code> / <code>exclusion</code></td><td>"Diferença" / "exclusão": subtrai uma cor da outra; branco inverte o que está atrás. O <code>exclusion</code> é mais suave</td><td>texto que muda de cor com o fundo</td></tr>
+<tr><td><code>hue</code>, <code>saturation</code>, <code>color</code>, <code>luminosity</code></td><td>Pegam só uma parte da cor da frente: o tom (matiz), a saturação, tom + saturação, ou a luminosidade</td><td><code>color</code>: tingir uma foto de uma cor</td></tr>
+</table>
+</div>
+
+<p>Não precisa decorar todos. Os do dia a dia são <code>multiply</code>, <code>screen</code>, <code>overlay</code> e <code>difference</code>. Para os outros, o jeito mais rápido é testar: troque o modo no editor abaixo.</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="palco"&gt;
+  &lt;p class="etiqueta"&gt;Bolo do dia&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.palco {
+  max-width: 400px;
+  height: 300px;
+  padding: 24px;
+  background-image: url("assets/midia/bolo-400.jpg");
+  background-size: cover;
+  font-family: sans-serif;
+}
+
+.etiqueta {
+  margin: 0;
+  padding: 12px;
+  font-size: 32px;
+  font-weight: bold;
+  color: white;
+  background-color: navy;
+  mix-blend-mode: overlay;
+}
+
+/* experimente: multiply, screen, difference,
+   color, luminosity, hard-light... */
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Luz e tinta: screen × multiply</h2>
+<p>Três círculos com as cores da luz (vermelho, verde e azul), com <code>screen</code>, num fundo preto. Como lanternas coloridas apontadas para uma parede escura:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .parede {
+    position: relative;
+    width: 200px;
+    height: 190px;
+    background-color: black;
+  }
+  .luz {
+    position: absolute;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    mix-blend-mode: screen;
+  }
+  .vermelha { background-color: red;  left: 10px; top: 10px; }
+  .verde    { background-color: lime; left: 80px; top: 10px; }
+  .azul     { background-color: blue; left: 45px; top: 70px; }
+&lt;/style&gt;
+&lt;div class="parede"&gt;
+  &lt;div class="luz vermelha"&gt;&lt;/div&gt;
+  &lt;div class="luz verde"&gt;&lt;/div&gt;
+  &lt;div class="luz azul"&gt;&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Onde o vermelho e o verde se cruzam, aparece amarelo; verde com azul dá ciano (azul-claro); vermelho com azul, magenta (rosa-choque). E no meio, onde as três luzes se encontram, branco: luz somada clareia. É o mesmo princípio dos pixels da sua tela, e é por isso que a cor <code>rgb(255, 255, 255)</code> é branca (aula <a href="cores-rgb.html">rgb()</a>).</p>
+
+<p>Com <code>multiply</code>, acontece o contrário: cada camada escurece, como tinta sobre papel. Troque <code>screen</code> por <code>multiply</code> e o fundo <code>black</code> por <code>white</code> no editor acima (copie este exemplo para lá) para ver.</p>
+
+<hr>
+
+<h2>4. Um título que muda de cor com o fundo</h2>
+<p>Com <code>difference</code>, um texto branco fica com a cor "oposta" de tudo o que está atrás dele. Num fundo de duas cores, cada pedaço do texto ganha uma cor diferente:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .faixa {
+    max-width: 320px;
+    padding: 20px;
+    background-image: linear-gradient(to right, navy 50%, gold 50%);
+    font-family: sans-serif;
+  }
+  .titulo {
+    margin: 0;
+    font-size: 40px;
+    color: white;
+    mix-blend-mode: difference;
+  }
+&lt;/style&gt;
+&lt;div class="faixa"&gt;
+  &lt;h2 class="titulo"&gt;Bolos da Ana&lt;/h2&gt;
+&lt;/div&gt;
+</pre>
+
+<p>A faixa é metade azul-marinho, metade amarela (o fundo é um <a href="gradientes.html">degradê</a> com a troca de cor em 50%). Na parte azul, o título aparece amarelo-claro; na parte amarela, aparece azul. Em nenhum momento ele some.</p>
+
+<div class="warning">
+<p><strong>Cuidado com o contraste.</strong> Com <code>difference</code>, a cor final depende do fundo, e um fundo cinza médio deixa o texto cinza sobre cinza, ilegível. Teste com os fundos reais da página e, para textos importantes, prefira uma cor fixa com bom contraste (aula <a href="acessibilidade.html">CSS e Acessibilidade</a>).</p>
+</div>
+
+<hr>
+
+<h2>5. background-blend-mode: misturando o fundo</h2>
+<p>O <code>mix-blend-mode</code> mistura o elemento <strong>inteiro</strong> com o que está atrás dele. A prima <code>background-blend-mode</code> mistura só as <strong>camadas do fundo</strong> do próprio elemento: a imagem de fundo com a cor de fundo (ou duas imagens de fundo). O texto do elemento fica intacto.</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .capa {
+    max-width: 300px;
+    height: 200px;
+    padding: 16px;
+    background-color: tomato;
+    background-image: url("assets/midia/bolo-400.jpg");
+    background-size: cover;
+    background-blend-mode: multiply;
+    color: white;
+    font-family: sans-serif;
+  }
+&lt;/style&gt;
+&lt;div class="capa"&gt;
+  &lt;h2&gt;Receitas de outono&lt;/h2&gt;
+&lt;/div&gt;
+</pre>
+
+<p>A foto do bolo inteira ficou tingida de vermelho-alaranjado, como uma foto de capa de revista, e o título branco continua branco. Sem o <code>background-blend-mode</code>, a foto cobriria a cor de fundo, e o <code>tomato</code> nem apareceria.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>Mistura</th><th>com</th></tr>
+<tr><td><code>mix-blend-mode</code></td><td>o elemento inteiro (com texto e filhos)</td><td>o que está atrás dele na página</td></tr>
+<tr><td><code>background-blend-mode</code></td><td>cada camada de fundo</td><td>as camadas de fundo de baixo e a cor de fundo do próprio elemento</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>6. isolation: a mistura que não vaza</h2>
+<p>"O que está atrás" pode ir longe: se o pai do elemento é transparente, a mistura atravessa o pai e pega o fundo do avô, da página… Às vezes é isso que você quer; às vezes não. A propriedade <code>isolation: isolate</code> ("isolar") no pai cria um grupo fechado: os filhos só se misturam com o que está <strong>dentro</strong> dele.</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .faixa {
+    background-color: gold;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+    font-family: sans-serif;
+  }
+  .avatar {
+    width: 96px;
+    mix-blend-mode: multiply;
+  }
+  .isolado {
+    isolation: isolate;
+  }
+&lt;/style&gt;
+&lt;div class="faixa"&gt;
+  &lt;div&gt;
+    &lt;img class="avatar" src="assets/midia/avatar-ana-192.jpg" alt="Avatar da Ana"&gt;
+    &lt;p&gt;sem isolation&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="isolado"&gt;
+    &lt;img class="avatar" src="assets/midia/avatar-ana-192.jpg" alt="Avatar da Ana"&gt;
+    &lt;p&gt;com isolation&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Os dois avatares têm <code>multiply</code>, e os dois <code>&lt;div&gt;</code> em volta deles são transparentes. No primeiro, a mistura atravessou o <code>&lt;div&gt;</code> e pegou o amarelo da faixa: os cantos brancos sumiram. No segundo, o <code>&lt;div class="isolado"&gt;</code> fechou o grupo: dentro dele não há nada atrás do avatar, então não há com o que misturar, e os cantos brancos voltaram.</p>
+
+<div class="note">
+<p><strong>Suporte:</strong> <code>mix-blend-mode</code>, <code>background-blend-mode</code> e <code>isolation</code> funcionam em todos os navegadores atuais desde 2020 (o MDN marca o <code>mix-blend-mode</code> como <em>Baseline: amplamente disponível</em>). A especificação nova acrescentou os valores <code>plus-lighter</code> e <code>plus-darker</code>, usados em animações de troca de imagem. O validador W3C (<code>vnu</code> 26.10.12) ainda não os conhece e acusa <code>“plus-lighter” is not a “mix-blend-mode” value.</code> mesmo assim: se você usar um deles, confira o suporte no MDN e ignore esse erro.</p>
+</div>
+
+<hr>
+
+<h2>7. Formas diferentes de fazer a mesma coisa</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você quer…</th><th>Opções</th><th>Qual usar</th></tr>
+<tr><td>Imagem sem o fundo branco</td><td>um arquivo com transparência (PNG, WebP, SVG); <code>mix-blend-mode: multiply</code></td><td>O arquivo com transparência, sempre que der. O <code>multiply</code> quando você não controla o arquivo e o fundo é claro.</td></tr>
+<tr><td>Foto tingida de uma cor</td><td><code>background-blend-mode</code> (cor + imagem de fundo); um elemento colorido por cima, com <code>mix-blend-mode: color</code> ou <code>multiply</code>; <code>filter: sepia() hue-rotate()</code></td><td>O <code>background-blend-mode</code>, quando a foto já é um fundo: um elemento só, sem nada por cima. O <code>filter</code>, para efeitos prontos (sépia, cinza).</td></tr>
+<tr><td>Escurecer a foto para ler o texto</td><td><code>filter: brightness()</code>; uma cor meio transparente por cima; <code>background-blend-mode: multiply</code> com uma cor escura</td><td>A cor meio transparente (<a href="opacity.html">rgba</a>) ou o <code>brightness()</code>: mais previsíveis.</td></tr>
+<tr><td>Deixar algo meio transparente</td><td><code>opacity</code>; <code>mix-blend-mode</code></td><td><code>opacity</code>. O <code>mix-blend-mode</code> não é transparência: ele <strong>calcula</strong> uma cor nova.</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Como sempre no CSS, um valor inválido é ignorado em silêncio: o elemento aparece com o modo <code>normal</code>, cobrindo o que está atrás. No F12, a declaração aparece riscada, com um ícone de aviso.</p>
+
+<div class="cenario">
+<strong><code>error: CSS: “mix-blend-mode”: “multiple” is not a “mix-blend-mode” value.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>mix-blend-mode: multiple;</code>. "Multiple" (múltiplo) parece com "multiply" (multiplicar), mas não é um modo.</p>
+<pre class="term" data-cwd="~/mistura">$ vnu --css multiple.css
+"file:/home/ana/mistura/multiple.css":2.19-2.26: error: CSS: “mix-blend-mode”: “multiple” is not a “mix-blend-mode” value.</pre>
+<p>"“multiple” não é um valor de <code>mix-blend-mode</code>." O fundo branco do avatar continua lá.</p>
+<p><strong>Como consertar:</strong> <code>multiply</code>, com <strong>y</strong>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “blend-mode”: Property “blend-mode” doesn't exist.</code></strong>
+<p><strong>O que aconteceu:</strong> o nome da propriedade ficou pela metade: <code>blend-mode: multiply;</code>.</p>
+<pre class="term" data-cwd="~/mistura">$ vnu --css blend.css
+"file:/home/ana/mistura/blend.css":2.15-2.22: error: CSS: “blend-mode”: Property “blend-mode” doesn't exist.</pre>
+<p>"A propriedade <code>blend-mode</code> não existe."</p>
+<p><strong>Como consertar:</strong> <code>mix-blend-mode</code> (para o elemento) ou <code>background-blend-mode</code> (para o fundo).</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “mix-blend-mode”: Too many values or values are not recognized.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>mix-blend-mode: multiply screen;</code>, tentando juntar dois modos. Diferente do <code>filter</code>, o <code>mix-blend-mode</code> aceita <strong>um</strong> modo só.</p>
+<pre class="term" data-cwd="~/mistura">$ vnu --css dois.css
+"file:/home/ana/mistura/dois.css":2.28-2.33: error: CSS: “mix-blend-mode”: Too many values or values are not recognized.</pre>
+<p>"Valores demais, ou valores não reconhecidos." (O <code>background-blend-mode</code>, esse sim, aceita uma lista separada por vírgula, um modo para cada camada de fundo.)</p>
+<p><strong>Como consertar:</strong> escolha um modo. Para dois efeitos, use dois elementos, um em cima do outro.</p>
+</div>
+
+<div class="cenario">
+<strong>Não aconteceu nada, e o código está certo</strong>
+<p><strong>O que aconteceu:</strong> a Ana pôs <code>mix-blend-mode: multiply</code> no avatar, mas ele está dentro de um cartão com <code>background-color: white</code>. O avatar se misturou, sim, mas com o branco do cartão, e multiplicar por branco não muda nada. O validador não reclama, porque não há erro.</p>
+<p><strong>Como consertar:</strong> lembre que a mistura é com o que está <strong>logo atrás</strong>. Tire o fundo branco do cartão (ou ponha a cor que você quer nele), ou mova o avatar para cima do fundo colorido.</p>
+</div>
+
+<div class="cenario">
+<strong>A mistura pegou o fundo da página</strong>
+<p><strong>O que aconteceu:</strong> um título com <code>difference</code> num cartão transparente, numa página escura: o título ficou de uma cor estranha, porque se misturou com o fundo da página, lá atrás. No modo escuro do celular, mudou de novo.</p>
+<p><strong>Como consertar:</strong> dê ao cartão um fundo próprio, ou <code>isolation: isolate</code>, para a mistura ficar só dentro dele.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Código</th><th>O que faz</th></tr>
+<tr><td><code>mix-blend-mode: normal;</code></td><td>Sem mistura (o padrão)</td></tr>
+<tr><td><code>mix-blend-mode: multiply;</code></td><td>Escurece; o branco some</td></tr>
+<tr><td><code>mix-blend-mode: screen;</code></td><td>Clareia; o preto some</td></tr>
+<tr><td><code>mix-blend-mode: overlay;</code></td><td>Mais contraste, tingindo</td></tr>
+<tr><td><code>mix-blend-mode: difference;</code></td><td>Subtrai as cores: texto branco inverte o fundo</td></tr>
+<tr><td><code>mix-blend-mode: color;</code></td><td>Pinta o que está atrás com o tom da frente</td></tr>
+<tr><td><code>background-blend-mode: multiply;</code></td><td>Mistura a imagem de fundo com a cor de fundo do próprio elemento</td></tr>
+<tr><td><code>isolation: isolate;</code></td><td>No pai: os filhos só se misturam com o que está dentro dele</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Sumindo com o branco</h3>
+<p>Complete com o modo que faz o fundo branco de uma imagem sumir num fundo colorido:</p>
+<div class="ex-code">.logo { mix-blend-mode: <input data-answer="multiply" aria-label="modo">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Fechando o grupo</h3>
+<p>Complete para que os filhos do cartão só se misturem com o que está dentro dele:</p>
+<div class="ex-code">.cartao { isolation: <input data-answer="isolate" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. Com <code>mix-blend-mode</code>, um elemento se mistura com o quê?</p>
+<label><input type="radio" name="q3"> Com os elementos que vêm depois dele no HTML</label>
+<label><input type="radio" name="q3"> Com o que está desenhado atrás dele</label>
+<label><input type="radio" name="q3"> Só com a cor de fundo dele mesmo</label>
+<label><input type="radio" name="q3"> Com a cor do texto da página</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Qual modo clareia, fazendo o <strong>preto</strong> sumir?</p>
+<label><input type="radio" name="q4"> <code>multiply</code></label>
+<label><input type="radio" name="q4"> <code>darken</code></label>
+<label><input type="radio" name="q4"> <code>screen</code></label>
+<label><input type="radio" name="q4"> <code>normal</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. A Ana quer tingir de vermelho a foto que já é a imagem de fundo do cabeçalho, sem pôr nenhum elemento a mais. O que usar?</p>
+<label><input type="radio" name="q5"> <code>background-color</code> vermelho + <code>background-blend-mode: multiply</code></label>
+<label><input type="radio" name="q5"> <code>mix-blend-mode: multiply multiply;</code></label>
+<label><input type="radio" name="q5"> <code>blend-mode: red;</code></label>
+<label><input type="radio" name="q5"> <code>isolation: isolate;</code></label>
+</div>
+
+<h3>Missão final: o cartaz da padaria</h3>
+
+<div class="tryhtml" data-goal="css:.cartaz{background-blend-mode}=multiply,css:.selo{mix-blend-mode}=multiply,css:.titulo{mix-blend-mode}=difference,css:.cartaz{isolation}=isolate">
+<p class="try-task"><strong>Missão:</strong> no <code>.cartaz</code>: (1) misture a foto de fundo com a cor <code>gold</code>, com <code>background-blend-mode: multiply</code>; (2) faça sumir o quadrado branco do <code>.selo</code> (o avatar) com <code>multiply</code>; (3) ponha <code>difference</code> no <code>.titulo</code>; (4) isole o cartaz com <code>isolation</code>, para nada se misturar com o fundo da página.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartaz"&gt;
+  &lt;h1 class="titulo"&gt;Padaria da Ana&lt;/h1&gt;
+  &lt;img class="selo" src="assets/midia/avatar-ana-192.jpg" alt="Avatar da Ana"&gt;
+  &lt;p&gt;Bolo de cenoura saindo do forno às 16h.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: sans-serif;
+}
+
+.cartaz {
+  max-width: 400px;
+  padding: 16px;
+  background-color: gold;
+  background-image: url("assets/midia/bolo-400.jpg");
+  background-size: cover;
+}
+
+.titulo {
+  margin: 0 0 8px;
+  font-size: 36px;
+  color: white;
+}
+
+.selo {
+  width: 96px;
+}
+
+.cartaz p {
+  font-weight: bold;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: sans-serif;
+}
+
+.cartaz {
+  max-width: 400px;
+  padding: 16px;
+  background-color: gold;
+  background-image: url("assets/midia/bolo-400.jpg");
+  background-size: cover;
+  background-blend-mode: multiply;
+  isolation: isolate;
+}
+
+.titulo {
+  margin: 0 0 8px;
+  font-size: 36px;
+  color: white;
+  mix-blend-mode: difference;
+}
+
+.selo {
+  width: 96px;
+  mix-blend-mode: multiply;
+}
+
+.cartaz p {
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<p>Com tudo pronto, a foto do bolo fica amarelada, o avatar perde o quadrado branco, e o título branco, sobre o fundo amarelo, aparece azul (branco "menos" amarelo dá azul). Mude a <code>background-color</code> do cartaz e veja o título mudar junto.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>mix-blend-mode</code> mistura o elemento (inteiro, com texto e filhos) com o que está desenhado atrás dele, ponto por ponto. Vai no elemento da frente, e aceita um modo só.</li>
+  <li><code>multiply</code> escurece e some com o branco; <code>screen</code> clareia e some com o preto; <code>overlay</code> aumenta o contraste; <code>difference</code> subtrai as cores (texto que muda com o fundo; cuidado com o contraste); <code>color</code> tinge.</li>
+  <li><code>background-blend-mode</code> mistura as camadas do fundo do próprio elemento (imagem com cor), sem mexer no texto.</li>
+  <li><code>isolation: isolate</code> no pai fecha o grupo: a mistura não vaza para a página.</li>
+  <li>Se nada mudou: um valor errado (ignorado em silêncio; o validador pega <code>multiple</code>, <code>blend-mode</code>, dois modos), ou um fundo branco logo atrás. O <code>vnu</code> ainda acusa, por engano, o novo <code>plus-lighter</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
