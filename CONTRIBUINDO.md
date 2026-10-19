@@ -1,0 +1,278 @@
+# Como escrever uma página do Guia CSS
+
+O guia é uma **escola**, estilo W3Schools, para quem **já viu um pouco de HTML** (o Guia HTML) mas **nunca escreveu CSS**. **Uma aula = um assunto** (uma propriedade ou uma ideia por aula). O dono do projeto já reclamou de outro guia que juntava vários assuntos numa página. Nunca mostre código "seco":
+- explique cada parte (anatomia: seletor, propriedade, valor, `;`, `{ }`);
+- mostre o **resultado real**: o próprio navegador do leitor desenha cada exemplo;
+- mostre **várias formas** de fazer e **quando usar** cada uma;
+- mostre o que acontece quando dá errado: no CSS quase nunca aparece mensagem — o navegador **ignora** a declaração errada em silêncio. Mostre o que o leitor vê (nada muda), como achar no F12 (a declaração riscada / o ícone de aviso) e a mensagem **real** do validador W3C;
+- deixe o leitor praticar no editor do guia.
+
+Antes de tudo, leia o `RECURSOS.md`: onde trabalhar (VPS) e como.
+
+## 0. O que o guia ensina
+- **CSS moderno**, como os navegadores de hoje (Chrome, Edge, Firefox, Safari de 2025–2026) entendem: Flexbox, Grid, variáveis, `clamp()`, `:has()`, aninhamento, `@layer`, `@container`, `oklch()`. O que é recente demais ou ainda não funciona em todos os navegadores ganha uma `div.note` com o suporte (confira em developer.mozilla.org/pt-BR e caniuse.com, WebFetch).
+- O jeito antigo (`float` para layout, tabelas para layout, prefixos `-webkit-`) aparece só para o leitor reconhecer, com o porquê de não usar.
+- O HTML dos exemplos é simples e **válido** (o leitor já fez o Guia HTML: aponte para `https://wallysondevs.github.io/guia-html/` quando citar um elemento, em texto ou link externo).
+
+## 1. Esqueleto do arquivo
+Use como modelo uma aula do Guia HTML (na VPS: `~/guia-html/links.html`, `~/guia-html/imagens.html`): cabeçalho, `<main>`, blocos, rodapé, `.exercise`, `.mc`, `dl.anatomy`, `div.cenario`, `div.note`, `table.ref`. Troque:
+- `<title>CSS TEMA — descrição | Guia CSS</title>`;
+- `<h1>CSS <span class="hl">TEMA</span></h1>`.
+
+Menu, selo e Anterior/Próximo vêm de `assets/site.js` (`NIVEIS`). **Não mude a `NIVEIS`.** Links internos só para páginas que estão nela.
+
+## 2. Ordem de uma aula
+1. Intro.
+2. "Você vai aprender".
+3. A ideia antes do código, com uma comparação do dia a dia (roupa × corpo, pintar uma parede, arrumar uma estante).
+4. Do simples ao completo, uma novidade por vez, com `dl.anatomy` ou uma tabela "valor → o que faz".
+5. **O resultado** de cada exemplo, desenhado ao vivo (`.tryhtml` sem meta, ou `pre.file[data-resultado]` para HTML com `<style>`). **Mostre os valores lado a lado**: numa aula de `border-style`, uma caixa para cada valor, com o nome escrito dentro.
+6. **Pelo menos dois "Experimente"** (`.tryhtml` com abas `index.html` + `style.css`) por aula: um no meio e uma missão no fim.
+7. Formas diferentes de fazer a mesma coisa + tabela "qual usar".
+8. **Quando dá errado** (`div.cenario`): o código errado, o que o leitor vê (descreva olhando a foto, veja §5), por que (ex.: faltou o `;`, a especificidade perdeu, o pai não é `display: flex`) e, quando houver, a mensagem do validador.
+9. Referência (`table.ref`).
+10. Exercícios (3 ou mais: `.exercise`, `.mc`).
+11. Resumo.
+
+Páginas de **Projetos**: passo a passo (versão 1, 2, 3… da página, cada uma com um `.tryhtml`). Páginas de **Referência**: tabelas, com poucos `.tryhtml`.
+
+## 3. Componentes
+
+### O exemplo com o resultado embaixo
+Para um exemplo curto, um `pre.file[data-resultado]` com o HTML e um `<style>` dentro (o site desenha num quadro "Resultado"):
+```html
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  h1 { color: tomato; }
+&lt;/style&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+</pre>
+```
+Para mostrar o CSS separado (o jeito certo, com `<link>`), use um `.tryhtml` **sem `data-goal`** com as abas `index.html` e `style.css` — ele também desenha o resultado ao vivo.
+
+Dentro de `<pre>`, **todo** `<`, `>` e `&` vira `&lt;`, `&gt;` e `&amp;` — inclusive o `>` do combinador filho (`ul &gt; li`) e o `&` do aninhamento (`&amp;:hover`). O testador confere.
+
+### Editor "Experimente" (`.tryhtml`): HTML + CSS ao vivo
+```html
+<div class="tryhtml" data-goal="css:h1{color}=rgb(255, 99, 71)">
+<p class="try-task"><strong>Missão:</strong> deixe o título da cor <code>tomato</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: black;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: tomato;
+}
+</pre>
+</div>
+```
+- O leitor edita e vê o resultado **ao vivo**, desenhado pelo navegador dele, num quadro isolado. A aba `style.css` só vale se o `index.html` tiver o `<link rel="stylesheet" href="style.css">`.
+- Sem `data-goal`: caixa livre (para brincar e para mostrar resultados). Com `data-goal`: missão, e o `pre.solucao` é **obrigatório** (um por aba que muda).
+- Os detalhes do quadro (largura, mídia de exemplo, o que fica isolado) estão na §4.
+
+### Metas (`data-goal`, separadas por vírgula; `\,` = vírgula literal)
+As metas olham a **página já desenhada pelo navegador** (o DOM), e não o texto do código. Por exemplo, `<h1>Oi</h2>` vira um `h1` consertado pelo navegador.
+
+| Meta | Verdade quando… |
+| --- | --- |
+| `sel:SELETOR` | existe pelo menos um elemento que casa com o seletor CSS (`sel:img[alt]`, `sel:nav ul li a`) |
+| `nsel:SELETOR=N` | existem exatamente N elementos (`nsel:li=3`) |
+| `texto:SELETOR=TEXTO` | o texto do **primeiro** elemento que casa (espaços juntados, sem as pontas) **contém** TEXTO, diferenciando maiúsculas de minúsculas |
+| `attr:SELETOR[ATRIBUTO]=VALOR` | o atributo do primeiro elemento é **igual** a VALOR; sem `=VALOR`, basta o atributo existir. **O último `[…]` é sempre o atributo** e o resto é o seletor: `attr:nav a[aria-current]=page` lê o `aria-current` do **primeiro** `nav a`. Para escolher o link que tem o atributo, filtre no seletor: `attr:nav a[aria-current][aria-current]=page` |
+| `css:SELETOR{propriedade}=VALOR` | o estilo **calculado** (`getComputedStyle`) do primeiro elemento é igual a VALOR (`css:h1{color}=rgb(255, 0, 0)`) |
+| `console:TEXTO` | a saída do console (log e erros) contém TEXTO |
+| `src:REGEX` | o código de todas as abas casa com a regex (flags `m` e `i`) |
+| `nsrc:REGEX` | o código **não** casa com a regex (para proibir algo, como `nsrc:<font`) |
+
+**Regras exatas (decididas antes de escrever; não invente outras):**
+- **Regex** (`src:`, `nsrc:`): é a regex do JavaScript. `|` é alternativa e `\|` é uma barra vertical literal.
+- **`texto:`** usa o texto como o leitor vê: um `<br>` e o fim de cada bloco (`p`, `li`, `div`…) contam como espaço.
+- **`src:`/`nsrc:` usam a flag `i`**, que junta maiúsculas e minúsculas também com acento: `Ã` casa com `ã`. Para letras exatas, use classes de caracteres (ex.: `nsrc:Ã[£§¡]`).
+- **Seletor:** é o CSS normal do `querySelector`. Para vírgula dentro de um seletor (`h1, h2`), escreva `\,`.
+- **Escapes no `data-goal`:** `\,` é vírgula literal; `\\` é uma barra invertida literal. Uma vírgula sem escape só separa metas quando vem seguida do nome de uma meta. Dentro do atributo, `&lt;` e `&gt;` são `<` e `>`.
+- O **código inicial não pode cumprir a meta**, e a **solução tem de cumprir** (o testador confere).
+- **A solução tem de ser HTML válido** no validador W3C (`--nativo`). A exceção é uma missão que ensina justamente um erro, e mesmo assim a solução conserta.
+- Não use meta que dependa da fonte, do tamanho da tela ou do navegador (larguras em pixels, quebra de linha).
+
+
+**Para o CSS, as metas mais úteis:**
+- `css:SELETOR{propriedade}=VALOR` confere o estilo **calculado** — o valor como o navegador o guarda depois de resolver tudo: cores viram `rgb(…)` (`tomato` → `rgb(255, 99, 71)`; com transparência, `rgba(…)`), tamanhos viram `px` (`2em` com fonte de 16px → `32px`), `bold` vira `700`, e os atalhos (`margin`, `border`, `background`) **não** aparecem: confira a propriedade longa (`margin-top`, `border-top-width`, `background-color`). **Antes de escrever a meta, confira o valor calculado de verdade** com `tools/foto.js --estilo` (§4) — nunca de memória.
+- `src:REGEX` exige um recurso no código (`src:display:\s*flex`, `src:@media`); `nsrc:` proíbe (`nsrc:!important`).
+- Não use meta que dependa da fonte instalada, da largura da tela (a não ser com a largura fixa do quadro, §4) ou do navegador (larguras de texto em px, quebra de linha, `font-family` calculada).
+- `:hover`, `:focus`, animações e transições não têm estado fixo para conferir: use `src:` (por exemplo, `src::hover\s*\{[^}]*background`) ou a meta que o agente do simulador acrescentar (§4).
+
+### Terminal (`pre.term`)
+Igual aos outros guias: `$ ` = `ana@notebook:~$`. No Guia CSS ele aparece pouco: o validador (`vnu --css estilo.css`, `vnu --also-check-css index.html`) e, nas aulas de organização, `tree`.
+
+### Outros blocos
+`dl.anatomy`, `div.note/.tip/.warning/.cenario`, `ol.passo`, `div.table-wrap > table.ref`, `.exercise`, `.mc`, `figure`.
+
+No `.exercise`, `data-answer="a|b"` aceita respostas alternativas (`\|` é uma barra literal).
+
+## 4. O editor do guia (`assets/htmlsim.js`)
+> **Herdada do Guia HTML (o mesmo editor); o agente do simulador do Guia CSS está revisando e completando.** **Esta seção é mantida pelo agente do simulador.** Antes de escrever uma frase do tipo "no editor…" que não esteja aqui, confira com as ferramentas dele.
+
+**Testador pronto (17/10, 15:55).** Mídia de exemplo pronta (lista abaixo). A aula do editor para o leitor é `simulador.html`; a página de teste é `tools/demo.html`.
+
+### O testador (na VPS)
+```bash
+~/guia-css-lab/testar pagina.html            # no notebook (roda na VPS, com timeout)
+~/guia-css-lab/testar -v pagina.html         # mostra cada meta, o que o código inicial ainda não cumpre e o console
+~/guia-css-lab/testar --nativo pagina.html   # + validador W3C do laboratório (vnu 26.10.12)
+```
+- Abre a página num **Chromium de verdade** (sem janela), com o **mesmo** `assets/htmlsim.js` do leitor: as metas são avaliadas pelo mesmo código, no mesmo quadro.
+- Em cada missão: põe o código inicial e confere que **alguma meta falha**; põe a solução e confere que **todas passam**. Mostra o motivo, por exemplo: `texto:h1=Receitas da Ana (hoje o texto é “Meu site”)`.
+- Confere o **escape** de todo `<pre>`:
+  - `<` ou `&` cru dentro de `pre.file`, `pre.script` ou `pre.solucao` é **falha**;
+  - uma entidade como `&copy;` crua é **aviso**: o leitor veria `©` no código; para mostrar `&copy;`, escreva `&amp;copy;`.
+- Confere o contrato: meta desconhecida, seletor ou regex inválidos, missão sem `pre.solucao`, abas com o mesmo nome, caixa sem aba `.html`.
+- **Avisos** (`!`, não são falha):
+  - erro no console da solução, de uma caixa livre ou de um Resultado (por exemplo, `Não foi possível carregar "bolo.jpg" (<img>)`);
+  - solução desenhada em modo quirks.
+  - **recurso que falha** na solução de uma missão, numa caixa livre ou num Resultado: um 404, uma imagem, um script ou CSS que não carregou, um `<iframe>` que caiu na 404 do editor ou do servidor. Exemplo: `a solução carrega algo que falha: 404 jogo.html`. Uma meta como `attr:iframe[sandbox]` não olha o conteúdo do iframe; este aviso, sim. Num Resultado com "erro de propósito" no rótulo, o aviso diz isso.
+- Guarda o que passou em `tools/.cache-missoes.json`. Só testa de novo a caixa que mudou (ou tudo, se o `htmlsim.js` mudar). Use `--sem-cache` para forçar.
+- `--nativo`: valida no `vnu` do lab **a solução de cada missão** (abas `.html` e `.css`) e **cada `pre.file[data-resultado]`**.
+  - Solução com erro do W3C = **falha**.
+  - Resultado com erro = só mostra (é normal num "quando dá errado").
+  - As mensagens saem no formato da linha de comando, com as linhas do **seu** código: `"index.html":3.29-3.35: error: …`.
+  - Num fragmento, as linhas e colunas já descontam o esqueleto. Um erro que o validador só percebe no fim do arquivo (`End of file seen…`, por exemplo de um `<textarea>` sem fechar) aparece sem posição, com a nota "depois do fim do seu código".
+  - O `vnu --also-check-css` 26.10.12 conta as linhas do HTML uma a menos. Por isso o testador valida o HTML e o CSS em rodadas separadas: as posições que ele mostra são as mesmas de `vnu arquivo.html`.
+- As metas são conferidas logo depois que a página carrega, **sem cliques**. Uma missão do tipo "clique no botão" não dá para testar: use `src:` (por exemplo, `src:addEventListener\("click"`) e deixe o leitor clicar.
+
+### O que o quadro faz
+- **Resultado ao vivo:** cada caixa desenha o código num `<iframe>` próprio, meio segundo depois que o leitor para de digitar (Ctrl+Enter desenha na hora). O CSS e o JS do leitor não vazam para a página do guia.
+- **Um site de verdade:** as abas viram arquivos de uma pasta.
+  - Um *service worker* (`assets/htmlsim-sw.js`) serve a pasta `assets/sim/<caixa>/`, com cada aba no próprio endereço.
+  - Por isso funcionam, como num site publicado: `<link href="estilo.css">`, `<script src="script.js">`, `<a href="sobre.html">`, `href="#receita"`, pastas (`data-file="css/estilo.css"`) e `../`.
+  - O DOM fica **exatamente** como o navegador montou: o `<link>` continua `<link href="estilo.css">`. Por isso `attr:link[href]=estilo.css` funciona.
+- **`<iframe sandbox>` no código do leitor** (conferido no Chromium): um `<iframe>` com `sandbox` **sem** `allow-same-origin` tem origem opaca e **não passa pelo service worker**.
+  - Por isso `src="jogo.html"` (uma aba) e `assets/midia/…` dentro dele dão o 404 do servidor de verdade.
+  - Nesses exemplos, ponha o conteúdo no `srcdoc` do iframe, ou use `sandbox="allow-scripts allow-same-origin"` quando a aula permitir.
+  - O editor não consegue resolver isso: é a regra do navegador. O testador avisa (`não passou pelo editor`).
+- **Mídia:** `assets/midia/…` funciona dentro do quadro e no Resultado, como se a pasta da caixa fosse a raiz do guia. Escreva `src="assets/midia/bolo-800.jpg"`, sem `/` no começo e sem `../`.
+- **Abas e navegação:**
+  - editar uma aba `.html` mostra essa página no quadro;
+  - editar `.css`/`.js` redesenha a página que está aberta;
+  - o botão ↻ volta à primeira aba `.html`;
+  - a barra do quadro mostra o endereço (`obrigado.html?nome=Ana`);
+  - ↗ abre o resultado numa aba nova.
+- **Console** embaixo do quadro, com `console.log/info/warn/error` (objetos e elementos formatados de forma simples, como o F12) e os erros de JS com o arquivo e a linha. Exemplo: `Uncaught ReferenceError: x is not defined   (script.js, linha 3)`. O texto do erro é o do navegador do leitor e muda de navegador para navegador.
+  - Imagem, vídeo, CSS ou script que não carregou também aparece: `Não foi possível carregar "fotoo.jpg" (<img>). Confira o nome e o caminho do arquivo.`
+  - O console aparece sempre quando a caixa tem JS (aba `.js`, `<script>`, `onclick=`…) ou uma meta `console:`; nas outras caixas, só quando aparece alguma mensagem.
+- **Links especiais:**
+  - `mailto:`, `tel:` e `sms:` não abrem nada: o console mostra `[editor] Este link abriria o programa de e-mail, para escrever para ana@exemplo.com`;
+  - um link para outro site abre numa **aba nova** do navegador (com aviso no console);
+  - `target="_top"`/`"_parent"` abre no próprio quadro (com aviso);
+  - um link para uma página que não é aba mostra uma página **404** do editor, com a lista das abas;
+  - `download` baixa de verdade, nos dois modos (conferido no Chromium): uma aba (`receita.txt`) é baixada com o conteúdo da aba, e um arquivo do site (`assets/midia/receita-bolo.pdf`) com o nome do atributo (`download="receita.pdf"`).
+    - O editor faz o download pela página do guia, porque o Chromium busca o `<a download>` sem passar pelo service worker (daria o 404 do servidor).
+    - Sem `download`, o link para uma aba que não é página (`.txt`, `.json`, `.vtt`…) mostra o conteúdo dela no quadro.
+- **Formulários (decisão):** o editor não tem servidor. No envio (depois da validação do navegador: `required`, `pattern`… funcionam de verdade):
+  - o console mostra `[editor] Formulário enviado: GET obrigado.html?nome=Ana`, ou `POST … corpo: nome=Ana&sabor=Cenoura`;
+  - os dados são codificados como no navegador de verdade (`application/x-www-form-urlencoded`): espaço vira `+`, e a quebra de linha de um `<textarea>` vira `%0D%0A` (CRLF, conferido no Chromium);
+  - um **GET** para uma aba (`action="obrigado.html"`) abre essa aba **com os dados no endereço**, e o JS dela consegue ler o `location.search`;
+  - qualquer outro envio (um POST, ou um `action` que não é aba, como `enviar.php` ou `https://…`) mostra a página **"📨 Formulário enviado"**:
+    - o método e o `action`;
+    - o endereço que abriria (GET) ou o corpo da mensagem (POST);
+    - a tabela `name → value`;
+    - um aviso de que um campo sem `name` não é enviado;
+    - o botão "Voltar ao formulário".
+  - Um `submit` com `preventDefault()` no JS do leitor não é tocado.
+  - `method="dialog"` fecha o `<dialog>`, como no navegador.
+- **`alert`, `confirm` e `prompt`** funcionam (são do navegador).
+- **`autofocus`:** pela regra do HTML, depois que o leitor focou qualquer coisa na página do guia (o editor, um botão), o navegador ignora o `autofocus` dentro dos quadros.
+  - Enquanto o leitor digita, o editor não tira o foco do código.
+  - O botão ↻ (da caixa e do Resultado) aplica o `autofocus` da página, como o navegador faria numa aba nova.
+  - O ↗ abre numa aba nova, onde quem aplica o `autofocus` é o próprio navegador.
+- **Validar no W3C (decisão: tem, opcional):** o botão manda o código da aba `.html` aberta para `validator.w3.org/nu`, só **depois de o leitor confirmar** (o código vai para a internet). As mensagens aparecem em inglês, com a linha e a coluna. As metas **não** dependem disso.
+- **Restaurar** volta ao código original. **Ver solução** pede confirmação e troca as abas que a solução muda.
+- **Missão:** "Missão em andamento… Ainda falta: h1 com o texto “Receitas da Ana” (hoje o texto é “Meu site”)" → "✔ Missão cumprida!".
+  - As metas olham a **primeira aba `.html`**. São conferidas quando ela carrega, a cada mensagem no console e a cada mudança no DOM (o leitor clicou, digitou num campo).
+  - Se o leitor estiver em outra página do quadro, a missão pede para voltar (↻).
+
+### Fragmento × documento completo (decisão)
+- **Fragmento** = código sem `<!DOCTYPE>`, `<html>`, `<head>` e `<body>` (por exemplo, `<h1>Oi</h1><p>…</p>`). O quadro o desenha como **parte de uma página completa em modo padrão** (põe `<!DOCTYPE html>` na frente). O que só cabe no `<head>` (`<title>`, `<meta>`…) vai para o head, como o navegador faria.
+- **Documento** (tem `<html>`, `<head>`, `<body>` ou `<!DOCTYPE>`): é desenhado **como está**. Sem o `<!DOCTYPE html>`, ele fica em **modo quirks** (`document.compatMode` é `"BackCompat"`), igual ao navegador de verdade. Use isso na aula do DOCTYPE.
+- **Validador** (`--nativo` e o botão "Validar no W3C"): o fragmento entra num **esqueleto mínimo válido**. A primeira linha é `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>Exemplo</title>` (sem o `meta`/`title` se o fragmento já tiver os seus), depois vem o fragmento e, no fim, `</body></html>`. As linhas das mensagens já são as do seu código.
+
+### `pre.file[data-resultado]`
+- Desenha o código num quadro **"Resultado"** logo abaixo, isolado, com a **altura do conteúdo** (até 640 px; depois rola). Só é desenhado quando chega perto da tela.
+- O `data-file` é só o **rótulo**: `"trecho"` e `"receita.html · erro de propósito"` funcionam, e o código é sempre desenhado como HTML. Um rótulo `.css`/`.js` não é desenhado (o testador acusa): para CSS ou JS junto, use um `.tryhtml` com abas.
+- Tem console próprio, que aparece só quando há mensagem (um `console.log` do exemplo, uma imagem que não carregou).
+
+### O que o quadro NÃO faz
+- Não tem servidor: nada de PHP, de `POST` de verdade ou de cookies vindos de um servidor.
+- Não tem caminho absoluto `/…` (num site do GitHub Pages ele aponta para outro lugar): use caminhos relativos.
+- Não abre sites de fora **dentro** do quadro, a não ser num `<iframe>` do próprio código do leitor. Um link para outro site vai para uma aba nova.
+- **Não é uma barreira de segurança.**
+  - O quadro é um `<iframe>` da mesma origem do guia (precisa ser, para o service worker e as metas), **sem** o atributo `sandbox`.
+    - Com `sandbox="allow-scripts allow-same-origin"`, o Chrome mostraria no F12 da página do guia um aviso por quadro: `An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing.`
+    - O editor mesmo impede que um link (`target="_top"`) ou um formulário troque a página do guia.
+  - O CSS e o JS do leitor ficam no documento do quadro. Mesmo assim, um script **pode** alcançar a página do guia (`parent`, `top.location`) e o `localStorage` dela (o tema escolhido). Não ensine `localStorage.clear()` nem `top.location` no editor.
+- **Quando o editor usa cada modo (`HtmlSim.modo()` diz qual):**
+  - **service worker** (o modo completo, descrito acima): quando o navegador tem `navigator.serviceWorker` e `caches`, a página está num contexto seguro (`https://`, ou `http://localhost`/`127.0.0.1`) e o `assets/htmlsim-sw.js` fica ativo em até 6 segundos. É o caso do guia publicado no GitHub Pages e do testador.
+  - **`srcdoc`** (modo simples): em qualquer outro caso (arquivo aberto do disco com `file://`, `http://` sem ser localhost, janela anônima do Firefox, service worker bloqueado) ou com `?htmlsim=simples` no endereço (para conferir). O console do F12 mostra `htmlsim: sem service worker (…); usando o modo simples` quando a tentativa falha.
+- **Modo simples**, conferido no Chromium:
+  - o CSS e o JS das abas entram embutidos: o `href` do `<link>` muda, e as metas `attr:` em `link`/`script` podem falhar;
+  - os links entre as abas e os formulários continuam funcionando, inclusive `bolo.html#modo-de-preparo` (abre a aba, rola e liga o `:target`) e o link para uma aba que não é página (`receita.txt`), que mostra ou baixa o conteúdo da aba;
+  - um `href="#x"` navega de verdade para o fragmento do próprio quadro, como no modo completo: rola, liga o `:target` e move o ponto de partida do foco (o próximo <kbd>Tab</kbd> parte dali);
+  - `href="#"` e `href="#top"` (sem elemento com esse id) voltam ao topo, como no navegador; o foco fica no link clicado;
+  - um link para uma página que não existe só dá um aviso no console;
+  - só `<link href>` e `<script src>` são embutidos: `<track src="aba.vtt">` não carrega, `<iframe src="aba.html">` mostra o 404 do servidor, e `import` entre abas `.js` não resolve;
+  - um GET para outra aba não leva os dados no `location.search`;
+  - o documento **nunca** fica em modo quirks (é a regra do `srcdoc`);
+  - `assets/midia/…` só funciona em páginas da raiz do site.
+
+### Mídia de exemplo (`assets/midia/`)
+Tudo foi desenhado ou sintetizado para o guia (sem fotos de terceiros). O gerador é `tools/midia/gerar.sh`. São 664 KB no total. Use `alt` de verdade, como "Bolo de cenoura com cobertura de chocolate".
+
+| Arquivo | Pixels | Peso | O que é |
+| --- | --- | --- | --- |
+| `bolo-400.jpg` · `.webp` · `.avif` | 400×300 | 10 KB · 5 KB · 3,4 KB | bolo de cenoura com cobertura de chocolate (ilustração) |
+| `bolo-800.jpg` · `.webp` · `.avif` · `.png` | 800×600 | 25 KB · 11 KB · 6,3 KB · 66 KB | o mesmo bolo (o PNG mostra que foto em PNG pesa mais) |
+| `bolo-1200.jpg` · `.webp` · `.avif` | 1200×900 | 42 KB · 18 KB · 9,2 KB | o mesmo bolo, para `srcset` |
+| `bolo-quadrado-400.jpg` · `.webp` | 400×400 | 16 KB · 8 KB | recorte quadrado do bolo (`<picture>` com direção de arte) |
+| `bolo-quadrado-800.jpg` · `.webp` | 800×800 | 38 KB · 17 KB | o recorte quadrado maior |
+| `bolo.svg` · `bolo-quadrado.svg` | 800×600 · 460×460 | 15 KB · 15 KB | as versões vetoriais |
+| `logo-lojinha.svg` | 400×160 | 1,7 KB | logo da "Lojinha da Ana" (texto em Lato/sans-serif, fundo transparente) |
+| `logo-lojinha-200.png` · `.webp` | 200×80 | 4,6 KB · 2,7 KB | logo, 1x (fundo transparente) |
+| `logo-lojinha-400.png` · `.webp` | 400×160 | 9 KB · 5,6 KB | logo, 2x (`srcset="… 2x"`) |
+| `avatar-ana.svg` | 256×256 | 1,6 KB | avatar redondo da Ana |
+| `avatar-ana-96.png` · `.jpg` · `.webp` | 96×96 | 5,4 KB · 2,9 KB · 2,2 KB | avatar pequeno |
+| `avatar-ana-192.png` · `.jpg` · `.webp` | 192×192 | 11,7 KB · 6,2 KB · 4,3 KB | avatar 2x |
+| `mapa.svg` | 800×500 | 7,7 KB | mapa do bairro (fictício): Lojinha da Ana na Rua das Flores, Av. Central, Praça da Árvore, Rio Azul |
+| `mapa-400.png` · `.webp` | 400×250 | 5,4 KB · 5,9 KB | mapa pequeno |
+| `mapa-800.png` · `.webp` | 800×500 | 13 KB · 13 KB | mapa |
+| `favicon.ico` | 16, 32 e 48 | 15 KB | ícone da aba (bolo com vela, fundo laranja) |
+| `favicon.svg` · `favicon-32.png` | 64×64 · 32×32 | 0,5 KB · 0,5 KB | o mesmo ícone |
+| `apple-touch-icon.png` | 180×180 | 4,3 KB | ícone para a tela inicial do celular |
+| `campainha.ogg` · `.mp3` | 2,2 s, mono | 10 KB · 18 KB | "dim-dom" de campainha (sintetizado) |
+| `video-bolo.webm` · `.mp4` | 640×360, 6 s, **sem som** | 26 KB · 35 KB | animação: misturar (0–2 s), assar (2–4 s), cobrir com chocolate (4–6 s) |
+| `video-bolo-poster.jpg` | 640×360 | 16 KB | capa do vídeo (`poster`), o último quadro |
+| `video-bolo.vtt` | 3 legendas | 0,3 KB | legendas em pt-BR (WebVTT), uma por cena |
+| `receita-bolo.pdf` | 1 página A5 | 38 KB | receita do bolo (para `<a download>`) |
+
+Exemplo de `srcset`: `srcset="assets/midia/bolo-400.jpg 400w, assets/midia/bolo-800.jpg 800w, assets/midia/bolo-1200.jpg 1200w"`. O vídeo não tem som, então `autoplay muted` é natural.
+
+
+## 5. Fidelidade
+- **O resultado visual** é desenhado ao vivo pelo navegador do leitor (`.tryhtml`, `data-resultado`): nunca é imagem. Mas **o texto que você escreve sobre ele** ("o botão fica azul com cantos arredondados", "os três cartões ficam lado a lado") tem de ser conferido **olhando**: tire a foto do resultado no Chromium da VPS com `tools/foto.js` (§4) e **abra a imagem com Read**. Em guias anteriores, autores descreveram resultados que não existiam.
+- **Valores calculados** (o que `getComputedStyle` devolve, o que o F12 mostra na aba Computed): confira com `tools/foto.js --estilo`.
+- **O validador W3C** (laboratório do Guia HTML, `~/guia-html-lab/lab`, na VPS, com o `vnu` 26.10.12): as mensagens de CSS saem em inglês; copie como saíram e explique em português.
+  ```bash
+  printf '%s\n' 'mkdir -p site && cd site' "printf 'h1 { colr: red; }\n' > estilo.css" 'vnu --css estilo.css' |
+    ~/guia-c-lab/vps 'timeout 120 ~/guia-html-lab/lab -n SEUNOME -i'
+  ```
+- **O F12 (DevTools)**: o lab não tem janela. Descreva com cuidado o que o leitor verá (a aba Elements/Elementos, o painel Styles/Estilos com a declaração riscada, a aba Computed), sem inventar textos exatos de menus que você não conferiu; o que não der para conferir fica **ilustrativo**.
+- **Suporte dos navegadores**: confira no MDN (developer.mozilla.org/pt-BR, seção "Compatibilidade com navegadores") ou no caniuse.com antes de dizer "funciona em todos". O Chromium do testador é o 155: algo que só funciona nele não pode ser vendido como universal.
+- **Privacidade:** nada da máquina real nem da VPS; só `/home/ana/…`.
+
+## 6. Escrita
+- Português do Brasil, frases curtas, "você". O leitor sabe o básico de HTML, mas nunca escreveu CSS.
+- Termos em inglês ganham tradução na primeira vez: `color` = "cor", `margin` = "margem", `padding` = "preenchimento" (o espaço de dentro).
+- Exemplos com a vida da Ana: o site de receitas, a lojinha, o currículo, o blog, o cardápio da padaria.
+- Boas práticas desde o começo, sempre com o porquê: CSS num arquivo separado (`style.css`), classes em vez de IDs para estilo, `box-sizing: border-box`, unidades `rem` para fonte, contraste suficiente e foco visível (acessibilidade), mobile first, nada de `!important` para "consertar".
+- Indentação de **2 espaços**, uma declaração por linha, `;` sempre (até na última), espaço depois dos `:`, nomes de classe em minúsculas com hífen (`cartao-produto`).
+- Cores: use nomes simples nos primeiros exemplos (`tomato`, `navy`), depois hex. Evite combinações com pouco contraste.
