@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS position — como funciona o posicionamento | Guia CSS</title>
+<meta name="description" content="A propriedade position para quem nunca escreveu CSS: o fluxo normal da página, os cinco valores (static, relative, absolute, fixed, sticky), as propriedades top, right, bottom, left e inset, o elemento de referência e os erros reais: top que não faz nada num elemento static, número sem unidade e as mensagens do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">position</span></h1>
+
+<p class="intro">Até aqui, cada elemento foi parar onde o navegador quis: um bloco embaixo do outro, as palavras uma depois da outra. A propriedade <code>position</code> ("posição") deixa você <strong>tirar um elemento desse lugar</strong>: empurrá-lo alguns pixels, prendê-lo no canto de um cartão, deixá-lo parado na tela enquanto a página rola. Esta aula é o mapa do assunto: o que é o "fluxo normal", os cinco valores de <code>position</code> e as propriedades que dizem para onde o elemento vai. As próximas aulas detalham cada valor.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que é o <strong>fluxo normal</strong> da página.</li>
+  <li>Os cinco valores: <code>static</code>, <code>relative</code>, <code>absolute</code>, <code>fixed</code> e <code>sticky</code>.</li>
+  <li><code>top</code>, <code>right</code>, <code>bottom</code>, <code>left</code> e o atalho <code>inset</code>: para onde o elemento vai.</li>
+  <li>A ideia de <strong>elemento de referência</strong>: "10px do topo… de quem?"</li>
+  <li>Qual valor usar em cada situação.</li>
+  <li>Os erros: o <code>top</code> que não faz nada e as mensagens do validador W3C.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código.</p>
+
+<hr>
+
+<h2>A ideia: a fila e quem sai dela</h2>
+<p>Pense numa fila de banco. Cada pessoa fica atrás da anterior, e ninguém escolhe o próprio lugar: é a ordem de chegada. Esse é o <strong>fluxo normal</strong> da página: os elementos se arrumam na ordem do HTML, os blocos um embaixo do outro, as palavras uma depois da outra.</p>
+<p>Agora imagine:</p>
+<ul>
+  <li>Alguém dá um passo para o lado, mas o lugar dele na fila continua guardado. É o <code>relative</code>.</li>
+  <li>Alguém sai da fila e vai se encostar numa parede; a fila anda e fecha o buraco. É o <code>absolute</code>.</li>
+  <li>Alguém fica parado na porta, não importa quanto a fila ande. É o <code>fixed</code>.</li>
+  <li>Alguém anda com a fila até chegar à porta e ali fica preso, até a fila acabar. É o <code>sticky</code>.</li>
+</ul>
+
+<hr>
+
+<h2>1. O padrão: <code>position: static</code></h2>
+<p>Todo elemento começa com <code>position: static</code> ("estático"): ele fica no fluxo normal, onde o navegador o pôs. Você quase nunca escreve <code>static</code>; ele é o que já está lá. A única vez em que ele aparece no código é para <strong>desfazer</strong> outro valor, por exemplo dentro de uma <code>@media</code>.</p>
+<p>Num elemento <code>static</code>, as propriedades <code>top</code>, <code>right</code>, <code>bottom</code> e <code>left</code> <strong>não fazem nada</strong>. Para que elas funcionem, o elemento precisa de outro valor de <code>position</code>: é aí que ele passa a ser um elemento <strong>posicionado</strong>.</p>
+
+<hr>
+
+<h2>2. Os três primeiros, lado a lado</h2>
+<p>Três fileiras com as mesmas caixas 1, 2 e 3. A caixa 2 de cada fileira tem <code>top: 20px</code> e <code>left: 20px</code>; só o <code>position</code> dela muda:</p>
+
+<pre class="file" data-file="lado-a-lado.html" data-resultado>&lt;style&gt;
+  .caixa {
+    width: 110px;
+    height: 36px;
+    margin: 4px;
+    background-color: #e8ecff;
+    border: 2px solid navy;
+  }
+  .mexe {
+    top: 20px;
+    left: 20px;
+    background-color: #fde8e1;
+    border-color: tomato;
+  }
+  .estatica { position: static; }
+  .relativa { position: relative; }
+  .absoluta { position: absolute; }
+  .fileira {
+    position: relative;
+    margin-bottom: 16px;
+    border: 2px dashed gray;
+  }
+&lt;/style&gt;
+&lt;div class="fileira"&gt;
+  &lt;div class="caixa"&gt;1&lt;/div&gt;
+  &lt;div class="caixa mexe estatica"&gt;2 static&lt;/div&gt;
+  &lt;div class="caixa"&gt;3&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="fileira"&gt;
+  &lt;div class="caixa"&gt;1&lt;/div&gt;
+  &lt;div class="caixa mexe relativa"&gt;2 relative&lt;/div&gt;
+  &lt;div class="caixa"&gt;3&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="fileira"&gt;
+  &lt;div class="caixa"&gt;1&lt;/div&gt;
+  &lt;div class="caixa mexe absoluta"&gt;2 absolute&lt;/div&gt;
+  &lt;div class="caixa"&gt;3&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Repare em cada fileira:</p>
+<ul>
+  <li><strong>static</strong>: a caixa 2 nem se mexeu. O <code>top</code> e o <code>left</code> foram ignorados.</li>
+  <li><strong>relative</strong>: a caixa 2 desceu 20px e foi 20px para a direita, <strong>a partir de onde estava</strong>, e ficou por cima da caixa 3. O lugar dela na fileira continua reservado: a caixa 3 não subiu.</li>
+  <li><strong>absolute</strong>: a caixa 2 <strong>saiu da fileira</strong>. A caixa 3 subiu e encostou na 1, e a caixa 2 foi parar a 20px do topo e 20px da esquerda <strong>da fileira tracejada</strong>, por cima das caixas 1 e 3. A fileira encolheu: ela só mede o que ficou no fluxo.</li>
+</ul>
+
+<p>Por que "da fileira tracejada"? Porque a fileira tem <code>position: relative</code>. Esse é o próximo assunto.</p>
+
+<hr>
+
+<h2>3. <code>top</code>, <code>right</code>, <code>bottom</code> e <code>left</code></h2>
+<p>Essas quatro propriedades, as <strong>propriedades de deslocamento</strong>, dizem a que distância o elemento fica de cada lado. O detalhe que confunde: <code>top: 20px</code> não quer dizer "suba 20px", e sim "fique a 20px <strong>do topo</strong>", o que, na prática, empurra para <strong>baixo</strong>.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Quer dizer</th><th>O elemento vai para</th></tr>
+<tr><td><code>top: 20px</code></td><td>20px de distância do topo</td><td>baixo</td></tr>
+<tr><td><code>bottom: 20px</code></td><td>20px de distância de baixo</td><td>cima</td></tr>
+<tr><td><code>left: 20px</code></td><td>20px de distância da esquerda</td><td>direita</td></tr>
+<tr><td><code>right: 20px</code></td><td>20px de distância da direita</td><td>esquerda</td></tr>
+<tr><td><code>top: -20px</code></td><td>Valor negativo: o contrário</td><td>cima</td></tr>
+</table>
+</div>
+
+<p>Os valores podem ser em <code>px</code>, <code>rem</code>, <code>%</code> e as outras unidades da aula <a href="unidades.html">Unidades</a>. O padrão é <code>auto</code>, "o navegador decide".</p>
+
+<h3>O atalho <code>inset</code></h3>
+<p>A propriedade <code>inset</code> ("encaixe") junta as quatro, na mesma ordem do <code>margin</code>: em cima, direita, embaixo, esquerda.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita curta</th><th>É o mesmo que</th></tr>
+<tr><td><code>inset: 0;</code></td><td><code>top: 0; right: 0; bottom: 0; left: 0;</code></td></tr>
+<tr><td><code>inset: 10px 20px;</code></td><td><code>top: 10px; bottom: 10px;</code> e <code>right: 20px; left: 20px;</code></td></tr>
+<tr><td><code>inset: 0 0 auto auto;</code></td><td><code>top: 0; right: 0;</code> (o canto de cima, à direita)</td></tr>
+</table>
+</div>
+<p>O <code>inset</code> funciona em todos os navegadores atuais (Chrome e Edge desde a versão 87, Firefox desde a 66, Safari desde a 14.1).</p>
+
+<div class="tryhtml" data-goal="css:.selo{position}=relative,css:.selo{top}=-10px,css:.selo{left}=8px">
+<p class="try-task"><strong>Missão:</strong> o selo "Novo!" está colado no título. Faça-o subir 10px e ir 8px para a direita, a partir de onde está, sem mexer no resto da página.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Bolo de cenoura &lt;span class="selo"&gt;Novo!&lt;/span&gt;&lt;/h1&gt;
+&lt;p&gt;Fofinho, com cobertura de chocolate.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.selo {
+  font-size: 0.5em;
+  padding: 2px 6px;
+  background-color: gold;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.selo {
+  position: relative;
+  top: -10px;
+  left: 8px;
+  font-size: 0.5em;
+  padding: 2px 6px;
+  background-color: gold;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>4. O elemento de referência: "10px do topo de quem?"</h2>
+<p>Quando você diz <code>top: 10px</code>, sempre há uma pergunta escondida: 10px do topo <strong>de quê</strong>? A resposta muda com o valor de <code>position</code>. Esse "de quê" é o <strong>elemento de referência</strong> (na especificação do CSS, o <em>containing block</em>, "bloco que contém").</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>Os deslocamentos contam a partir de…</th><th>Sai do fluxo?</th><th>Aula</th></tr>
+<tr><td><code>static</code></td><td>(não usa deslocamento)</td><td>Não</td><td>esta</td></tr>
+<tr><td><code>relative</code></td><td>Do <strong>lugar onde o próprio elemento estaria</strong></td><td>Não: o lugar fica guardado</td><td><a href="position-relative.html">position: relative</a></td></tr>
+<tr><td><code>absolute</code></td><td>Do <strong>ancestral posicionado</strong> mais próximo (o primeiro "pai", "avô"… com <code>position</code> diferente de <code>static</code>); se não houver, da página</td><td>Sim</td><td><a href="position-absolute.html">position: absolute</a></td></tr>
+<tr><td><code>fixed</code></td><td>Da <strong>janela</strong> do navegador (a parte visível da página)</td><td>Sim</td><td><a href="position-fixed.html">position: fixed</a></td></tr>
+<tr><td><code>sticky</code></td><td>Da área que rola: o elemento anda com a página até "grudar" na distância pedida</td><td>Não</td><td><a href="position-sticky.html">position: sticky</a></td></tr>
+</table>
+</div>
+
+<p>Por isso, no exemplo da seção 2, a caixa <code>absolute</code> foi parar dentro da fileira: a fileira tinha <code>position: relative</code> e virou a referência. Essa dupla, <strong>pai <code>relative</code> + filho <code>absolute</code></strong>, é a receita mais usada do posicionamento, e é o centro da aula <a href="position-absolute.html">position: absolute</a>.</p>
+
+<div class="note">
+<strong>Quem fica por cima?</strong>
+<p>Quando um elemento posicionado cai em cima de outro, ele é desenhado por cima dos elementos do fluxo normal. Entre dois posicionados, vence o que vem depois no HTML. Para mudar essa ordem existe o <code>z-index</code>, aula <a href="z-index.html">Camadas</a>.</p>
+</div>
+
+<hr>
+
+<h2>5. Qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quero</th><th>Use</th></tr>
+<tr><td>Ajustar um elemento uns poucos pixels, sem mexer no resto</td><td><code>relative</code> + <code>top</code>/<code>left</code></td></tr>
+<tr><td>Servir de referência para um filho <code>absolute</code></td><td><code>relative</code>, sem deslocamento</td></tr>
+<tr><td>Um selo no canto de um cartão, um "×" para fechar, um texto sobre a foto</td><td><code>absolute</code> dentro de um pai <code>relative</code></td></tr>
+<tr><td>Um botão "voltar ao topo" ou um aviso de cookies sempre na tela</td><td><code>fixed</code></td></tr>
+<tr><td>Um cabeçalho que gruda no topo quando a página rola</td><td><code>sticky</code> + <code>top: 0</code></td></tr>
+<tr><td>Arrumar colunas, cartões lado a lado, o layout da página</td><td><strong>Nenhum</strong>: use Flexbox ou Grid (aulas <a href="flexbox.html">Flexbox</a> e <a href="grid.html">Grid</a>)</td></tr>
+</table>
+</div>
+
+<div class="warning">
+<strong>Position não é para montar o layout</strong>
+<p>Dá para posicionar tudo com <code>absolute</code> e números exatos, e a página fica perfeita… na sua tela. Numa tela menor, com uma fonte maior ou com um texto mais comprido, tudo se sobrepõe, porque elementos fora do fluxo não empurram uns aos outros. Use <code>position</code> para <strong>detalhes</strong>; o layout é com Flexbox e Grid.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>O <code>top</code> não faz nada: o elemento é <code>static</code></strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .selo {
+    top: -10px;
+    left: 8px;
+    background-color: gold;
+  }
+&lt;/style&gt;
+&lt;h1&gt;Bolo de cenoura &lt;span class="selo"&gt;Novo!&lt;/span&gt;&lt;/h1&gt;
+</pre>
+<p><strong>O que você vê:</strong> o selo fica onde estava, colado ao título.</p>
+<p><strong>Por quê:</strong> sem <code>position</code>, o selo é <code>static</code>, e um elemento <code>static</code> ignora os deslocamentos. O validador não reclama: tudo ali é CSS válido. O F12 confunde mais: na aba <em>Computed</em>, o <code>top</code> aparece com <code>-10px</code>, como se valesse; quem diz que ele não tem efeito é o <code>position: static</code>, logo ao lado.</p>
+<p><strong>Como consertar:</strong> acrescente <code>position: relative;</code> (ou outro valor que não seja <code>static</code>).</p>
+</div>
+
+<div class="cenario">
+<strong>Número sem unidade: <code>top: 10</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.selo {
+  position: relative;
+  top: 10;
+}
+</pre>
+<p><strong>O que você vê:</strong> o selo não se move. No F12, a declaração <code>top: 10</code> aparece riscada, com um ícone de aviso.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.8-3.9: error: CSS: “top”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<p><strong>O que significa:</strong> "só o <code>0</code> pode ficar sem unidade. Você precisa pôr uma unidade depois do número." Escreva <code>top: 10px</code>. O <code>0</code> é a exceção porque zero é zero em qualquer unidade: <code>top: 0</code> está certo.</p>
+</div>
+
+<div class="cenario">
+<strong>Valor com erro de digitação: <code>absolut</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.selo {
+  position: absolut;
+  top: 0;
+  right: 0;
+}
+</pre>
+<p><strong>O que você vê:</strong> o selo continua no fluxo normal, e o <code>top</code> e o <code>right</code> não fazem nada, porque o elemento continua <code>static</code>.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":2.13-2.19: error: CSS: “position”: “absolut” is not a “position” value.</pre>
+<p><strong>O que significa:</strong> "<code>absolut</code> não é um valor de <code>position</code>". Faltou o <code>e</code>: <code>absolute</code>. Os cinco valores são <code>static</code>, <code>relative</code>, <code>absolute</code>, <code>fixed</code> e <code>sticky</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>position: static;</code></td><td>Padrão: no fluxo normal, ignora os deslocamentos</td></tr>
+<tr><td><code>position: relative;</code></td><td>Desloca a partir do próprio lugar, que fica guardado</td></tr>
+<tr><td><code>position: absolute;</code></td><td>Sai do fluxo; conta a partir do ancestral posicionado</td></tr>
+<tr><td><code>position: fixed;</code></td><td>Sai do fluxo; preso na janela</td></tr>
+<tr><td><code>position: sticky;</code></td><td>Anda com a página e gruda ao chegar no deslocamento</td></tr>
+<tr><td><code>top</code>, <code>right</code>, <code>bottom</code>, <code>left</code></td><td>Distância de cada lado da referência</td></tr>
+<tr><td><code>inset: 0;</code></td><td>Atalho dos quatro deslocamentos</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O padrão</h3>
+<p>Qual é o valor padrão de <code>position</code>?</p>
+<div class="ex-code">position: <input data-answer="static" aria-label="valor">;</div>
+</div>
+
+<div class="exercise">
+<h3>2. Descer</h3>
+<p>Complete a propriedade que faz um elemento <code>relative</code> descer 10px:</p>
+<div class="ex-code">.selo { position: relative; <input data-answer="top" aria-label="propriedade">: 10px; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Os quatro de uma vez</h3>
+<p>Complete o atalho para <code>top</code>, <code>right</code>, <code>bottom</code> e <code>left</code> iguais a <code>0</code>:</p>
+<div class="ex-code"><input data-answer="inset" aria-label="propriedade">: 0;</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. A Ana escreveu <code>.selo { top: 10px; }</code> e nada aconteceu. Por quê?</p>
+<label><input type="radio" name="q4"> Faltou o <code>!important</code></label>
+<label><input type="radio" name="q4"> O certo é <code>margin-top</code></label>
+<label><input type="radio" name="q4"> O selo é <code>static</code>, e um elemento <code>static</code> ignora o <code>top</code></label>
+<label><input type="radio" name="q4"> <code>top</code> só aceita <code>%</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Com <code>position: relative; left: 30px;</code>, para onde o elemento vai?</p>
+<label><input type="radio" name="q5"> 30px para a direita, e o lugar dele no fluxo continua guardado</label>
+<label><input type="radio" name="q5"> 30px para a esquerda</label>
+<label><input type="radio" name="q5"> Para a borda esquerda da página</label>
+<label><input type="radio" name="q5"> Para fora do fluxo, e os vizinhos ocupam o lugar</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">6. Um elemento <code>absolute</code> conta o <code>top</code> a partir de quê?</p>
+<label><input type="radio" name="q6"> Do lugar onde ele estaria</label>
+<label><input type="radio" name="q6"> Do ancestral posicionado mais próximo (ou da página, se não houver)</label>
+<label><input type="radio" name="q6"> Sempre da janela do navegador</label>
+<label><input type="radio" name="q6"> Do elemento que vem antes dele no HTML</label>
+</div>
+
+<h3>Missão final: o selo no canto do cartão</h3>
+
+<div class="tryhtml" data-goal="css:.cartao{position}=relative,css:.selo{position}=absolute,css:.selo{top}=0px,css:.selo{right}=0px">
+<p class="try-task"><strong>Missão:</strong> o selo "Novo!" deve ficar no <strong>canto de cima, à direita, do cartão</strong>. (1) Faça o cartão virar a referência; (2) tire o selo do fluxo com <code>absolute</code>; (3) cole-o no canto com <code>top</code> e <code>right</code> iguais a <code>0</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;span class="selo"&gt;Novo!&lt;/span&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Fofinho, com cobertura de chocolate.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  width: 260px;
+  padding: 12px;
+  border: 2px solid tomato;
+}
+
+.selo {
+  padding: 4px 8px;
+  background-color: gold;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  position: relative;
+  width: 260px;
+  padding: 12px;
+  border: 2px solid tomato;
+}
+
+.selo {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 4px 8px;
+  background-color: gold;
+}
+</pre>
+</div>
+
+<p>Tire o <code>position: relative</code> do cartão e veja o selo fugir para o canto do quadro inteiro: sem ancestral posicionado, a referência passa a ser a página.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Sem <code>position</code>, todo elemento é <code>static</code>: fica no fluxo normal e ignora <code>top</code>, <code>right</code>, <code>bottom</code> e <code>left</code>.</li>
+  <li><code>relative</code>: desloca a partir do próprio lugar, que continua guardado. Também serve de referência para filhos <code>absolute</code>.</li>
+  <li><code>absolute</code>: sai do fluxo e conta a partir do ancestral posicionado mais próximo.</li>
+  <li><code>fixed</code>: preso à janela. <code>sticky</code>: anda com a página e gruda.</li>
+  <li><code>top: 20px</code> é "a 20px do topo", ou seja, empurra para baixo. <code>inset</code> é o atalho dos quatro.</li>
+  <li>Position é para detalhes; o layout da página é com Flexbox e Grid.</li>
+  <li>Erros: deslocamento num elemento <code>static</code> não faz nada (e o validador não avisa); número sem unidade (<code>top: 10</code>) e <code>absolut</code> são ignorados, e o validador avisa.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
