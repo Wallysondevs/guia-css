@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Frameworks — Tailwind e Bootstrap: o que são, prós e contras | Guia CSS</title>
+<meta name="description" content="Frameworks de CSS para quem está começando: o que são, Bootstrap (componentes prontos como .btn e .card) e Tailwind (classes utilitárias como p-4 e rounded-lg), um exemplo pequeno de cada, como eles funcionam por dentro (uma imitação feita à mão), prós e contras, quando usar, e os erros comuns: classe com erro de digitação e o seu CSS perdendo para o do framework.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Frameworks</span></h1>
+
+<p class="intro">Mais cedo ou mais tarde você vai ouvir: "por que escrever CSS na mão? Usa Bootstrap!" ou "hoje todo mundo usa Tailwind". Os dois são <strong>frameworks de CSS</strong>: um monte de CSS já escrito por outras pessoas, pronto para usar com classes no HTML. Esta aula é uma <strong>visão geral</strong>: o que cada um é, um exemplo pequeno, como eles funcionam por dentro, os prós e os contras, e quando faz sentido usar. Spoiler: tudo o que você aprendeu neste guia continua valendo, porque os frameworks <strong>são</strong> CSS.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que é um framework de CSS, e os dois estilos principais: <strong>componentes</strong> (Bootstrap) e <strong>utilitários</strong> (Tailwind).</li>
+  <li>Um exemplo pequeno de cada um, com as versões atuais.</li>
+  <li>Como eles funcionam por dentro, com uma imitação feita à mão no editor.</li>
+  <li>Os prós, os contras e quando usar cada um (ou nenhum).</li>
+  <li>Os erros comuns: classe digitada errado e o seu CSS perdendo para o do framework.</li>
+</ul>
+</div>
+
+<div class="note">
+<strong>Versões conferidas nos sites oficiais em outubro de 2026</strong>
+<p><strong>Bootstrap</strong>: a versão estável é a <strong>5.3.8</strong> (getbootstrap.com); a 6 está em fase de testes (<em>6.0.0-alpha.1</em>). <strong>Tailwind CSS</strong>: versão <strong>4.3</strong> (tailwindcss.com). Frameworks mudam rápido: antes de começar um projeto, confira a versão no site de cada um.</p>
+</div>
+
+<hr>
+
+<h2>A ideia: cozinhar do zero ou usar massa pronta</h2>
+<p>A Ana pode fazer a massa do bolo do zero ou comprar uma mistura pronta. A mistura é rápida e quase sempre dá certo, mas todo bolo de mistura tem um gostinho parecido, e se ela quiser mudar a receita precisa entender o que tem dentro do pacote. Fazer do zero dá mais trabalho e deixa o bolo do jeito dela.</p>
+<p>Um framework de CSS é a mistura pronta: botões, cartões, grades e espaçamentos já feitos. Você ganha velocidade e perde um pouco de personalidade (e de controle). E, como na cozinha, quem sabe fazer do zero usa a mistura muito melhor.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th>Bootstrap</th><th>Tailwind CSS</th></tr>
+<tr><td>Estilo</td><td><strong>Componentes</strong>: uma classe = uma peça pronta (<code>btn</code>, <code>card</code>, <code>navbar</code>)</td><td><strong>Utilitários</strong>: uma classe = uma declaração (<code>p-4</code>, <code>rounded-lg</code>, <code>font-bold</code>)</td></tr>
+<tr><td>Você escreve</td><td>Pouco HTML de classes; o visual já vem decidido</td><td>Muitas classes no HTML; quase nenhum CSS</td></tr>
+<tr><td>Cara do site</td><td>Parece "Bootstrap", a menos que você personalize</td><td>Tem a cara que você montar</td></tr>
+<tr><td>Como instala</td><td>Um <code>&lt;link&gt;</code> para um arquivo CSS pronto</td><td>Um programa que <strong>gera</strong> o CSS lendo o seu HTML</td></tr>
+<tr><td>JavaScript</td><td>Tem (menus, janelas, abas)</td><td>Não tem: só CSS</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. Bootstrap: componentes prontos</h2>
+<p>O Bootstrap nasceu em 2011 e é um dos frameworks mais usados da web. A forma mais simples de experimentar é ligar o CSS dele por um <strong>CDN</strong> (um servidor público que entrega arquivos de bibliotecas). Este é o trecho oficial da documentação da versão 5.3.8:</p>
+
+<pre class="file" data-file="index.html">&lt;link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous"&gt;
+
+&lt;div class="card"&gt;
+  &lt;div class="card-body"&gt;
+    &lt;h2 class="card-title"&gt;Bolo de cenoura&lt;/h2&gt;
+    &lt;p class="card-text"&gt;Com cobertura de chocolate.&lt;/p&gt;
+    &lt;a href="bolo.html" class="btn btn-primary"&gt;Ver receita&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>&lt;link href="https://cdn.jsdelivr.net/…/bootstrap.min.css"&gt;</dt><dd>O CSS inteiro do Bootstrap, minificado (aula <a href="performance.html">CSS Rápido</a>). O <code>integrity</code> é uma "impressão digital" do arquivo: se alguém adulterar o arquivo no servidor, o navegador recusa.</dd>
+  <dt>class="card"</dt><dd>Um componente: a caixa com borda fina, cantos arredondados e fundo branco. O <code>card-body</code> dá o espaço interno; <code>card-title</code> e <code>card-text</code>, as margens do título e do texto.</dd>
+  <dt>class="btn btn-primary"</dt><dd>Duas classes juntas: <code>btn</code> é a forma de botão (preenchimento, cantos, fonte); <code>btn-primary</code> é a <strong>variação</strong> de cor (o azul principal). Trocar para <code>btn-danger</code> deixa o botão vermelho.</dd>
+</dl>
+
+<p>Repare que as classes dizem <strong>o que</strong> a coisa é (<code>card</code>, <code>btn</code>), como você aprendeu na aula <a href="estilo.html">Estilo de Código</a>. Os componentes interativos (menu que abre, janela modal) precisam também do JavaScript do Bootstrap, que vem em outro arquivo.</p>
+
+<h3>Por dentro: um "mini-Bootstrap" feito à mão</h3>
+<p>Não há mágica: o arquivo do Bootstrap é um CSS como o seu, só que enorme. Na caixa abaixo, o arquivo <code>mini-bootstrap.css</code> é uma <strong>imitação</strong> com três componentes no mesmo estilo (os valores são parecidos com os do Bootstrap, mas não idênticos). Nada vem da internet: é tudo CSS desta aula.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque <code>btn-primary</code> por <code>btn-perigo</code> no segundo botão. Depois abra a aba <code>mini-bootstrap.css</code> e invente uma variação nova, <code>.btn-sucesso</code>, verde, no mesmo modelo das outras.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="mini-bootstrap.css"&gt;
+&lt;div class="card"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Com cobertura de chocolate.&lt;/p&gt;
+  &lt;a href="bolo.html" class="btn btn-primary"&gt;Ver receita&lt;/a&gt;
+  &lt;a href="carrinho.html" class="btn btn-primary"&gt;Comprar&lt;/a&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="mini-bootstrap.css">/* Imitação, feita à mão, do jeito do Bootstrap */
+.card {
+  max-width: 320px;
+  padding: 16px;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  font-family: sans-serif;
+}
+.btn {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  text-decoration: none;
+}
+.btn-primary {
+  background-color: #0d6efd;
+  color: white;
+}
+.btn-perigo {
+  background-color: #dc3545;
+  color: white;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. Tailwind CSS: uma classe para cada declaração</h2>
+<p>O Tailwind segue a ideia contrária: em vez de componentes prontos, ele dá <strong>classes utilitárias</strong>, cada uma com uma declaração só. Você monta o visual juntando classes no HTML:</p>
+
+<pre class="file" data-file="index.html">&lt;a href="bolo.html" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700"&gt;
+  Ver receita
+&lt;/a&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Classe</th><th>A declaração que ela gera (Tailwind 4)</th></tr>
+<tr><td><code>inline-block</code></td><td><code>display: inline-block;</code></td></tr>
+<tr><td><code>bg-blue-600</code></td><td><code>background-color</code> com o azul de tom 600 da paleta (as cores do Tailwind 4 são definidas em <code>oklch()</code>, aula <a href="cores-modernas.html">Cores Modernas</a>)</td></tr>
+<tr><td><code>text-white</code></td><td><code>color</code> branco</td></tr>
+<tr><td><code>px-4</code> · <code>py-2</code></td><td><code>padding-inline: calc(var(--spacing) * 4);</code> · <code>padding-block: calc(var(--spacing) * 2);</code> Com o <code>--spacing</code> padrão de <code>0.25rem</code>, dá 1rem dos lados e 0.5rem em cima e embaixo (aula <a href="propriedades-logicas.html">Propriedades Lógicas</a>)</td></tr>
+<tr><td><code>rounded-lg</code></td><td><code>border-radius: var(--radius-lg);</code>, que vale 0.5rem (8px)</td></tr>
+<tr><td><code>font-bold</code></td><td><code>font-weight: 700;</code></td></tr>
+<tr><td><code>hover:bg-blue-700</code></td><td>O prefixo <code>hover:</code> põe a declaração dentro de um <code>:hover</code>: o fundo escurece com o mouse em cima</td></tr>
+<tr><td><code>md:flex</code></td><td>O prefixo <code>md:</code> põe a declaração dentro de uma media query para telas médias ou maiores</td></tr>
+</table>
+</div>
+
+<h3>Como se instala: o Tailwind gera o CSS</h3>
+<p>O Tailwind 4 não é um arquivo pronto. É um programa que <strong>lê o seu HTML</strong>, vê quais classes você usou e gera um CSS só com elas. O caminho oficial com a ferramenta de linha de comando (precisa do Node.js instalado):</p>
+
+<pre class="file" data-file="src/input.css">@import "tailwindcss";
+</pre>
+
+<pre class="term" data-cwd="~/site">$ npm install tailwindcss @tailwindcss/cli
+$ npx @tailwindcss/cli -i ./src/input.css -o ./src/output.css --watch</pre>
+
+<p>O <code>--watch</code> ("vigiar") deixa o programa rodando: cada vez que você salva o HTML, ele gera o <code>output.css</code> de novo, e é esse arquivo que a página liga com <code>&lt;link&gt;</code>. Os comandos são os da documentação oficial; não foram rodados no laboratório deste guia.</p>
+
+<div class="note">
+<strong>E o CDN do Tailwind?</strong>
+<p>Existe um atalho, o <em>Play CDN</em>: um <code>&lt;script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"&gt;&lt;/script&gt;</code> que gera o CSS dentro do navegador. A própria documentação avisa: ele é feito "só para desenvolvimento" e <strong>não</strong> para o site publicado. O Tailwind 4 também pede navegadores recentes: Chrome 111, Safari 16.4 e Firefox 128 ou mais novos, segundo a página de compatibilidade dele.</p>
+</div>
+
+<h3>Por dentro: um "mini-Tailwind" feito à mão</h3>
+<p>De novo, uma <strong>imitação</strong>: o arquivo <code>mini-tailwind.css</code> abaixo tem algumas classes com os mesmos nomes do Tailwind, escritas à mão (as cores são hexadecimais simples, não as do Tailwind de verdade). Repare como cada regra tem uma declaração só.</p>
+
+<div class="tryhtml" data-goal="css:a{background-color}=rgb(29, 78, 216),css:a{color}=rgb(255, 255, 255),css:a{padding-left}=24px,css:a{padding-top}=12px,css:a{border-top-left-radius}=8px,css:a{font-weight}=700,nsrc:(^|\})\s*a\s*\{">
+<p class="try-task"><strong>Missão:</strong> transforme o link num botão <strong>sem escrever CSS</strong>: só acrescentando classes do <code>mini-tailwind.css</code> no <code>class</code> do link. Ele precisa de fundo <code>bg-blue-700</code>, letra <code>text-white</code>, <code>px-6</code>, <code>py-3</code>, <code>rounded-lg</code> e <code>font-bold</code>. O <code>inline-block</code> já está lá.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="mini-tailwind.css"&gt;
+&lt;p&gt;
+  &lt;a href="carrinho.html" class="inline-block"&gt;Comprar o bolo&lt;/a&gt;
+&lt;/p&gt;
+</pre>
+<pre class="script" data-file="mini-tailwind.css">/* Imitação, feita à mão, de algumas classes do Tailwind */
+.inline-block { display: inline-block; }
+.bg-blue-700 { background-color: #1d4ed8; }
+.bg-red-600 { background-color: #dc2626; }
+.text-white { color: #ffffff; }
+.px-6 { padding-inline: 1.5rem; }
+.py-3 { padding-block: 0.75rem; }
+.rounded-lg { border-radius: 0.5rem; }
+.rounded-full { border-radius: 9999px; }
+.font-bold { font-weight: 700; }
+.no-underline { text-decoration-line: none; }
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="mini-tailwind.css"&gt;
+&lt;p&gt;
+  &lt;a href="carrinho.html" class="inline-block bg-blue-700 text-white px-6 py-3 rounded-lg font-bold"&gt;Comprar o bolo&lt;/a&gt;
+&lt;/p&gt;
+</pre>
+</div>
+
+<p>Depois de cumprir a missão, acrescente <code>no-underline</code> para tirar o sublinhado, e troque <code>rounded-lg</code> por <code>rounded-full</code> para um botão em forma de pílula. Viu o jeito Tailwind? O visual inteiro mora no HTML.</p>
+
+<div class="tip">
+<strong>As regras de uma linha</strong>
+<p>O <code>mini-tailwind.css</code> usa regras de uma linha só, a exceção aceitável da aula <a href="estilo.html">Estilo de Código</a>: cada regra tem uma declaração, e assim a lista fica fácil de ler.</p>
+</div>
+
+<hr>
+
+<h2>3. Prós e contras</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th>Prós</th><th>Contras</th></tr>
+<tr><td><strong>Bootstrap</strong></td><td>Muito rápido para começar: um <code>&lt;link&gt;</code> e os componentes estão lá. Documentação enorme. Componentes já pensados para teclado e leitor de tela. Bom para painéis e sistemas internos.</td><td>Sites "com cara de Bootstrap". Arquivo grande, com muita coisa que você não usa. Para personalizar a fundo, você briga com o CSS dele (seção <a href="#errado">Quando dá errado</a>).</td></tr>
+<tr><td><strong>Tailwind</strong></td><td>Visual livre, sem cara padrão. O CSS gerado só tem as classes usadas (pequeno). Você não precisa inventar nomes de classe. Espaçamentos e cores consistentes no site todo.</td><td>O HTML fica cheio de classes (<code>class="…"</code> com dez palavras). Precisa de uma etapa de geração (Node.js). Esconde o CSS: quem só aprendeu Tailwind trava quando precisa de CSS de verdade.</td></tr>
+<tr><td><strong>CSS seu</strong></td><td>Controle total, nada sobrando, nenhum programa extra. Tudo o que este guia ensina.</td><td>Mais trabalho no começo. Você decide e mantém tudo: nomes, cores, espaçamentos.</td></tr>
+</table>
+</div>
+
+<h3>Quando usar cada um</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Boa escolha</th></tr>
+<tr><td>Você está aprendendo CSS</td><td><strong>CSS seu.</strong> O framework esconde justamente o que você precisa entender. Depois, qualquer framework fica fácil.</td></tr>
+<tr><td>Um site pequeno: currículo, cardápio, blog da Ana</td><td>CSS seu, com <a href="variaveis.html">variáveis</a> e um bom <a href="reset.html">reset</a>. Um framework seria mais pesado que o site.</td></tr>
+<tr><td>Um painel administrativo, um protótipo para amanhã</td><td>Bootstrap: os formulários, tabelas e menus já estão prontos.</td></tr>
+<tr><td>Um produto com design próprio, feito por uma equipe que já usa Node.js</td><td>Tailwind.</td></tr>
+<tr><td>Entrar num projeto que já usa um framework</td><td>O framework do projeto, com a documentação aberta.</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Classe digitada errado: nada acontece, e ninguém avisa</strong>
+<pre class="file" data-file="erro de propósito" data-resultado>&lt;style&gt;
+.btn-primary {
+  padding: 6px 12px;
+  background-color: #0d6efd;
+  color: white;
+}
+&lt;/style&gt;
+&lt;a href="bolo.html" class="btn-primry"&gt;Ver receita&lt;/a&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> um link comum, sem fundo azul. <strong>Por quê:</strong> <code>btn-primry</code> (faltou o "a") não casa com nenhuma regra. Para o HTML, qualquer nome de classe é válido, e o validador W3C não tem como saber quais classes existem no framework. Com frameworks, isso é o erro mais comum de todos, porque as classes são muitas e parecidas. <strong>Como achar:</strong> no F12, o elemento não mostra nenhuma regra do framework no painel de estilos. Os editores de código têm extensões que completam e conferem as classes do Tailwind e do Bootstrap.</p>
+</div>
+
+<div class="cenario">
+<strong>O seu CSS perde para o do framework</strong>
+<p>A Ana quer o botão do Bootstrap na cor da lojinha e escreve, no <code>style.css</code> dela, <code>.btn-primary { background-color: #e5533d; }</code>. O botão continua azul. O motivo mais comum: o <code>&lt;link&gt;</code> do framework vem <strong>depois</strong> do dela. Os dois seletores têm a mesma especificidade, e no empate vence o que vem por último (aula <a href="cascata.html">A Cascata</a>). Também acontece de o framework usar um seletor mais específico que o seu (aula <a href="especificidade.html">Especificidade</a>), e aí o F12 mostra a sua declaração <strong>riscada</strong>.</p>
+<p><strong>Como consertar:</strong> o <code>&lt;link&gt;</code> do framework primeiro e o seu depois; se ainda perder, um seletor tão específico quanto o dele. No Bootstrap 5.3, muitas cores também podem ser trocadas pelas variáveis CSS dele, que começam com <code>--bs-</code>. Evite o <code>!important</code>: ele resolve hoje e cria uma briga amanhã (aula <a href="important.html">!important</a>).</p>
+</div>
+
+<div class="cenario">
+<strong>Tailwind: a classe montada aos pedaços não aparece</strong>
+<p>No JavaScript, a Ana escreveu <code>"bg-" + cor + "-600"</code> para escolher a cor do botão. O botão ficou sem fundo. <strong>Por quê:</strong> o Tailwind lê os arquivos do projeto como <strong>texto</strong>, procurando nomes de classe inteiros. <code>bg-red-600</code> não aparece escrito em lugar nenhum, então a regra dele não é gerada. A documentação oficial do Tailwind explica isso na parte sobre <em>dynamic class names</em> (nomes de classe dinâmicos). <strong>Como consertar:</strong> escreva os nomes inteiros no código (por exemplo, um objeto <code>{ vermelho: "bg-red-600", azul: "bg-blue-600" }</code>).</p>
+</div>
+
+<div class="cenario">
+<strong>CDN fora do ar ou sem internet</strong>
+<p>Com o framework ligado por CDN, um site aberto sem internet (ou com o CDN bloqueado pela rede da empresa) aparece "pelado", sem nenhum estilo. Para um site publicado, muitos projetos preferem copiar o arquivo do framework para a própria pasta (<code>css/bootstrap.min.css</code>). É também por isso que as caixas desta aula usam imitações locais.</p>
+</div>
+
+<h3>Missão: a cor da Ana tem de vencer</h3>
+<div class="tryhtml" data-goal="css:.btn-primary{background-color}=rgb(229, 83, 61),css:.btn{padding-left}=12px,nsrc:!important,sel:link[href='framework.css']">
+<p class="try-task"><strong>Missão:</strong> o <code>framework.css</code> (uma imitação de framework) pinta o <code>.btn-primary</code> de azul. A Ana escreveu a cor dela no <code>style.css</code>, mas o botão continua azul. Faça a cor da Ana (<code>#e5533d</code>) vencer <strong>sem</strong> <code>!important</code> e sem tirar o framework.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;link rel="stylesheet" href="framework.css"&gt;
+&lt;a href="carrinho.html" class="btn btn-primary"&gt;Comprar&lt;/a&gt;
+</pre>
+<pre class="script" data-file="style.css">.btn-primary {
+  background-color: #e5533d;
+}
+</pre>
+<pre class="script" data-file="framework.css">.btn {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-family: sans-serif;
+  text-decoration: none;
+}
+.btn-primary {
+  background-color: #0d6efd;
+  color: white;
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="framework.css"&gt;
+&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;a href="carrinho.html" class="btn btn-primary"&gt;Comprar&lt;/a&gt;
+</pre>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Termo</th><th>O que é</th></tr>
+<tr><td>Framework de CSS</td><td>CSS pronto, escrito por outros, usado por meio de classes no HTML</td></tr>
+<tr><td>Componente (Bootstrap)</td><td>Uma classe = uma peça pronta: <code>btn</code>, <code>card</code>, <code>navbar</code>; variações como <code>btn-primary</code>, <code>btn-danger</code></td></tr>
+<tr><td>Utilitário (Tailwind)</td><td>Uma classe = uma declaração: <code>p-4</code>, <code>font-bold</code>, <code>rounded-lg</code>; prefixos <code>hover:</code>, <code>md:</code></td></tr>
+<tr><td>CDN</td><td>Servidor público que entrega o arquivo do framework (<code>cdn.jsdelivr.net</code>)</td></tr>
+<tr><td><code>@import "tailwindcss";</code></td><td>A linha que liga o Tailwind 4 no CSS de entrada</td></tr>
+<tr><td><code>npx @tailwindcss/cli -i … -o … --watch</code></td><td>Gera o CSS do Tailwind a cada mudança</td></tr>
+<tr><td>Versões (out/2026)</td><td>Bootstrap 5.3.8 (6.0 em alfa) · Tailwind CSS 4.3</td></tr>
+<tr><td>Seu CSS depois do framework</td><td>O <code>&lt;link&gt;</code> do framework primeiro, o seu depois</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A variação do botão</h3>
+<p>No Bootstrap, complete a classe da variação de cor principal:</p>
+<div class="ex-code">&lt;a class="btn btn-<input data-answer="primary" aria-label="variação">"&gt;Comprar&lt;/a&gt;</div>
+</div>
+
+<div class="exercise">
+<h3>2. Negrito no Tailwind</h3>
+<p>Qual classe do Tailwind gera <code>font-weight: 700</code>?</p>
+<div class="ex-code">&lt;p class="<input data-answer="font-bold" aria-label="classe">"&gt;R$ 35,00&lt;/p&gt;</div>
+</div>
+
+<div class="exercise">
+<h3>3. A ordem dos arquivos</h3>
+<p>Para o CSS da Ana vencer os empates com o framework, qual <code>&lt;link&gt;</code> vem primeiro? Escreva o nome do arquivo.</p>
+<div class="ex-code">&lt;link rel="stylesheet" href="<input data-answer="framework.css|bootstrap.min.css" aria-label="arquivo">"&gt;<br>&lt;link rel="stylesheet" href="style.css"&gt;</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Qual a principal diferença entre Bootstrap e Tailwind?</p>
+<label><input type="radio" name="q4"> O Bootstrap é pago, o Tailwind é grátis</label>
+<label><input type="radio" name="q4"> O Bootstrap dá componentes prontos (<code>card</code>, <code>btn</code>); o Tailwind dá classes de uma declaração cada (<code>p-4</code>, <code>font-bold</code>)</label>
+<label><input type="radio" name="q4"> O Tailwind não usa CSS</label>
+<label><input type="radio" name="q4"> Só o Bootstrap funciona no celular</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. A Ana escreveu <code>class="btn btn-primry"</code> e o botão ficou sem cor. O que o validador W3C diz?</p>
+<label><input type="radio" name="q5"> "Unknown class btn-primry"</label>
+<label><input type="radio" name="q5"> Que a página é inválida</label>
+<label><input type="radio" name="q5"> Nada: qualquer nome de classe é válido no HTML</label>
+<label><input type="radio" name="q5"> Que falta o <code>&lt;link&gt;</code> do Bootstrap</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Por que este guia recomenda aprender CSS antes de um framework?</p>
+<label><input type="radio" name="q6"> Porque os frameworks são CSS: para personalizar e consertar, você precisa entender o que está por baixo</label>
+<label><input type="radio" name="q6"> Porque frameworks estão proibidos</label>
+<label><input type="radio" name="q6"> Porque frameworks deixam o site mais lento sempre</label>
+<label><input type="radio" name="q6"> Porque o Tailwind não funciona no Chrome</label>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Um framework de CSS é CSS pronto, usado por classes no HTML. Os dois estilos: <strong>componentes</strong> (Bootstrap 5.3.8: <code>card</code>, <code>btn btn-primary</code>) e <strong>utilitários</strong> (Tailwind 4.3: <code>px-4</code>, <code>rounded-lg</code>, <code>hover:bg-blue-700</code>).</li>
+  <li>O Bootstrap entra com um <code>&lt;link&gt;</code> (e um script para os componentes interativos). O Tailwind 4 é um programa que lê o seu HTML e gera o CSS (<code>@import "tailwindcss";</code> e a CLI); o Play CDN é só para testes.</li>
+  <li>Por dentro, é tudo CSS comum: você mesmo fez um mini-Bootstrap e um mini-Tailwind nesta aula.</li>
+  <li>Bootstrap: rápido, mas com cara padrão e muito CSS sobrando. Tailwind: visual livre e CSS enxuto, mas HTML cheio de classes e uma etapa de geração. CSS seu: controle total.</li>
+  <li>Erros comuns: classe digitada errado (ninguém avisa), o seu CSS ligado antes do framework (perde o empate) e, no Tailwind, nomes de classe montados aos pedaços.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
