@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Unidades — tabela de consulta (px, rem, em, %, vw, dvh, fr…) | Guia CSS</title>
+<meta name="description" content="Referência das unidades do CSS: absolutas (px, cm, pt), relativas à fonte (em, rem, ch, lh), à tela (vw, vh, dvh, svh), ao contêiner (cqi), porcentagem, fr, ângulos, tempo e resolução. Com as conversões medidas no navegador, quando usar cada uma, o suporte e as mensagens do validador.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Unidades</span></h1>
+
+<p class="intro">Quase todo tamanho no CSS é um <strong>número colado numa unidade</strong>: <code>16px</code>, <code>1.5rem</code>, <code>50%</code>, <code>100vw</code>. A unidade diz "16 <em>de quê</em>": pixels, o tamanho da letra, a largura da tela, a largura do pai. Esta página junta todas as unidades em tabelas, com as conversões <strong>medidas no Chromium</strong> e a aula que explica cada grupo.</p>
+
+<div class="note">
+<strong>Como usar esta página</strong>
+<ul>
+  <li>Procure a unidade com <kbd>Ctrl</kbd>+<kbd>F</kbd> (<code>dvh</code>, <code>ch</code>).</li>
+  <li>Os valores em <code>px</code> foram medidos com <code>getComputedStyle</code> (o mesmo que a aba <strong>Computed</strong> do F12 mostra), numa tela de 800 × 600 pixels, com a fonte padrão de 16px. No seu navegador, as unidades da tela e as que dependem da fonte darão outros números.</li>
+  <li>Na dúvida, o guia recomenda: <strong><code>rem</code></strong> para letras, <strong><code>rem</code>/<code>em</code></strong> para espaços, <strong><code>%</code> ou <code>fr</code></strong> para larguras, <strong><code>px</code></strong> para bordas finas.</li>
+</ul>
+</div>
+
+<p>Atalhos: <a href="#anatomia">Como se escreve</a> · <a href="#absolutas">Absolutas</a> · <a href="#fonte">Relativas à fonte</a> · <a href="#tela">Relativas à tela</a> · <a href="#conteiner">Relativas ao contêiner</a> · <a href="#porcentagem">Porcentagem</a> · <a href="#sem-unidade">Sem unidade</a> · <a href="#outras">fr, ângulos, tempo, resolução</a> · <a href="#qual">Qual usar</a> · <a href="#errado">Quando dá errado</a></p>
+
+<hr>
+
+<h2 id="anatomia">Como se escreve</h2>
+<pre class="file" data-file="anatomia">h1 {
+  font-size: 2.5rem;
+  margin: 0;
+}</pre>
+<dl class="anatomy">
+  <dt>2.5</dt><dd>O número. A parte decimal vai com <strong>ponto</strong>, como no inglês: <code>2.5</code>, nunca <code>2,5</code> (a vírgula separa valores no CSS). <code>.5rem</code> é o mesmo que <code>0.5rem</code>. Pode ser negativo onde faz sentido (<code>margin-top: -1rem</code>).</dd>
+  <dt>rem</dt><dd>A unidade, <strong>colada</strong> no número, sem espaço. <code>2.5 rem</code>, com espaço, é inválido.</dd>
+  <dt>0</dt><dd>Zero é zero em qualquer unidade: pode ficar sem unidade (<code>margin: 0</code>). É o único número de tamanho que dispensa a unidade.</dd>
+</dl>
+
+<h2 id="absolutas">Unidades absolutas</h2>
+<p>Têm um tamanho fixo, que não depende de nada na página. Na tela, todas são convertidas para <code>px</code>: o CSS define <strong>1in = 96px</strong>, e as outras saem daí. Um "pixel do CSS" não é um ponto físico da tela: num celular com tela densa, <code>1px</code> ocupa 2 ou 3 pontos de verdade.</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Unidade</th><th>Nome</th><th>Vale</th><th>Medido no Chromium</th><th>Quando usar</th></tr>
+<tr><td><code>px</code></td><td>pixel</td><td>1/96 de polegada</td><td><code>1px</code></td><td>bordas, sombras, detalhes finos; nunca para a letra (ignora o tamanho que a pessoa escolheu no navegador)</td></tr>
+<tr><td><code>cm</code></td><td>centímetro</td><td>96/2,54 ≈ 37,8px</td><td><code>37.7812px</code></td><td>só na <a href="impressao.html">impressão</a></td></tr>
+<tr><td><code>mm</code></td><td>milímetro</td><td>1/10 de cm ≈ 3,78px</td><td><code>3.76562px</code></td><td>só na impressão</td></tr>
+<tr><td><code>Q</code></td><td>quarto de milímetro</td><td>1/40 de cm ≈ 0,94px</td><td><code>0.9375px</code></td><td>quase nunca</td></tr>
+<tr><td><code>in</code></td><td>polegada (<em>inch</em>)</td><td>2,54 cm = 96px</td><td><code>96px</code></td><td>só na impressão</td></tr>
+<tr><td><code>pt</code></td><td>ponto (tipografia)</td><td>1/72 de polegada ≈ 1,33px</td><td><code>1.32812px</code></td><td>na impressão, para quem pensa em "letra 12" do editor de texto (<code>12pt</code> = 16px)</td></tr>
+<tr><td><code>pc</code></td><td>paica</td><td>12pt = 16px</td><td><code>16px</code></td><td>quase nunca</td></tr>
+</table>
+</div>
+<p>Os valores medidos saem um pouco diferentes da conta porque o Chromium arredonda as medidas do desenho para frações de 1/64 de pixel. Aula: <a href="unidades.html">Unidades: px, em, rem e %</a>.</p>
+
+<h2 id="fonte">Relativas à fonte</h2>
+<p>Crescem e diminuem junto com a letra. Medido num elemento com <code>font-size: 20px</code>, numa página com a fonte padrão (16px):</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Unidade</th><th>Relativa a…</th><th>Medido</th><th>Quando usar</th><th>Aula</th></tr>
+<tr><td><code>rem</code></td><td>o <code>font-size</code> da <strong>raiz</strong> (<code>&lt;html&gt;</code>), em geral 16px. O "r" é de <em>root</em>, raiz.</td><td><code>1rem</code> = <code>16px</code></td><td><strong>letras</strong>, espaços, larguras máximas de texto. Respeita a letra maior que a pessoa escolheu no navegador, e é igual em toda a página.</td><td><a href="unidades.html">Unidades</a>, <a href="font-size.html">font-size</a></td></tr>
+<tr><td><code>em</code></td><td>o <code>font-size</code> do <strong>próprio elemento</strong>. Dentro do próprio <code>font-size</code>, é o do <strong>pai</strong>.</td><td><code>1em</code> = <code>20px</code></td><td>espaços que acompanham a letra do próprio componente (o <code>padding</code> de um botão)</td><td><a href="unidades.html">Unidades</a></td></tr>
+<tr><td><code>ch</code></td><td>a largura do algarismo "0" da fonte</td><td><code>1ch</code> = <code>10px</code> (nesta fonte)</td><td>largura de leitura: <code>max-width: 65ch</code> ≈ 65 letras por linha; campos para N dígitos</td><td><a href="texto-longo.html">Texto que Não Cabe</a></td></tr>
+<tr><td><code>ex</code></td><td>a altura da letra "x" minúscula</td><td><code>1ex</code> = <code>9.17188px</code> (nesta fonte)</td><td>ajustes finos ao lado do texto</td><td>—</td></tr>
+<tr><td><code>cap</code> <strong>novo</strong></td><td>a altura das letras maiúsculas</td><td><code>1cap</code> = <code>13.0938px</code> (nesta fonte)</td><td>ícones da altura de uma maiúscula</td><td>—</td></tr>
+<tr><td><code>ic</code></td><td>a largura do ideograma "水" (para chinês e japonês)</td><td>depende da fonte</td><td>textos em chinês ou japonês</td><td>—</td></tr>
+<tr><td><code>lh</code> <strong>novo</strong></td><td>a altura da linha (<code>line-height</code>) do elemento</td><td><code>1lh</code> = <code>23px</code> (com a altura de linha normal desta fonte)</td><td>espaços do tamanho de uma linha de texto; <code>max-height: 3lh</code> = "três linhas"</td><td><a href="line-height.html">line-height</a></td></tr>
+<tr><td><code>rlh</code> <strong>novo</strong></td><td>a altura da linha da raiz</td><td><code>1rlh</code> = <code>18px</code></td><td>um ritmo vertical igual na página toda</td><td>—</td></tr>
+</table>
+</div>
+<p>As unidades <code>rch</code>, <code>rex</code>, <code>rcap</code> e <code>ric</code> são as mesmas <code>ch</code>, <code>ex</code>, <code>cap</code> e <code>ic</code>, medidas na fonte da raiz.</p>
+<div class="note"><strong>Suporte:</strong> <code>lh</code>: Chrome 109, Firefox 120, Safari 16.4. <code>rlh</code>: Chrome 111, Firefox 120, Safari 16.4. <code>cap</code>: Chrome 118, Firefox 97, Safari 17.2. <code>rch</code>, <code>rex</code>, <code>rcap</code>, <code>ric</code> chegaram por último ao Firefox (147). <code>em</code>, <code>rem</code>, <code>ch</code> e <code>ex</code> funcionam em todos há muitos anos.</div>
+
+<h2 id="tela">Relativas à tela (viewport)</h2>
+<p>A <em>viewport</em> é a área da janela onde a página aparece. <code>1vw</code> é 1% da largura dela; <code>100vw</code>, a largura inteira. Medido numa janela de 800 × 600:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Unidade</th><th>1 unidade = 1% de…</th><th>Medido (<code>10</code> unidades)</th><th>Quando usar</th></tr>
+<tr><td><code>vw</code></td><td>a largura da janela (<em>viewport width</em>)</td><td><code>10vw</code> = <code>80px</code></td><td>títulos que crescem com a tela (sempre dentro de um <a href="clamp.html"><code>clamp()</code></a>)</td></tr>
+<tr><td><code>vh</code></td><td>a altura da janela (<em>viewport height</em>)</td><td><code>10vh</code> = <code>60px</code></td><td>no computador, uma seção da altura da tela. No celular, prefira <code>dvh</code> ou <code>svh</code>.</td></tr>
+<tr><td><code>vmin</code></td><td>o <strong>menor</strong> lado da janela</td><td><code>10vmin</code> = <code>60px</code></td><td>algo que tem de caber deitado e em pé (um quadrado no meio da tela)</td></tr>
+<tr><td><code>vmax</code></td><td>o <strong>maior</strong> lado</td><td><code>10vmax</code> = <code>80px</code></td><td>raramente</td></tr>
+<tr><td><code>dvh</code> / <code>dvw</code></td><td>a altura / largura <strong>do momento</strong> (<em>dynamic</em>): no celular, muda quando a barra de endereço aparece ou some</td><td><code>10dvh</code> = <code>60px</code></td><td>uma tela cheia que acompanha a barra do navegador: <code>min-height: 100dvh</code></td></tr>
+<tr><td><code>svh</code> / <code>svw</code></td><td>a janela no tamanho <strong>menor</strong> (<em>small</em>): com as barras do navegador à mostra</td><td><code>10svh</code> = <code>60px</code></td><td>algo que tem de caber inteiro sempre, sem pular quando a barra some</td></tr>
+<tr><td><code>lvh</code> / <code>lvw</code></td><td>a janela no tamanho <strong>maior</strong> (<em>large</em>): sem as barras</td><td><code>10lvh</code> = <code>60px</code></td><td>fundos que não podem deixar buraco</td></tr>
+<tr><td><code>vi</code> / <code>vb</code></td><td>a janela na direção do texto (<em>inline</em>) / na direção dos blocos. Em português, <code>vi</code> = <code>vw</code> e <code>vb</code> = <code>vh</code>.</td><td><code>10vi</code> = <code>80px</code>, <code>10vb</code> = <code>60px</code></td><td>sites com texto vertical (japonês)</td></tr>
+</table>
+</div>
+<p>No computador, <code>dvh</code>, <code>svh</code> e <code>lvh</code> dão o mesmo número que <code>vh</code> (as barras do navegador não mudam). A diferença aparece no celular. Também existem <code>dvmin</code>, <code>svmax</code> e companhia. Aula: <a href="unidades-viewport.html">Unidades da Tela (vw, vh, dvh)</a>.</p>
+<div class="note"><strong>Suporte:</strong> <code>dvh</code>, <code>svh</code>, <code>lvh</code>, <code>vi</code> e <code>vb</code> funcionam no Chrome 108, Firefox 101 e Safari 15.4 em diante. <code>vw</code>, <code>vh</code>, <code>vmin</code> e <code>vmax</code>, em todos.</div>
+<div class="warning"><strong><code>width: 100vw</code> pode criar rolagem para o lado.</strong> O <code>100vw</code> inclui a largura da barra de rolagem vertical. Num computador com barra visível, a caixa fica uns pixels mais larga que a página. Para "a largura toda", use <code>width: 100%</code>.</div>
+
+<h2 id="conteiner">Relativas ao contêiner</h2>
+<p>Iguais às da tela, mas medem o <strong>contêiner</strong> mais próximo (um ancestral com <code>container-type</code>). Sem contêiner, valem como as da tela.</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Unidade</th><th>1 unidade = 1% de…</th><th>Aula</th></tr>
+<tr><td><code>cqw</code> / <code>cqh</code></td><td>a largura / altura do contêiner</td><td><a href="container-queries.html">Container Queries</a></td></tr>
+<tr><td><code>cqi</code> / <code>cqb</code></td><td>o contêiner na direção do texto / dos blocos (em português, <code>cqi</code> = <code>cqw</code>)</td><td><a href="container-queries.html">Container Queries</a></td></tr>
+<tr><td><code>cqmin</code> / <code>cqmax</code></td><td>o lado menor / maior do contêiner</td><td><a href="container-queries.html">Container Queries</a></td></tr>
+</table>
+</div>
+<div class="note"><strong>Suporte:</strong> Chrome 105, Firefox 110, Safari 16. <strong>O validador W3C ainda não as conhece:</strong> no <code>vnu</code> 26.10.12, <code>width: 50cqi;</code> dá <code>error: CSS: “width”: Unknown dimension.</code> ("dimensão desconhecida"). Esse erro é do validador, não do seu CSS: o navegador entende.</div>
+
+<h2 id="porcentagem">Porcentagem (<code>%</code>)</h2>
+<p>A porcentagem é sempre "% de alguma coisa", e a coisa muda de propriedade para propriedade. Medido dentro de um pai com <code>width: 400px</code>, <code>height: 200px</code> e <code>font-size: 20px</code>:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th><code>%</code> de…</th><th>Medido</th></tr>
+<tr><td><code>width</code>, <code>left</code>, <code>right</code></td><td>a largura do pai (do bloco que contém)</td><td><code>width: 50%</code> = <code>200px</code></td></tr>
+<tr><td><code>height</code>, <code>top</code>, <code>bottom</code></td><td>a altura do pai, <strong>se ela estiver definida</strong>; se o pai tem altura automática, <code>height: 50%</code> vale como <code>auto</code></td><td>—</td></tr>
+<tr><td><code>margin</code> e <code>padding</code> (<strong>todos os lados</strong>, até o de cima)</td><td>a <strong>largura</strong> do pai</td><td><code>padding-top: 10%</code> = <code>40px</code> (10% de 400, não de 200)</td></tr>
+<tr><td><code>font-size</code></td><td>o <code>font-size</code> do pai</td><td><code>150%</code> = 1.5em</td></tr>
+<tr><td><code>line-height</code></td><td>o <code>font-size</code> do próprio elemento</td><td><code>line-height: 150%</code> com letra de 20px = <code>30px</code></td></tr>
+<tr><td><code>transform: translate()</code></td><td>o tamanho do <strong>próprio</strong> elemento</td><td><code>translate(-50%, -50%)</code> = metade dele (o truque de <a href="centralizar.html">centralizar</a>)</td></tr>
+<tr><td><code>border-radius</code></td><td>o tamanho do próprio elemento</td><td><code>50%</code> num quadrado = um círculo</td></tr>
+</table>
+</div>
+<p>Aula: <a href="unidades.html">Unidades: px, em, rem e %</a>.</p>
+
+<h2 id="sem-unidade">Números sem unidade</h2>
+<p>Algumas propriedades pedem um número puro, sem unidade nenhuma:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>Exemplo</th><th>O número é…</th></tr>
+<tr><td><code>line-height</code></td><td><code>line-height: 1.5</code></td><td>um fator: 1,5 × o tamanho da letra. É o jeito <strong>recomendado</strong>: os filhos herdam o fator, e não um valor em px já calculado com a letra do pai.</td></tr>
+<tr><td><code>opacity</code></td><td><code>opacity: 0.5</code></td><td>de 0 (invisível) a 1 (opaco). Aceita também <code>50%</code>.</td></tr>
+<tr><td><code>z-index</code></td><td><code>z-index: 10</code></td><td>um número inteiro: a ordem das camadas</td></tr>
+<tr><td><code>flex-grow</code>, <code>flex-shrink</code></td><td><code>flex-grow: 2</code></td><td>uma proporção</td></tr>
+<tr><td><code>order</code></td><td><code>order: -1</code></td><td>a ordem do item no flex ou grid</td></tr>
+<tr><td><code>font-weight</code></td><td><code>font-weight: 700</code></td><td>o peso da letra, de 1 a 1000</td></tr>
+<tr><td><code>aspect-ratio</code></td><td><code>aspect-ratio: 16 / 9</code></td><td>a proporção largura / altura</td></tr>
+</table>
+</div>
+
+<h2 id="outras">Outras unidades: <code>fr</code>, ângulos, tempo e resolução</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Unidade</th><th>O que mede</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td><code>fr</code></td><td>uma <strong>fração</strong> do espaço que sobra no Grid</td><td><code>grid-template-columns: 1fr 2fr;</code></td><td><a href="grid-colunas.html">Colunas</a></td></tr>
+<tr><td><code>deg</code></td><td>graus: uma volta = <code>360deg</code></td><td><code>rotate: 45deg;</code></td><td><a href="transform.html">transform</a></td></tr>
+<tr><td><code>turn</code></td><td>voltas: <code>1turn</code> = <code>360deg</code></td><td><code>0.25turn</code> → calculado como <code>90deg</code></td><td><a href="transform.html">transform</a></td></tr>
+<tr><td><code>rad</code>, <code>grad</code></td><td>radianos (uma volta ≈ 6,2832rad) e grados (uma volta = 400grad)</td><td><code>rotate: 1rad;</code></td><td>—</td></tr>
+<tr><td><code>s</code>, <code>ms</code></td><td>segundos e milissegundos</td><td><code>250ms</code> → calculado como <code>0.25s</code></td><td><a href="transition.html">Transições</a>, <a href="animation.html">Animações</a></td></tr>
+<tr><td><code>dppx</code>, <code>x</code></td><td>pontos da tela por pixel do CSS (<code>2x</code> = tela de alta densidade)</td><td><code>@media (min-resolution: 2x) { … }</code></td><td><a href="media-queries.html">Media Queries</a></td></tr>
+<tr><td><code>dpi</code>, <code>dpcm</code></td><td>pontos por polegada / por centímetro (<code>96dpi</code> = <code>1x</code>)</td><td><code>@media (min-resolution: 192dpi)</code></td><td><a href="media-queries.html">Media Queries</a></td></tr>
+</table>
+</div>
+<p>Os graus nos degradês: <code>linear-gradient(90deg, …)</code> vai da esquerda para a direita (aula <a href="gradientes.html">Degradês</a>). Misturar unidades numa conta: <a href="calc.html"><code>calc()</code></a> (medido: <code>calc(100% - 2rem)</code> num pai de 400px = <code>368px</code>).</p>
+
+<h2 id="experimente">Experimente</h2>
+<p>Cinco caixas com a mesma conta, em unidades diferentes. Mude a largura da janela, ou o <code>font-size</code> do <code>.grupo</code>, e veja quem acompanha o quê:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="grupo"&gt;
+  &lt;p class="px"&gt;width: 200px&lt;/p&gt;
+  &lt;p class="rem"&gt;width: 12.5rem&lt;/p&gt;
+  &lt;p class="em"&gt;width: 12.5em&lt;/p&gt;
+  &lt;p class="pct"&gt;width: 50%&lt;/p&gt;
+  &lt;p class="vw"&gt;width: 30vw&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.grupo {
+  font-size: 20px;
+}
+
+.grupo p {
+  margin: 0 0 0.5rem;
+  padding: 0.25rem;
+  background-color: lightsteelblue;
+  font-size: 1rem;
+}
+
+.px  { width: 200px; }
+.rem { width: 12.5rem; }
+.em  { width: 12.5em; }
+.pct { width: 50%; }
+.vw  { width: 30vw; }
+</pre>
+</div>
+<p>Com a fonte padrão de 16px, <code>12.5rem</code> e <code>12.5em</code> dão os mesmos 200px que <code>200px</code>: o <code>em</code> de cada parágrafo usa o <code>font-size</code> dele (<code>1rem</code>), e não os 20px do <code>.grupo</code>. Troque o <code>font-size: 1rem</code> do <code>.grupo p</code> por <code>1.5rem</code>: a letra cresce nas cinco, mas só a caixa <code>em</code> fica mais larga.</p>
+
+<h2 id="qual">Qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Para</th><th>Use</th><th>Por quê</th></tr>
+<tr><td>tamanho da letra</td><td><code>rem</code></td><td>respeita a letra que a pessoa escolheu no navegador; igual em toda a página</td></tr>
+<tr><td>espaço interno de um botão, de um cartão</td><td><code>em</code> ou <code>rem</code></td><td><code>em</code> acompanha a letra do próprio componente</td></tr>
+<tr><td>largura de um bloco de texto</td><td><code>max-width</code> em <code>ch</code> ou <code>rem</code></td><td>linhas de 60–75 letras são as mais confortáveis de ler</td></tr>
+<tr><td>colunas</td><td><code>fr</code> (Grid) ou <code>%</code></td><td>dividem o espaço que existe</td></tr>
+<tr><td>a altura de uma tela inteira</td><td><code>min-height: 100dvh</code></td><td>no celular, o <code>100vh</code> fica maior que a área visível</td></tr>
+<tr><td>bordas e linhas finas</td><td><code>px</code></td><td>uma borda de <code>1px</code> não precisa crescer com a letra</td></tr>
+<tr><td>impressão</td><td><code>cm</code>, <code>mm</code>, <code>pt</code></td><td>no papel, o centímetro é de verdade</td></tr>
+</table>
+</div>
+
+<h2 id="errado">Quando dá errado</h2>
+<div class="cenario">
+<strong>Número sem unidade, espaço no meio, unidade inventada</strong>
+<pre class="file" data-file="style.css · erro de propósito">.caixa {
+  width: 300;
+}
+h1 {
+  font-size: 2 rem;
+}</pre>
+<p><strong>O que a Ana vê:</strong> a caixa continua com a largura de antes e o título continua do tamanho padrão. Nenhuma mensagem na tela.</p>
+<p><strong>Por quê:</strong> <code>300</code> sem unidade não é um tamanho (só o <code>0</code> pode ficar sem), e <code>2 rem</code> são dois valores separados, não "2rem". O navegador descarta as duas declarações. No F12, aba <strong>Elements</strong> (Elementos), painel <strong>Styles</strong> (Estilos), elas aparecem <strong>riscadas</strong>, com um ícone de aviso amarelo ao lado.</p>
+<p><strong>O validador W3C:</strong></p>
+<pre class="term" data-cwd="~/ref/unidades">$ vnu --css semunidade.css
+"file:/home/ana/ref/unidades/semunidade.css":2.10-2.12: error: CSS: “width”: only “0” can be a “unit”. You must put a unit after your number.
+$ vnu --css espaco.css
+"file:/home/ana/ref/unidades/espaco.css":2.16-2.18: error: CSS: “font-size”: Too many values or values are not recognized.
+$ vnu --css pxx.css
+"file:/home/ana/ref/unidades/pxx.css":2.10-2.14: error: CSS: “width”: Unknown dimension.</pre>
+<ul>
+  <li><em>only “0” can be a “unit”. You must put a unit after your number.</em> = "só o 0 dispensa a unidade. Você precisa pôr uma unidade depois do número."</li>
+  <li><em>Too many values or values are not recognized.</em> = "valores demais, ou valores não reconhecidos": o validador viu <code>2</code> e <code>rem</code> como duas coisas.</li>
+  <li><em>Unknown dimension.</em> = "dimensão desconhecida": a unidade não existe (aqui, <code>10pxx</code>). Lembre que as unidades <code>cq…</code> também dão esse erro no <code>vnu</code> 26.10.12, mas por falha do validador.</li>
+</ul>
+<p><strong>Como resolver:</strong> número e unidade colados (<code>300px</code>, <code>2rem</code>), ponto como separador decimal.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>em</code> que vira uma bola de neve</strong>
+<p>Uma lista dentro de outra, com <code>li { font-size: 1.2em; }</code>: cada nível fica 1,2 vez maior que o de fora (1,2 × 1,2 × 1,2…), porque o <code>em</code> do <code>font-size</code> é medido na letra do pai. Com <code>1.2rem</code>, todos os níveis ficam iguais. Na letra, prefira <code>rem</code>.</p>
+</div>
+
+<h2>Missão</h2>
+<div class="tryhtml" data-goal="css:h1{font-size}=32px,src:h1\s*\{[^}]*font-size:\s*2rem,css:.aviso{padding-top}=20px,src:\.aviso\s*\{[^}]*padding:\s*1em">
+<p class="try-task"><strong>Missão:</strong> deixe o CSS da Ana em unidades relativas. (1) O título: troque os <code>32px</code> por <code>2rem</code> (o mesmo tamanho, mas respeitando a letra que a pessoa escolheu). (2) O aviso: troque o <code>padding: 10px</code> por <code>1em</code>, para o espaço acompanhar a letra dele (que é de <code>1.25rem</code> = 20px). Confira o <code>padding-top</code> calculado no F12, se quiser.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;p class="aviso"&gt;Hoje tem pão de queijo quentinho!&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  font-size: 32px;
+}
+
+.aviso {
+  font-size: 1.25rem;
+  padding: 10px;
+  background-color: lightyellow;
+  border: 1px solid goldenrod;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  font-size: 2rem;
+}
+
+.aviso {
+  font-size: 1.25rem;
+  padding: 1em;
+  background-color: lightyellow;
+  border: 1px solid goldenrod;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Número e unidade colados, decimal com ponto: <code>1.5rem</code>. Só o <code>0</code> dispensa a unidade.</li>
+  <li>Absolutas: <code>px</code> (1in = 96px), <code>cm</code>, <code>mm</code>, <code>pt</code>; fora o <code>px</code>, ficam para a impressão.</li>
+  <li>Da fonte: <code>rem</code> (raiz), <code>em</code> (o próprio elemento), <code>ch</code>, <code>ex</code>, <code>lh</code>.</li>
+  <li>Da tela: <code>vw</code>, <code>vh</code>, <code>vmin</code>, <code>vmax</code> e, para o celular, <code>dvh</code>, <code>svh</code>, <code>lvh</code>. Do contêiner: <code>cqw</code>, <code>cqi</code>…</li>
+  <li><code>%</code> depende da propriedade: <code>padding</code> e <code>margin</code> usam a <strong>largura</strong> do pai, até em cima e embaixo.</li>
+  <li>Sem unidade: <code>line-height: 1.5</code>, <code>opacity</code>, <code>z-index</code>, <code>flex-grow</code>.</li>
+  <li><code>fr</code> no Grid, <code>deg</code>/<code>turn</code> nos giros, <code>s</code>/<code>ms</code> no tempo, <code>x</code>/<code>dppx</code> na resolução.</li>
+  <li>Unidade errada ou faltando: a declaração é ignorada (riscada no F12).</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
