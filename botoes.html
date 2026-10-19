@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Botões — estilizando button e links com cara de botão | Guia CSS</title>
+<meta name="description" content="Como estilizar botões com CSS: o botão padrão do navegador, cor, preenchimento, borda e cantos, os estados :hover, :active, :focus-visible e :disabled, variações (principal, secundário, perigo), links com aparência de botão e os erros comuns, com as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Botões</span></h1>
+
+<p class="intro">O botão padrão do navegador é pequeno, cinza e com cara de 1998. Nesta aula você vai transformar os botões da lojinha da Ana em botões de verdade: cor da marca, tamanho bom para o dedo, cantos arredondados, uma reação ao passar o mouse e ao clicar, um foco visível para quem usa teclado, e um jeito claro de mostrar que um botão está desativado.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Como é o botão padrão, valor por valor.</li>
+  <li>A receita de um botão: <code>font</code>, <code>padding</code>, <code>border</code>, <code>border-radius</code>, <code>background-color</code>, <code>color</code>, <code>cursor</code>.</li>
+  <li>Os quatro estados: <code>:hover</code>, <code>:active</code>, <code>:focus-visible</code> e <code>:disabled</code>.</li>
+  <li>Variações com classes: principal, secundário e perigo.</li>
+  <li>Link com aparência de botão (e quando usar cada um).</li>
+  <li>Os erros mais comuns e o que o validador W3C diz.</li>
+</ul>
+</div>
+
+<hr>
+
+<h2>A ideia: o interruptor da parede</h2>
+<p>Um bom interruptor você reconhece de longe: tem formato de interruptor, fica num lugar previsível, é grande o bastante para o dedo e faz "clique" quando você aperta. Um botão na tela precisa do mesmo: <strong>parecer clicável</strong>, ter um tamanho confortável e <strong>reagir</strong> quando você passa o mouse, aperta ou chega nele pelo teclado. O CSS cuida da aparência; o HTML (<code>&lt;button&gt;</code>) já cuida do comportamento: ele funciona com <kbd>Enter</kbd> e espaço, recebe o foco do <kbd>Tab</kbd> e é anunciado como "botão" pelo leitor de tela.</p>
+
+<hr>
+
+<h2>1. O botão padrão</h2>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;button type="button"&gt;Encomendar&lt;/button&gt;
+</pre>
+
+<p>Pequeno, cinza, com uma borda fina. Os valores que o Chromium calcula para ele (cada navegador tem os seus, parecidos):</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>Valor padrão</th><th>O que significa</th></tr>
+<tr><td><code>font-size</code></td><td><code>13.3333px</code></td><td>Letra menor que a da página (16px): o botão <strong>não herda</strong> a fonte</td></tr>
+<tr><td><code>background-color</code></td><td><code>rgb(239, 239, 239)</code></td><td>Cinza clarinho</td></tr>
+<tr><td><code>border-top-style</code></td><td><code>outset</code></td><td>Uma borda com efeito de "alto-relevo", de 2px</td></tr>
+<tr><td><code>padding</code></td><td><code>1px 6px</code></td><td>Quase nenhum espaço interno</td></tr>
+<tr><td><code>border-radius</code></td><td><code>0px</code></td><td>Cantos retos (o desenho do sistema pode arredondar um pouco)</td></tr>
+<tr><td><code>cursor</code></td><td><code>default</code></td><td>A setinha normal, e não a mãozinha</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>2. A receita de um botão</h2>
+<p>Sete linhas transformam o botão. Uma propriedade de cada vez:</p>
+
+<pre class="file" data-file="style.css">.botao {
+  font: inherit;
+  padding: 10px 20px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: white;
+  cursor: pointer;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>font: inherit</dt><dd>A letra da página, como nos campos de formulário (aula <a href="formularios.html">Formulários</a>).</dd>
+  <dt>padding: 10px 20px</dt><dd>Espaço interno: 10 em cima e embaixo, 20 dos lados. É o que faz o botão ficar "gordinho" e fácil de acertar (aula <a href="padding.html">padding</a>).</dd>
+  <dt>border: 2px solid transparent</dt><dd>Troca a borda de alto-relevo por uma borda <strong>invisível</strong> de 2px. Por que não <code>border: none</code>? Porque o botão secundário, mais abaixo, tem uma borda colorida de 2px: com a borda transparente em todos, os botões ficam do mesmo tamanho, lado a lado.</dd>
+  <dt>border-radius: 8px</dt><dd>Cantos arredondados (aula <a href="border-radius.html">border-radius</a>).</dd>
+  <dt>background-color: #c2410c</dt><dd>O laranja-escuro da lojinha.</dd>
+  <dt>color: white</dt><dd>Texto branco. Branco sobre esse laranja tem contraste suficiente para ler; um laranja claro com texto branco não teria.</dd>
+  <dt>cursor: pointer</dt><dd>A "mãozinha" ao passar o mouse (aula <a href="cursor.html">Cursor e Interação</a>).</dd>
+</dl>
+
+<div class="tryhtml" data-goal="css:.botao{font-size}=16px,css:.botao{padding-top}=10px,css:.botao{padding-left}=20px,css:.botao{border-top-left-radius}=8px,css:.botao{background-color}=rgb(194\, 65\, 12),css:.botao{color}=rgb(255\, 255\, 255),css:.botao{cursor}=pointer">
+<p class="try-task"><strong>Missão:</strong> o botão "Encomendar" está com a cara padrão. Escreva a regra <code>.botao</code> com: a letra da página, espaço interno de <code>10px 20px</code>, cantos de <code>8px</code>, fundo <code>#c2410c</code>, texto branco e a mãozinha.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p&gt;R$ 45,00&lt;/p&gt;
+&lt;button class="botao" type="button"&gt;Encomendar&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+
+.botao {
+  font: inherit;
+  padding: 10px 20px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: white;
+  cursor: pointer;
+}
+</pre>
+</div>
+
+<div class="tip">
+<strong>Tamanho para o dedo</strong>
+<p>No celular, um botão pequeno vira um alvo difícil. As recomendações de acessibilidade pedem uma área de toque de pelo menos <strong>24×24 pixels</strong> (o mínimo das regras WCAG 2.2), e o ideal é por volta de <strong>44×44</strong>. Com letra de 16px e <code>padding: 10px 20px</code>, o botão desta aula fica com cerca de 43 pixels de altura (conferido no Chromium; o número exato depende da fonte). Para garantir os 44, some um pouco de <code>padding</code> ou use <code>min-height: 44px</code>.</p>
+</div>
+
+<hr>
+
+<h2>3. Os estados: o botão reage</h2>
+<p>Um botão de verdade "responde" ao que você faz. Cada estado tem a sua pseudo-classe (aula <a href="hover-focus.html">Estados</a>):</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Pseudo-classe</th><th>Quando vale</th><th>O que costuma mudar</th></tr>
+<tr><td><code>:hover</code></td><td>O mouse está em cima</td><td>Fundo um pouco mais escuro</td></tr>
+<tr><td><code>:active</code></td><td>Durante o clique (o botão está sendo apertado)</td><td>Fundo ainda mais escuro, como se afundasse</td></tr>
+<tr><td><code>:focus-visible</code></td><td>Chegou nele pelo teclado (<kbd>Tab</kbd>)</td><td>Um contorno bem visível</td></tr>
+<tr><td><code>:disabled</code></td><td>O botão tem o atributo <code>disabled</code></td><td>Cores apagadas e o cursor de "proibido"</td></tr>
+</table>
+</div>
+
+<pre class="file" data-file="style.css">.botao:hover {
+  background-color: #9a3412;
+}
+
+.botao:active {
+  background-color: #7c2d12;
+}
+
+.botao:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 2px;
+}
+
+.botao:disabled {
+  background-color: #d6d3d1;
+  color: #57534e;
+  cursor: not-allowed;
+}
+</pre>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> passe o mouse sobre "Encomendar", aperte e segure o clique, depois clique dentro do quadro e use o <kbd>Tab</kbd> para chegar nos botões. O "Esgotado" não reage: ele está desativado (e o <kbd>Tab</kbd> pula por ele).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;
+  &lt;button class="botao" type="button"&gt;Encomendar&lt;/button&gt;
+  &lt;button class="botao" type="button" disabled&gt;Esgotado&lt;/button&gt;
+&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+
+.botao {
+  font: inherit;
+  padding: 10px 20px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: white;
+  cursor: pointer;
+}
+
+.botao:hover {
+  background-color: #9a3412;
+}
+
+.botao:active {
+  background-color: #7c2d12;
+}
+
+.botao:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 2px;
+}
+
+.botao:disabled {
+  background-color: #d6d3d1;
+  color: #57534e;
+  cursor: not-allowed;
+}
+</pre>
+</div>
+
+<p>Com o mouse em cima, o laranja fica mais escuro (<code>rgb(154, 52, 18)</code>, conferido no Chromium); com o foco do teclado, aparece um contorno azul grosso em volta, afastado 2 pixels do botão.</p>
+
+<div class="note">
+<strong>Por que o desativado também precisa de <code>:disabled</code>?</strong>
+<p>Sem a regra <code>.botao:disabled</code>, o botão desativado ficaria com o mesmo laranja dos outros (a classe <code>.botao</code> vale para ele também) e a pessoa clicaria sem entender por que nada acontece. As cores apagadas avisam "não dá". Repare na ordem: a regra do <code>:disabled</code> vem <strong>depois</strong> da do <code>:hover</code>, e as duas têm a mesma especificidade, então, se o mouse passar por cima de um botão desativado, quem vence é o <code>:disabled</code> (aula <a href="cascata.html">A Cascata</a>).</p>
+</div>
+
+<div class="tip">
+<strong>Uma transição deixa a mudança suave</strong>
+<p>Por padrão, a cor troca de uma vez. Com <code>transition: background-color 0.2s;</code> na regra <code>.botao</code>, a troca leva dois décimos de segundo. É o assunto da aula <a href="transition.html">Transições</a>.</p>
+</div>
+
+<hr>
+
+<h2>4. Variações: principal, secundário e perigo</h2>
+<p>Uma página costuma ter um botão <strong>principal</strong> (a ação mais importante, "Encomendar"), botões <strong>secundários</strong> (menos destaque, "Ver cardápio") e, às vezes, um de <strong>perigo</strong> (algo que não tem volta, "Cancelar pedido"). Em vez de repetir tudo, a classe <code>.botao</code> guarda o que é comum e uma segunda classe muda só o que é diferente:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;
+  &lt;button class="botao" type="button"&gt;Encomendar&lt;/button&gt;
+  &lt;button class="botao botao-secundario" type="button"&gt;Ver cardápio&lt;/button&gt;
+  &lt;button class="botao botao-perigo" type="button"&gt;Cancelar pedido&lt;/button&gt;
+&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+
+.botao {
+  font: inherit;
+  padding: 10px 20px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: white;
+  cursor: pointer;
+}
+
+.botao-secundario {
+  background-color: white;
+  color: #c2410c;
+  border-color: #c2410c;
+}
+
+.botao-perigo {
+  background-color: #b91c1c;
+}
+</pre>
+</div>
+
+<p>Os três ficam da mesma altura, lado a lado: o principal laranja cheio, o secundário branco com borda e texto laranja (o "fantasma" do principal), e o de perigo vermelho. No HTML, o botão secundário tem as <strong>duas</strong> classes (<code>class="botao botao-secundario"</code>, aula <a href="seletor-classe.html">Seletor de Classe</a>), e a regra da segunda vem depois no CSS, então ela vence onde as duas falam da mesma propriedade.</p>
+
+<div class="warning">
+<strong>A cor não diz tudo</strong>
+<p>O vermelho do "Cancelar pedido" ajuda, mas o que avisa de verdade é o <strong>texto</strong>. Escreva o que o botão faz ("Cancelar pedido", e não só "OK"), para quem não distingue as cores e para quem ouve a página num leitor de tela.</p>
+</div>
+
+<hr>
+
+<h2>5. Link com cara de botão</h2>
+<p>"Ver cardápio" leva a outra página: é um <strong>link</strong> (<code>&lt;a href&gt;</code>), mesmo que pareça um botão. A mesma classe serve, com dois acréscimos:</p>
+
+<pre class="file" data-file="style.css">.botao {
+  display: inline-block;
+  text-decoration: none;
+  /* … o resto da receita … */
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>display: inline-block</dt><dd>O <code>&lt;a&gt;</code> é um elemento em linha: o <code>padding</code> de cima e de baixo aparece, mas não empurra as linhas vizinhas, e o fundo invade o texto de cima e de baixo (veja <a href="#errado">Quando dá errado</a>). Com <code>inline-block</code>, ele vira uma caixa, como o <code>&lt;button&gt;</code> já é (aula <a href="display.html">display</a>).</dd>
+  <dt>text-decoration: none</dt><dd>Tira o sublinhado do link (aula <a href="links.html">Estilizando Links</a>).</dd>
+</dl>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>O clique…</th><th>Use</th><th>Exemplo</th></tr>
+<tr><td>Leva a outro lugar (outra página, outro ponto da página)</td><td><code>&lt;a href="…" class="botao"&gt;</code></td><td>"Ver cardápio", "Ler a receita"</td></tr>
+<tr><td>Faz algo ali mesmo (enviar, abrir, adicionar)</td><td><code>&lt;button class="botao"&gt;</code></td><td>"Encomendar", "Adicionar ao carrinho"</td></tr>
+</table>
+</div>
+<p>O CSS deixa os dois iguais por fora, mas por dentro eles continuam diferentes: o link abre com <kbd>Enter</kbd> e o leitor de tela diz "link"; o botão funciona também com a barra de espaço e é anunciado como "botão". Escolha pelo que o clique <strong>faz</strong>, nunca pela aparência.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Link com <code>padding</code>, mas sem <code>inline-block</code>: o fundo invade as outras linhas</strong>
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  body {
+    font-family: system-ui, sans-serif;
+  }
+  .botao {
+    padding: 10px 20px;
+    background-color: #fde68a;
+  }
+&lt;/style&gt;
+&lt;p style="width: 320px"&gt;Texto antes &lt;a class="botao" href="#"&gt;Ver cardápio&lt;/a&gt; texto depois, numa linha comprida que quebra para mostrar o problema.&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> o fundo amarelo do link sobe acima da linha dele e desce por cima da linha de baixo, cobrindo o alto das letras de "depois, numa linha comprida": o espaço interno vertical foi desenhado, mas as linhas não se afastaram para ele.</p>
+<p><strong>Por quê:</strong> num elemento em linha, o <code>padding</code> de cima e de baixo não ocupa lugar na linha. O validador não acusa nada: o CSS é válido.</p>
+<p><strong>Como consertar:</strong> <code>display: inline-block;</code> no link.</p>
+</div>
+
+<div class="cenario">
+<strong>Só o <code>:hover</code>: no celular e no teclado, nada acontece</strong>
+<p><strong>O que você vê:</strong> no computador, o botão escurece com o mouse. Pelo <kbd>Tab</kbd>, se você apagou o contorno, não há sinal nenhum; e no celular não existe "mouse em cima".</p>
+<p><strong>Por quê:</strong> <code>:hover</code> é só para mouse. O botão precisa ser claramente um botão <strong>sem</strong> o hover (cor, formato), e o foco precisa de um <code>:focus-visible</code> visível.</p>
+<p><strong>Como consertar:</strong> nunca dependa só do <code>:hover</code>; mantenha (ou desenhe) o foco.</p>
+</div>
+
+<div class="cenario">
+<strong>Erros de digitação: o validador mostra todos</strong>
+<pre class="file" data-file="botao.css">.botao {
+  border-radius: 8 px;
+  background-color: #c2410;
+  cursor: hand;
+}
+.botao:hoover {
+  background-color: #9a3412;
+}
+</pre>
+<p><strong>O que você vê:</strong> o botão continua com os cantos retos, o fundo cinza, a setinha normal, e não escurece com o mouse. Cada declaração errada foi ignorada; no F12 ela aparece riscada.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css botao.css
+"file:/home/ana/site/botao.css":2.20-2.21: error: CSS: “border-radius”: only “0” can be a “unit”. You must put a unit after your number.
+"file:/home/ana/site/botao.css":3.21-3.26: error: CSS: “background-color”: “#c2410” is not a “background-color” value.
+"file:/home/ana/site/botao.css":4.11-4.14: error: CSS: “cursor”: “hand” is not a “cursor” value.
+"file:/home/ana/site/botao.css":6.8-6.13: error: CSS: Unknown pseudo-element or pseudo-class “:hoover”</pre>
+<p><strong>O que significa:</strong></p>
+<ul>
+  <li><code>8 px</code>, com espaço: o validador lê "o número 8" e "a palavra px", e diz que "só o 0 pode ficar sem unidade". O número e a unidade vão <strong>grudados</strong>: <code>8px</code>.</li>
+  <li><code>#c2410</code> tem 5 dígitos: "não é um valor de <code>background-color</code>". Uma cor hexadecimal tem 3, 4, 6 ou 8.</li>
+  <li><code>hand</code> não é um cursor: era um valor antigo do Internet Explorer. O certo é <code>pointer</code>.</li>
+  <li><code>:hoover</code>, com dois "o": "pseudo-classe desconhecida". A regra inteira é descartada.</li>
+</ul>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>font: inherit;</code></td><td>A letra da página (o botão não herda sozinho)</td></tr>
+<tr><td><code>padding: 10px 20px;</code></td><td>Espaço interno: botão confortável</td></tr>
+<tr><td><code>border: 2px solid transparent;</code></td><td>Tira o alto-relevo e mantém o tamanho igual ao do botão com borda</td></tr>
+<tr><td><code>border-radius: 8px;</code></td><td>Cantos arredondados</td></tr>
+<tr><td><code>cursor: pointer;</code></td><td>Mãozinha</td></tr>
+<tr><td><code>.botao:hover</code> / <code>:active</code></td><td>Mouse em cima / durante o clique</td></tr>
+<tr><td><code>.botao:focus-visible</code></td><td>Foco do teclado</td></tr>
+<tr><td><code>.botao:disabled</code></td><td>Botão com <code>disabled</code>: cores apagadas, <code>cursor: not-allowed</code></td></tr>
+<tr><td><code>a.botao { display: inline-block; text-decoration: none; }</code></td><td>Link com cara de botão</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A mãozinha</h3>
+<p>Complete:</p>
+<div class="ex-code">.botao { cursor: <input data-answer="pointer" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Mouse em cima</h3>
+<p>Complete a pseudo-classe que vale quando o mouse está sobre o botão:</p>
+<div class="ex-code">.botao<input data-answer=":hover" aria-label="pseudo-classe"> { background-color: #9a3412; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. O link vira caixa</h3>
+<p>Complete para o <code>padding</code> do link funcionar como num botão:</p>
+<div class="ex-code">a.botao { display: <input data-answer="inline-block" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Qual pseudo-classe deixa o botão desativado com cores apagadas?</p>
+<label><input type="radio" name="q4"> <code>:active</code></label>
+<label><input type="radio" name="q4"> <code>:disabled</code></label>
+<label><input type="radio" name="q4"> <code>:focus</code></label>
+<label><input type="radio" name="q4"> <code>:hover</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. "Ler a receita completa" leva para outra página. O que a Ana deve usar?</p>
+<label><input type="radio" name="q5"> <code>&lt;a href="receita.html" class="botao"&gt;</code></label>
+<label><input type="radio" name="q5"> <code>&lt;button class="botao"&gt;</code></label>
+<label><input type="radio" name="q5"> <code>&lt;div class="botao"&gt;</code></label>
+<label><input type="radio" name="q5"> <code>&lt;span class="botao"&gt;</code></label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">6. Por que <code>border-radius: 8 px</code> não funciona?</p>
+<label><input type="radio" name="q6"> Porque falta o <code>!important</code></label>
+<label><input type="radio" name="q6"> Porque botão não aceita cantos arredondados</label>
+<label><input type="radio" name="q6"> Porque o número e a unidade têm de ficar grudados: <code>8px</code></label>
+<label><input type="radio" name="q6"> Porque o certo é <code>border-radius: 8</code></label>
+</div>
+
+<h3>Missão final: os botões da página do bolo</h3>
+
+<div class="tryhtml" data-goal="css:a.botao{display}=inline-block,css:a.botao{text-decoration-line}=none,src:\.botao:hover\s*\{[^}]*background,src:\.botao:focus-visible\s*\{[^}]*outline,css:.botao:disabled{cursor}=not-allowed,nsrc:outline:\s*(none|0)\s*;">
+<p class="try-task"><strong>Missão:</strong> a receita <code>.botao</code> já está pronta. (1) Faça o link "Ver cardápio" funcionar como botão: <code>inline-block</code> e sem sublinhado. (2) Escreva um <code>.botao:hover</code> que escureça o fundo. (3) Escreva um <code>.botao:focus-visible</code> com um <code>outline</code>. (4) Deixe o botão desativado com <code>cursor: not-allowed</code> e cores apagadas.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p&gt;
+  &lt;button class="botao" type="button"&gt;Encomendar&lt;/button&gt;
+  &lt;a class="botao" href="cardapio.html"&gt;Ver cardápio&lt;/a&gt;
+  &lt;button class="botao" type="button" disabled&gt;Bolo de fubá: esgotado&lt;/button&gt;
+&lt;/p&gt;
+</pre>
+<pre class="script" data-file="cardapio.html">&lt;h1&gt;Cardápio&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura, bolo de fubá, pão de queijo.&lt;/p&gt;
+&lt;p&gt;&lt;a href="index.html"&gt;Voltar&lt;/a&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+
+.botao {
+  font: inherit;
+  padding: 10px 20px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: white;
+  cursor: pointer;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+
+.botao {
+  display: inline-block;
+  font: inherit;
+  padding: 10px 20px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.botao:hover {
+  background-color: #9a3412;
+}
+
+.botao:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 2px;
+}
+
+.botao:disabled {
+  background-color: #d6d3d1;
+  color: #57534e;
+  cursor: not-allowed;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O botão padrão tem letra de 13.3333px, fundo cinza, borda <code>outset</code>, quase nenhum espaço e a setinha normal.</li>
+  <li>A receita: <code>font: inherit</code>, <code>padding</code>, <code>border</code>, <code>border-radius</code>, <code>background-color</code>, <code>color</code> com bom contraste, <code>cursor: pointer</code>. Tamanho confortável para o dedo.</li>
+  <li>Estados: <code>:hover</code> (mouse), <code>:active</code> (clique), <code>:focus-visible</code> (teclado, sempre visível) e <code>:disabled</code> (cores apagadas, <code>not-allowed</code>).</li>
+  <li>Uma classe base (<code>.botao</code>) e classes de variação (<code>.botao-secundario</code>, <code>.botao-perigo</code>) que mudam só o necessário.</li>
+  <li>Link com cara de botão: <code>display: inline-block</code> e <code>text-decoration: none</code>. Link leva a um lugar; botão faz uma ação.</li>
+  <li>Erros comuns: <code>8 px</code> com espaço, hexadecimal com dígitos de menos, <code>cursor: hand</code>, <code>:hoover</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
