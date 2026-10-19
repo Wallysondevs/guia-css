@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS width e height — largura e altura das caixas | Guia CSS</title>
+<meta name="description" content="As propriedades width e height do CSS para quem nunca escreveu CSS: o tamanho automático das caixas, largura e altura em px, % e rem, max-width para textos e imagens, min-height, o texto que vaza de uma altura fixa, a altura em % que não funciona, width em elementos em linha e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">width</span> e <span class="hl">height</span></h1>
+
+<p class="intro">Toda caixa da página tem uma largura e uma altura. Quase sempre o navegador as escolhe sozinho, e escolhe bem. Mas às vezes você quer um cartão com 300px de largura, um texto que não passe de 600px para ser fácil de ler, ou uma faixa com pelo menos 200px de altura. Para isso servem o <code>width</code> ("largura") e o <code>height</code> ("altura"), e os primos <code>max-width</code> e <code>min-height</code>. Nesta aula você também vai ver por que fixar a altura costuma dar problema.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O tamanho automático (<code>auto</code>): como o navegador decide a largura e a altura sozinho.</li>
+  <li><code>width</code> e <code>height</code> em <code>px</code>, <code>%</code> e <code>rem</code>, lado a lado.</li>
+  <li><code>max-width</code> e <code>min-width</code>, <code>max-height</code> e <code>min-height</code>: os limites, que são o jeito moderno de dar tamanho.</li>
+  <li>O que acontece quando o conteúdo não cabe na altura que você deu.</li>
+  <li>Por que <code>height: 50%</code> muitas vezes não faz nada.</li>
+  <li>Por que <code>width</code> não funciona num <code>&lt;span&gt;</code> ou num <code>&lt;a&gt;</code>.</li>
+  <li>Os erros reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a água e o copo</h2>
+<p>Despeje água numa mesa: ela se espalha até onde der. Despeje num copo: ela fica do tamanho do copo, e se você puser água demais, ela <strong>transborda</strong>.</p>
+<p>Uma caixa de bloco sem tamanho é a água na mesa: ocupa <strong>toda a largura</strong> disponível e fica <strong>tão alta quanto o conteúdo</strong>. O <code>width</code> e o <code>height</code> são o copo: o tamanho passa a ser o seu. E, como o copo, uma altura fixa pode ser pequena demais para o que vai dentro.</p>
+
+<hr>
+
+<h2>1. O tamanho automático</h2>
+<p>Sem <code>width</code> nem <code>height</code>, os dois valem <code>auto</code> ("automático"). Para um elemento de bloco, como <code>&lt;div&gt;</code>, <code>&lt;p&gt;</code> e <code>&lt;h1&gt;</code>:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .caixa {
+    background-color: lightblue;
+    border: 2px solid steelblue;
+    margin-bottom: 8px;
+  }
+&lt;/style&gt;
+&lt;div class="caixa"&gt;Uma linha.&lt;/div&gt;
+&lt;div class="caixa"&gt;Três linhas:&lt;br&gt;pão de queijo&lt;br&gt;brigadeiro&lt;/div&gt;
+</pre>
+
+<ul>
+  <li><strong>Largura automática:</strong> as duas caixas vão de ponta a ponta, mesmo com pouco texto. O bloco ocupa toda a largura do pai.</li>
+  <li><strong>Altura automática:</strong> a primeira tem a altura de uma linha; a segunda, de três. O bloco cresce com o conteúdo.</li>
+</ul>
+<p>Isso é quase sempre o que você quer. Guarde esta regra: <strong>só dê tamanho quando precisar</strong>, e dê preferência aos limites (seção 4).</p>
+
+<hr>
+
+<h2>2. A primeira largura e altura</h2>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .cartao {
+    width: 250px;
+    height: 100px;
+    background-color: lavender;
+    border: 2px solid slateblue;
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;Bolo de cenoura: R$ 35&lt;/div&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>width: 250px;</dt><dd>A largura da caixa: 250 pixels, mesmo que a tela seja maior. <em>Width</em> = "largura".</dd>
+  <dt>height: 100px;</dt><dd>A altura: 100 pixels, mesmo que o texto ocupe só uma linha. <em>Height</em> = "altura".</dd>
+</dl>
+
+<p>Repare: a caixa parou nos 250px e sobrou espaço branco à direita; e ela ficou bem mais alta que o texto. A borda é desenhada <strong>por fora</strong> desses números: a caixa ocupa 254 × 104px (os 2px de borda de cada lado). Mais sobre isso na seção 7.</p>
+
+<hr>
+
+<h2>3. As unidades lado a lado</h2>
+<p>As barras abaixo têm larguras em unidades diferentes. O valor está escrito dentro:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .pai {
+    width: 400px;
+    border: 2px dashed gray;
+    padding: 4px;
+  }
+  .barra {
+    background-color: gold;
+    margin: 4px 0;
+    font-family: monospace;
+  }
+&lt;/style&gt;
+&lt;div class="pai"&gt;
+  &lt;div class="barra"&gt;auto&lt;/div&gt;
+  &lt;div class="barra" style="width: 200px"&gt;200px&lt;/div&gt;
+  &lt;div class="barra" style="width: 50%"&gt;50%&lt;/div&gt;
+  &lt;div class="barra" style="width: 10rem"&gt;10rem&lt;/div&gt;
+  &lt;div class="barra" style="width: 30ch"&gt;30ch&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Unidade</th><th>Exemplo</th><th>A largura fica…</th></tr>
+<tr><td><code>auto</code></td><td><code>width: auto;</code></td><td>toda a largura do pai (num bloco). É o valor inicial.</td></tr>
+<tr><td><code>px</code></td><td><code>width: 200px;</code></td><td>sempre com 200 pixels, em qualquer tela</td></tr>
+<tr><td><code>%</code></td><td><code>width: 50%;</code></td><td>metade da largura do <strong>pai</strong> (aqui, 200 dos 400px)</td></tr>
+<tr><td><code>rem</code></td><td><code>width: 10rem;</code></td><td>10 vezes a letra da página (160px no padrão do navegador)</td></tr>
+<tr><td><code>ch</code></td><td><code>width: 30ch;</code></td><td>a largura de cerca de 30 caracteres: ótimo para medir textos</td></tr>
+<tr><td><code>vw</code></td><td><code>width: 50vw;</code></td><td>metade da largura da <strong>janela</strong> (aula <a href="unidades-viewport.html">Unidades da Tela</a>)</td></tr>
+</table>
+</div>
+
+<p>No F12, na aba <em>Computed</em> (Calculado), a largura aparece sempre em pixels, mesmo que você tenha escrito <code>50%</code> ou <code>10rem</code>: o navegador mostra o tamanho que de fato desenhou. A barra de <code>50%</code> mostra <code>width: 200px</code>.</p>
+
+<hr>
+
+<h2>4. Os limites: <code>max-width</code> e <code>min-height</code></h2>
+<p>Uma largura fixa tem um problema: <code>width: 600px</code> num celular de 360px de largura faz a caixa passar da tela, e aparece a rolagem para o lado. Quase sempre, o que você quer dizer é "<strong>no máximo</strong> 600px". Para isso existem os limites:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>Quer dizer</th><th>Uso típico</th></tr>
+<tr><td><code>max-width</code></td><td>largura máxima: encolhe à vontade, cresce até ali</td><td>textos (linhas curtas são mais fáceis de ler), cartões, imagens</td></tr>
+<tr><td><code>min-width</code></td><td>largura mínima: cresce à vontade, encolhe até ali</td><td>botões que não podem ficar estreitos demais</td></tr>
+<tr><td><code>max-height</code></td><td>altura máxima</td><td>caixas com rolagem (com <code>overflow</code>)</td></tr>
+<tr><td><code>min-height</code></td><td>altura mínima: cresce com o conteúdo se precisar</td><td>faixas e cartões que precisam de uma altura mínima</td></tr>
+</table>
+</div>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .texto {
+    max-width: 30ch;
+    background-color: honeydew;
+    border-left: 4px solid seagreen;
+    padding: 8px;
+  }
+  .foto {
+    max-width: 100%;
+    height: auto;
+  }
+&lt;/style&gt;
+&lt;p class="texto"&gt;Bata a manteiga com o açúcar, junte os ovos um a um e, por fim, a farinha peneirada com o fermento.&lt;/p&gt;
+&lt;img class="foto" src="assets/midia/bolo-1200.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="1200" height="900"&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>.texto { max-width: 30ch; }</dt><dd>O parágrafo não passa de uns 30 caracteres de largura, mesmo com espaço sobrando. Num quadro estreito, ele encolhe junto. Em textos de verdade, algo entre <code>60ch</code> e <code>75ch</code> é o mais confortável de ler.</dd>
+  <dt>.foto { max-width: 100%; }</dt><dd>A foto tem 1200px de verdade, mas nunca passa da largura do pai: aqui ela encolheu para caber no quadro. É a regra mais famosa do CSS responsivo (aula <a href="imagens-responsivas.html">Imagens que se Adaptam</a>).</dd>
+  <dt>height: auto;</dt><dd>Recalcula a altura para a foto não ficar achatada quando a largura encolhe. Sem ela, o <code>height="900"</code> do HTML seria mantido, e a foto ficaria deformada.</dd>
+</dl>
+
+<div class="tryhtml" data-goal="css:.receita{max-width}=600px,nsrc:\.receita\s*\{[^}]*[^-]width\s*:\s*600px">
+<p class="try-task"><strong>Missão:</strong> a receita deve ter <strong>no máximo</strong> 600px de largura, mas encolher se a tela for menor. Troque a largura fixa pelo limite certo. Depois, abra o resultado numa aba nova (botão ↗) e estreite a janela para ver o texto se ajustar.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="receita"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Bata no liquidificador as cenouras, os ovos e o óleo. Despeje numa tigela, junte o açúcar e a farinha e misture bem. Por último, o fermento. Asse em forno médio por 40 minutos.&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">.receita {
+  width: 600px;
+  background-color: oldlace;
+  padding: 16px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.receita {
+  max-width: 600px;
+  background-color: oldlace;
+  padding: 16px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>5. Quando o conteúdo não cabe na altura</h2>
+<p>A altura fixa é o copo cheio demais. As duas caixas abaixo têm o mesmo texto, que precisa de quatro ou cinco linhas:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .caixa {
+    display: inline-block;
+    vertical-align: top;
+    width: 200px;
+    margin: 0 8px 8px 0;
+    background-color: mistyrose;
+    border: 2px solid crimson;
+  }
+  .fixa   { height: 60px; }
+  .minima { min-height: 60px; }
+&lt;/style&gt;
+&lt;div class="caixa fixa"&gt;height: 60px. Bolo de cenoura com cobertura de chocolate, fofinho, fácil de fazer e perfeito para o café da tarde.&lt;/div&gt;
+&lt;div class="caixa minima"&gt;min-height: 60px. Bolo de cenoura com cobertura de chocolate, fofinho, fácil de fazer e perfeito para o café da tarde.&lt;/div&gt;
+</pre>
+
+<ul>
+  <li><strong><code>height: 60px</code>:</strong> a caixa para nos 60px, e o texto <strong>vaza</strong> por baixo da borda. Se houvesse algo embaixo, o texto passaria por cima.</li>
+  <li><strong><code>min-height: 60px</code>:</strong> a caixa tem <strong>pelo menos</strong> 60px e cresce o quanto for preciso.</li>
+</ul>
+<p>O texto muda de tamanho quando o leitor aumenta a fonte, traduz a página ou abre num celular. Por isso, para caixas com texto, prefira <code>min-height</code>. O <code>height</code> fixo combina com coisas de tamanho conhecido: imagens, ícones, faixas decorativas. Para escolher o que fazer com o conteúdo que sobra (esconder, rolar), existe o <code>overflow</code> (aula <a href="overflow.html">O que Transborda</a>).</p>
+
+<hr>
+
+<h2>6. <code>width</code> não funciona em elementos em linha</h2>
+<p>Elementos em linha, como <code>&lt;span&gt;</code>, <code>&lt;a&gt;</code>, <code>&lt;strong&gt;</code> e <code>&lt;em&gt;</code>, ficam no meio do texto e têm o tamanho das próprias letras. Neles, o navegador <strong>ignora</strong> <code>width</code> e <code>height</code>:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .etiqueta {
+    width: 150px;
+    height: 40px;
+    background-color: gold;
+  }
+  .bloco-em-linha {
+    display: inline-block;
+  }
+&lt;/style&gt;
+&lt;p&gt;Em linha: &lt;span class="etiqueta"&gt;Promoção&lt;/span&gt; (ignorou o tamanho)&lt;/p&gt;
+&lt;p&gt;inline-block: &lt;span class="etiqueta bloco-em-linha"&gt;Promoção&lt;/span&gt; (150 × 40px)&lt;/p&gt;
+</pre>
+
+<p>O primeiro <code>span</code> tem só o tamanho da palavra; o segundo, com <code>display: inline-block</code>, aceitou os 150 × 40px e continuou na mesma linha do texto. A propriedade <code>display</code> tem aula própria: <a href="display.html">display: block, inline e inline-block</a>. Imagens (<code>&lt;img&gt;</code>) são a exceção: ficam em linha e mesmo assim aceitam <code>width</code> e <code>height</code>.</p>
+
+<hr>
+
+<h2>7. O tamanho que você dá × o tamanho que a caixa ocupa</h2>
+<p>Por padrão, <code>width</code> e <code>height</code> medem só o <strong>conteúdo</strong>. O <a href="padding.html">padding</a> e a <a href="border.html">borda</a> são somados por fora:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .caixa {
+    width: 200px;
+    background-color: lightcyan;
+    border: 2px solid teal;
+    margin-bottom: 8px;
+  }
+  .recheada {
+    padding: 20px;
+    border-width: 10px;
+  }
+&lt;/style&gt;
+&lt;div class="caixa"&gt;width: 200px&lt;/div&gt;
+&lt;div class="caixa recheada"&gt;width: 200px, padding 20px, borda 10px&lt;/div&gt;
+</pre>
+
+<p>As duas dizem <code>width: 200px</code>, mas a segunda ocupa 260px: 200 + 20 + 20 de padding + 10 + 10 de borda. Por isso a regra <code>box-sizing: border-box</code>, que faz o <code>width</code> já incluir padding e borda, aparece no começo de quase todo CSS moderno. Ela é a próxima aula: <a href="box-sizing.html">box-sizing</a>.</p>
+
+<hr>
+
+<h2>8. Formas de dar tamanho e qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Quando usar</th></tr>
+<tr><td>Nada (<code>auto</code>)</td><td>A maioria das caixas. Deixe o navegador decidir.</td></tr>
+<tr><td><code>max-width: 65ch;</code></td><td>Colunas de texto: linhas confortáveis de ler.</td></tr>
+<tr><td><code>max-width: 1100px;</code> + <code>margin: 0 auto;</code></td><td>O "miolo" do site, centralizado nas telas grandes (aula <a href="margin.html">Margem</a>).</td></tr>
+<tr><td><code>max-width: 100%;</code> + <code>height: auto;</code></td><td>Imagens que não podem passar do pai.</td></tr>
+<tr><td><code>width: 50%;</code></td><td>Uma fração do pai. Para colunas lado a lado, prefira <a href="flexbox.html">Flexbox</a> ou <a href="grid.html">Grid</a>.</td></tr>
+<tr><td><code>width: 48px; height: 48px;</code></td><td>Coisas de tamanho fixo: ícones, avatares, a foto do perfil.</td></tr>
+<tr><td><code>min-height: 200px;</code></td><td>Faixas e cartões com uma altura mínima e conteúdo de texto.</td></tr>
+<tr><td><code>width: fit-content;</code></td><td>Um bloco do tamanho do próprio conteúdo (como um botão), sem virar <code>inline-block</code>. Funciona nos navegadores atuais.</td></tr>
+</table>
+</div>
+
+<div class="tip">
+<strong>Largura e altura "lógicas"</strong>
+<p>Você também vai encontrar <code>inline-size</code> (a largura, no sentido em que o texto corre) e <code>block-size</code> (a altura), com <code>max-inline-size</code> e companhia. Em português, valem o mesmo que <code>width</code> e <code>height</code>; mudam em idiomas escritos na vertical. Aula <a href="propriedades-logicas.html">Propriedades Lógicas</a>.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Lembre: o navegador <strong>ignora</strong> a declaração inválida, em silêncio. A caixa volta ao tamanho automático, e o F12 mostra a linha <strong>riscada</strong> no painel de estilos (aula <a href="devtools.html">DevTools</a>). Dois dos problemas abaixo nem são erros: o CSS é válido, só não faz o que você esperava.</p>
+
+<div class="cenario">
+<strong>Número sem unidade: <code>You must put a unit after your number</code></strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  .cartao {
+    width: 300;
+    background-color: lavender;
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;Era para ter 300px de largura.&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> a caixa lavanda ocupando a largura toda: o <code>width</code> foi ignorado.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css largura-semunidade.css
+"file:/home/ana/site/largura-semunidade.css":2.10-2.12: error: CSS: “width”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<p><strong>O que significa:</strong> "só o <code>0</code> pode ficar sem unidade". O atributo <code>width="300"</code> do HTML, nas imagens, é sem unidade; no CSS, não. <strong>Conserto:</strong> <code>width: 300px;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Valor negativo, dois valores ou nome errado</strong>
+<pre class="term" data-cwd="~/site">$ vnu --css largura-neg.css
+"file:/home/ana/site/largura-neg.css":2.11-2.15: error: CSS: “width”: “-100px” negative values are not allowed.
+$ vnu --css dois.css
+"file:/home/ana/site/dois.css":2.16-2.20: error: CSS: “width”: Too many values or values are not recognized.
+$ vnu --css largura-nome.css
+"file:/home/ana/site/largura-nome.css":2.10-2.14: error: CSS: “widht”: Property “widht” doesn't exist.</pre>
+<p>"Valores negativos não são permitidos" (não existe caixa com largura menor que zero). Em <code>width: 300px 200px;</code>, "valores demais": o <code>width</code> não é atalho de largura e altura, são duas propriedades. E <code>widht</code>, com o <code>h</code> e o <code>t</code> trocados, "não existe". Nos três casos, a caixa fica no tamanho automático.</p>
+</div>
+
+<div class="cenario">
+<strong><code>height: 50%</code> não faz nada (e o validador não reclama)</strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  .pai {
+    border: 2px dashed gray;
+  }
+  .filho {
+    height: 50%;
+    background-color: gold;
+  }
+&lt;/style&gt;
+&lt;div class="pai"&gt;
+  &lt;div class="filho"&gt;Era para ter metade da altura do pai.&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> a faixa dourada com a altura de uma linha, como se o <code>height</code> nem existisse.</p>
+<p><strong>Por quê:</strong> a altura do pai é <code>auto</code>, ou seja, depende da altura do filho. "Metade de algo que depende de mim" não tem resposta, e a regra do CSS manda tratar esse <code>%</code> como <code>auto</code>. O <code>vnu --css</code> não acusa nada: o CSS é válido.</p>
+<p><strong>Como consertar:</strong> dê uma altura de verdade ao pai (<code>height: 300px</code>, por exemplo), ou use outra unidade no filho (<code>min-height: 50vh</code>, metade da altura da janela). Para dividir o espaço entre caixas, <a href="flexbox.html">Flexbox</a> e <a href="grid.html">Grid</a> resolvem melhor.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:.faixa{min-height}=120px,nsrc:\.faixa\s*\{[^}]*[^-]height\s*:\s*120px">
+<p class="try-task"><strong>Missão:</strong> o texto da faixa vaza para fora dela (o fim dele, branco, some no fundo branco da página). Troque a altura fixa por uma altura <strong>mínima</strong> de 120px, para a faixa crescer com o texto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;section class="faixa"&gt;
+  &lt;h2&gt;Encomendas de Natal&lt;/h2&gt;
+  &lt;p&gt;Panetone caseiro, bolo de frutas e cookies decorados. Faça o pedido até o dia 15 de dezembro pelo telefone da lojinha.&lt;/p&gt;
+&lt;/section&gt;
+&lt;p&gt;Próxima seção do site.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.faixa {
+  max-width: 260px;
+  height: 120px;
+  background-color: darkred;
+  color: white;
+  padding: 8px 16px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.faixa {
+  max-width: 260px;
+  min-height: 120px;
+  background-color: darkred;
+  color: white;
+  padding: 8px 16px;
+}
+</pre>
+</div>
+
+<div class="cenario">
+<strong><code>width</code> num <code>&lt;a&gt;</code> ou <code>&lt;span&gt;</code>: nada muda</strong>
+<p><strong>O que você vê:</strong> o link continua do tamanho do texto (seção 6). Também não é erro, e o validador fica calado.</p>
+<p><strong>Como consertar:</strong> <code>display: inline-block;</code> (ou <code>block</code>) no elemento, e o tamanho passa a valer.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>O que faz</th><th>Inicial</th></tr>
+<tr><td><code>width</code></td><td>Largura do conteúdo</td><td><code>auto</code></td></tr>
+<tr><td><code>height</code></td><td>Altura do conteúdo</td><td><code>auto</code></td></tr>
+<tr><td><code>min-width</code> / <code>max-width</code></td><td>Largura mínima / máxima</td><td><code>auto</code> / <code>none</code></td></tr>
+<tr><td><code>min-height</code> / <code>max-height</code></td><td>Altura mínima / máxima</td><td><code>auto</code> / <code>none</code></td></tr>
+<tr><td><code>%</code> no <code>width</code></td><td colspan="2">Da largura do pai</td></tr>
+<tr><td><code>%</code> no <code>height</code></td><td colspan="2">Da altura do pai, <strong>se</strong> ela for definida; senão, vira <code>auto</code></td></tr>
+<tr><td>Valores aceitos</td><td colspan="2"><code>auto</code>, tamanhos ≥ 0 (<code>px</code>, <code>rem</code>, <code>%</code>, <code>ch</code>, <code>vw</code>…), <code>fit-content</code>, <code>min-content</code>, <code>max-content</code></td></tr>
+<tr><td>Em elementos em linha</td><td colspan="2">Ignorados (menos em imagens); use <code>display: inline-block</code></td></tr>
+<tr><td>Herdado?</td><td colspan="2">Não</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. No máximo</h3>
+<p>Complete para o texto ter <strong>no máximo</strong> 600px de largura:</p>
+<div class="ex-code">.artigo { <input data-answer="max-width" aria-label="propriedade">: 600px; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Pelo menos</h3>
+<p>Complete para a faixa ter <strong>pelo menos</strong> 200px de altura e crescer se o texto precisar:</p>
+<div class="ex-code">.faixa { <input data-answer="min-height" aria-label="propriedade">: 200px; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. A imagem que não passa do pai</h3>
+<p>Complete o valor:</p>
+<div class="ex-code">img { max-width: <input data-answer="100%" aria-label="valor">; height: auto; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Um <code>&lt;div&gt;</code> sem <code>width</code> nem <code>height</code>. Qual o tamanho dele?</p>
+<label><input type="radio" name="q4"> 0 × 0: fica invisível</label>
+<label><input type="radio" name="q4"> 100 × 100px</label>
+<label><input type="radio" name="q4"> Toda a largura do pai, e a altura do conteúdo</label>
+<label><input type="radio" name="q4"> A largura do texto, e a altura da tela</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. A caixa tem <code>height: 80px</code> e um texto de dez linhas. O que acontece?</p>
+<label><input type="radio" name="q5"> A caixa fica com 80px e o texto vaza por baixo dela</label>
+<label><input type="radio" name="q5"> A caixa cresce até caber o texto</label>
+<label><input type="radio" name="q5"> O texto diminui para caber</label>
+<label><input type="radio" name="q5"> O navegador mostra um erro</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. A Ana pôs <code>width: 200px</code> num <code>&lt;a class="botao"&gt;</code> e nada mudou. Por quê?</p>
+<label><input type="radio" name="q6"> Faltou a unidade</label>
+<label><input type="radio" name="q6"> Links não aceitam CSS</label>
+<label><input type="radio" name="q6"> Precisa de <code>!important</code></label>
+<label><input type="radio" name="q6"> O <code>&lt;a&gt;</code> é em linha; precisa de <code>display: inline-block</code></label>
+</div>
+
+<h3>Missão final: o cartão do produto</h3>
+
+<div class="tryhtml" data-goal="css:.cartao{max-width}=280px,css:.cartao img{max-width}=100%,src:\.cartao img\s*\{[^}]*height\s*:\s*auto,css:.selo{display}=inline-block,css:.selo{width}=120px">
+<p class="try-task"><strong>Missão:</strong> arrume os tamanhos do cartão. (1) O <code>.cartao</code> com largura <strong>máxima</strong> de <code>280px</code>. (2) A imagem com <code>max-width: 100%</code> e <code>height: auto</code>, para caber no cartão sem deformar. (3) O <code>.selo</code> é um <code>span</code>: ponha <code>display: inline-block</code> para o <code>width: 120px</code> dele passar a valer.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="400" height="300"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;span class="selo"&gt;Mais vendido&lt;/span&gt;
+  &lt;p&gt;R$ 35,00&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  background-color: oldlace;
+  border: 2px solid peru;
+  padding: 12px;
+}
+
+.selo {
+  width: 120px;
+  text-align: center;
+  background-color: saddlebrown;
+  color: white;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  max-width: 280px;
+  background-color: oldlace;
+  border: 2px solid peru;
+  padding: 12px;
+}
+
+.cartao img {
+  max-width: 100%;
+  height: auto;
+}
+
+.selo {
+  display: inline-block;
+  width: 120px;
+  text-align: center;
+  background-color: saddlebrown;
+  color: white;
+}
+</pre>
+</div>
+
+<p>O <code>max-width: 280px</code> vale para o <strong>conteúdo</strong> do cartão (o padding fica por fora, seção 7). A imagem encolhe de 400px para 280px de largura, e o <code>height: auto</code> recalcula a altura de 300px para 210px, mantendo a proporção.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Sem tamanho (<code>auto</code>), um bloco ocupa toda a largura do pai e tem a altura do conteúdo. Quase sempre é o melhor.</li>
+  <li><code>width</code> e <code>height</code> fixam o tamanho do conteúdo, em <code>px</code>, <code>%</code> (do pai), <code>rem</code>, <code>ch</code>, <code>vw</code>…</li>
+  <li>Prefira os limites: <code>max-width</code> para textos, cartões e imagens (<code>max-width: 100%</code>); <code>min-height</code> no lugar de <code>height</code> em caixas com texto.</li>
+  <li>Uma altura fixa pequena faz o texto vazar. <code>height: 50%</code> só funciona se o pai tiver altura definida.</li>
+  <li>Em elementos em linha (<code>span</code>, <code>a</code>), <code>width</code> e <code>height</code> são ignorados; use <code>inline-block</code>.</li>
+  <li>Padding e borda são somados ao <code>width</code> (até a próxima aula, <a href="box-sizing.html">box-sizing</a>).</li>
+  <li>Erros: número sem unidade, negativo, dois valores, <code>widht</code>. Em todos, o navegador ignora a declaração.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
