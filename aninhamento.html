@@ -47,12 +47,12 @@
 <p>Primeiro, o CSS do cartão escrito do jeito que você já conhece, com cada seletor completo:</p>
 
 <pre class="file" data-file="style.css (sem aninhar)">.receita {
-  border: 2px solid tomato;
+  border: 2px solid firebrick;
   padding: 16px;
 }
 
 .receita h2 {
-  color: tomato;
+  color: firebrick;
 }
 
 .receita p {
@@ -63,11 +63,11 @@
 <p>Agora o mesmo, aninhado:</p>
 
 <pre class="file" data-file="style.css (aninhado)">.receita {
-  border: 2px solid tomato;
+  border: 2px solid firebrick;
   padding: 16px;
 
   h2 {
-    color: tomato;
+    color: firebrick;
   }
 
   p {
@@ -87,11 +87,11 @@
 &lt;h2&gt;Fora do cartão&lt;/h2&gt;
 </pre>
 <pre class="script" data-file="style.css">.receita {
-  border: 2px solid tomato;
+  border: 2px solid firebrick;
   padding: 16px;
 
   h2 {
-    color: tomato;
+    color: firebrick;
   }
 
   p {
@@ -101,7 +101,7 @@
 </pre>
 </div>
 
-<p>O título de dentro do cartão fica <code>tomato</code>; o "Fora do cartão", não, porque está fora do <code>.receita</code>. É a regra <code>.receita h2</code>, só que escrita dentro.</p>
+<p>O título de dentro do cartão fica <code>firebrick</code>; o "Fora do cartão", não, porque está fora do <code>.receita</code>. É a regra <code>.receita h2</code>, só que escrita dentro.</p>
 
 <dl class="anatomy">
   <dt>.receita {</dt><dd>A regra de fora, a "mãe". Abre as chaves normalmente.</dd>
@@ -110,8 +110,8 @@
   <dt>}</dt><dd>A última chave fecha a mãe. Cada <code>{</code> precisa do seu <code>}</code>: com o recuo de 2 espaços por nível, dá para conferir de olho.</dd>
 </dl>
 
-<div class="tryhtml" data-goal="css:.receita h2{color}=rgb(255, 99, 71),src:\.receita\s*\{[^}]*h2\s*\{,nsrc:\.receita\s+h2">
-<p class="try-task"><strong>Missão:</strong> reescreva a regra <code>.receita h2</code> <strong>dentro</strong> da regra <code>.receita</code>, aninhada. O título tem de continuar <code>tomato</code>.</p>
+<div class="tryhtml" data-goal="css:.receita h2{color}=rgb(178, 34, 34),src:\.receita\s*\{[^}]*h2\s*\{,nsrc:\.receita\s+h2">
+<p class="try-task"><strong>Missão:</strong> reescreva a regra <code>.receita h2</code> <strong>dentro</strong> da regra <code>.receita</code>, aninhada. O título tem de continuar <code>firebrick</code>.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;article class="receita"&gt;
   &lt;h2&gt;Torta de limão&lt;/h2&gt;
@@ -119,20 +119,20 @@
 &lt;/article&gt;
 </pre>
 <pre class="script" data-file="style.css">.receita {
-  border: 2px solid tomato;
+  border: 2px solid firebrick;
   padding: 16px;
 }
 
 .receita h2 {
-  color: tomato;
+  color: firebrick;
 }
 </pre>
 <pre class="solucao" data-file="style.css">.receita {
-  border: 2px solid tomato;
+  border: 2px solid firebrick;
   padding: 16px;
 
   h2 {
-    color: tomato;
+    color: firebrick;
   }
 }
 </pre>
@@ -145,7 +145,7 @@
 
 <pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
   .receita {
-    border: 2px solid tomato;
+    border: 2px solid firebrick;
     padding: 8px 16px;
     margin-bottom: 8px;
     font-family: sans-serif;
@@ -173,7 +173,7 @@
 &lt;/article&gt;
 </pre>
 
-<p>Os dois cartões têm a borda <code>tomato</code> e o tempo em cinza; o segundo, que também tem a classe <code>destaque</code>, ganhou a borda bem mais grossa. Passe o mouse em cima de um cartão: o fundo fica rosado.</p>
+<p>Os dois cartões têm a borda <code>firebrick</code> e o tempo em cinza; o segundo, que também tem a classe <code>destaque</code>, ganhou a borda bem mais grossa. Passe o mouse em cima de um cartão: o fundo fica rosado.</p>
 
 <div class="table-wrap">
 <table class="ref">
@@ -209,20 +209,20 @@
 }
 </pre>
 
-<p>É o mesmo que <code>@media (min-width: 600px) { .receita { padding: 32px; } }</code>. A vantagem: tudo o que muda o <code>.receita</code>, em qualquer tamanho de tela, fica junto. Experimente: o quadro do editor é estreito; clique em ↗ para abrir o resultado numa aba nova, larga, e veja o espaço interno crescer e a cor da borda mudar.</p>
+<p>É o mesmo que <code>@media (min-width: 600px) { .receita { padding: 32px; } }</code>. A vantagem: tudo o que muda o <code>.receita</code>, em qualquer tamanho de tela, fica junto. Experimente: numa tela de computador, o quadro tem mais de 600 pixels: a borda é azul-marinho e o espaço interno, grande. Clique em <strong>375</strong>, na barra do quadro: abaixo de 600 pixels, o espaço interno encolhe e a borda volta a ser <code>firebrick</code>. O botão <strong>cheia</strong> volta à largura da coluna.</p>
 
 <div class="tryhtml">
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;article class="receita"&gt;
   &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
-  &lt;p&gt;Abra numa aba larga (↗) e compare.&lt;/p&gt;
+  &lt;p&gt;Troque a largura do quadro (375 · cheia) e compare.&lt;/p&gt;
 &lt;/article&gt;
 </pre>
 <pre class="script" data-file="style.css">.receita {
-  border: 4px solid tomato;
+  border: 4px solid firebrick;
   padding: 8px;
 
-  @media (min-width: 900px) {
+  @media (min-width: 600px) {
     border-color: navy;
     padding: 48px;
   }
@@ -265,7 +265,7 @@
 <pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
   .receita, #receita-do-dia {
     p {
-      color: tomato;
+      color: firebrick;
     }
   }
 
@@ -278,7 +278,7 @@
 &lt;/div&gt;
 </pre>
 
-<p>O texto ficou <code>tomato</code>, e não <code>navy</code>. A regra aninhada vira <code>:is(.receita, #receita-do-dia) p</code>, que conta como um ID e um elemento (1, 0, 1), e ganha da <code>.receita p.tempo</code> (0, 2, 1), mesmo vindo antes. Por extenso, <code>.receita p, #receita-do-dia p</code>, a parte da classe teria só (0, 1, 1) e perderia. Mais um motivo para não usar ID em estilo.</p>
+<p>O texto ficou <code>firebrick</code>, e não <code>navy</code>. A regra aninhada vira <code>:is(.receita, #receita-do-dia) p</code>, que conta como um ID e um elemento (1, 0, 1), e ganha da <code>.receita p.tempo</code> (0, 2, 1), mesmo vindo antes. Por extenso, <code>.receita p, #receita-do-dia p</code>, a parte da classe teria só (0, 1, 1) e perderia. Mais um motivo para não usar ID em estilo.</p>
 
 <hr>
 
@@ -326,7 +326,7 @@
     color: navy;
 
     &amp;__titulo {
-      color: tomato;
+      color: firebrick;
     }
   }
 &lt;/style&gt;
@@ -334,7 +334,7 @@
   &lt;h2 class="receita__titulo"&gt;Bolo de cenoura&lt;/h2&gt;
 &lt;/div&gt;
 </pre>
-<p>O título fica azul-marinho (o <code>navy</code> herdado do <code>.receita</code>), e não <code>tomato</code>: o navegador jogou fora a regra <code>&amp;__titulo</code> inteira. Para ele, <code>__titulo</code> grudado no <code>&amp;</code> é um nome de elemento depois de outro seletor, e isso não é permitido. O validador:</p>
+<p>O título fica azul-marinho (o <code>navy</code> herdado do <code>.receita</code>), e não <code>firebrick</code>: o navegador jogou fora a regra <code>&amp;__titulo</code> inteira. Para ele, <code>__titulo</code> grudado no <code>&amp;</code> é um nome de elemento depois de outro seletor, e isso não é permitido. O validador:</p>
 <pre class="term" data-cwd="~/ninho">$ vnu --css bem.css
 "file:/home/ana/ninho/bem.css":4.4-4.4: error: CSS: Parse Error.</pre>
 <p>"Erro de leitura", na linha 4, a do <code>}</code> que fecha a regra quebrada.</p>
@@ -349,7 +349,7 @@
     color: navy
 
     h2 {
-      color: tomato;
+      color: firebrick;
     }
 
     p {
@@ -362,7 +362,7 @@
   &lt;p&gt;50 minutos&lt;/p&gt;
 &lt;/div&gt;
 </pre>
-<p>O título fica <strong>preto</strong>: perdeu o <code>tomato</code> e também o <code>navy</code>. Só o parágrafo ficou verde. Sem o <code>;</code>, o navegador leu <code>color: navy h2 { color: tomato; }</code> como <strong>uma</strong> declaração só, com um valor sem sentido, e jogou tudo fora. A regra do <code>p</code>, que vem depois, sobreviveu.</p>
+<p>O título fica <strong>preto</strong>: perdeu o <code>firebrick</code> e também o <code>navy</code>. Só o parágrafo ficou verde. Sem o <code>;</code>, o navegador leu <code>color: navy h2 { color: firebrick; }</code> como <strong>uma</strong> declaração só, com um valor sem sentido, e jogou tudo fora. A regra do <code>p</code>, que vem depois, sobreviveu.</p>
 <pre class="term" data-cwd="~/ninho">$ vnu --css sem-ponto-virgula.css
 "file:/home/ana/ninho/sem-ponto-virgula.css":6.4-6.4: error: CSS: Parse Error.</pre>
 <p><strong>Como consertar:</strong> <code>color: navy;</code>. O <code>;</code> sempre, até na última declaração: no CSS aninhado, ele separa a declaração da regra que vem embaixo.</p>
@@ -423,8 +423,8 @@
 </div>
 
 <div class="mc" data-answer="3">
-<p class="mc-q">4. A Ana escreveu <code>.receita { color: navy  h2 { color: tomato; } }</code>, sem o <code>;</code> depois de <code>navy</code>. O que acontece?</p>
-<label><input type="radio" name="q4"> Só o <code>navy</code> some; o <code>h2</code> fica <code>tomato</code></label>
+<p class="mc-q">4. A Ana escreveu <code>.receita { color: navy  h2 { color: firebrick; } }</code>, sem o <code>;</code> depois de <code>navy</code>. O que acontece?</p>
+<label><input type="radio" name="q4"> Só o <code>navy</code> some; o <code>h2</code> fica <code>firebrick</code></label>
 <label><input type="radio" name="q4"> O navegador põe o <code>;</code> sozinho</label>
 <label><input type="radio" name="q4"> O <code>navy</code> e a regra do <code>h2</code> somem juntos</label>
 <label><input type="radio" name="q4"> A página inteira fica sem estilo</label>
@@ -453,7 +453,7 @@
 &lt;/article&gt;
 </pre>
 <pre class="script" data-file="style.css">.produto {
-  border: 2px solid tomato;
+  border: 2px solid firebrick;
   border-radius: 8px;
   padding: 8px 16px;
   margin-bottom: 12px;
@@ -461,7 +461,7 @@
 }
 </pre>
 <pre class="solucao" data-file="style.css">.produto {
-  border: 2px solid tomato;
+  border: 2px solid firebrick;
   border-radius: 8px;
   padding: 8px 16px;
   margin-bottom: 12px;
