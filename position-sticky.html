@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS position: sticky — gruda ao rolar a página | Guia CSS</title>
+<meta name="description" content="position: sticky em CSS para quem está começando: o elemento que rola normalmente e gruda ao chegar no topo, o top obrigatório, o limite do pai, títulos de seção que se empurram, sticky dentro de uma caixa que rola, bottom: 0, o overflow: hidden que impede de grudar e a mensagem real do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">position: sticky</span></h1>
+
+<p class="intro">Em muitos sites, o menu fica no lugar dele, abaixo do logo, mas, quando você rola a página e ele chega no alto da tela, ele <strong>gruda</strong> ali e passa a acompanhar a leitura. Isso é o <code>position: sticky</code> (<em>sticky</em> = "grudento"): um meio-termo entre a posição normal e a fixa. Nesta aula você vai grudar o menu do site da Ana, fazer os títulos das categorias de receita se empurrarem enquanto a página rola, grudar o cabeçalho de uma tabela e entender por que, às vezes, o <code>sticky</code> simplesmente não gruda.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que <code>position: sticky</code> faz: rolar normalmente e grudar ao chegar num ponto.</li>
+  <li>Por que o <code>top</code> (ou outro lado) é obrigatório.</li>
+  <li>O limite do elemento grudento: ele nunca sai de dentro do pai.</li>
+  <li>Títulos de seção que se empurram, como numa agenda.</li>
+  <li>Grudar dentro de uma caixa que rola (o cabeçalho de uma tabela) e grudar embaixo, com <code>bottom</code>.</li>
+  <li>Os três motivos de um <code>sticky</code> não grudar e a mensagem do validador.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador. Para ver o <code>sticky</code>, <strong>role cada quadro</strong> com a rodinha do mouse ou com o dedo. Se você ainda não viu o <code>fixed</code>, comece pela aula anterior, <a href="position-fixed.html">position: fixed</a>: esta aula compara os dois o tempo todo.</p>
+
+<hr>
+
+<h2>A ideia: o título do capítulo</h2>
+<p>Pense num livro de receitas aberto num aplicativo de leitura. Enquanto você lê o capítulo "Bolos", o título "Bolos" fica no alto da tela, para você saber onde está. Quando chega o capítulo "Doces", o título novo sobe e <strong>empurra</strong> o antigo para fora. Antes de você chegar a ele, o título "Doces" era só mais uma linha da página.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>No livro</th><th>Na página</th></tr>
+<tr><td>O título, antes de você chegar a ele, é uma linha como as outras</td><td>O elemento <code>sticky</code> ocupa o seu lugar no fluxo, como um elemento normal</td></tr>
+<tr><td>Ao chegar no alto da tela, o título fica parado ali</td><td>Ao chegar a <code>top: 0</code>, o elemento gruda na borda da janela</td></tr>
+<tr><td>O título só fica enquanto dura o capítulo</td><td>O elemento só gruda enquanto o <strong>pai</strong> dele está na tela</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. O primeiro elemento grudento: o menu</h2>
+<p>O menu da Ana fica abaixo da apresentação. Role o resultado devagar e observe a barra azul:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> role o resultado. O menu sobe junto com o texto até encostar no alto do quadro, e daí em diante fica grudado ali. Role de volta para cima: ele "desgruda" e volta para o lugar dele, abaixo da apresentação. Depois troque <code>sticky</code> por <code>fixed</code> e compare.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Receitas testadas na minha cozinha, do jeito que eu faço.&lt;/p&gt;
+&lt;nav class="menu"&gt;Bolos · Doces · Salgados&lt;/nav&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p&gt;Bata no liquidificador 3 cenouras, 3 ovos e 1 xícara de óleo. Misture com 2 xícaras de açúcar e 2 de farinha.&lt;/p&gt;
+&lt;h2&gt;Pão de queijo&lt;/h2&gt;
+&lt;p&gt;Escalde o polvilho com leite e óleo quentes. Junte os ovos e o queijo, faça bolinhas e asse.&lt;/p&gt;
+&lt;h2&gt;Brigadeiro&lt;/h2&gt;
+&lt;p&gt;Leve ao fogo o leite condensado, o chocolate e a manteiga, mexendo até desgrudar da panela.&lt;/p&gt;
+&lt;h2&gt;Bolo de fubá&lt;/h2&gt;
+&lt;p&gt;Bata os ovos, o leite, o óleo, o açúcar e o fubá. Por último, o fermento. Asse por 40 minutos.&lt;/p&gt;
+&lt;h2&gt;Cuscuz&lt;/h2&gt;
+&lt;p&gt;Hidrate a flocão com água e sal, coloque na cuscuzeira e cozinhe no vapor por 10 minutos.&lt;/p&gt;
+&lt;h2&gt;Pudim&lt;/h2&gt;
+&lt;p&gt;Faça a calda com açúcar, bata o leite condensado, o leite e os ovos e asse em banho-maria.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu {
+  position: sticky;
+  top: 0;
+  background-color: navy;
+  color: white;
+  padding: 12px;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>position: sticky;</dt><dd>Deixa o elemento no fluxo, como um elemento normal, mas permite que ele <strong>grude</strong> quando a rolagem o leva até um ponto.</dd>
+  <dt>top: 0;</dt><dd>O ponto onde ele gruda: a <strong>zero pixels da borda de cima</strong> da janela. Com <code>top: 20px</code>, ele grudaria um pouco abaixo da borda. Sem um <code>top</code> (ou <code>bottom</code>, <code>left</code>, <code>right</code>), o <code>sticky</code> não tem onde grudar e não faz nada.</dd>
+  <dt>background-color: navy;</dt><dd>Não é obrigatório, mas quase sempre necessário: o texto da página passa <strong>por baixo</strong> do elemento grudado. Sem fundo, as letras dos dois se misturariam.</dd>
+</dl>
+
+<p>Repare na diferença para o <code>fixed</code> da aula anterior:</p>
+<ul>
+  <li>O menu é <strong>largo</strong>, de lado a lado do conteúdo, como qualquer bloco: o <code>sticky</code> não encolhe o elemento.</li>
+  <li>Ninguém fica escondido embaixo dele no começo: ele <strong>ocupa o seu espaço</strong> na página. Não precisa de <code>padding-top</code> no <code>body</code>.</li>
+  <li>Com <code>fixed</code> (se você fez a troca), o menu sai do fluxo e pula para o alto do quadro desde o começo, por cima do título "Receitas da Ana"; ele encolhe para o tamanho do texto, e a apresentação e as receitas sobem para o lugar que era dele.</li>
+</ul>
+
+<div class="note">
+<strong>No editor do guia</strong>
+<p>Cada resultado é um quadro separado, que funciona como uma janela pequena: o elemento gruda no alto <strong>do quadro</strong>. O quadro cresce com o conteúdo até um limite e, a partir dele, ganha a própria rolagem.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:.categorias{position}=sticky,css:.categorias{top}=0px">
+<p class="try-task"><strong>Missão:</strong> a barra de categorias da lojinha da Ana deve grudar no alto do quadro quando a rolagem chegar nela. Faça isso com <code>position</code> e <code>top: 0</code>, e role o resultado para conferir.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;p&gt;Bolos e doces por encomenda. Entrega no bairro.&lt;/p&gt;
+&lt;nav class="categorias"&gt;Bolos · Tortas · Docinhos · Salgados&lt;/nav&gt;
+&lt;h2&gt;Bolo de cenoura com chocolate&lt;/h2&gt;
+&lt;p&gt;Massa fofinha e cobertura de brigadeiro. Serve 12 fatias. R$ 45,00.&lt;/p&gt;
+&lt;h2&gt;Torta de limão&lt;/h2&gt;
+&lt;p&gt;Base crocante, creme de limão e merengue maçaricado. R$ 60,00.&lt;/p&gt;
+&lt;h2&gt;Brigadeiros (cento)&lt;/h2&gt;
+&lt;p&gt;Tradicional, com granulado de chocolate. R$ 110,00.&lt;/p&gt;
+&lt;h2&gt;Coxinhas (cento)&lt;/h2&gt;
+&lt;p&gt;Massa de batata e recheio de frango com requeijão. R$ 90,00.&lt;/p&gt;
+&lt;h2&gt;Bolo de fubá&lt;/h2&gt;
+&lt;p&gt;Com erva-doce, do jeito da vó. R$ 35,00.&lt;/p&gt;
+&lt;h2&gt;Pudim&lt;/h2&gt;
+&lt;p&gt;Pudim de leite condensado, com calda de caramelo. R$ 40,00.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.categorias {
+  background-color: darkslateblue;
+  color: white;
+  padding: 12px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.categorias {
+  position: sticky;
+  top: 0;
+  background-color: darkslateblue;
+  color: white;
+  padding: 12px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. O limite: o pai</h2>
+<p>Aqui está a regra que mais confunde: um elemento <code>sticky</code> <strong>só gruda enquanto o pai dele está na tela</strong>. Quando o fim do pai sobe, ele leva o elemento grudado junto. É o "o título só fica enquanto dura o capítulo".</p>
+<p>Isso, que parece uma limitação, permite um efeito muito usado: títulos de seção que se empurram. Cada categoria do site da Ana é uma <code>&lt;section&gt;</code> com um título <code>&lt;h2&gt;</code> grudento:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> role devagar. O título "Bolos" gruda no alto. Quando a seção "Doces" chega, o título dela empurra "Bolos" para fora e gruda no lugar. Depois vem "Salgados". O "Pães" não chega a grudar: a página termina antes de ele alcançar o alto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;section&gt;
+  &lt;h2&gt;Bolos&lt;/h2&gt;
+  &lt;p&gt;Bolo de cenoura com cobertura de chocolate.&lt;/p&gt;
+  &lt;p&gt;Bolo de fubá com erva-doce.&lt;/p&gt;
+  &lt;p&gt;Bolo de laranja com calda.&lt;/p&gt;
+  &lt;p&gt;Bolo de milho cremoso.&lt;/p&gt;
+  &lt;p&gt;Bolo de chocolate com morango.&lt;/p&gt;
+  &lt;p&gt;Bolo de banana com canela.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section&gt;
+  &lt;h2&gt;Doces&lt;/h2&gt;
+  &lt;p&gt;Brigadeiro de panela.&lt;/p&gt;
+  &lt;p&gt;Pudim de leite condensado.&lt;/p&gt;
+  &lt;p&gt;Doce de leite caseiro.&lt;/p&gt;
+  &lt;p&gt;Cocada branca.&lt;/p&gt;
+  &lt;p&gt;Beijinho de coco.&lt;/p&gt;
+  &lt;p&gt;Quindim.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section&gt;
+  &lt;h2&gt;Salgados&lt;/h2&gt;
+  &lt;p&gt;Pão de queijo mineiro.&lt;/p&gt;
+  &lt;p&gt;Coxinha de frango.&lt;/p&gt;
+  &lt;p&gt;Empadinha de palmito.&lt;/p&gt;
+  &lt;p&gt;Esfiha de carne.&lt;/p&gt;
+  &lt;p&gt;Pastel de queijo.&lt;/p&gt;
+  &lt;p&gt;Quibe frito.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section&gt;
+  &lt;h2&gt;Pães&lt;/h2&gt;
+  &lt;p&gt;Pão de batata.&lt;/p&gt;
+  &lt;p&gt;Pão de leite.&lt;/p&gt;
+  &lt;p&gt;Pão integral.&lt;/p&gt;
+  &lt;p&gt;Rosca de coco.&lt;/p&gt;
+  &lt;p&gt;Pão de mel.&lt;/p&gt;
+  &lt;p&gt;Broa de milho.&lt;/p&gt;
+&lt;/section&gt;
+</pre>
+<pre class="script" data-file="style.css">h2 {
+  position: sticky;
+  top: 0;
+  margin: 0;
+  padding: 8px;
+  background-color: wheat;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>h2 { position: sticky; top: 0; }</dt><dd>Cada título gruda no alto, mas só <strong>dentro da sua <code>&lt;section&gt;</code></strong>. Quando o fim da seção "Bolos" sobe, o título "Bolos" sobe com ela, e o título "Doces", que vem logo depois, chega ao topo e gruda.</dd>
+  <dt>margin: 0;</dt><dd>Tira a margem padrão do <code>h2</code>, para a faixa grudada encostar mesmo na borda e os títulos ficarem colados ao texto.</dd>
+</dl>
+
+<p>É o mesmo efeito da lista de contatos do celular, com as letras A, B, C acompanhando a rolagem.</p>
+
+<hr>
+
+<h2>3. Grudar dentro de uma caixa que rola</h2>
+<p>O elemento <code>sticky</code> gruda na borda da <strong>caixa que rola mais próxima</strong>. Normalmente é a janela. Mas, se um ancestral tem altura limitada e <code>overflow: auto</code> (aula <a href="overflow.html">overflow</a>), ele vira uma caixa com barra de rolagem própria, e o <code>sticky</code> gruda nela.</p>
+<p>O uso clássico é o cabeçalho de uma tabela comprida: a tabela de preços da lojinha fica numa caixa de 200&nbsp;px de altura, e a linha dos títulos acompanha a rolagem da caixa.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> role <strong>dentro</strong> da caixa da tabela, e não o quadro. A linha "Produto / Preço" fica grudada no alto da caixa enquanto os produtos passam por baixo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Tabela de preços&lt;/h1&gt;
+&lt;div class="rolagem"&gt;
+  &lt;table&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;&lt;th&gt;Produto&lt;/th&gt;&lt;th&gt;Preço&lt;/th&gt;&lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;tr&gt;&lt;td&gt;Bolo de cenoura&lt;/td&gt;&lt;td&gt;R$ 45,00&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Bolo de fubá&lt;/td&gt;&lt;td&gt;R$ 35,00&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Torta de limão&lt;/td&gt;&lt;td&gt;R$ 60,00&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Pudim&lt;/td&gt;&lt;td&gt;R$ 40,00&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Brigadeiros (cento)&lt;/td&gt;&lt;td&gt;R$ 110,00&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Beijinhos (cento)&lt;/td&gt;&lt;td&gt;R$ 110,00&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Coxinhas (cento)&lt;/td&gt;&lt;td&gt;R$ 90,00&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Empadinhas (cento)&lt;/td&gt;&lt;td&gt;R$ 95,00&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Pão de queijo (kg)&lt;/td&gt;&lt;td&gt;R$ 50,00&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Cocada (unidade)&lt;/td&gt;&lt;td&gt;R$ 6,00&lt;/td&gt;&lt;/tr&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.rolagem {
+  height: 200px;
+  overflow: auto;
+  border: 1px solid gray;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  background-color: moccasin;
+}
+
+th,
+td {
+  padding: 6px 12px;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>.rolagem { height: 200px; overflow: auto; }</dt><dd>Uma caixa de altura fixa que ganha barra de rolagem quando o conteúdo não cabe. É ela a "janela" do <code>sticky</code> aqui.</dd>
+  <dt>th { position: sticky; top: 0; }</dt><dd>Cada célula de título (<code>&lt;th&gt;</code>) gruda no alto da caixa. O pai delas é a tabela inteira, então elas ficam grudadas até a última linha.</dd>
+</dl>
+
+<h3>Grudar embaixo: <code>bottom</code></h3>
+<p>O <code>sticky</code> funciona com qualquer lado. Com <code>bottom: 0</code>, o elemento gruda na borda de <strong>baixo</strong> enquanto o lugar dele ainda não apareceu, e volta ao lugar normal quando a rolagem chega nele. Serve, por exemplo, para o total de um pedido longo:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> antes de rolar, a faixa "Total" já aparece grudada embaixo do quadro, apesar de estar no fim do código. Role até o fim: ela "pousa" no lugar dela, depois do último item.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Seu pedido&lt;/h1&gt;
+&lt;section class="pedido"&gt;
+  &lt;p&gt;1 bolo de cenoura com chocolate — R$ 45,00&lt;/p&gt;
+  &lt;p&gt;1 torta de limão — R$ 60,00&lt;/p&gt;
+  &lt;p&gt;50 brigadeiros — R$ 55,00&lt;/p&gt;
+  &lt;p&gt;50 beijinhos — R$ 55,00&lt;/p&gt;
+  &lt;p&gt;100 coxinhas — R$ 90,00&lt;/p&gt;
+  &lt;p&gt;100 empadinhas — R$ 95,00&lt;/p&gt;
+  &lt;p&gt;1 kg de pão de queijo — R$ 50,00&lt;/p&gt;
+  &lt;p&gt;10 cocadas — R$ 60,00&lt;/p&gt;
+  &lt;p&gt;1 pudim — R$ 40,00&lt;/p&gt;
+  &lt;p&gt;1 bolo de fubá — R$ 35,00&lt;/p&gt;
+  &lt;p&gt;1 bolo de laranja — R$ 35,00&lt;/p&gt;
+  &lt;p&gt;30 pastéis de queijo — R$ 75,00&lt;/p&gt;
+  &lt;p&gt;1 quindim grande — R$ 50,00&lt;/p&gt;
+  &lt;p&gt;2 kg de broa de milho — R$ 40,00&lt;/p&gt;
+  &lt;p&gt;20 sonhos — R$ 120,00&lt;/p&gt;
+  &lt;p class="total"&gt;Total: R$ 905,00&lt;/p&gt;
+&lt;/section&gt;
+</pre>
+<pre class="script" data-file="style.css">.total {
+  position: sticky;
+  bottom: 0;
+  margin: 0;
+  padding: 12px;
+  background-color: seagreen;
+  color: white;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Sticky ou fixed?</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th><code>position: sticky</code></th><th><code>position: fixed</code></th></tr>
+<tr><td>Ocupa espaço no fluxo</td><td>Sim: nada fica escondido no começo</td><td>Não: precisa de <code>padding</code> no <code>body</code></td></tr>
+<tr><td>Largura</td><td>A de um bloco normal</td><td>Encolhe; precisa de <code>left: 0; right: 0;</code></td></tr>
+<tr><td>Quando gruda</td><td>Só quando a rolagem chega no ponto (<code>top: 0</code>)</td><td>Sempre, desde o começo</td></tr>
+<tr><td>Limite</td><td>Só dentro do pai</td><td>Nenhum: a janela inteira</td></tr>
+<tr><td>Funciona dentro de uma caixa que rola</td><td>Sim, gruda na caixa</td><td>Não: sempre na janela</td></tr>
+<tr><td>Use para</td><td>Menu abaixo de um logo, títulos de seção, cabeçalho de tabela</td><td>Botão flutuante no canto, aviso que nunca sai da tela</td></tr>
+</table>
+</div>
+
+<div class="tip">
+<strong>Link para um título e a barra grudada</strong>
+<p>Com um menu grudado no topo, um link <code>href="#pudim"</code> leva o título "Pudim" para o alto da janela, exatamente atrás do menu. A solução é a propriedade <code>scroll-padding-top</code>, explicada na aula <a href="scroll.html">Rolagem Suave e scroll-snap</a>.</p>
+</div>
+
+<div class="note">
+<strong>Suporte dos navegadores</strong>
+<p>O <code>position: sticky</code> funciona em todos os navegadores atuais (Chrome, Edge, Firefox e Safari, inclusive no celular). Em códigos antigos você pode encontrar <code>position: -webkit-sticky;</code>, uma versão com prefixo que versões antigas do Safari pediam. Hoje ela não é mais necessária.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>"O <code>sticky</code> não gruda" é uma das dúvidas mais comuns do CSS. Nenhuma mensagem aparece: o elemento simplesmente rola como um elemento normal. Os culpados quase sempre são estes.</p>
+
+<div class="cenario">
+<strong>Faltou o <code>top</code>: não gruda nunca</strong>
+<pre class="file" data-file="style.css · erro de propósito">.menu {
+  position: sticky;
+  background-color: navy;
+  color: white;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> o menu rola junto com a página, como se não houvesse <code>position</code>.</p>
+<p><strong>Por quê:</strong> o <code>sticky</code> precisa saber <strong>onde</strong> grudar. Sem <code>top</code>, <code>bottom</code>, <code>left</code> ou <code>right</code>, ele se comporta como um elemento comum. O validador não reclama: o código é válido. No F12, a aba de estilos calculados mostra <code>position: sticky</code> e <code>top: auto</code>, a pista do problema.</p>
+<p><strong>Como consertar:</strong> <code>top: 0;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Um ancestral tem <code>overflow: hidden</code></strong>
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o menu tem <code>position: sticky</code> e <code>top: 0</code>, mas rola junto com o texto. Apague a regra <code>.pagina</code> e role de novo. Depois troque <code>hidden</code> por <code>clip</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+  &lt;nav class="menu"&gt;Bolos · Doces · Salgados&lt;/nav&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Bata no liquidificador 3 cenouras, 3 ovos e 1 xícara de óleo. Misture com 2 xícaras de açúcar e 2 de farinha.&lt;/p&gt;
+  &lt;h2&gt;Pão de queijo&lt;/h2&gt;
+  &lt;p&gt;Escalde o polvilho com leite e óleo quentes. Junte os ovos e o queijo, faça bolinhas e asse.&lt;/p&gt;
+  &lt;h2&gt;Brigadeiro&lt;/h2&gt;
+  &lt;p&gt;Leve ao fogo o leite condensado, o chocolate e a manteiga, mexendo até desgrudar da panela.&lt;/p&gt;
+  &lt;h2&gt;Bolo de fubá&lt;/h2&gt;
+  &lt;p&gt;Bata os ovos, o leite, o óleo, o açúcar e o fubá. Por último, o fermento. Asse por 40 minutos.&lt;/p&gt;
+  &lt;h2&gt;Cuscuz&lt;/h2&gt;
+  &lt;p&gt;Hidrate a flocão com água e sal, coloque na cuscuzeira e cozinhe no vapor por 10 minutos.&lt;/p&gt;
+  &lt;h2&gt;Pudim&lt;/h2&gt;
+  &lt;p&gt;Faça a calda com açúcar, bata o leite condensado, o leite e os ovos e asse em banho-maria.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+  overflow: hidden;
+}
+
+.menu {
+  position: sticky;
+  top: 0;
+  background-color: navy;
+  color: white;
+  padding: 12px;
+}
+</pre>
+</div>
+<p><strong>Por quê:</strong> <code>overflow: hidden</code> (e também <code>auto</code> e <code>scroll</code>) transforma a <code>div.pagina</code> numa "caixa que rola", mesmo sem barra de rolagem. O menu passa a grudar no alto <strong>dela</strong>, e não da janela. Como a <code>div</code> não rola (quem rola é a janela), o menu nunca gruda. É comum o <code>overflow: hidden</code> ter sido posto lá longe, num avô, para esconder alguma outra coisa.</p>
+<p><strong>Como achar:</strong> no F12, selecione o elemento grudento e suba pelos ancestrais, olhando o <code>overflow</code> de cada um.</p>
+<p><strong>Como consertar:</strong> tire o <code>overflow: hidden</code>; ou, se ele estava lá para cortar o que transborda, troque por <code>overflow: clip</code> (Chrome 90, Firefox 81 e Safari 16 em diante), que corta igual, mas não cria uma caixa que rola: com ele, o menu volta a grudar.</p>
+</div>
+
+<div class="cenario">
+<strong>O pai é do tamanho do elemento</strong>
+<pre class="file" data-file="index.html · erro de propósito">&lt;header&gt;
+  &lt;nav class="menu"&gt;Bolos · Doces · Salgados&lt;/nav&gt;
+&lt;/header&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+…
+</pre>
+<p><strong>O que o leitor vê:</strong> o menu tem <code>position: sticky; top: 0;</code>, mas rola embora junto com a página.</p>
+<p><strong>Por quê:</strong> o elemento só gruda <strong>dentro do pai</strong> (seção 2). Aqui o pai é o <code>&lt;header&gt;</code>, que contém só o menu e termina logo depois dele. Não sobra espaço para o menu "andar" lá dentro: assim que ele chega no alto, o fim do <code>&lt;header&gt;</code> já o leva embora.</p>
+<p><strong>Como consertar:</strong> ponha o <code>sticky</code> no próprio <code>&lt;header&gt;</code>, que é filho do <code>body</code> (um pai do tamanho da página toda), ou tire o <code>&lt;nav&gt;</code> de dentro dele.</p>
+</div>
+
+<div class="cenario">
+<strong>Erro de digitação: <code>“stiky” is not a “position” value</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.menu {
+  position: stiky;
+  top: 0;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":2.13-2.17: error: CSS: “position”: “stiky” is not a “position” value.</pre>
+<p><strong>O que significa:</strong> "<code>stiky</code> não é um valor de <code>position</code>". O navegador ignora a declaração inteira, o <code>top: 0</code> sozinho não faz nada, e o menu rola com a página. No F12, a declaração aparece riscada.</p>
+<p><strong>Como consertar:</strong> <code>sticky</code>, com <code>c</code> antes do <code>k</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>position: sticky; top: 0;</code></td><td>Rola normalmente e gruda no alto quando chega lá</td></tr>
+<tr><td><code>top: 20px</code></td><td>Gruda 20&nbsp;px abaixo da borda de cima</td></tr>
+<tr><td><code>position: sticky; bottom: 0;</code></td><td>Fica grudado embaixo até a rolagem chegar ao lugar dele</td></tr>
+<tr><td>Limite</td><td>Só gruda enquanto o pai está na tela</td></tr>
+<tr><td>Dentro de <code>overflow: auto</code> com altura</td><td>Gruda na caixa que rola, e não na janela</td></tr>
+<tr><td>Não gruda?</td><td>Falta <code>top</code>; ancestral com <code>overflow: hidden</code>/<code>auto</code>; pai do tamanho do elemento</td></tr>
+<tr><td><code>background-color</code></td><td>Quase sempre necessário: o texto passa por baixo</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O valor</h3>
+<p>Complete para o menu grudar ao chegar no alto:</p>
+<div class="ex-code">.menu { position: <input data-answer="sticky" aria-label="valor">; top: 0; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. O ponto de grudar</h3>
+<p>Complete para o menu grudar encostado na borda de cima:</p>
+<div class="ex-code">.menu { position: sticky; <input data-answer="top" aria-label="propriedade">: 0; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Embaixo</h3>
+<p>Complete para o total grudar na borda de baixo:</p>
+<div class="ex-code">.total { position: sticky; <input data-answer="bottom" aria-label="propriedade">: 0; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Qual é a principal diferença entre <code>sticky</code> e <code>fixed</code>?</p>
+<label><input type="radio" name="q4"> O <code>sticky</code> não aceita <code>top</code></label>
+<label><input type="radio" name="q4"> O <code>fixed</code> ocupa espaço no fluxo; o <code>sticky</code>, não</label>
+<label><input type="radio" name="q4"> O <code>sticky</code> ocupa o seu lugar e só gruda quando a rolagem chega nele, e só dentro do pai</label>
+<label><input type="radio" name="q4"> Nenhuma</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. O menu tem <code>position: sticky; top: 0;</code> mas não gruda. O avô dele tem <code>overflow: hidden</code>. O que fazer?</p>
+<label><input type="radio" name="q5"> Pôr <code>!important</code> no <code>position</code></label>
+<label><input type="radio" name="q5"> Tirar o <code>overflow: hidden</code> do avô (ou trocá-lo por <code>overflow: clip</code>)</label>
+<label><input type="radio" name="q5"> Trocar <code>top: 0</code> por <code>top: 0px</code></label>
+<label><input type="radio" name="q5"> Pôr um <code>z-index</code> no menu</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Títulos <code>h2</code> grudentos, cada um dentro da sua <code>&lt;section&gt;</code>. O que acontece quando a próxima seção chega ao topo?</p>
+<label><input type="radio" name="q6"> O título da seção anterior sobe com o fim dela, e o novo gruda no lugar</label>
+<label><input type="radio" name="q6"> Os dois títulos ficam grudados, um em cima do outro</label>
+<label><input type="radio" name="q6"> O primeiro título fica grudado para sempre</label>
+<label><input type="radio" name="q6"> Nenhum título gruda</label>
+</div>
+
+<h3>Missão final: o cardápio da padaria</h3>
+
+<div class="tryhtml" data-goal="css:th{position}=sticky,css:th{top}=0px,css:th{background-color}=rgb(255, 228, 181)">
+<p class="try-task"><strong>Missão:</strong> o cardápio da padaria fica numa caixa que rola. Faça a linha de títulos (<code>th</code>) grudar no alto da caixa (<code>top: 0</code>) e dê a ela o fundo <code>moccasin</code>, para os itens não aparecerem através dela. Role <strong>dentro</strong> da caixa para conferir.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;div class="cardapio"&gt;
+  &lt;table&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;&lt;th&gt;Item&lt;/th&gt;&lt;th&gt;Preço&lt;/th&gt;&lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;tr&gt;&lt;td&gt;Pão francês (unidade)&lt;/td&gt;&lt;td&gt;R$ 1,00&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Pão de queijo&lt;/td&gt;&lt;td&gt;R$ 3,50&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Pão de batata&lt;/td&gt;&lt;td&gt;R$ 4,00&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Sonho&lt;/td&gt;&lt;td&gt;R$ 6,00&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Fatia de bolo&lt;/td&gt;&lt;td&gt;R$ 7,00&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Coxinha&lt;/td&gt;&lt;td&gt;R$ 6,50&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Café pequeno&lt;/td&gt;&lt;td&gt;R$ 4,00&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Café com leite&lt;/td&gt;&lt;td&gt;R$ 6,00&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Suco de laranja&lt;/td&gt;&lt;td&gt;R$ 8,00&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Pingado&lt;/td&gt;&lt;td&gt;R$ 5,00&lt;/td&gt;&lt;/tr&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cardapio {
+  height: 180px;
+  overflow: auto;
+  border: 1px solid gray;
+}
+
+th,
+td {
+  padding: 6px 12px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cardapio {
+  height: 180px;
+  overflow: auto;
+  border: 1px solid gray;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  background-color: moccasin;
+}
+
+th,
+td {
+  padding: 6px 12px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>position: sticky</code> deixa o elemento no fluxo, ocupando o seu lugar, e o faz <strong>grudar</strong> quando a rolagem o leva até o ponto do <code>top</code> (ou <code>bottom</code>).</li>
+  <li>Sem <code>top</code>, <code>bottom</code>, <code>left</code> ou <code>right</code>, ele não gruda.</li>
+  <li>Ele só gruda enquanto o <strong>pai</strong> está na tela: títulos de seção se empurram, e um pai do tamanho do elemento impede de grudar.</li>
+  <li>Ele gruda na caixa que rola mais próxima: a janela, ou um ancestral com <code>overflow: auto</code> (o cabeçalho da tabela). Um ancestral com <code>overflow: hidden</code> impede de grudar na janela; <code>overflow: clip</code> não atrapalha.</li>
+  <li>Dê um fundo ao elemento grudado: o conteúdo passa por baixo dele.</li>
+  <li>Comparado ao <code>fixed</code>: não encolhe, não esconde o começo da página e respeita o pai. Validador: <code>“stiky” is not a “position” value</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
