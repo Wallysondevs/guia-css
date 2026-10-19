@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS !important — o que faz e por que evitar | Guia CSS</title>
+<meta name="description" content="O !important do CSS para quem nunca escreveu CSS: como ele faz uma declaração passar na frente de todas as normais (até do atributo style), o que acontece quando dois !important brigam, por que ele vira uma corrida sem fim, os poucos usos legítimos e as alternativas, e o que dá errado (no lugar errado, !importante, a herança que não leva o !important), com as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">!important (e Por que Evitar)</span></h1>
+
+<p class="intro">Toda pessoa que aprende CSS descobre, mais cedo ou mais tarde, o "botão de pânico": escrever <code>!important</code> depois de um valor faz aquela declaração ganhar de quase tudo. Funciona na hora. E é por funcionar tão bem que ele causa tanto estrago: cada <code>!important</code> obriga o próximo conserto a ser outro <code>!important</code>. Nesta aula você vai ver o que ele faz de verdade na <a href="cascata.html">cascata</a>, os poucos casos em que ele é a ferramenta certa e o que usar no lugar dele.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Onde se escreve o <code>!important</code> e o que ele faz.</li>
+  <li>Por que ele vence até o atributo <code>style</code>, e o que acontece quando dois <code>!important</code> brigam.</li>
+  <li>A "corrida do <code>!important</code>": por que ele torna o CSS difícil de mudar.</li>
+  <li>Os usos legítimos: CSS de terceiros, <code>style</code> que você não controla, classes utilitárias.</li>
+  <li>As alternativas: especificidade, ordem, <code>:where()</code>, <code>@layer</code>.</li>
+  <li>Os erros: <code>!important</code> no lugar errado, <code>!importante</code> e a herança que não leva o <code>!important</code>.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a fila preferencial</h2>
+<p>No banco, existe a fila normal e a fila preferencial. Quem está na preferencial é atendido antes de <strong>todo mundo</strong> da fila normal, não importa a hora em que chegou. Funciona bem enquanto a preferencial é pequena. Agora imagine que todo mundo descobriu um jeito de entrar nela: a preferencial vira uma segunda fila normal, tão lenta quanto a primeira, e o problema voltou, só que maior.</p>
+<p>O <code>!important</code> é a fila preferencial das declarações. E o CSS com <code>!important</code> em todo lugar é a preferencial lotada.</p>
+
+<hr>
+
+<h2>1. Como se escreve</h2>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> a regra <code>#aviso</code> (um ID!) diz azul-marinho, mas o aviso ficou vermelho-escuro: a declaração com <code>!important</code> passou na frente. Apague o <code>!important</code> e veja o ID ganhar de novo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p id="aviso" class="aviso"&gt;Fechado no feriado.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.aviso {
+  color: darkred !important;
+}
+
+#aviso {
+  color: navy;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>color: darkred</dt><dd>Uma declaração comum: propriedade, dois-pontos, valor.</dd>
+  <dt>!important</dt><dd>Depois do valor e <strong>antes</strong> do <code>;</code>. O <code>!</code> não é "não", como em outras linguagens: aqui ele só marca a palavra <code>important</code> ("importante"). Um espaço entre os dois (<code>! important</code>) também é aceito, mas ninguém escreve assim.</dd>
+  <dt>;</dt><dd>Fecha a declaração, como sempre.</dd>
+</dl>
+
+<p>O <code>!important</code> vale para <strong>uma</strong> declaração, e não para a regra inteira. Numa regra com três declarações, só a que tem a marca vai para a fila preferencial; as outras continuam normais.</p>
+
+<hr>
+
+<h2>2. O que ele faz na cascata</h2>
+<p>Lembre os critérios da <a href="cascata.html">cascata</a>: primeiro <strong>origem e importância</strong>, depois camadas, especificidade e ordem. O <code>!important</code> atua no <strong>primeiro</strong> critério. Por isso ele passa na frente de tudo o que vem depois: de qualquer especificidade, de qualquer ordem, e até do atributo <code>style</code>.</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .aviso {
+    color: darkred !important;
+  }
+&lt;/style&gt;
+&lt;p class="aviso" style="color: navy;"&gt;O style normal perde.&lt;/p&gt;
+&lt;p class="aviso" style="color: navy !important;"&gt;O style com !important ganha.&lt;/p&gt;
+</pre>
+
+<p>O primeiro parágrafo ficou vermelho-escuro: o <code>!important</code> da folha de estilo venceu o <code>style</code> normal. O segundo ficou azul-marinho: quando os <strong>dois</strong> lados têm <code>!important</code>, a disputa recomeça entre eles, e o <code>style</code> volta a ganhar.</p>
+
+<h3>Dois <code>!important</code> brigando</h3>
+<p>Quando duas declarações com <code>!important</code> disputam a mesma propriedade, tudo volta a ser como antes, só que no andar de cima: ganha a mais específica e, no empate, a última. Ou seja, o <code>!important</code> não resolveu a briga: só a mudou de andar.</p>
+
+<h3>Origens invertidas</h3>
+<p>No andar de cima, a ordem das origens se <strong>inverte</strong>: o <code>!important</code> do <strong>usuário</strong> (quem lê a página) ganha do <code>!important</code> do <strong>autor</strong> (quem fez a página). Isso é de propósito: quem precisa de letras maiores ou de mais contraste pode configurar o navegador, ou uma extensão, com <code>!important</code>, e a sua página não consegue desfazer. É por isso que o <code>!important</code> existe.</p>
+
+<hr>
+
+<h2>3. Por que evitar: a corrida</h2>
+<p>Veja como um único <code>!important</code> contamina o CSS:</p>
+
+<ol class="passo">
+  <li>A Ana quer o preço verde e a regra perde. Em vez de entender por quê, ela escreve <code>.preco { color: darkgreen !important; }</code>. Funciona.</li>
+  <li>Um mês depois, ela quer o preço <strong>em promoção</strong> vermelho: <code>.promocao .preco { color: crimson; }</code>. Não funciona: o <code>!important</code> do verde ganha de qualquer regra normal, por mais específica que seja.</li>
+  <li>Ela escreve <code>.promocao .preco { color: crimson !important; }</code>. Funciona, porque agora as duas estão no andar de cima e esta é mais específica.</li>
+  <li>Depois vem o preço esgotado, o preço do tema escuro… cada um com o seu <code>!important</code>, cada um mais específico que o anterior.</li>
+</ol>
+
+<p>No fim, o andar de cima tem tantas regras quanto o de baixo, com o mesmo problema de antes e um seletor mais comprido em cada uma. E quem chega depois (outra pessoa, ou a própria Ana daqui a um ano) não tem mais nenhuma "fila preferencial" para usar.</p>
+
+<hr>
+
+<h2>4. Quando o <code>!important</code> é a ferramenta certa</h2>
+<p>Existem poucos casos legítimos. Em todos eles, o <code>!important</code> é uma decisão consciente, e não um conserto às pressas:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Caso</th><th>Exemplo</th><th>Por quê</th></tr>
+<tr><td>Vencer um <code>style</code> que você não pode editar</td><td>Um plugin ou um script põe <code>style="color: …"</code> no HTML</td><td>Só o <code>!important</code> vence o <code>style</code></td></tr>
+<tr><td>Vencer o CSS de terceiros com seletores enormes</td><td>Um widget de comentários com <code>#widget div.lista &gt; p</code></td><td>Você não pode mudar o CSS dele</td></tr>
+<tr><td>Classes utilitárias, que têm de valer sempre</td><td><code>.escondido { display: none !important; }</code></td><td>Quem põe essa classe quer o elemento escondido, sem exceção</td></tr>
+<tr><td>Preferências do leitor</td><td>Desligar animações para quem pede menos movimento (aula <a href="reduced-motion.html">Respeitando Quem Prefere Menos Movimento</a>)</td><td>A acessibilidade tem de ganhar de qualquer animação do site</td></tr>
+</table>
+</div>
+
+<div class="tryhtml" data-goal="css:.aviso{color}=rgb(139, 0, 0),sel:p.aviso[style],src:!important">
+<p class="try-task"><strong>Missão:</strong> um plugin da loja da Ana escreve o aviso com <code>style="color: gray;"</code>, e ela não consegue mudar esse HTML (finja que ele vem pronto do plugin: não mexa no <code>index.html</code>). Faça o aviso ficar <code>darkred</code> pelo <code>style.css</code>. Este é um dos poucos casos em que o <code>!important</code> é a resposta certa.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="aviso" style="color: gray;"&gt;Frete grátis acima de R$ 100.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.aviso {
+  color: darkred;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.aviso {
+  color: darkred !important;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>5. O que usar no lugar</h2>
+<p>Quando a sua regra perde, descubra <strong>por que</strong> ela perde (no F12, a declaração riscada e a vencedora acima dela) e escolha o conserto pelo motivo:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Motivo</th><th>Conserto</th><th>Aula</th></tr>
+<tr><td>Empate, e a outra regra vem depois</td><td>Mova a sua para depois, ou junte as duas</td><td><a href="cascata.html">A Cascata</a></td></tr>
+<tr><td>A outra regra é mais específica</td><td>Suba a sua só o necessário (<code>.cardapio .preco</code>)</td><td><a href="especificidade.html">Especificidade</a></td></tr>
+<tr><td>A outra regra usa ID</td><td>Troque o ID por classe no estilo</td><td><a href="seletor-id.html">Seletor de ID</a></td></tr>
+<tr><td>Um CSS de base com seletores fortes demais</td><td>Reescreva-o com <code>:where()</code>, que zera a especificidade</td><td><a href="not-is-where.html">:where()</a></td></tr>
+<tr><td>Muitos arquivos brigando (reset, framework, o seu)</td><td>Organize em camadas</td><td><a href="layer.html">@layer</a></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>O <code>!important</code> antes do valor</strong>
+<pre class="term" data-cwd="~/site">$ cat antes.css
+p {
+  color: !important darkred;
+}
+$ vnu --css antes.css
+"file:/home/ana/site/antes.css":2.21-2.27: error: CSS: “color”: Parse Error.</pre>
+<p><strong>O que significa:</strong> "erro de leitura em <code>color</code>". O <code>!important</code> vai <strong>depois</strong> do valor. Escrito antes, a declaração inteira fica inválida e é ignorada: nem o <code>darkred</code> vale.</p>
+<p><strong>Como consertar:</strong> <code>color: darkred !important;</code></p>
+</div>
+
+<div class="cenario">
+<strong><code>!importante</code>, em português</strong>
+<pre class="term" data-cwd="~/site">$ vnu --css portugues.css
+"file:/home/ana/site/portugues.css":2.30-2.30: error: CSS: Parse Error.
+"file:/home/ana/site/portugues.css":3.2-4.1: error: CSS: Parse Error.</pre>
+<p><strong>O que significa:</strong> o CSS só conhece a palavra em inglês. Com <code>!importante</code>, a declaração inteira é ignorada, e o validador ainda se perde até o fim da regra.</p>
+</div>
+
+<div class="cenario">
+<strong>Depois do ponto e vírgula</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .aviso {
+    color: darkred; !important
+  }
+  #aviso {
+    color: navy;
+  }
+&lt;/style&gt;
+&lt;p id="aviso" class="aviso"&gt;Fechado no feriado.&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> o aviso fica azul-marinho.</p>
+<p><strong>Por quê:</strong> o <code>;</code> fechou a declaração <code>color: darkred</code>, que ficou normal (e perde para o ID). O <code>!important</code> sobrou sozinho, sem declaração, e foi ignorado. O validador acusa <code>Parse Error</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>!important</code> não passa por herança</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .cartao {
+    color: crimson !important;
+  }
+  p {
+    color: navy;
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Bolo de fubá&lt;/h2&gt;
+  &lt;p&gt;Fofinho, com erva-doce.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> o título ficou vermelho, mas o parágrafo ficou azul-marinho, mesmo com o <code>!important</code> no cartão.</p>
+<p><strong>Por quê:</strong> o <code>!important</code> vale na disputa pelo <strong>próprio</strong> elemento, o <code>.cartao</code>. O título herdou o vermelho porque nenhuma regra fala dele. O parágrafo tem uma regra própria (<code>p</code>), e uma regra do próprio elemento sempre vence um valor herdado, com ou sem <code>!important</code> no pai (aula <a href="heranca.html">Herança</a>).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Quem ganha</th></tr>
+<tr><td>Declaração normal × <code>!important</code></td><td>O <code>!important</code>, sempre</td></tr>
+<tr><td><code>style</code> normal × <code>!important</code> na folha</td><td>O <code>!important</code></td></tr>
+<tr><td><code>!important</code> × <code>!important</code></td><td>Especificidade e ordem, como sempre</td></tr>
+<tr><td><code>!important</code> do autor × do usuário</td><td>O do usuário (acessibilidade)</td></tr>
+<tr><td>Pai com <code>!important</code>, filho com regra própria</td><td>A regra do filho: a importância não é herdada</td></tr>
+<tr><td>Onde escrever</td><td><code>propriedade: valor !important;</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Onde vai</h3>
+<p>Complete a declaração:</p>
+<div class="ex-code">color: darkred <input data-answer="!important" aria-label="marca">;</div>
+</div>
+
+<div class="exercise">
+<h3>2. O símbolo</h3>
+<p>Qual símbolo vem antes da palavra <code>important</code>?</p>
+<div class="ex-code"><input data-answer="!" aria-label="símbolo">important</div>
+</div>
+
+<div class="exercise">
+<h3>3. A alternativa</h3>
+<p>A regra <code>.preco</code> perde para <code>.cardapio p</code>. Em vez de <code>!important</code>, escreva o seletor de mesma força, com duas classes, para o preço:</p>
+<div class="ex-code"><input data-answer=".cardapio .preco" aria-label="seletor"> { color: darkgreen; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Com <code>.a { color: red !important; }</code> e <code>#b { color: blue !important; }</code> no mesmo elemento, quem ganha?</p>
+<label><input type="radio" name="q4"> <code>.a</code>, porque vem antes</label>
+<label><input type="radio" name="q4"> <code>#b</code>: entre dois <code>!important</code>, vale a especificidade</label>
+<label><input type="radio" name="q4"> Nenhum: os dois se anulam</label>
+<label><input type="radio" name="q4"> Depende do navegador</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Qual destes é um uso legítimo do <code>!important</code>?</p>
+<label><input type="radio" name="q5"> Fazer a regra do botão ganhar de outra regra do seu próprio CSS</label>
+<label><input type="radio" name="q5"> Pôr em todas as declarações, por garantia</label>
+<label><input type="radio" name="q5"> Vencer um atributo <code>style</code> que um plugin escreve e você não pode mudar</label>
+<label><input type="radio" name="q5"> Deixar o CSS mais rápido</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. O que acontece com <code>color: darkred; !important</code>?</p>
+<label><input type="radio" name="q6"> A cor vale como declaração normal, e o <code>!important</code> solto é ignorado</label>
+<label><input type="radio" name="q6"> A cor vale com <code>!important</code></label>
+<label><input type="radio" name="q6"> A página para de funcionar</label>
+<label><input type="radio" name="q6"> O navegador mostra um aviso na tela</label>
+</div>
+
+<h3>Missão final: desligando o <code>!important</code></h3>
+
+<div class="tryhtml" data-goal="nsrc:!important,css:.ativo{color}=rgb(220, 20, 60),css:.menu a:last-child{color}=rgb(0, 0, 128)">
+<p class="try-task"><strong>Missão:</strong> a Ana encheu o CSS do menu de <code>!important</code> e, mesmo assim, o link ativo ("Início") está azul-marinho, e não vermelho. Apague <strong>todos</strong> os <code>!important</code> e faça o link ativo ficar <code>crimson</code>, com o outro link em azul-marinho. Conte as <a href="especificidade.html">especificidades</a> e ajuste o seletor que está perdendo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav class="menu"&gt;
+  &lt;a href="index.html" class="ativo"&gt;Início&lt;/a&gt;
+  &lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu a {
+  color: navy !important;
+}
+
+.ativo {
+  color: crimson !important;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.menu a {
+  color: navy;
+}
+
+.menu .ativo {
+  color: crimson;
+}
+</pre>
+</div>
+
+<p>Por que o <code>!important</code> não resolveu? Porque as <strong>duas</strong> regras tinham <code>!important</code>: as duas subiram para o andar de cima, e lá a disputa foi decidida pela especificidade, como seria embaixo. <code>.menu a</code> (0, 1, 1) ganhava de <code>.ativo</code> (0, 1, 0). Com <code>.menu .ativo</code> (0, 2, 0) e nenhum <code>!important</code>, o ativo ganha pelo motivo certo, e qualquer regra futura de duas classes consegue mudá-lo.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>propriedade: valor !important;</code> põe a declaração na "fila preferencial": ela ganha de todas as declarações normais, de qualquer especificidade e até do atributo <code>style</code>.</li>
+  <li>Entre dois <code>!important</code>, valem de novo a especificidade e a ordem. O do usuário ganha do do autor, para a acessibilidade.</li>
+  <li>Usado como conserto, ele começa uma corrida: cada mudança futura precisa de outro <code>!important</code>, mais específico.</li>
+  <li>Usos legítimos: vencer <code>style</code> ou CSS de terceiros que você não controla, classes utilitárias, preferências do leitor.</li>
+  <li>No lugar dele: descubra por que a regra perde e conserte pela causa (ordem, especificidade, ID, <code>:where()</code>, <code>@layer</code>).</li>
+  <li>Erros: antes do valor ou <code>!importante</code> invalidam a declaração; depois do <code>;</code> ele é ignorado; e a importância não passa por herança.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
