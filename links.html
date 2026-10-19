@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Links — cores, sublinhado e os estados :link, :visited, :hover e :active | Guia CSS</title>
+<meta name="description" content="Estilizando links com CSS para quem nunca escreveu CSS: o estilo padrão do navegador, cor e sublinhado, os quatro estados (:link, :visited, :hover, :active) e a ordem LVHA, o foco visível, o link com cara de botão, o menu de navegação, os limites do :visited e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Links</span></h1>
+
+<p class="intro">Todo link nasce azul e sublinhado, e fica roxo depois de visitado: é o estilo que o navegador dá a todo <code>&lt;a href&gt;</code> (aula de HTML <a href="https://wallysondevs.github.io/guia-html/links.html">Links</a>). Com CSS, a Ana pode pintar os links com as cores do site, mudar o sublinhado, reagir quando o mouse passa por cima e até transformar um link num botão. Nesta aula você vai conhecer os <strong>quatro estados</strong> de um link e a ordem em que eles precisam aparecer no CSS, a famosa ordem <strong>LVHA</strong>.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O estilo padrão dos links e como trocá-lo: cor e sublinhado.</li>
+  <li>Os quatro estados: <code>:link</code>, <code>:visited</code>, <code>:hover</code> e <code>:active</code>.</li>
+  <li>Por que a ordem <strong>L</strong>ink, <strong>V</strong>isited, <strong>H</strong>over, <strong>A</strong>ctive importa, e o que acontece fora dela.</li>
+  <li>O foco do teclado nos links (<code>:focus-visible</code>).</li>
+  <li>O link com cara de botão e o menu de navegação.</li>
+  <li>O que o <code>:visited</code> não deixa mudar, por privacidade.</li>
+  <li>Os erros reais do validador e os que ele não pega.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código: passe o mouse e clique nos links para ver os estados. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a placa que muda de cor</h2>
+<p>Imagine uma placa de loja que acende de um jeito antes de você entrar, de outro depois que você já entrou, brilha quando você chega perto e pisca no instante em que você empurra a porta. É o mesmo link, em <strong>momentos diferentes</strong>.</p>
+<p>No CSS, cada momento é uma <strong>pseudo-classe</strong>: uma palavra depois de dois-pontos que escolhe o elemento <strong>num certo estado</strong>. <code>a:hover</code> quer dizer "o link, quando o mouse está em cima".</p>
+
+<hr>
+
+<h2>1. O estilo padrão e o seletor <code>a</code></h2>
+<p>Sem nenhum CSS seu, o navegador desenha os links assim:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;p style="color: darkgreen"&gt;Este parágrafo é verde, mas &lt;a href="#receitas"&gt;este link&lt;/a&gt; não.&lt;/p&gt;
+</pre>
+
+<ul>
+  <li><strong>Cor:</strong> azul (no Chromium do guia, <code>rgb(0, 0, 238)</code>); roxo depois de visitado; e, no Chrome, vermelho (<code>rgb(255, 0, 0)</code>) no instante do clique.</li>
+  <li><strong>Sublinhado:</strong> <code>text-decoration-line: underline</code>.</li>
+  <li><strong>Cursor:</strong> a mãozinha (<code>cursor: pointer</code>, aula <a href="cursor.html">Cursor</a>).</li>
+</ul>
+
+<p>Repare: o parágrafo é verde, e o link continua azul. O link <strong>não herda</strong> a cor do pai, porque o navegador dá uma cor própria a ele (aula <a href="heranca.html">Herança</a>). Para mudar a cor de um link, a regra tem de mirar no próprio <code>a</code>.</p>
+
+<h3>Cor e sublinhado</h3>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .site a {
+    color: darkred;
+  }
+  .sem-traco {
+    text-decoration: none;
+  }
+  .traco-bonito {
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+&lt;/style&gt;
+&lt;div class="site"&gt;
+  &lt;p&gt;&lt;a href="#bolo"&gt;Bolo de cenoura&lt;/a&gt;: vermelho-escuro, sublinhado normal.&lt;/p&gt;
+  &lt;p&gt;&lt;a class="sem-traco" href="#pao"&gt;Pão de queijo&lt;/a&gt;: sem sublinhado.&lt;/p&gt;
+  &lt;p&gt;&lt;a class="traco-bonito" href="#pudim"&gt;Pudim&lt;/a&gt;: sublinhado mais grosso e mais afastado.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>.site a { color: darkred; }</dt><dd>Todos os links dentro de <code>.site</code> ficam vermelho-escuros, <strong>em todos os estados</strong>: visitados também (já que nada diz o contrário).</dd>
+  <dt>text-decoration: none;</dt><dd>Tira o sublinhado (aula <a href="text-decoration.html">Sublinhado e Riscado</a>).</dd>
+  <dt>text-decoration-thickness: 2px;</dt><dd>A espessura do traço.</dd>
+  <dt>text-underline-offset: 4px;</dt><dd>A distância entre o texto e o traço. Afastado, o traço não corta as "perninhas" do g, p e q.</dd>
+</dl>
+
+<div class="warning">
+<strong>Cuidado ao tirar o sublinhado</strong>
+<p>No meio de um parágrafo, o sublinhado é o que diz "isto é clicável", também para quem não enxerga bem as cores ou não distingue vermelho de verde. Num link dentro do texto, mantenha o sublinhado (pode deixá-lo bonito, com espessura e afastamento). Tirar faz sentido em menus e botões, onde a forma já mostra que é clicável.</p>
+</div>
+
+<hr>
+
+<h2>2. Os quatro estados</h2>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Pseudo-classe</th><th>Tradução</th><th>Vale quando…</th></tr>
+<tr><td><code>a:link</code></td><td>link</td><td>o link ainda <strong>não foi visitado</strong> (e tem <code>href</code>)</td></tr>
+<tr><td><code>a:visited</code></td><td>visitado</td><td>o endereço do link já está no histórico do navegador</td></tr>
+<tr><td><code>a:hover</code></td><td>pairar</td><td>o mouse está <strong>em cima</strong> do link</td></tr>
+<tr><td><code>a:active</code></td><td>ativo</td><td>o link está sendo <strong>clicado</strong>: entre apertar e soltar o botão do mouse</td></tr>
+</table>
+</div>
+
+<p>Um link pode estar em vários estados ao mesmo tempo: um link visitado com o mouse em cima é <code>:visited</code> <strong>e</strong> <code>:hover</code>. É aí que entra a ordem.</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  a:link {
+    color: navy;
+  }
+  a:visited {
+    color: purple;
+  }
+  a:hover {
+    color: crimson;
+    text-decoration-thickness: 3px;
+  }
+  a:active {
+    color: darkorange;
+  }
+&lt;/style&gt;
+&lt;p&gt;Passe o mouse e clique (segure o botão): &lt;a href="#receitas"&gt;receitas da Ana&lt;/a&gt;.&lt;/p&gt;
+</pre>
+
+<p>O link começa azul-marinho. Com o mouse em cima, fica vermelho com o traço mais grosso. Segurando o botão do mouse, fica laranja. Depois do primeiro clique, o endereço <code>#receitas</code> entra no histórico, e o link pode passar a aparecer roxo.</p>
+
+<hr>
+
+<h2>3. A ordem LVHA</h2>
+<p>As quatro regras têm a mesma <a href="especificidade.html">especificidade</a> (um elemento e uma pseudo-classe). Quando duas valem ao mesmo tempo, <strong>vence a que vem por último</strong> no CSS (aula <a href="cascata.html">A Cascata</a>). Por isso a ordem tem de ser:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Ordem</th><th>Regra</th><th>Por quê</th></tr>
+<tr><td>1º</td><td><code>a:link</code></td><td rowspan="2">Os dois estados "de repouso". Um link é um ou outro, nunca os dois, então a ordem entre eles não importa; mas os dois têm de vir antes dos estados de ação.</td></tr>
+<tr><td>2º</td><td><code>a:visited</code></td></tr>
+<tr><td>3º</td><td><code>a:hover</code></td><td>Vem depois, para vencer o repouso quando o mouse chega.</td></tr>
+<tr><td>4º</td><td><code>a:active</code></td><td>Por último: no clique, o mouse também está em cima (<code>:hover</code>), e o clique precisa vencer.</td></tr>
+</table>
+</div>
+
+<div class="tip">
+<strong>Para decorar: <em>LoVe HAte</em></strong>
+<p>"Amor e ódio", em inglês: <strong>L</strong>o<strong>V</strong>e <strong>HA</strong>te = <strong>L</strong>ink, <strong>V</strong>isited, <strong>H</strong>over, <strong>A</strong>ctive.</p>
+</div>
+
+<h3>O que acontece fora da ordem</h3>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  a:hover {
+    color: crimson;
+  }
+  a:link {
+    color: navy;
+  }
+&lt;/style&gt;
+&lt;p&gt;Passe o mouse: &lt;a href="#nunca-visitado"&gt;este link não fica vermelho&lt;/a&gt;.&lt;/p&gt;
+</pre>
+
+<p>O <code>a:hover</code> veio <strong>antes</strong>. Com o mouse em cima de um link não visitado, valem as duas regras, e a de baixo (<code>a:link</code>, azul-marinho) vence: o vermelho nunca aparece. No F12, no painel de estilos do link, você veria o <code>color: crimson</code> <strong>riscado</strong>, vencido pelo outro. O validador não diz nada: as duas regras são CSS válido.</p>
+
+<div class="tryhtml" data-goal="hover:.receita{color}=rgb(220\, 20\, 60)">
+<p class="try-task"><strong>Missão:</strong> o link deveria ficar vermelho (<code>crimson</code>) com o mouse em cima, mas não fica. Ponha as regras na ordem LVHA, <strong>sem</strong> mudar as cores. Depois, passe o mouse sobre o link para conferir.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Veja a &lt;a class="receita" href="#bolo"&gt;receita do bolo de cenoura&lt;/a&gt;.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.receita:active {
+  color: darkorange;
+}
+
+.receita:hover {
+  color: crimson;
+}
+
+.receita:link {
+  color: navy;
+}
+
+.receita:visited {
+  color: navy;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.receita:link {
+  color: navy;
+}
+
+.receita:visited {
+  color: navy;
+}
+
+.receita:hover {
+  color: crimson;
+}
+
+.receita:active {
+  color: darkorange;
+}
+</pre>
+</div>
+
+<p>Repare que a missão usa <code>.receita:hover</code> em vez de <code>a:hover</code>. A ordem LVHA vale do mesmo jeito: as quatro regras continuam com especificidades iguais entre si.</p>
+
+<hr>
+
+<h2>4. Os limites do <code>:visited</code></h2>
+<p>Se um site pudesse ver quais links você já visitou, ele descobriria o seu histórico: em que banco você entra, que sites de saúde você leu. Para impedir isso, os navegadores limitam o <code>:visited</code>:</p>
+<ul>
+  <li>Só as <strong>cores</strong> podem mudar: <code>color</code>, <code>background-color</code>, <code>border-color</code>, <code>outline-color</code> e outras cores. Tamanho de letra, fundo com imagem, <code>display</code>… são ignorados no <code>:visited</code>, sem aviso.</li>
+  <li>O JavaScript (e as ferramentas do F12 em parte) recebe o estilo como se o link <strong>não</strong> tivesse sido visitado. No Chromium do guia, mesmo forçando o estado <code>:visited</code>, o <code>getComputedStyle</code> devolveu o azul de link novo.</li>
+  <li>Por isso, as missões do guia não conferem o <code>:visited</code>: confira olhando.</li>
+</ul>
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  a:visited {
+    color: purple;
+    font-size: 2rem;
+  }
+&lt;/style&gt;
+&lt;p&gt;Clique: &lt;a href="#visitado"&gt;link de teste&lt;/a&gt;. Ele pode ficar roxo, mas nunca grande.&lt;/p&gt;
+</pre>
+
+<hr>
+
+<h2>5. O foco do teclado</h2>
+<p>Quem navega com <kbd>Tab</kbd> não tem mouse para o <code>:hover</code>. Para essa pessoa, o estado que importa é o <strong>foco</strong>. O navegador já desenha um anel em volta do link focado; se você quiser outro, use <code>:focus-visible</code> e <strong>nunca</strong> apague o anel sem pôr um no lugar (aula <a href="outline.html">outline</a>).</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  a:hover,
+  a:focus-visible {
+    color: crimson;
+  }
+  a:focus-visible {
+    outline: 3px solid darkorange;
+    outline-offset: 2px;
+  }
+&lt;/style&gt;
+&lt;p&gt;Clique aqui no branco e aperte Tab: &lt;a href="#um"&gt;primeiro&lt;/a&gt; e &lt;a href="#dois"&gt;segundo&lt;/a&gt;.&lt;/p&gt;
+</pre>
+
+<p>Escrever <code>a:hover, a:focus-visible</code> juntos é um costume bom: quem usa o teclado ganha o mesmo destaque de quem usa o mouse. Na ordem, o foco anda junto do <code>:hover</code>: L, V, H + foco, A.</p>
+
+<hr>
+
+<h2>6. O link com cara de botão</h2>
+<p>Quando um link leva a uma página importante ("Encomendar", "Ver cardápio"), ele pode ganhar cara de botão: padding, fundo, cantos arredondados. Continua sendo um link (leva a outro lugar); só muda a aparência.</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .botao {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: darkgreen;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+  }
+  .botao:hover,
+  .botao:focus-visible {
+    background-color: forestgreen;
+  }
+  .botao:active {
+    background-color: green;
+  }
+&lt;/style&gt;
+&lt;a class="botao" href="#encomendar"&gt;Encomendar bolo&lt;/a&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>display: inline-block;</dt><dd>O link é em linha; com <code>inline-block</code>, o padding de cima e de baixo passa a ocupar espaço (aula <a href="padding.html">padding</a>).</dd>
+  <dt>color: white;</dt><dd>Na própria classe, vale para todos os estados: visitado ou não, o texto fica branco.</dd>
+  <dt>text-decoration: none;</dt><dd>Aqui pode: a forma de botão já mostra que é clicável.</dd>
+  <dt>:hover, :focus-visible / :active</dt><dd>O fundo clareia com o mouse (ou o foco) e escurece no clique, dando a sensação de "apertar".</dd>
+</dl>
+
+<p>Botões de verdade (<code>&lt;button&gt;</code>) e mais detalhes de aparência estão na aula <a href="botoes.html">Estilizando Botões</a>.</p>
+
+<hr>
+
+<h2>7. Formas de escrever e qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Quando usar</th></tr>
+<tr><td><code>a { color: … }</code></td><td>Uma cor só para todos os links e estados. Simples, e já resolve o "roxo de visitado" quando você não quer diferença.</td></tr>
+<tr><td><code>a:link</code>, <code>a:visited</code>, <code>a:hover</code>, <code>a:active</code></td><td>Cada estado com o seu visual. Sempre nessa ordem (LVHA).</td></tr>
+<tr><td><code>a:hover, a:focus-visible { … }</code></td><td>O mesmo destaque para o mouse e para o teclado.</td></tr>
+<tr><td><code>.menu a { … }</code></td><td>Links de uma parte do site (menu, rodapé), sem mexer nos outros.</td></tr>
+<tr><td><code>.botao { … }</code></td><td>Um link com cara de botão. Ponha a cor na classe, para valer em todos os estados.</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Ordem trocada: o <code>:hover</code> não funciona (e o validador não reclama)</strong>
+<p><strong>O que você vê:</strong> o link não muda com o mouse em cima, ou muda só enquanto não foi visitado.</p>
+<pre class="term" data-cwd="~/site">$ cat l3.css
+a:hover {
+  color: crimson;
+}
+a:link {
+  color: navy;
+}
+$ vnu --css l3.css
+$</pre>
+<p><strong>Por quê:</strong> especificidades iguais, vence a última regra (seção 3). <strong>Como consertar:</strong> L, V, H, A.</p>
+</div>
+
+<div class="cenario">
+<strong>Nome errado: <code>Unknown pseudo-element or pseudo-class</code></strong>
+<pre class="term" data-cwd="~/site">$ cat l1.css
+a:hoover {
+  color: crimson;
+}
+$ vnu --css l1.css
+"file:/home/ana/site/l1.css":1.3-1.8: error: CSS: Unknown pseudo-element or pseudo-class “:hoover”
+$ vnu --css l6.css
+"file:/home/ana/site/l6.css":1.3-1.10: error: CSS: Unknown pseudo-element or pseudo-class “:visitado”</pre>
+<p><strong>O que você vê:</strong> nada muda no link.</p>
+<p><strong>O que significa:</strong> "pseudo-elemento ou pseudo-classe desconhecido". Repare na diferença para os erros de propriedade: com um seletor inválido, o navegador joga fora a <strong>regra inteira</strong>, com todas as declarações entre as chaves, e não só uma linha. E os nomes são sempre em inglês: <code>:visited</code>, não <code>:visitado</code>.</p>
+<p><strong>Como consertar:</strong> <code>a:hover</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Um espaço antes dos dois-pontos: <code>a :hover</code></strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  a :hover {
+    color: crimson;
+  }
+&lt;/style&gt;
+&lt;p&gt;Passe o mouse: &lt;a href="#bolo"&gt;nada acontece&lt;/a&gt;.&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> o link não fica vermelho.</p>
+<p><strong>Por quê:</strong> o espaço é um <a href="combinadores.html">combinador</a>: <code>a :hover</code> quer dizer "qualquer elemento <strong>dentro</strong> de um <code>a</code> que esteja com o mouse em cima". Este link não tem nenhum elemento dentro, só texto. O validador não acusa: é um seletor válido, só não é o que você queria.</p>
+<p><strong>Como consertar:</strong> tudo junto, <code>a:hover</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Pus a cor no parágrafo e o link continuou azul</strong>
+<p><strong>O que você vê:</strong> <code>p { color: darkgreen; }</code> pinta o texto, mas os links dentro do parágrafo continuam azuis (seção 1).</p>
+<p><strong>Por quê:</strong> o navegador dá uma cor própria aos links, que vence a herança do pai. <strong>Como consertar:</strong> uma regra para o <code>a</code> (<code>p a { color: darkgreen; }</code>), ou, se quiser que o link tenha sempre a cor do texto em volta, <code>a { color: inherit; }</code>, mantendo o sublinhado para ele continuar parecendo link.</p>
+</div>
+
+<div class="cenario">
+<strong>Tirei o sublinhado do <code>li</code> e o link continua sublinhado</strong>
+<p><strong>O que você vê:</strong> <code>nav li { text-decoration: none; }</code> não muda nada nos links do menu.</p>
+<p><strong>Por quê:</strong> o sublinhado não é do <code>li</code>: é do <code>a</code>, posto pelo navegador. <strong>Como consertar:</strong> <code>nav a { text-decoration: none; }</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>a:link</code></td><td>Link ainda não visitado</td></tr>
+<tr><td><code>a:visited</code></td><td>Link visitado (só cores podem mudar)</td></tr>
+<tr><td><code>a:hover</code></td><td>Mouse em cima</td></tr>
+<tr><td><code>a:active</code></td><td>Durante o clique</td></tr>
+<tr><td><code>a:focus-visible</code></td><td>Foco do teclado (desenhe um anel; não apague)</td></tr>
+<tr><td>Ordem</td><td>LVHA: <code>:link</code>, <code>:visited</code>, <code>:hover</code> (+ <code>:focus-visible</code>), <code>:active</code></td></tr>
+<tr><td><code>text-decoration: none</code></td><td>Tira o sublinhado (em menus e botões)</td></tr>
+<tr><td><code>text-underline-offset</code>, <code>text-decoration-thickness</code></td><td>Afastamento e espessura do sublinhado</td></tr>
+<tr><td>Padrão do navegador</td><td>Azul, sublinhado, roxo depois de visitado, cursor de mãozinha</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Mouse em cima</h3>
+<p>Complete a pseudo-classe do mouse em cima:</p>
+<div class="ex-code">a:<input data-answer="hover" aria-label="pseudo-classe"> { color: crimson; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Já visitado</h3>
+<p>Complete a pseudo-classe dos links já visitados:</p>
+<div class="ex-code">a:<input data-answer="visited" aria-label="pseudo-classe"> { color: purple; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Sem sublinhado</h3>
+<p>Complete para tirar o sublinhado dos links do menu:</p>
+<div class="ex-code">nav a { text-decoration: <input data-answer="none" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Qual é a ordem certa das regras no CSS?</p>
+<label><input type="radio" name="q4"> <code>:hover</code>, <code>:active</code>, <code>:link</code>, <code>:visited</code></label>
+<label><input type="radio" name="q4"> <code>:link</code>, <code>:visited</code>, <code>:hover</code>, <code>:active</code></label>
+<label><input type="radio" name="q4"> <code>:active</code>, <code>:hover</code>, <code>:visited</code>, <code>:link</code></label>
+<label><input type="radio" name="q4"> A ordem não importa</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. A Ana escreveu <code>a:visited { font-size: 2rem; }</code>. O que acontece com os links visitados?</p>
+<label><input type="radio" name="q5"> Ficam com letra grande</label>
+<label><input type="radio" name="q5"> Somem da página</label>
+<label><input type="radio" name="q5"> O validador recusa o arquivo</label>
+<label><input type="radio" name="q5"> Nada: no <code>:visited</code>, só as cores podem mudar</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Por que <code>a:active</code> precisa vir depois de <code>a:hover</code>?</p>
+<label><input type="radio" name="q6"> Porque durante o clique o mouse também está em cima, e com especificidades iguais vence a última regra</label>
+<label><input type="radio" name="q6"> Porque <code>:active</code> tem especificidade menor</label>
+<label><input type="radio" name="q6"> Porque o validador exige</label>
+<label><input type="radio" name="q6"> Não precisa</label>
+</div>
+
+<h3>Missão final: o menu da lojinha</h3>
+
+<div class="tryhtml" data-goal="css:.menu a{text-decoration-line}=none,css:.menu a{color}=rgb(255\, 255\, 255),css:.menu a{display}=inline-block,hover:.menu a{background-color}=rgb(139\, 0\, 0),foco:.menu a{outline-style}=solid">
+<p class="try-task"><strong>Missão:</strong> monte o menu. (1) Os links do <code>.menu</code>: brancos (<code>white</code>), sem sublinhado, com <code>display: inline-block</code> e padding de <code>8px 14px</code>. (2) Com o mouse em cima <strong>ou</strong> com o foco do teclado (<code>:hover</code> e <code>:focus-visible</code>), o fundo fica <code>darkred</code>. (3) No foco do teclado, um anel de 2px contínuo, branco. Confira passando o mouse no primeiro link, "Início", e, depois, clicando no branco do resultado e apertando <kbd>Tab</kbd> até o foco chegar nele.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav class="menu"&gt;
+  &lt;a href="#inicio"&gt;Início&lt;/a&gt;
+  &lt;a href="#bolos"&gt;Bolos&lt;/a&gt;
+  &lt;a href="#salgados"&gt;Salgados&lt;/a&gt;
+  &lt;a href="#contato"&gt;Contato&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu {
+  background-color: firebrick;
+  padding: 6px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.menu {
+  background-color: firebrick;
+  padding: 6px;
+}
+
+.menu a {
+  display: inline-block;
+  padding: 8px 14px;
+  color: white;
+  text-decoration: none;
+}
+
+.menu a:hover,
+.menu a:focus-visible {
+  background-color: darkred;
+}
+
+.menu a:focus-visible {
+  outline: 2px solid white;
+}
+</pre>
+</div>
+
+<p>Como a cor branca está em <code>.menu a</code>, ela vale para todos os estados: os links visitados não ficam roxos. Num menu, isso é o que você quer; no meio de um texto, deixar o visitado diferente ajuda o leitor a saber onde já esteve.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Links vêm azuis, sublinhados e roxos depois de visitados, e não herdam a cor do pai: estilize o próprio <code>a</code>.</li>
+  <li><code>color</code> muda a cor; <code>text-decoration: none</code> tira o sublinhado (mantenha-o nos links de texto); <code>text-underline-offset</code> e <code>text-decoration-thickness</code> o deixam bonito.</li>
+  <li>Estados: <code>:link</code> (não visitado), <code>:visited</code>, <code>:hover</code> (mouse em cima), <code>:active</code> (clique). Sempre na ordem <strong>LVHA</strong> (<em>LoVe HAte</em>), porque com especificidades iguais vence a última regra.</li>
+  <li><code>:visited</code> só aceita cores, por privacidade.</li>
+  <li>Junte <code>:hover</code> com <code>:focus-visible</code> e nunca apague o anel de foco.</li>
+  <li>Erros: ordem trocada e <code>a :hover</code> com espaço passam no validador; <code>:hoover</code> e <code>:visitado</code> dão <code>Unknown pseudo-element or pseudo-class</code>, e a regra inteira é ignorada.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
