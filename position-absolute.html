@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS position: absolute — prender no canto de outro elemento | Guia CSS</title>
+<meta name="description" content="position: absolute para quem nunca escreveu CSS: tirar um elemento do fluxo, a dupla pai relative + filho absolute, os quatro cantos, esticar com inset: 0, texto sobre a foto, centralizar, selo pendurado para fora e os erros reais: selo que foge para o canto da página, pai que encolhe até sumir e selo cortado pelo overflow.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">position: absolute</span></h1>
+
+<p class="intro">Um selo "Novo!" no canto de cima de um cartão. Um "×" para fechar um aviso. O nome do bolo escrito por cima da foto. Tudo isso é <code>position: absolute</code>: o elemento <strong>sai da fila</strong> do fluxo normal e vai se prender a um ponto exato de outro elemento. Nesta aula você vai aprender a receita que resolve quase todos esses casos, <strong>pai <code>relative</code> + filho <code>absolute</code></strong>, e os tropeços clássicos de quem começa.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que muda quando um elemento sai do fluxo.</li>
+  <li>A quem o <code>top</code> e o <code>left</code> se referem: o <strong>ancestral posicionado</strong>.</li>
+  <li>A receita <strong>pai <code>relative</code> + filho <code>absolute</code></strong>.</li>
+  <li>Os quatro cantos, esticar com <code>inset: 0</code> e centralizar.</li>
+  <li>Texto sobre a foto e selo pendurado para fora do cartão.</li>
+  <li>Os erros: o selo que foge para o canto da página, o pai que encolhe e o selo cortado.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador. Se ainda não viu, leia antes <a href="position.html">position: Como Funciona</a> e <a href="position-relative.html">position: relative</a>.</p>
+
+<hr>
+
+<h2>A ideia: o ímã na geladeira</h2>
+<p>Os papéis presos na porta da geladeira não ficam numa fila: cada ímã vai exatamente onde você o põe, "no canto de cima, à direita", e não empurra os outros. Se você pregar um ímã num quadro de avisos, a posição dele passa a ser "no canto do <strong>quadro</strong>", e não mais da geladeira.</p>
+<p>No CSS, o elemento <code>absolute</code> é o ímã, e o elemento onde ele "gruda" é o <strong>ancestral posicionado</strong> mais próximo: o primeiro pai, avô ou bisavô que tenha <code>position</code> diferente de <code>static</code>. Se nenhum tiver, ele gruda na própria página.</p>
+
+<hr>
+
+<h2>1. Sair do fluxo</h2>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .cartao {
+    position: relative;
+    width: 260px;
+    padding: 12px;
+    border: 2px solid tomato;
+  }
+  .selo {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 4px 8px;
+    background-color: gold;
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;
+  &lt;span class="selo"&gt;Novo!&lt;/span&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Fofinho, com cobertura de chocolate.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>.cartao { position: relative; }</dt><dd>O cartão vira um elemento <strong>posicionado</strong>: a referência dos filhos <code>absolute</code>. Ele não se move: não tem deslocamento.</dd>
+  <dt>.selo { position: absolute; }</dt><dd>O selo sai do fluxo: os outros elementos se arrumam como se ele não existisse.</dd>
+  <dt>top: 0; right: 0;</dt><dd>A 0 do topo e a 0 da direita do cartão: o canto de cima, à direita. As distâncias contam a partir da borda de dentro do cartão (depois da <code>border</code>, antes do <code>padding</code>): o selo encosta na borda vermelha, ignorando os 12px de padding.</dd>
+</dl>
+
+<p>Repare que o título começa no alto do cartão, como se o selo não estivesse ali: o selo, fora do fluxo, não ocupa lugar. É por isso que ele pode ficar <strong>por cima</strong> de outras coisas, e é por isso que você precisa deixar espaço para ele, se não quiser que cubra o texto.</p>
+
+<h3>Ele também encolhe</h3>
+<p>Um bloco <code>absolute</code> não ocupa mais a largura toda: ele fica <strong>do tamanho do conteúdo</strong>, como um <code>inline-block</code>. E, mesmo que seja um <code>&lt;span&gt;</code>, ele passa a aceitar <code>width</code>, <code>height</code> e todas as margens (aula <a href="display.html">display</a>): o navegador o trata como um bloco.</p>
+
+<hr>
+
+<h2>2. Com e sem a referência</h2>
+<p>O que acontece se o pai <strong>não</strong> tiver <code>position: relative</code>? O <code>absolute</code> continua procurando um ancestral posicionado, subindo pelo HTML. Se não achar nenhum, usa a própria página. Compare:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o selo está no canto do cartão. Apague a linha <code>position: relative;</code> do <code>.cartao</code>: o selo foge para o canto de cima, à direita, do quadro inteiro. Volte a linha e troque o <code>right: 0</code> por <code>left: 0</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;div class="cartao"&gt;
+  &lt;span class="selo"&gt;Novo!&lt;/span&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Fofinho, com cobertura de chocolate.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  position: relative;
+  width: 260px;
+  padding: 12px;
+  border: 2px solid tomato;
+}
+
+.selo {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 4px 8px;
+  background-color: gold;
+}
+</pre>
+</div>
+
+<div class="tip">
+<strong>A receita</strong>
+<p>Sempre que escrever <code>position: absolute</code>, pergunte: "em relação a quem?". E ponha <code>position: relative</code> nesse elemento. Pai <code>relative</code>, filho <code>absolute</code>: é a regra que resolve 9 em cada 10 casos.</p>
+</div>
+
+<hr>
+
+<h2>3. Os cantos, as bordas e o meio</h2>
+<p>Combinando um deslocamento vertical (<code>top</code> ou <code>bottom</code>) e um horizontal (<code>left</code> ou <code>right</code>), você alcança qualquer canto:</p>
+
+<pre class="file" data-file="cantos.html" data-resultado>&lt;style&gt;
+  .quadro {
+    position: relative;
+    height: 160px;
+    border: 2px solid navy;
+    background-color: #e8ecff;
+  }
+  .ima {
+    position: absolute;
+    padding: 4px 8px;
+    background-color: gold;
+  }
+  .a { top: 0;    left: 0; }
+  .b { top: 0;    right: 0; }
+  .c { bottom: 0; left: 0; }
+  .d { bottom: 0; right: 0; }
+  .meio {
+    inset: 0;
+    margin: auto;
+    width: 90px;
+    height: 24px;
+    background-color: #fde8e1;
+  }
+&lt;/style&gt;
+&lt;div class="quadro"&gt;
+  &lt;span class="ima a"&gt;top left&lt;/span&gt;
+  &lt;span class="ima b"&gt;top right&lt;/span&gt;
+  &lt;span class="ima c"&gt;bottom left&lt;/span&gt;
+  &lt;span class="ima d"&gt;bottom right&lt;/span&gt;
+  &lt;span class="ima meio"&gt;no meio&lt;/span&gt;
+&lt;/div&gt;
+</pre>
+
+<p>O "no meio" usa um truque: <code>inset: 0</code> diz "a 0 de todos os lados", <code>width</code> e <code>height</code> dizem o tamanho e, com <code>margin: auto</code>, o navegador divide a sobra igualmente entre os quatro lados. O elemento fica centralizado nas duas direções. (Para centralizar no layout, Flexbox e Grid são mais simples: aula <a href="centralizar.html">Centralizando Qualquer Coisa</a>.)</p>
+
+<h3>Esticar: lados opostos ao mesmo tempo</h3>
+<p>Diferente do <code>relative</code>, no <code>absolute</code> os lados opostos <strong>não brigam</strong>: <code>left: 0</code> e <code>right: 0</code> juntos fazem o elemento <strong>esticar</strong> de uma borda à outra. Com <code>inset: 0</code>, ele cobre o pai inteiro, como uma película.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Resultado</th></tr>
+<tr><td><code>top: 0; right: 0;</code></td><td>Canto de cima, à direita (o selo)</td></tr>
+<tr><td><code>bottom: 0; left: 0; right: 0;</code></td><td>Faixa na borda de baixo, de ponta a ponta (a legenda da foto)</td></tr>
+<tr><td><code>inset: 0;</code></td><td>Cobre o pai inteiro (uma película escura sobre a foto)</td></tr>
+<tr><td><code>inset: 0; margin: auto;</code> + <code>width</code> e <code>height</code></td><td>Centralizado</td></tr>
+<tr><td><code>top: -10px; right: -10px;</code></td><td>Pendurado para fora do canto (o número de notificações)</td></tr>
+<tr><td><code>top: 50%; left: 50%; transform: translate(-50%, -50%);</code></td><td>Centralizado sem saber o tamanho (aula <a href="transform.html">transform</a>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>4. Texto sobre a foto</h2>
+<p>Um dos usos mais bonitos: a legenda numa faixa escura, por cima da parte de baixo da foto.</p>
+
+<div class="tryhtml" data-goal="css:.foto{position}=relative,css:.legenda{position}=absolute,css:.legenda{bottom}=0px,css:.legenda{left}=0px">
+<p class="try-task"><strong>Missão:</strong> ponha a legenda por cima da foto, colada na borda de baixo e na da esquerda. (1) A <code>.foto</code> vira a referência; (2) a <code>.legenda</code> sai do fluxo; (3) <code>bottom</code> e <code>left</code> iguais a <code>0</code>. Para a faixa ir de ponta a ponta, acrescente também <code>right: 0</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="foto"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="400" height="300"&gt;
+  &lt;p class="legenda"&gt;Bolo de cenoura, R$ 35,00&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.foto {
+  width: 300px;
+}
+
+.foto img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.legenda {
+  margin: 0;
+  padding: 8px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.foto {
+  position: relative;
+  width: 300px;
+}
+
+.foto img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.legenda {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 8px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+}
+</pre>
+</div>
+
+<p>Dois detalhes do código: o <code>margin: 0</code> da legenda tira a margem padrão do <code>&lt;p&gt;</code>, senão ela ficaria 16px acima da borda; e o fundo <code>rgba(0, 0, 0, 0.6)</code> é um preto 60% opaco (aula <a href="opacity.html">Transparência</a>), que garante o contraste da letra branca sobre qualquer parte da foto.</p>
+
+<hr>
+
+<h2>5. Pendurado para fora</h2>
+<p>Com valores negativos, o filho sai um pouco para fora do pai, como o numerozinho vermelho de notificações em cima de um ícone:</p>
+
+<pre class="file" data-file="notificacao.html" data-resultado>&lt;style&gt;
+  .carrinho {
+    position: relative;
+    display: inline-block;
+    margin: 16px;
+    padding: 10px 14px;
+    border: 2px solid navy;
+    border-radius: 8px;
+  }
+  .contador {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: crimson;
+    color: white;
+    font-size: 13px;
+    text-align: center;
+    line-height: 22px;
+  }
+&lt;/style&gt;
+&lt;a class="carrinho" href="carrinho.html"&gt;
+  Carrinho
+  &lt;span class="contador"&gt;3&lt;/span&gt;
+&lt;/a&gt;
+</pre>
+
+<p>O círculo com o "3" fica metade dentro e metade fora do canto do botão. Em um site de verdade, o leitor de tela leria "Carrinho 3"; um texto escondido como "itens" (com a classe da aula <a href="esconder.html">Escondendo</a>) deixa a leitura mais clara.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>O selo fugiu para o canto da página</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .cartao {
+    width: 220px;
+    margin-top: 40px;
+    padding: 12px;
+    border: 2px solid tomato;
+  }
+  .selo {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: gold;
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;
+  &lt;span class="selo"&gt;Novo!&lt;/span&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> o "Novo!" aparece lá no canto de cima, à direita, do quadro, longe do cartão.</p>
+<p><strong>Por quê:</strong> o cartão não tem <code>position</code>, então não é a referência. Sem nenhum ancestral posicionado, o selo usa a página. O validador não reclama: o CSS é válido.</p>
+<p><strong>Como consertar:</strong> <code>position: relative</code> no <code>.cartao</code>. No F12, para saber qual é a referência de um elemento <code>absolute</code>, suba pelos pais na aba <em>Elements</em> e veja qual é o primeiro com <code>position</code> diferente de <code>static</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O pai encolheu até sumir</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .faixa {
+    position: relative;
+    border: 3px dashed crimson;
+  }
+  .faixa p {
+    position: absolute;
+    margin: 0;
+  }
+&lt;/style&gt;
+&lt;div class="faixa"&gt;
+  &lt;p&gt;Promoção de bolos!&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Este parágrafo deveria vir embaixo da faixa.&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> a borda tracejada da faixa virou uma linha só, sem altura. O texto "Promoção de bolos!" aparece por cima dessa linha, e o parágrafo seguinte subiu e ficou colado nele.</p>
+<p><strong>Por quê:</strong> o pai só mede o que está no fluxo. Com o único filho fora do fluxo, a faixa fica com altura 0 (o F12 mostra <code>height: 0px</code> na aba <em>Computed</em>), e o parágrafo de baixo sobe.</p>
+<p><strong>Como consertar:</strong> deixe no fluxo pelo menos o conteúdo principal e use <code>absolute</code> só para os enfeites; ou dê ao pai uma altura (<code>min-height</code>) que caiba o filho.</p>
+</div>
+
+<div class="cenario">
+<strong>O selo pendurado foi cortado</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .cartao {
+    position: relative;
+    overflow: hidden;
+    width: 220px;
+    margin: 20px;
+    padding: 12px;
+    border: 2px solid tomato;
+    border-radius: 12px;
+  }
+  .selo {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    padding: 6px 10px;
+    background-color: gold;
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;
+  &lt;span class="selo"&gt;Novo!&lt;/span&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> só um pedaço do selo aparece, cortado na borda arredondada do cartão.</p>
+<p><strong>Por quê:</strong> o <code>overflow: hidden</code> do cartão (posto para arredondar os cantos de uma foto, por exemplo) corta tudo o que passa da borda, inclusive um filho <code>absolute</code> pendurado para fora (aula <a href="overflow.html">O que Transborda</a>).</p>
+<p><strong>Como consertar:</strong> tire o <code>overflow: hidden</code> do cartão e ponha o corte só onde ele é preciso (na foto, com <code>border-radius</code> nela), ou deixe o selo inteiro dentro do cartão (<code>top: 8px; right: 8px;</code>).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>position: absolute;</code></td><td>Sai do fluxo; os vizinhos fecham o lugar; a caixa encolhe para o conteúdo</td></tr>
+<tr><td><code>.pai { position: relative; }</code></td><td>Faz do pai a referência dos filhos <code>absolute</code></td></tr>
+<tr><td><code>top: 0; right: 0;</code></td><td>Canto de cima, à direita, da referência</td></tr>
+<tr><td><code>left: 0; right: 0;</code></td><td>Estica de uma borda à outra</td></tr>
+<tr><td><code>inset: 0;</code></td><td>Cobre a referência inteira</td></tr>
+<tr><td><code>inset: 0; margin: auto;</code> + tamanho</td><td>Centraliza</td></tr>
+<tr><td><code>top: -10px; right: -10px;</code></td><td>Pendura para fora do canto</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A referência</h3>
+<p>Complete o valor que faz o cartão virar a referência do selo:</p>
+<div class="ex-code">.cartao { position: <input data-answer="relative" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Canto de baixo</h3>
+<p>Complete a propriedade para colar o selo no canto de baixo, à esquerda:</p>
+<div class="ex-code">.selo { position: absolute; <input data-answer="bottom" aria-label="propriedade">: 0; left: 0; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Cobrir tudo</h3>
+<p>Complete o atalho que faz a película cobrir a foto inteira:</p>
+<div class="ex-code">.pelicula { position: absolute; <input data-answer="inset" aria-label="propriedade">: 0; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. O selo <code>absolute</code> da Ana foi parar no canto da página, e não no do cartão. O que falta?</p>
+<label><input type="radio" name="q4"> <code>position: absolute</code> no cartão também</label>
+<label><input type="radio" name="q4"> <code>position: relative</code> no cartão</label>
+<label><input type="radio" name="q4"> <code>display: block</code> no selo</label>
+<label><input type="radio" name="q4"> <code>z-index</code> no selo</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Num elemento <code>absolute</code>, o que fazem <code>left: 0</code> e <code>right: 0</code> juntos?</p>
+<label><input type="radio" name="q5"> Vale só o <code>left</code></label>
+<label><input type="radio" name="q5"> Vale só o <code>right</code></label>
+<label><input type="radio" name="q5"> O elemento estica de uma borda à outra da referência</label>
+<label><input type="radio" name="q5"> O elemento some</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. Um <code>&lt;div&gt;</code> tem só um filho, e esse filho é <code>absolute</code>. Qual a altura do <code>&lt;div&gt;</code> (sem <code>height</code>, padding nem borda)?</p>
+<label><input type="radio" name="q6"> A altura do filho</label>
+<label><input type="radio" name="q6"> 100% da tela</label>
+<label><input type="radio" name="q6"> A altura de uma linha de texto</label>
+<label><input type="radio" name="q6"> 0, porque o filho saiu do fluxo</label>
+</div>
+
+<h3>Missão final: o cartão completo</h3>
+
+<div class="tryhtml" data-goal="css:.cartao{position}=relative,css:.selo{position}=absolute,css:.selo{top}=-10px,css:.selo{right}=-10px,css:.fechar{position}=absolute,css:.fechar{top}=8px,css:.fechar{left}=8px">
+<p class="try-task"><strong>Missão:</strong> (1) faça o cartão virar a referência; (2) pendure o selo "Novo!" para fora do canto de cima, à direita, com <code>top</code> e <code>right</code> de <code>-10px</code>; (3) ponha o botão "×" no canto de cima, à <strong>esquerda</strong>, a <code>8px</code> de cada borda.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;button class="fechar" aria-label="Fechar"&gt;×&lt;/button&gt;
+  &lt;span class="selo"&gt;Novo!&lt;/span&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Fofinho, com cobertura de chocolate.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  width: 260px;
+  margin: 20px;
+  padding: 24px 12px 12px;
+  border: 2px solid tomato;
+  border-radius: 12px;
+}
+
+.selo {
+  padding: 4px 8px;
+  background-color: gold;
+}
+
+.fechar {
+  width: 28px;
+  height: 28px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  position: relative;
+  width: 260px;
+  margin: 20px;
+  padding: 24px 12px 12px;
+  border: 2px solid tomato;
+  border-radius: 12px;
+}
+
+.selo {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  padding: 4px 8px;
+  background-color: gold;
+}
+
+.fechar {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 28px;
+  height: 28px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>position: absolute</code> tira o elemento do fluxo: os vizinhos ocupam o lugar dele, e ele encolhe para o tamanho do conteúdo.</li>
+  <li><code>top</code>, <code>right</code>, <code>bottom</code> e <code>left</code> contam a partir do <strong>ancestral posicionado</strong> mais próximo; sem nenhum, da página.</li>
+  <li>A receita: <strong>pai <code>relative</code>, filho <code>absolute</code></strong>.</li>
+  <li>Lados opostos esticam (<code>left: 0; right: 0</code>); <code>inset: 0</code> cobre tudo; com <code>margin: auto</code> e tamanho, centraliza; valores negativos penduram para fora.</li>
+  <li>Use para enfeites (selos, "×", legendas sobre fotos), não para o layout.</li>
+  <li>Erros: sem pai posicionado o filho foge para a página; um pai com todos os filhos <code>absolute</code> fica com altura 0; <code>overflow: hidden</code> no pai corta o que está pendurado.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
