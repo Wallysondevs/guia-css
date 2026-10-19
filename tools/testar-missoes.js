@@ -425,10 +425,10 @@ async function main() {
         const msgs = validarNoLab(docs);
         docs.forEach((d) => {
           const ms = msgs[d.id] || [];
-          const falsos = ms.filter((m) => vnuFalso(m));
-          const erros = ms.filter((m) => (m.type === "error" || m.type === "non-document-error") && !vnuFalso(m));
+          const falsos = ms.filter((m) => vnuFalso(m, d.texto));
+          const erros = ms.filter((m) => (m.type === "error" || m.type === "non-document-error") && !vnuFalso(m, d.texto));
           // num fragmento, "nenhum h1" é culpa do esqueleto, e não do exemplo
-          const mostrar = ms.filter((m) => !vnuFalso(m) && (m.type !== "info" || m.subType === "warning") && !(d.fragmento && /computed heading level of 1/.test(m.message)));
+          const mostrar = ms.filter((m) => !vnuFalso(m, d.texto) && (m.type !== "info" || m.subType === "warning") && !(d.fragmento && /computed heading level of 1/.test(m.message)));
           if (falsos.length) aviso(d.alvo.rot + " — W3C (" + d.nome + "): erro FALSO do vnu 26.10.12, que ainda não conhece este CSS moderno (funciona nos navegadores; não é falha):\n" + falsos.map((m) => "      " + linhaVnu(d.nome, m, d.v)).join("\n"));
           const cab = d.alvo.rot + " — W3C (" + d.nome + (d.fragmento ? ", fragmento dentro do esqueleto mínimo" : "") + ")";
           const corpo = mostrar.map((m) => "      " + linhaVnu(d.nome, m, d.v)).join("\n");

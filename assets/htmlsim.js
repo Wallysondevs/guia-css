@@ -315,13 +315,29 @@
     [/“allow-discrete” is not a/, "transition-behavior: allow-discrete"],
     [/“(path|shape)\([^”]*” is not a “clip-path” value/, "clip-path com path()/shape()"],
     [/“plus-lighter” is not a/, "mix-blend-mode: plus-lighter"],
+    [/“base-select” is not a/, "appearance: base-select"],
   ];
   // "Unknown dimension" é falso quando o valor usa as unidades de contêiner (cqi, cqw…)
   // "Parse Error" sem pista na mensagem: olha o trecho (extract) do código
   function vnuFalsoTrecho(m) { return /Parse Error/.test(m.message || "") && /sibling-(index|count)\(\)/.test(m.extract || "") ? "sibling-index()/sibling-count()" : null; }
   function vnuFalsoUnidade(m) { return /Unknown dimension/.test(m.message || "") && /\d(cqi|cqb|cqw|cqh|cqmin|cqmax)\b/.test(m.extract || "") ? "unidade de contêiner (cq…)" : null; }
-  // mensagem do validador → nome do recurso moderno (erro falso) ou null
-  function vnuFalso(m) { for (var i = 0; i < VNU_FALSOS.length; i++) if (VNU_FALSOS[i][0].test(m.message || "")) return VNU_FALSOS[i][1]; return vnuFalsoUnidade(m) || vnuFalsoTrecho(m); }
+  /* com o texto enviado ao validador: olha a linha do erro
+     - dentro da condição de um @supports, um valor desconhecido é de propósito (o @supports serve
+       para perguntar se o navegador conhece aquilo): "@supports not (display: inexistente)" é CSS válido;
+     - "Parse Error" numa linha com ::picker(select) (o select personalizável) */
+  function vnuFalsoLinha(m, texto) {
+    if (!texto) return null;
+    var ls = String(texto).split("\n"), l1 = ls[(m.firstLine || m.lastLine) - 1] || "", l2 = ls[m.lastLine - 1] || "";
+    if (/is not a “[\w-]+” value|Parse Error/.test(m.message || "") && /@supports\b/.test(l2.slice(0, m.firstColumn || m.lastColumn || l2.length))) return "valor dentro da condição de um @supports";
+    if (/Parse Error/.test(m.message || "") && /::picker\(/.test(l1 + "\n" + l2)) return "::picker(select)";
+    // unidades de contêiner (cqi, cqw…) em qualquer lugar, também dentro de calc()/clamp() ("Parse Error")
+    if (/Unknown dimension|Parse Error/.test(m.message || "") && /\d(cqi|cqb|cqw|cqh|cqmin|cqmax)\b/.test(l1 + "\n" + l2)) return "unidade de contêiner (cq…)";
+    // variável cujo nome começa com número depois do -- (--1x: 2 é um nome válido)
+    if (/“--”: Parse Error/.test(m.message || "") && /--\d[\w-]*\s*:/.test(l1 + "\n" + l2)) return "variável com nome que começa com número (--1x)";
+    return null;
+  }
+  // mensagem do validador (e, se houver, o texto enviado a ele) → nome do recurso moderno (erro falso) ou null
+  function vnuFalso(m, texto) { for (var i = 0; i < VNU_FALSOS.length; i++) if (VNU_FALSOS[i][0].test(m.message || "")) return VNU_FALSOS[i][1]; return vnuFalsoUnidade(m) || vnuFalsoTrecho(m) || vnuFalsoLinha(m, texto); }
   HS.vnuFalso = vnuFalso;
   HS.VNU_FALSOS = VNU_FALSOS;
 
@@ -875,8 +891,8 @@
   }
   HS.validarW3C = validarW3C;
   function mostrarW3C(caixa, res, nomeAba) {
-    var falsos = res.msgs.filter(function (m) { return vnuFalso(m); });
-    var erros = res.msgs.filter(function (m) { return (m.type === "error" || m.type === "non-document-error") && !vnuFalso(m); });
+    var falsos = res.msgs.filter(function (m) { return vnuFalso(m, res.doc.texto); });
+    var erros = res.msgs.filter(function (m) { return (m.type === "error" || m.type === "non-document-error") && !vnuFalso(m, res.doc.texto); });
     // num fragmento, "nenhum h1" vem do esqueleto que o editor pôs em volta, e não do código do leitor
     var avisos = res.msgs.filter(function (m) { return m.type === "info" && m.subType === "warning" && !(res.fragmento && /computed heading level of 1/.test(m.message)); });
     var h = "<strong>Validador do W3C</strong> (" + escHtml(nomeAba) + "): ";
@@ -889,7 +905,7 @@
         var l = m.firstLine || m.lastLine, p = HS.posicaoNoCodigo(res.doc, l, m.firstColumn);
         if (!m.firstColumn && p) p = HS.posicaoNoCodigo(res.doc, m.lastLine, m.lastColumn);
         var onde = p ? "linha " + p.linha + (p.coluna ? ", coluna " + p.coluna : "") : (l ? "no esqueleto que o editor pôs em volta" : "");
-        var falso = vnuFalso(m);
+        var falso = vnuFalso(m, res.doc.texto);
         return "<li><span class=\"" + (falso ? "hs-a\">Error (falso)" : m.type === "error" ? "hs-e\">Error" : "hs-a\">Warning") + "</span>" + (onde ? " (" + onde + ")" : "") + ": " + escHtml(m.message) + (m.extract ? "<br><code>" + escHtml(m.extract.replace(/\n/g, "↵")) + "</code>" : "") +
           (falso ? "<br><small>O validador ainda não conhece este CSS moderno (" + escHtml(falso) + "). Os navegadores atuais entendem: não é erro seu.</small>" : "") + "</li>";
       }).join("") + "</ol>";
