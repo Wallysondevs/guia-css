@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Alinhando no Grid — justify-items, align-items e place-items | Guia CSS</title>
+<meta name="description" content="Alinhar no CSS Grid para quem está começando: o item dentro da célula (justify-items, align-items, place-items), um item diferente (justify-self, align-self), a grade inteira dentro da caixa (justify-content, align-content), centralizar com place-items: center, e o que acontece quando o alinhamento não faz nada.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Alinhando no Grid</span></h1>
+
+<p class="intro">Até agora, os itens da grade ocuparam a célula inteira: o cartão estica de uma borda à outra, de cima a baixo. Às vezes você quer outra coisa: um selo pequeno no canto da célula, um botão centralizado, a grade toda no meio da página. Nesta aula você vai alinhar no Grid, em dois níveis: <strong>o item dentro da célula</strong> e <strong>a grade inteira dentro da caixa</strong>.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Os dois eixos: <code>justify</code> (na horizontal) e <code>align</code> (na vertical).</li>
+  <li><code>justify-items</code> e <code>align-items</code>: todos os itens dentro das suas células.</li>
+  <li><code>place-items</code>: os dois de uma vez, e o famoso <code>place-items: center</code>.</li>
+  <li><code>justify-self</code> e <code>align-self</code>: um item diferente dos outros.</li>
+  <li><code>justify-content</code> e <code>align-content</code>: a grade inteira, quando ela é menor que a caixa.</li>
+  <li>Por que, às vezes, o alinhamento "não faz nada".</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: os quadros na parede</h2>
+<p>Pense numa parede com molduras penduradas em fileiras. Há duas perguntas diferentes:</p>
+<ol>
+  <li>Dentro de cada moldura, onde fica a foto? Grudada no canto, no meio, esticada até a borda? Isso é alinhar o <strong>item na célula</strong> (<code>-items</code> e <code>-self</code>).</li>
+  <li>Onde fica o conjunto de molduras na parede? Encostado à esquerda, no centro, espalhado? Isso é alinhar a <strong>grade na caixa</strong> (<code>-content</code>).</li>
+</ol>
+<p>E cada pergunta tem duas direções. No Grid, a palavra diz a direção:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Começa com</th><th>Direção</th><th>Para lembrar</th></tr>
+<tr><td><code>justify-</code></td><td>Horizontal (ao longo da fileira, da esquerda para a direita)</td><td>Como o "justificar" do editor de texto, que mexe na horizontal</td></tr>
+<tr><td><code>align-</code></td><td>Vertical (ao longo da coluna, de cima para baixo)</td><td>O que sobra</td></tr>
+</table>
+</div>
+
+<div class="tip">
+<strong>Diferente do Flexbox</strong>
+<p>No Flexbox, <code>justify-content</code> segue a direção do <code>flex-direction</code> e pode virar vertical (aula <a href="flex-direction.html">Direção</a>). No Grid, não há <code>flex-direction</code>: <code>justify</code> é sempre a direção da escrita (horizontal, em português) e <code>align</code> sempre a vertical.</p>
+</div>
+
+<hr>
+
+<h2>1. <code>justify-items</code>: na horizontal, dentro da célula</h2>
+<p>Sem a propriedade, o item ocupa a largura toda da célula: é o <code>stretch</code> ("esticar"). No F12, aba Computed, o valor aparece como <code>normal</code>, que num item de grade funciona igual ao <code>stretch</code>. Com outro valor, o item fica do tamanho do conteúdo e vai para um lado da célula. Uma grade para cada valor, com duas colunas, e a área da grade em cinza:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .grade {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    background: #e5e7eb;
+    margin-bottom: 4px;
+  }
+  .grade div {
+    background: #fde68a;
+    border: 2px solid #a16207;
+    padding: 8px;
+  }
+  .stretch { justify-items: stretch; }
+  .start { justify-items: start; }
+  .center { justify-items: center; }
+  .end { justify-items: end; }
+  p { margin: 12px 0 4px; font-family: monospace; }
+&lt;/style&gt;
+&lt;p&gt;justify-items: stretch&lt;/p&gt;
+&lt;div class="grade stretch"&gt;&lt;div&gt;Bolo&lt;/div&gt;&lt;div&gt;Pudim&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;justify-items: start&lt;/p&gt;
+&lt;div class="grade start"&gt;&lt;div&gt;Bolo&lt;/div&gt;&lt;div&gt;Pudim&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;justify-items: center&lt;/p&gt;
+&lt;div class="grade center"&gt;&lt;div&gt;Bolo&lt;/div&gt;&lt;div&gt;Pudim&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;justify-items: end&lt;/p&gt;
+&lt;div class="grade end"&gt;&lt;div&gt;Bolo&lt;/div&gt;&lt;div&gt;Pudim&lt;/div&gt;&lt;/div&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que acontece</th></tr>
+<tr><td><code>stretch</code> (o mesmo que o padrão, <code>normal</code>)</td><td>O item estica e ocupa a célula toda: as duas caixas amarelas cobrem a grade cinza de ponta a ponta</td></tr>
+<tr><td><code>start</code></td><td>O item fica do tamanho do texto, encostado no <strong>começo</strong> (à esquerda) da sua célula</td></tr>
+<tr><td><code>center</code></td><td>No <strong>meio</strong> da célula: "Bolo" no meio da metade esquerda, "Pudim" no meio da direita</td></tr>
+<tr><td><code>end</code></td><td>No <strong>fim</strong> (à direita) da célula</td></tr>
+</table>
+</div>
+
+<p>Repare que, com <code>center</code>, os itens não vão para o meio da <strong>grade</strong>: cada um vai para o meio da <strong>sua célula</strong>. A grade continua com duas colunas.</p>
+
+<hr>
+
+<h2>2. <code>align-items</code>: na vertical, dentro da célula</h2>
+<p>Para ver a vertical, as células precisam ser mais altas que o conteúdo. Aqui, cada fileira tem <code>100px</code> de altura (<code>grid-template-rows</code>, aula <a href="grid-linhas.html">Linhas</a>):</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque o <code>align-items</code> por <code>start</code>, <code>end</code> e <code>stretch</code>. Depois apague a linha do <code>grid-template-rows</code>: sem altura extra na célula, os quatro valores ficam iguais.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="grade"&gt;
+  &lt;div&gt;Bolo&lt;/div&gt;
+  &lt;div&gt;Pudim&lt;/div&gt;
+  &lt;div&gt;Torta&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.grade {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 100px;
+  align-items: center;
+  gap: 8px;
+  background: #e5e7eb;
+}
+
+.grade div {
+  background: #fde68a;
+  border: 2px solid #a16207;
+  padding: 8px;
+}
+</pre>
+</div>
+
+<p>Com <code>center</code>, as três caixas amarelas ficam baixinhas, no meio da faixa cinza de 100px. Os valores são os mesmos do <code>justify-items</code>: <code>stretch</code> (igual ao padrão: ocupa a altura toda), <code>start</code> (em cima), <code>center</code> (no meio), <code>end</code> (embaixo). O <code>align-items</code> tem ainda o <code>baseline</code>, que alinha a <strong>linha de base do texto</strong> dos itens (útil quando os textos têm tamanhos diferentes).</p>
+
+<hr>
+
+<h2>3. <code>place-items</code>: os dois de uma vez</h2>
+<p>O atalho <code>place-items</code> ("posicionar os itens") escreve o <code>align-items</code> e o <code>justify-items</code> juntos. Com um valor só, ele vale para os dois:</p>
+
+<dl class="anatomy">
+  <dt>place-items: center;</dt><dd>O mesmo que <code>align-items: center;</code> + <code>justify-items: center;</code>: o item no centro da célula, nas duas direções.</dd>
+  <dt>place-items: start end;</dt><dd>Dois valores: o primeiro é o <code>align</code> (vertical), o segundo o <code>justify</code> (horizontal). Aqui: em cima e à direita.</dd>
+</dl>
+
+<p>A ordem é "vertical, horizontal", ao contrário do que muita gente espera. Na dúvida, escreva as duas propriedades separadas: fica mais claro.</p>
+
+<h3>Centralizar qualquer coisa com duas linhas</h3>
+<p>Uma grade com <strong>um</strong> item só tem uma célula, do tamanho da caixa toda. Centralizar o item na célula é centralizar na caixa. É o jeito mais curto de pôr algo no meio, nas duas direções (aula <a href="centralizar.html">Centralizando Qualquer Coisa</a>):</p>
+
+<div class="tryhtml" data-goal="css:.vitrine{align-items}=center,css:.vitrine{justify-items}=center">
+<p class="try-task"><strong>Missão:</strong> ponha o cartão "Bolo do dia" no centro da vitrine, na horizontal e na vertical, com <strong>uma</strong> declaração no <code>.vitrine</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;div class="cartao"&gt;Bolo do dia&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.vitrine {
+  display: grid;
+  height: 200px;
+  background: #e5e7eb;
+}
+
+.cartao {
+  background: #fde68a;
+  border: 2px solid #a16207;
+  padding: 16px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.vitrine {
+  display: grid;
+  place-items: center;
+  height: 200px;
+  background: #e5e7eb;
+}
+
+.cartao {
+  background: #fde68a;
+  border: 2px solid #a16207;
+  padding: 16px;
+}
+</pre>
+</div>
+
+<p>Antes, o cartão ocupa a vitrine inteira: no F12, <code>align-items</code> e <code>justify-items</code> estão em <code>normal</code>, que estica nas duas direções. Com <code>place-items: center</code>, ele encolhe para o tamanho do texto e fica no meio da faixa cinza. No F12, aba Computed, aparecem as duas longas: <code>align-items: center</code> e <code>justify-items: center</code>.</p>
+
+<hr>
+
+<h2>4. <code>justify-self</code> e <code>align-self</code>: um item diferente</h2>
+<p>As propriedades com <code>-items</code> vão no <strong>pai</strong> e valem para todos. Para um item só, use a versão com <code>-self</code> ("o próprio") <strong>no item</strong>. Ela vence o <code>-items</code> do pai:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .grade {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 90px;
+    gap: 8px;
+    background: #e5e7eb;
+  }
+  .grade div {
+    background: #fde68a;
+    border: 2px solid #a16207;
+    padding: 8px;
+  }
+  .selo {
+    justify-self: end;
+    align-self: start;
+  }
+&lt;/style&gt;
+&lt;div class="grade"&gt;
+  &lt;div&gt;Bolo&lt;/div&gt;
+  &lt;div class="selo"&gt;Novo!&lt;/div&gt;
+  &lt;div&gt;Torta&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<p>"Bolo" e "Torta" ocupam as células inteiras (o padrão). O "Novo!" encolheu e foi para o canto de cima, à direita, da célula do meio. Também existe o atalho <code>place-self</code>, com a mesma ordem do <code>place-items</code> (vertical, horizontal): <code>place-self: start end</code> faz o mesmo que as duas linhas do <code>.selo</code>.</p>
+
+<hr>
+
+<h2>5. <code>justify-content</code> e <code>align-content</code>: a grade inteira</h2>
+<p>Agora a outra pergunta: onde fica o <strong>conjunto</strong> de células dentro da caixa. Isso só importa quando as colunas (ou fileiras) somam <strong>menos</strong> que a caixa, por exemplo colunas de tamanho fixo numa caixa larga. Com <code>1fr</code>, as colunas já ocupam tudo e não sobra nada para distribuir.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> as três colunas têm 80px, e a caixa é bem mais larga. Troque o <code>justify-content</code> por <code>start</code>, <code>end</code>, <code>space-between</code>, <code>space-around</code> e <code>space-evenly</code>. Depois troque o <code>80px</code> por <code>1fr</code>: nenhum valor muda mais nada.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="grade"&gt;
+  &lt;div&gt;Bolo&lt;/div&gt;
+  &lt;div&gt;Pudim&lt;/div&gt;
+  &lt;div&gt;Torta&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.grade {
+  display: grid;
+  grid-template-columns: repeat(3, 80px);
+  justify-content: center;
+  gap: 8px;
+  background: #e5e7eb;
+}
+
+.grade div {
+  background: #fde68a;
+  border: 2px solid #a16207;
+  padding: 8px;
+}
+</pre>
+</div>
+
+<p>Com <code>center</code>, as três colunas de 80px ficam juntas no meio da faixa cinza, com espaço vazio dos dois lados. Os valores são os mesmos do <code>justify-content</code> do Flexbox (aula <a href="justify-content.html">Alinhando na Linha</a>):</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>As colunas…</th></tr>
+<tr><td><code>start</code></td><td>Juntas, no começo (à esquerda). É o que acontece sem a propriedade.</td></tr>
+<tr><td><code>center</code></td><td>Juntas, no meio</td></tr>
+<tr><td><code>end</code></td><td>Juntas, no fim</td></tr>
+<tr><td><code>space-between</code></td><td>A primeira encostada à esquerda, a última à direita, o espaço que sobra entre elas</td></tr>
+<tr><td><code>space-around</code></td><td>Espaço em volta de cada uma (nas pontas, metade)</td></tr>
+<tr><td><code>space-evenly</code></td><td>Espaços todos iguais, inclusive nas pontas</td></tr>
+</table>
+</div>
+
+<p>O <code>align-content</code> faz o mesmo com as <strong>fileiras</strong>, na vertical. Ele só aparece quando a grade tem uma altura maior que a soma das fileiras (um <code>height</code>, por exemplo). E <code>place-content</code> é o atalho dos dois, na mesma ordem: vertical, horizontal.</p>
+
+<hr>
+
+<h2>6. Qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quero…</th><th>Use</th><th>Onde</th></tr>
+<tr><td>Todos os itens num lado da célula</td><td><code>justify-items</code> / <code>align-items</code></td><td>Pai (a grade)</td></tr>
+<tr><td>Todos no centro da célula</td><td><code>place-items: center</code></td><td>Pai</td></tr>
+<tr><td>Um item diferente dos outros</td><td><code>justify-self</code> / <code>align-self</code></td><td>Item</td></tr>
+<tr><td>A grade inteira no meio da caixa (colunas fixas)</td><td><code>justify-content</code> / <code>align-content</code></td><td>Pai</td></tr>
+<tr><td>Os itens do tamanho da célula (cartões de mesma altura)</td><td>Nada: o padrão já estica (como o <code>stretch</code>)</td><td>—</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>O <code>align-items</code> não faz nada</strong>
+<pre class="file" data-file="style.css">.grade {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+}
+</pre>
+<p><strong>O que você vê:</strong> nada muda. Os itens continuam onde estavam.</p>
+<p><strong>Por quê:</strong> sem altura extra, cada fileira tem exatamente a altura do item mais alto dela. Se todos os itens têm a mesma altura, não sobra espaço vertical na célula, e "no meio" é o mesmo lugar que "em cima". O <code>align-items</code> está funcionando: só não tem o que mexer. O validador não reclama, porque não há erro.</p>
+<p><strong>Como consertar:</strong> dê altura às fileiras (<code>grid-template-rows: 100px</code>) ou à grade (<code>height</code>), ou tenha itens de alturas diferentes na mesma fileira.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>justify-content</code> não faz nada</strong>
+<p><strong>O que você vê:</strong> com <code>grid-template-columns: 1fr 1fr 1fr</code> e <code>justify-content: center</code>, nada muda.</p>
+<p><strong>Por quê:</strong> as colunas de <code>1fr</code> dividem a largura toda; não sobra espaço para "pôr a grade no meio". Talvez você quisesse <code>justify-items: center</code>, que mexe nos itens <strong>dentro</strong> das células.</p>
+</div>
+
+<div class="cenario">
+<strong><code>justify-items</code> numa caixa flex</strong>
+<p><strong>O que você vê:</strong> com <code>display: flex</code> e <code>justify-items: center</code>, nada muda.</p>
+<p><strong>Por quê:</strong> o Flexbox não tem células. Lá, <code>justify-items</code> e <code>justify-self</code> são ignorados. No F12, a declaração não aparece riscada, porque é válida: ela só não tem efeito nesse elemento. No Flexbox, use <code>justify-content</code> (aula <a href="justify-content.html">Alinhando na Linha</a>). O validador não reclama, porque a declaração é válida.</p>
+</div>
+
+<div class="cenario">
+<strong>Valor inventado: <code>“middle” is not a “justify-items” value</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.grade {
+  display: grid;
+  justify-items: middle;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.18-3.23: error: CSS: “justify-items”: “middle” is not a “justify-items” value.</pre>
+<p><strong>O que significa:</strong> "<code>middle</code> não é um valor de <code>justify-items</code>". O meio, no CSS, é <code>center</code> (em inglês americano). Com <code>centre</code>, do inglês britânico, o validador diz o mesmo: <code>“centre” is not a “align-items” value</code>. A declaração é ignorada, e os itens continuam esticados (o padrão).</p>
+</div>
+
+<div class="cenario">
+<strong>Trocou a ordem do <code>place-items</code></strong>
+<p>A Ana queria os itens à direita e no meio da altura, e escreveu <code>place-items: end center;</code>.</p>
+<p><strong>O que você vê:</strong> os itens ficam <strong>embaixo</strong> e no meio da largura.</p>
+<p><strong>Por quê:</strong> no <code>place-items</code>, o primeiro valor é o vertical (<code>align</code>) e o segundo o horizontal (<code>justify</code>). O certo era <code>place-items: center end;</code>. O validador não tem como saber o que você queria.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>Onde</th><th>Direção</th><th>Mexe em</th></tr>
+<tr><td><code>justify-items</code></td><td>Pai</td><td>Horizontal</td><td>Todos os itens, dentro das células</td></tr>
+<tr><td><code>align-items</code></td><td>Pai</td><td>Vertical</td><td>Todos os itens, dentro das células</td></tr>
+<tr><td><code>place-items</code></td><td>Pai</td><td>Vertical, horizontal</td><td>Atalho dos dois acima</td></tr>
+<tr><td><code>justify-self</code> / <code>align-self</code> / <code>place-self</code></td><td>Item</td><td>Horizontal / vertical / os dois</td><td>Só aquele item</td></tr>
+<tr><td><code>justify-content</code> / <code>align-content</code> / <code>place-content</code></td><td>Pai</td><td>Horizontal / vertical / os dois</td><td>A grade inteira dentro da caixa</td></tr>
+<tr><td>Valores dos <code>-items</code>/<code>-self</code></td><td colspan="3"><code>normal</code> (padrão, estica como o <code>stretch</code>), <code>stretch</code>, <code>start</code>, <code>center</code>, <code>end</code>; <code>baseline</code> no <code>align</code></td></tr>
+<tr><td>Valores dos <code>-content</code></td><td colspan="3"><code>start</code>, <code>center</code>, <code>end</code>, <code>space-between</code>, <code>space-around</code>, <code>space-evenly</code>, <code>stretch</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Na horizontal</h3>
+<p>Complete para todos os itens ficarem à direita das suas células:</p>
+<div class="ex-code"><input data-answer="justify-items" aria-label="propriedade">: end;</div>
+</div>
+
+<div class="exercise">
+<h3>2. Centralizar</h3>
+<p>Complete o atalho que centraliza os itens nas duas direções:</p>
+<div class="ex-code"><input data-answer="place-items" aria-label="propriedade">: center;</div>
+</div>
+
+<div class="exercise">
+<h3>3. Só um item</h3>
+<p>Complete para só o <code>.selo</code> ir para o alto da sua célula:</p>
+<div class="ex-code">.selo { <input data-answer="align-self" aria-label="propriedade">: start; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Qual valor de <code>justify-items</code> faz o item ocupar a largura toda da célula, como acontece quando você não escreve nada?</p>
+<label><input type="radio" name="q4"> <code>start</code></label>
+<label><input type="radio" name="q4"> <code>center</code></label>
+<label><input type="radio" name="q4"> <code>stretch</code></label>
+<label><input type="radio" name="q4"> <code>fill</code></label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Uma grade com <code>grid-template-columns: 1fr 1fr</code> e <code>justify-content: center</code>. O que acontece?</p>
+<label><input type="radio" name="q5"> As duas colunas vão para o meio da caixa</label>
+<label><input type="radio" name="q5"> Nada: as colunas de <code>1fr</code> já ocupam toda a largura</label>
+<label><input type="radio" name="q5"> Os itens ficam no meio das células</label>
+<label><input type="radio" name="q5"> O validador acusa erro</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Em <code>place-items: start end</code>, o que é o <code>start</code>?</p>
+<label><input type="radio" name="q6"> O alinhamento vertical (<code>align-items</code>): em cima</label>
+<label><input type="radio" name="q6"> O alinhamento horizontal (<code>justify-items</code>): à esquerda</label>
+<label><input type="radio" name="q6"> O começo da grade</label>
+<label><input type="radio" name="q6"> A primeira coluna</label>
+</div>
+
+<h3>Missão final: a vitrine da padaria</h3>
+
+<div class="tryhtml" data-goal="css:.vitrine{justify-content}=center,css:.vitrine{align-items}=end,css:.preco{justify-self}=end">
+<p class="try-task"><strong>Missão:</strong> (1) as três colunas de 120px devem ficar no <strong>meio</strong> da vitrine (a grade inteira); (2) os cartões devem ficar <strong>embaixo</strong> nas suas células, como doces apoiados na prateleira; (3) só a etiqueta <code>.preco</code> fica à <strong>direita</strong> da sua célula.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;div&gt;Bolo&lt;/div&gt;
+  &lt;div&gt;Pudim&lt;br&gt;de leite&lt;/div&gt;
+  &lt;div class="preco"&gt;R$ 9&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.vitrine {
+  display: grid;
+  grid-template-columns: repeat(3, 120px);
+  grid-template-rows: 120px;
+  gap: 8px;
+  background: #e5e7eb;
+}
+
+.vitrine div {
+  background: #fde68a;
+  border: 2px solid #a16207;
+  padding: 8px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.vitrine {
+  display: grid;
+  grid-template-columns: repeat(3, 120px);
+  grid-template-rows: 120px;
+  justify-content: center;
+  align-items: end;
+  gap: 8px;
+  background: #e5e7eb;
+}
+
+.vitrine div {
+  background: #fde68a;
+  border: 2px solid #a16207;
+  padding: 8px;
+}
+
+.preco {
+  justify-self: end;
+}
+</pre>
+</div>
+
+<p>Com a solução, as três colunas ficam juntas no meio da faixa cinza; os cartões descem para o fundo da fileira de 120px, cada um com a sua altura; e a etiqueta "R$ 9" encolhe e encosta à direita da terceira célula.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>No Grid, <code>justify</code> é horizontal e <code>align</code> é vertical, sempre.</li>
+  <li><code>justify-items</code>/<code>align-items</code> (no pai) mexem nos itens <strong>dentro das células</strong>. Sem nada (o padrão, <code>normal</code>), o item estica e ocupa a célula toda, como no <code>stretch</code>.</li>
+  <li><code>place-items: center</code> centraliza nas duas direções; com dois valores, a ordem é vertical, horizontal.</li>
+  <li><code>justify-self</code>/<code>align-self</code> (no item) mudam um item só.</li>
+  <li><code>justify-content</code>/<code>align-content</code> mexem na <strong>grade inteira</strong>, e só quando as colunas ou fileiras não ocupam a caixa toda.</li>
+  <li>"Não faz nada" quase sempre é falta de espaço sobrando (célula sem altura extra, colunas de <code>1fr</code>) ou propriedade de Grid numa caixa flex.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
