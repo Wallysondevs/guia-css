@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Seletores — tabela de consulta com combinadores, atributos e especificidade | Guia CSS</title>
+<meta name="description" content="Referência dos seletores CSS: universal, elemento, classe, ID, grupo, os quatro combinadores (descendente, filho, irmão seguinte, irmãos), os seletores de atributo, um resumo das pseudo-classes e dos pseudo-elementos, o & do aninhamento e a tabela de especificidade, com exemplo desenhado ao vivo e os erros mais comuns.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Seletores</span></h1>
+
+<p class="intro">O <strong>seletor</strong> é a parte da regra que diz <strong>quem</strong> recebe o estilo: "todos os parágrafos", "o botão com a classe <code>comprar</code>", "os links que estão dentro do menu". Esta página reúne todos os seletores do guia numa tabela de consulta: o que cada um escolhe, um exemplo, a força dele na disputa (a <strong>especificidade</strong>) e a aula que explica.</p>
+
+<div class="note">
+<strong>Como usar esta página</strong>
+<ul>
+  <li>Para aprender do começo, vá à aula <a href="seletores.html">O que é um Seletor</a>.</li>
+  <li>As pseudo-classes (<code>:hover</code>, <code>:nth-child()</code>…) e os pseudo-elementos (<code>::before</code>…) aparecem aqui em resumo; a lista completa está em <a href="ref-pseudo.html">Pseudo-classes e Pseudo-elementos</a>.</li>
+  <li>Os exemplos usam a vida da Ana: o menu da lojinha, os cartões de produto, o formulário de contato.</li>
+</ul>
+</div>
+
+<p>Atalhos: <a href="#basicos">Básicos</a> · <a href="#combinadores">Combinadores</a> · <a href="#vivo">Combinadores ao vivo</a> · <a href="#atributo">Atributo</a> · <a href="#pseudo">Pseudo-classes e pseudo-elementos</a> · <a href="#juntos">Juntando seletores</a> · <a href="#aninhamento">Aninhamento</a> · <a href="#especificidade">Especificidade</a> · <a href="#errado">Quando dá errado</a></p>
+
+<hr>
+
+<h2>A anatomia, para lembrar</h2>
+<pre class="file" data-file="anatomia">nav .menu &gt; a:hover {    /* o SELETOR é tudo antes da chave */
+  color: tomato;
+}</pre>
+<p>Lido da direita para a esquerda: "um <code>&lt;a&gt;</code>, com o mouse em cima (<code>:hover</code>), que é filho direto (<code>&gt;</code>) de um elemento com a classe <code>menu</code>, que está em algum lugar dentro de um <code>&lt;nav&gt;</code>". É assim também que o navegador confere: começa pelo elemento e sobe procurando os pais.</p>
+
+<h2 id="basicos">Seletores básicos</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Seletor</th><th>Exemplo</th><th>Escolhe</th><th>Especificidade</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>*</code></td><td><code>* { box-sizing: border-box; }</code></td><td>todos os elementos</td><td>0-0-0</td><td><a href="seletor-universal.html">Seletor Universal</a></td></tr>
+<tr><td><code>elemento</code></td><td><code>p { line-height: 1.6; }</code></td><td>todos os elementos daquela tag</td><td>0-0-1</td><td><a href="seletor-elemento.html">Seletor de Elemento</a></td></tr>
+<tr><td><code>.classe</code></td><td><code>.cartao { padding: 1rem; }</code></td><td>todos os elementos com <code>class="cartao"</code> (entre outras classes)</td><td>0-1-0</td><td><a href="seletor-classe.html">Seletor de Classe</a></td></tr>
+<tr><td><code>#id</code></td><td><code>#contato { … }</code></td><td>o elemento com <code>id="contato"</code> (único na página)</td><td>1-0-0</td><td><a href="seletor-id.html">Seletor de ID</a></td></tr>
+<tr><td><code>[atributo]</code></td><td><code>[disabled] { opacity: 0.5; }</code></td><td>os elementos que têm o atributo (<a href="#atributo">tabela abaixo</a>)</td><td>0-1-0</td><td><a href="seletores-atributo.html">Seletores de Atributo</a></td></tr>
+<tr><td><code>A, B</code> (grupo)</td><td><code>h1, h2, h3 { font-family: Georgia, serif; }</code></td><td>os elementos de <strong>qualquer</strong> um dos seletores; cada um conta a própria especificidade</td><td>a de cada um</td><td><a href="seletor-grupo.html">Agrupando Seletores</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="combinadores">Combinadores (as relações de família)</h2>
+<p>Um combinador liga dois seletores e diz qual é a relação entre eles no HTML. O espaço também é um combinador: <code>nav a</code> e <code>nava</code> são coisas muito diferentes.</p>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Combinador</th><th>Exemplo</th><th>Escolhe</th><th>Especificidade do exemplo</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>A B</code> (espaço: descendente)</td><td><code>nav a</code></td><td>todo <code>&lt;a&gt;</code> que está <strong>em qualquer nível</strong> dentro de um <code>&lt;nav&gt;</code> (filho, neto, bisneto…)</td><td>0-0-2</td><td><a href="combinadores.html">Descendente, Filho e Irmãos</a></td></tr>
+<tr><td><code>A &gt; B</code> (filho)</td><td><code>.menu &gt; a</code></td><td>só o <code>&lt;a&gt;</code> que é filho <strong>direto</strong> do <code>.menu</code> (os netos não)</td><td>0-1-1</td><td><a href="combinadores.html">Descendente, Filho e Irmãos</a></td></tr>
+<tr><td><code>A + B</code> (irmão seguinte)</td><td><code>h2 + p</code></td><td>o <code>&lt;p&gt;</code> que vem <strong>logo depois</strong> de um <code>&lt;h2&gt;</code>, com o mesmo pai</td><td>0-0-2</td><td><a href="combinadores.html">Descendente, Filho e Irmãos</a></td></tr>
+<tr><td><code>A ~ B</code> (irmãos seguintes)</td><td><code>h2 ~ p</code></td><td><strong>todos</strong> os <code>&lt;p&gt;</code> que vêm depois de um <code>&lt;h2&gt;</code>, com o mesmo pai (não precisam estar colados)</td><td>0-0-2</td><td><a href="combinadores.html">Descendente, Filho e Irmãos</a></td></tr>
+</tbody>
+</table>
+</div>
+<p>Não existe combinador "pai" nem "irmão anterior": o CSS sempre olha para baixo e para a frente. Para escolher um elemento pelo que ele <strong>contém</strong>, há o <code>:has()</code> (<a href="#pseudo">abaixo</a>).</p>
+
+<h3 id="vivo">Combinadores ao vivo</h3>
+<p>Cada quadro tem o mesmo tipo de HTML e uma regra que pinta de amarelo os parágrafos escolhidos. O nome do seletor está no alto de cada quadro:</p>
+
+<pre class="file" data-file="combinadores" data-resultado>&lt;style&gt;
+  .demo { margin: 0 0 0.75rem; padding: 0.5rem; border: 1px solid silver; font: 0.9rem/1.4 system-ui, sans-serif; }
+  .demo p, .demo h3 { margin: 0.25rem 0; padding: 0.125rem 0.5rem; }
+  .demo h3 { font-size: 0.9rem; background-color: lightsteelblue; }
+  .demo blockquote { margin: 0 0 0 1.5rem; }
+  .demo .nome { margin: 0 0 0.25rem; padding: 0; font: bold 0.85rem monospace; }
+  .d1 div p { background-color: gold; }
+  .d2 div &gt; p { background-color: gold; }
+  .d3 h3 + p { background-color: gold; }
+  .d4 h3 ~ p { background-color: gold; }
+&lt;/style&gt;
+&lt;div class="demo d1"&gt;
+  &lt;p class="nome"&gt;div p (descendente)&lt;/p&gt;
+  &lt;div&gt;&lt;p&gt;filho do div&lt;/p&gt;&lt;blockquote&gt;&lt;p&gt;neto do div (dentro de um blockquote)&lt;/p&gt;&lt;/blockquote&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="demo d2"&gt;
+  &lt;p class="nome"&gt;div &gt; p (filho)&lt;/p&gt;
+  &lt;div&gt;&lt;p&gt;filho do div&lt;/p&gt;&lt;blockquote&gt;&lt;p&gt;neto do div (dentro de um blockquote)&lt;/p&gt;&lt;/blockquote&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="demo d3"&gt;
+  &lt;p class="nome"&gt;h3 + p (irmão seguinte)&lt;/p&gt;
+  &lt;h3&gt;Título h3&lt;/h3&gt;&lt;p&gt;logo depois do h3&lt;/p&gt;&lt;p&gt;depois&lt;/p&gt;&lt;p&gt;depois&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="demo d4"&gt;
+  &lt;p class="nome"&gt;h3 ~ p (irmãos seguintes)&lt;/p&gt;
+  &lt;h3&gt;Título h3&lt;/h3&gt;&lt;p&gt;logo depois do h3&lt;/p&gt;&lt;p&gt;depois&lt;/p&gt;&lt;p&gt;depois&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<p>O que aparece: em <code>div p</code>, os <strong>dois</strong> parágrafos ficam amarelos, o filho e o neto (que está dentro de um <code>&lt;blockquote&gt;</code>, recuado). Em <code>div &gt; p</code>, só o filho: o neto fica sem fundo. Em <code>h3 + p</code>, só o parágrafo colado no título (o título, em azul-claro, é só para você achar o <code>&lt;h3&gt;</code>). Em <code>h3 ~ p</code>, os três parágrafos depois do título. O "nome" de cada quadro também é um <code>&lt;p&gt;</code>, mas nenhuma das regras o escolhe: ele não está dentro de um <code>&lt;div&gt;</code> interno e vem <strong>antes</strong> do <code>&lt;h3&gt;</code>.</p>
+
+<h2 id="atributo">Seletores de atributo</h2>
+<p>Escolhem pelo atributo do HTML e pelo valor dele. Todos valem 0-1-0, como uma classe.</p>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Seletor</th><th>Exemplo</th><th>Escolhe quem tem o atributo…</th></tr></thead>
+<tbody>
+<tr><td><code>[a]</code></td><td><code>img[alt]</code></td><td>…com qualquer valor (até vazio)</td></tr>
+<tr><td><code>[a="v"]</code></td><td><code>input[type="email"]</code></td><td>…exatamente igual a <code>v</code></td></tr>
+<tr><td><code>[a~="v"]</code></td><td><code>[class~="destaque"]</code></td><td>…com <code>v</code> como uma das palavras separadas por espaço</td></tr>
+<tr><td><code>[a|="v"]</code></td><td><code>[lang|="pt"]</code></td><td>…igual a <code>v</code> ou começando com <code>v-</code> (<code>pt</code>, <code>pt-BR</code>)</td></tr>
+<tr><td><code>[a^="v"]</code></td><td><code>a[href^="https://"]</code></td><td>…<strong>começando</strong> com <code>v</code></td></tr>
+<tr><td><code>[a$="v"]</code></td><td><code>a[href$=".pdf"]</code></td><td>…<strong>terminando</strong> com <code>v</code></td></tr>
+<tr><td><code>[a*="v"]</code></td><td><code>a[href*="lojinha"]</code></td><td>…<strong>contendo</strong> <code>v</code> em qualquer lugar</td></tr>
+<tr><td><code>[a="v" i]</code></td><td><code>a[href$=".pdf" i]</code></td><td>…igual, sem diferenciar maiúsculas de minúsculas (pega <code>.PDF</code> também)</td></tr>
+</tbody>
+</table>
+</div>
+<p>Aula: <a href="seletores-atributo.html">Seletores de Atributo</a>.</p>
+
+<h2 id="pseudo">Pseudo-classes e pseudo-elementos (resumo)</h2>
+<p>Uma <strong>pseudo-classe</strong> (um <code>:</code>) escolhe pelo <strong>estado</strong> ou pela <strong>posição</strong>; vale 0-1-0. Um <strong>pseudo-elemento</strong> (dois <code>::</code>) escolhe uma <strong>parte</strong> do elemento ou cria uma; vale 0-0-1. A lista completa está em <a href="ref-pseudo.html">Pseudo-classes e Pseudo-elementos</a>.</p>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Seletor</th><th>Exemplo</th><th>Escolhe</th><th>Especificidade</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>:hover</code>, <code>:focus</code>, <code>:focus-visible</code>, <code>:active</code></td><td><code>.botao:hover</code></td><td>o elemento com o mouse em cima, com foco (do teclado), sendo clicado</td><td>0-1-0</td><td><a href="hover-focus.html">Estados</a></td></tr>
+<tr><td><code>:first-child</code>, <code>:last-child</code>, <code>:nth-child(n)</code></td><td><code>tr:nth-child(even)</code></td><td>pela posição entre os irmãos</td><td>0-1-0</td><td><a href="nth-child.html">:nth-child</a></td></tr>
+<tr><td><code>:not(X)</code></td><td><code>li:not(:last-child)</code></td><td>os que <strong>não</strong> casam com X; vale a especificidade do X mais forte</td><td>a do X</td><td><a href="not-is-where.html">:not(), :is(), :where()</a></td></tr>
+<tr><td><code>:is(X, Y)</code></td><td><code>:is(h1, h2) a</code></td><td>os que casam com qualquer um; vale a do mais forte</td><td>a do mais forte</td><td><a href="not-is-where.html">:not(), :is(), :where()</a></td></tr>
+<tr><td><code>:where(X, Y)</code></td><td><code>:where(.cartao) p</code></td><td>igual ao <code>:is()</code>, mas <strong>não pesa nada</strong></td><td>0-0-0</td><td><a href="not-is-where.html">:not(), :is(), :where()</a></td></tr>
+<tr><td><code>:has(X)</code></td><td><code>.cartao:has(img)</code></td><td>o elemento que <strong>contém</strong> X (o "seletor do pai")</td><td>a do X</td><td><a href="has.html">:has()</a></td></tr>
+<tr><td><code>:user-invalid</code>, <code>:checked</code>, <code>:disabled</code>…</td><td><code>input:user-invalid</code></td><td>pelo estado de um campo de formulário</td><td>0-1-0</td><td><a href="formularios.html">Formulários</a></td></tr>
+<tr><td><code>::before</code>, <code>::after</code></td><td><code>.tags a::before</code></td><td>cria uma caixa no começo / no fim do conteúdo (precisa de <code>content</code>)</td><td>0-0-1</td><td><a href="before-after.html">::before e ::after</a></td></tr>
+<tr><td><code>::first-letter</code>, <code>::first-line</code>, <code>::marker</code>, <code>::placeholder</code>, <code>::selection</code></td><td><code>p::first-letter</code></td><td>a primeira letra, a primeira linha, o marcador da lista, o texto de exemplo do campo, o trecho selecionado</td><td>0-0-1</td><td><a href="pseudo-elementos.html">Outros Pseudo-elementos</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="juntos">Juntando seletores (sem espaço)</h2>
+<p>Seletores <strong>colados</strong> descrevem o <strong>mesmo</strong> elemento; com espaço, são dois elementos diferentes. As especificidades se somam.</p>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Seletor</th><th>Escolhe</th><th>Especificidade</th></tr></thead>
+<tbody>
+<tr><td><code>a.botao</code></td><td>um <code>&lt;a&gt;</code> que tem a classe <code>botao</code></td><td>0-1-1</td></tr>
+<tr><td><code>.cartao.destaque</code></td><td>um elemento com as <strong>duas</strong> classes (<code>class="cartao destaque"</code>)</td><td>0-2-0</td></tr>
+<tr><td><code>.cartao .destaque</code></td><td>um elemento com a classe <code>destaque</code> <strong>dentro</strong> de um <code>.cartao</code></td><td>0-2-0</td></tr>
+<tr><td><code>input[type="email"]:focus</code></td><td>o campo de e-mail que está com foco</td><td>0-2-1</td></tr>
+<tr><td><code>nav .menu &gt; a:hover</code></td><td>o exemplo da anatomia</td><td>0-2-2</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="aninhamento">Aninhamento com <code>&amp;</code></h2>
+<p>O CSS moderno deixa escrever uma regra dentro da outra; o <code>&amp;</code> representa o seletor de fora. Aula: <a href="aninhamento.html">CSS Aninhado</a>.</p>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Escrito aninhado</th><th>Equivale a</th></tr></thead>
+<tbody>
+<tr><td><code>.cartao { h2 { … } }</code></td><td><code>.cartao h2 { … }</code></td></tr>
+<tr><td><code>.cartao { &gt; img { … } }</code></td><td><code>.cartao &gt; img { … }</code></td></tr>
+<tr><td><code>.botao { &amp;:hover { … } }</code></td><td><code>.botao:hover { … }</code> (o <code>&amp;</code> colado: o mesmo elemento)</td></tr>
+<tr><td><code>.cartao { &amp;.destaque { … } }</code></td><td><code>.cartao.destaque { … }</code></td></tr>
+<tr><td><code>.cartao { .tema-escuro &amp; { … } }</code></td><td><code>.tema-escuro .cartao { … }</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="especificidade">Especificidade: quem vence</h2>
+<p>Quando duas regras dão valores diferentes à mesma propriedade do mesmo elemento, vence a de seletor mais <strong>específico</strong>. A especificidade é contada em três colunas, <strong>IDs – classes – elementos</strong>, e comparada da esquerda para a direita, como um placar: 1-0-0 vence 0-15-0. Empate? Vence a regra que vem <strong>depois</strong> no CSS. Aulas: <a href="especificidade.html">Especificidade</a> e <a href="cascata.html">A Cascata</a>.</p>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Conta na coluna…</th><th>Quem</th></tr></thead>
+<tbody>
+<tr><td><strong>IDs</strong> (1-0-0)</td><td><code>#id</code></td></tr>
+<tr><td><strong>classes</strong> (0-1-0)</td><td><code>.classe</code>, <code>[atributo]</code>, pseudo-classes (<code>:hover</code>, <code>:nth-child()</code>…)</td></tr>
+<tr><td><strong>elementos</strong> (0-0-1)</td><td><code>elemento</code>, pseudo-elementos (<code>::before</code>…)</td></tr>
+<tr><td>nada (0-0-0)</td><td><code>*</code>, os combinadores (<code>&gt;</code>, <code>+</code>, <code>~</code>, espaço), <code>:where()</code></td></tr>
+<tr><td>a do argumento mais forte</td><td><code>:is()</code>, <code>:not()</code>, <code>:has()</code></td></tr>
+<tr><td>acima de qualquer seletor</td><td>o atributo <code>style="…"</code> no HTML; e, acima de tudo, uma declaração com <code>!important</code> (<a href="important.html">e por que evitar</a>)</td></tr>
+</tbody>
+</table>
+</div>
+<div class="tip"><strong>Boa prática:</strong> estilize com classes (0-1-0) e evite IDs no CSS: com especificidades parecidas, a ordem do arquivo decide, e fica fácil sobrescrever. Quando precisar de uma regra fraca de propósito (um reset, um tema), use <code>:where()</code>. Aula: <a href="bem.html">Organizando Classes</a>.</div>
+
+<hr>
+
+<h2>Experimente: o menu da lojinha</h2>
+<div class="tryhtml" data-goal="css:.menu &gt; a{color}=rgb(0, 0, 128),css:.menu &gt; a{font-weight}=700,css:.sub a{color}=rgb(0, 0, 238),css:p a{color}=rgb(0, 0, 238),src:\.menu\s*&gt;\s*a">
+<p class="try-task"><strong>Missão:</strong> a regra <code>.menu a</code> pegou também o link do submenu. Mude o seletor para pintar de <code>navy</code> e pôr em negrito <strong>só</strong> os links que são filhos diretos do <code>.menu</code> ("Início" e "Bolos"); o link "Bolo de cenoura", do submenu, e o "blog", do parágrafo, ficam com a cor padrão.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav class="menu"&gt;
+  &lt;a href="#"&gt;Início&lt;/a&gt;
+  &lt;a href="#"&gt;Bolos&lt;/a&gt;
+  &lt;div class="sub"&gt;
+    &lt;a href="#"&gt;Bolo de cenoura&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/nav&gt;
+&lt;p&gt;Leia também o &lt;a href="#"&gt;blog&lt;/a&gt;.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+
+.sub {
+  margin-left: 1rem;
+}
+
+.menu a {
+  color: navy;
+  font-weight: 700;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+
+.sub {
+  margin-left: 1rem;
+}
+
+.menu &gt; a {
+  color: navy;
+  font-weight: 700;
+}
+</pre>
+</div>
+<p>Para brincar mais: troque o seletor por <code>.menu a:not(.sub a)</code>, que dá o mesmo resultado, ou por <code>a + a</code> e veja quem é escolhido.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<h3>Um erro num grupo derruba a regra inteira</h3>
+<pre class="file" data-file="style.css · erro de propósito">h1,
+h2:hovr {
+  color: tomato;
+}
+</pre>
+<p><strong>O que você vê:</strong> nem o <code>&lt;h1&gt;</code> fica tomate (o estilo calculado do <code>color</code> continua <code>rgb(0, 0, 0)</code>). <strong>Por quê:</strong> num grupo, se <strong>um</strong> dos seletores é inválido (<code>:hovr</code> não existe), o navegador descarta a regra <strong>toda</strong>, inclusive para os seletores certos. Dentro de <code>:is()</code> e <code>:where()</code> é diferente: eles são "tolerantes", e a parte errada é só ignorada (<code>:is(h1, h2:hovr)</code> pinta o <code>h1</code>; medido no Chromium). O validador:</p>
+<pre class="term" data-cwd="~/sel">$ vnu --css style.css
+"file:/home/ana/sel/style.css":2.4-2.7: error: CSS: Unknown pseudo-element or pseudo-class “:hovr”</pre>
+</div>
+
+<div class="cenario">
+<h3>Um ID que começa com número</h3>
+<pre class="file" data-file="style.css · erro de propósito">#2026 {
+  color: navy;
+}
+</pre>
+<p><strong>O que você vê:</strong> o elemento com <code>id="2026"</code> não muda. <strong>Por quê:</strong> no HTML, <code>id="2026"</code> é permitido, mas no CSS um nome de ID ou de classe não pode começar com número. Escreva <code>#\32 026</code> (escapando o "2"), use <code>[id="2026"]</code> ou, melhor, dê um nome que comece com letra (<code>id="ano-2026"</code>). O validador:</p>
+<pre class="term" data-cwd="~/sel">$ vnu --css style.css
+"file:/home/ana/sel/style.css":1.1-1.5: error: CSS: Invalid ID selector.</pre>
+</div>
+
+<div class="cenario">
+<h3>Combinador em dobro</h3>
+<pre class="file" data-file="style.css · erro de propósito">.menu &gt;&gt; a {
+  color: navy;
+}
+</pre>
+<p><strong>O que você vê:</strong> os links não mudam. <strong>Por quê:</strong> <code>&gt;&gt;</code> não é um combinador do CSS (já foi proposto, e abandonado); o seletor é inválido, e a regra inteira é descartada. O validador se perde e aponta o fim da regra:</p>
+<pre class="term" data-cwd="~/sel">$ vnu --css style.css
+"file:/home/ana/sel/style.css":3.2-4.1: error: CSS: Parse Error.</pre>
+</div>
+
+<div class="cenario">
+<h3>Um espaço a mais (ou a menos)</h3>
+<p><code>.cartao.destaque</code> e <code>.cartao .destaque</code> são seletores válidos, e por isso o validador não reclama de nenhum dos dois, mas escolhem coisas diferentes (<a href="#juntos">tabela acima</a>). Se a regra "não pega", confira o espaço; no F12, o painel de estilos mostra só as regras que casam com o elemento selecionado: se a sua não aparece lá, o seletor não o escolheu. Aula: <a href="devtools.html">Inspecionando com o F12</a>.</p>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Filho direto</h3>
+<p>Complete para escolher só os <code>&lt;li&gt;</code> que são filhos diretos do <code>.menu</code>:</p>
+<div class="ex-code">.menu <input data-answer="&gt;" aria-label="combinador"> li { … }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Links para PDF</h3>
+<p>Complete para escolher os links cujo <code>href</code> termina em <code>.pdf</code>:</p>
+<div class="ex-code">a[href<input data-answer="$=" aria-label="operador">".pdf"] { … }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. Qual seletor é mais específico?</p>
+<label><input type="radio" name="q3"> <code>nav ul li a</code> (0-0-4)</label>
+<label><input type="radio" name="q3"> <code>.menu a</code> (0-1-1)</label>
+<label><input type="radio" name="q3"> <code>#topo a</code> (1-0-1)</label>
+<label><input type="radio" name="q3"> <code>:where(#topo) a</code></label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. O que <code>h2 + p</code> escolhe?</p>
+<label><input type="radio" name="q4"> Todos os <code>&lt;p&gt;</code> dentro de um <code>&lt;h2&gt;</code></label>
+<label><input type="radio" name="q4"> O <code>&lt;p&gt;</code> que vem logo depois de um <code>&lt;h2&gt;</code>, com o mesmo pai</label>
+<label><input type="radio" name="q4"> O <code>&lt;h2&gt;</code> e o <code>&lt;p&gt;</code></label>
+<label><input type="radio" name="q4"> Todos os <code>&lt;p&gt;</code> depois de um <code>&lt;h2&gt;</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. A regra <code>h1, h2:hovr { color: tomato; }</code> não pintou nem o <code>h1</code>. Por quê?</p>
+<label><input type="radio" name="q5"> Um seletor inválido num grupo derruba a regra inteira</label>
+<label><input type="radio" name="q5"> O <code>h1</code> já tem cor própria</label>
+<label><input type="radio" name="q5"> Falta <code>!important</code></label>
+<label><input type="radio" name="q5"> Grupos só aceitam classes</label>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Básicos: <code>*</code>, <code>elemento</code>, <code>.classe</code>, <code>#id</code>, <code>[atributo]</code> e o grupo <code>A, B</code>.</li>
+  <li>Combinadores: espaço (dentro, em qualquer nível), <code>&gt;</code> (filho direto), <code>+</code> (irmão logo depois), <code>~</code> (irmãos depois). Colado = o mesmo elemento.</li>
+  <li>Pseudo-classes (<code>:</code>) escolhem por estado ou posição; pseudo-elementos (<code>::</code>), uma parte do elemento.</li>
+  <li>Especificidade: IDs – classes – elementos, comparada como placar; empate, vence a regra de baixo. <code>:where()</code> não pesa; <code>:is()</code>, <code>:not()</code> e <code>:has()</code> pesam o argumento mais forte.</li>
+  <li>Um seletor inválido num grupo derruba a regra inteira; dentro de <code>:is()</code>/<code>:where()</code>, não.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
