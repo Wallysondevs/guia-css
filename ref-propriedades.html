@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Propriedades — tabela de consulta por assunto, com valor inicial e herança | Guia CSS</title>
+<meta name="description" content="Referência das propriedades CSS usadas no guia, agrupadas por assunto (texto, cor e fundo, caixa, bordas, layout, posição, Flexbox, Grid, listas e tabelas, transformações e animações, efeitos, interação, rolagem, imagens): um exemplo de cada, o valor inicial medido no Chromium, se herda ou não, e o link para a aula.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Propriedades</span></h1>
+
+<p class="intro">Esta é a "cola" das <strong>propriedades</strong> do CSS que o guia ensina, separadas por assunto. Em cada linha: um exemplo de uso, o valor que a propriedade tem quando ninguém escreve nada (o <strong>inicial</strong>), se ela passa de pai para filho (a <strong>herança</strong>), o que faz e a aula que explica com calma. Use para lembrar um nome, conferir um valor ou achar a aula certa.</p>
+
+<div class="note">
+<strong>Como ler as tabelas</strong>
+<ul>
+  <li><strong>Inicial</strong> é o valor da especificação, medido no Chromium num elemento sem nenhum estilo. Atenção: o navegador tem a <strong>folha de estilos padrão</strong> dele, que muda alguns valores em certos elementos (o <code>&lt;h1&gt;</code> já vem em negrito e grande, o <code>&lt;p&gt;</code> já vem com margem, o <code>&lt;div&gt;</code> já é <code>block</code>). Por isso, num <code>&lt;div&gt;</code>, o <code>display</code> é <code>block</code>, embora o inicial seja <code>inline</code>.</li>
+  <li><strong>Herda?</strong> "sim" quer dizer que, se você puser a propriedade no pai, os filhos recebem o mesmo valor sem você escrever nada (é por isso que um <code>color</code> no <code>body</code> pinta a página toda). Aula: <a href="heranca.html">Herança</a>.</li>
+  <li>Os <strong>atalhos</strong> (<code>margin</code>, <code>border</code>, <code>font</code>…) aparecem na tabela própria, no fim: no F12 e nas metas, o navegador mostra as propriedades longas (<code>margin-top</code>, <code>border-top-width</code>…).</li>
+  <li>Os assuntos maiores têm referência própria: <a href="ref-flexbox.html">Flexbox</a>, <a href="ref-grid.html">Grid</a>, <a href="ref-unidades.html">Unidades</a>, <a href="ref-cores.html">Nomes de Cores</a>, <a href="ref-funcoes.html">Funções</a>, <a href="ref-seletores.html">Seletores</a> e <a href="ref-pseudo.html">Pseudo-classes e Pseudo-elementos</a>.</li>
+</ul>
+</div>
+
+<p>Assuntos: <a href="#texto">Texto e fonte</a> · <a href="#cor">Cor e fundo</a> · <a href="#caixa">Caixa e tamanho</a> · <a href="#borda">Bordas e sombras</a> · <a href="#display">Exibição e posição</a> · <a href="#flex">Flexbox</a> · <a href="#grid">Grid</a> · <a href="#listas">Listas e tabelas</a> · <a href="#movimento">Transformação e animação</a> · <a href="#efeitos">Efeitos</a> · <a href="#interacao">Interação e formulários</a> · <a href="#rolagem">Rolagem</a> · <a href="#imagens">Imagens e conteúdo gerado</a> · <a href="#outras">Escrita e outras</a> · <a href="#atalhos">Atalhos</a> · <a href="#errado">Quando dá errado</a></p>
+
+<hr>
+
+<h2>A anatomia, para lembrar</h2>
+<p>Uma <strong>propriedade</strong> é a característica que você quer mudar; o <strong>valor</strong>, como ela fica. Juntas, com <code>:</code> no meio e <code>;</code> no fim, formam uma declaração:</p>
+<pre class="file" data-file="anatomia">.cartao {               /* seletor: QUEM recebe o estilo */
+  background-color: white;   /* propriedade: valor; */
+  padding: 1rem;
+}</pre>
+<p>A aula completa é <a href="sintaxe.html">Regras, Seletores e Declarações</a>. Todas as propriedades aceitam também os valores <code>inherit</code> (copia do pai), <code>initial</code> (volta ao inicial), <code>unset</code> e <code>revert</code>.</p>
+
+<h2 id="texto">Texto e fonte</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Propriedade</th><th>Exemplo</th><th>Inicial</th><th>Herda?</th><th>O que faz</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>color</code></td><td><code>color: navy;</code></td><td>preto (<code>rgb(0, 0, 0)</code>)</td><td>sim</td><td>a cor do texto (e, por tabela, das bordas e do sublinhado que não têm cor própria)</td><td><a href="cores.html">Cores por Nome</a></td></tr>
+<tr><td><code>font-family</code></td><td><code>font-family: Georgia, serif;</code></td><td>depende do navegador (no Chromium, <code>"Times New Roman"</code>)</td><td>sim</td><td>a fonte, com uma lista de reservas; termine com uma família genérica (<code>serif</code>, <code>sans-serif</code>, <code>monospace</code>)</td><td><a href="font-family.html">Fontes</a></td></tr>
+<tr><td><code>font-size</code></td><td><code>font-size: 1.25rem;</code></td><td><code>16px</code> (o <code>medium</code>)</td><td>sim</td><td>o tamanho da letra</td><td><a href="font-size.html">font-size</a></td></tr>
+<tr><td><code>font-weight</code></td><td><code>font-weight: 700;</code></td><td><code>400</code> (<code>normal</code>)</td><td>sim</td><td>a espessura: <code>bold</code> = <code>700</code>, <code>normal</code> = <code>400</code>, de 100 a 900</td><td><a href="font-weight.html">Negrito e Itálico</a></td></tr>
+<tr><td><code>font-style</code></td><td><code>font-style: italic;</code></td><td><code>normal</code></td><td>sim</td><td>itálico</td><td><a href="font-weight.html">Negrito e Itálico</a></td></tr>
+<tr><td><code>line-height</code></td><td><code>line-height: 1.6;</code></td><td><code>normal</code></td><td>sim</td><td>a altura de cada linha; sem unidade, é um múltiplo do tamanho da letra</td><td><a href="line-height.html">Espaçamento</a></td></tr>
+<tr><td><code>letter-spacing</code></td><td><code>letter-spacing: 0.05em;</code></td><td><code>normal</code></td><td>sim</td><td>espaço extra entre as letras</td><td><a href="line-height.html">Espaçamento</a></td></tr>
+<tr><td><code>word-spacing</code></td><td><code>word-spacing: 0.2em;</code></td><td><code>0px</code></td><td>sim</td><td>espaço extra entre as palavras</td><td><a href="line-height.html">Espaçamento</a></td></tr>
+<tr><td><code>text-align</code></td><td><code>text-align: center;</code></td><td><code>start</code> (o começo da linha)</td><td>sim</td><td>alinha o texto <strong>dentro</strong> do bloco: <code>left</code>, <code>right</code>, <code>center</code>, <code>justify</code></td><td><a href="text-align.html">text-align</a></td></tr>
+<tr><td><code>text-decoration</code></td><td><code>text-decoration: none;</code></td><td><code>none</code></td><td>não*</td><td>sublinhado, riscado, linha em cima. *Não herda, mas a linha do pai é desenhada por cima dos filhos</td><td><a href="text-decoration.html">text-decoration</a></td></tr>
+<tr><td><code>text-transform</code></td><td><code>text-transform: uppercase;</code></td><td><code>none</code></td><td>sim</td><td>maiúsculas, minúsculas ou a primeira letra de cada palavra, sem mudar o HTML</td><td><a href="text-transform.html">text-transform</a></td></tr>
+<tr><td><code>text-indent</code></td><td><code>text-indent: 2em;</code></td><td><code>0px</code></td><td>sim</td><td>recuo da primeira linha do parágrafo</td><td>—</td></tr>
+<tr><td><code>text-shadow</code></td><td><code>text-shadow: 1px 1px 2px gray;</code></td><td><code>none</code></td><td>sim</td><td>sombra nas letras</td><td><a href="text-shadow.html">text-shadow</a></td></tr>
+<tr><td><code>white-space</code></td><td><code>white-space: nowrap;</code></td><td><code>normal</code></td><td>sim</td><td>se o texto quebra linha e se os espaços repetidos contam</td><td><a href="texto-longo.html">Texto que Não Cabe</a></td></tr>
+<tr><td><code>overflow-wrap</code></td><td><code>overflow-wrap: anywhere;</code></td><td><code>normal</code></td><td>sim</td><td>deixa quebrar uma palavra comprida demais (um link enorme) para ela não vazar</td><td><a href="texto-longo.html">Texto que Não Cabe</a></td></tr>
+<tr><td><code>text-overflow</code></td><td><code>text-overflow: ellipsis;</code></td><td><code>clip</code></td><td>não</td><td>as reticências "…" no texto cortado (precisa de <code>overflow: hidden</code> e <code>white-space: nowrap</code>)</td><td><a href="texto-longo.html">Texto que Não Cabe</a></td></tr>
+<tr><td><code>vertical-align</code></td><td><code>vertical-align: middle;</code></td><td><code>baseline</code></td><td>não</td><td>alinha na vertical um elemento <strong>em linha</strong> (imagem, ícone) ou uma célula de tabela; não centraliza blocos</td><td><a href="centralizar.html">Centralizando</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="cor">Cor e fundo</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Propriedade</th><th>Exemplo</th><th>Inicial</th><th>Herda?</th><th>O que faz</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>background-color</code></td><td><code>background-color: #fff8f0;</code></td><td>transparente (<code>rgba(0, 0, 0, 0)</code>)</td><td>não</td><td>a cor de fundo (o fundo transparente deixa ver o do pai, por isso parece herdar)</td><td><a href="background-color.html">Cor de Fundo</a></td></tr>
+<tr><td><code>background-image</code></td><td><code>background-image: url("bolo.jpg");</code></td><td><code>none</code></td><td>não</td><td>uma imagem ou um degradê no fundo</td><td><a href="background-image.html">Imagem de Fundo</a>, <a href="gradientes.html">Degradês</a></td></tr>
+<tr><td><code>background-repeat</code></td><td><code>background-repeat: no-repeat;</code></td><td><code>repeat</code></td><td>não</td><td>se a imagem de fundo se repete como azulejo</td><td><a href="background-posicao.html">Repetição e Posição</a></td></tr>
+<tr><td><code>background-position</code></td><td><code>background-position: center;</code></td><td><code>0% 0%</code> (canto de cima à esquerda)</td><td>não</td><td>onde a imagem de fundo começa</td><td><a href="background-posicao.html">Repetição e Posição</a></td></tr>
+<tr><td><code>background-size</code></td><td><code>background-size: cover;</code></td><td><code>auto</code></td><td>não</td><td>o tamanho da imagem de fundo: <code>cover</code> cobre tudo, <code>contain</code> cabe inteira</td><td><a href="background-size.html">cover e contain</a></td></tr>
+<tr><td><code>opacity</code></td><td><code>opacity: 0.5;</code></td><td><code>1</code></td><td>não*</td><td>a transparência do elemento <strong>inteiro</strong>, com tudo o que tem dentro. *Não herda, mas os filhos ficam transparentes junto</td><td><a href="opacity.html">Transparência</a></td></tr>
+<tr><td><code>color-scheme</code></td><td><code>color-scheme: light dark;</code></td><td><code>normal</code></td><td>sim</td><td>avisa ao navegador que a página tem tema claro e/ou escuro: campos, barras de rolagem e o fundo padrão acompanham</td><td><a href="tema-escuro.html">Tema Escuro</a></td></tr>
+</tbody>
+</table>
+</div>
+<p>Os jeitos de escrever uma cor (<code>#hex</code>, <code>rgb()</code>, <code>hsl()</code>, <code>oklch()</code>, <code>color-mix()</code>) estão em <a href="cores-hex.html">Hexadecimais</a>, <a href="cores-rgb.html">rgb()</a>, <a href="cores-hsl.html">hsl()</a>, <a href="cores-modernas.html">Cores Modernas</a> e na <a href="ref-cores.html">lista de nomes</a>.</p>
+
+<h2 id="caixa">Caixa e tamanho</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Propriedade</th><th>Exemplo</th><th>Inicial</th><th>Herda?</th><th>O que faz</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>margin-top</code> (e <code>-right</code>, <code>-bottom</code>, <code>-left</code>)</td><td><code>margin-top: 1rem;</code></td><td><code>0px</code></td><td>não</td><td>o espaço <strong>de fora</strong>, entre a caixa e as vizinhas; aceita <code>auto</code> e valores negativos</td><td><a href="margin.html">Margem</a></td></tr>
+<tr><td><code>padding-top</code> (e os outros lados)</td><td><code>padding-top: 1rem;</code></td><td><code>0px</code></td><td>não</td><td>o espaço <strong>de dentro</strong>, entre a borda e o conteúdo; pega a cor de fundo</td><td><a href="padding.html">Espaço Interno</a></td></tr>
+<tr><td><code>width</code>, <code>height</code></td><td><code>width: 20rem;</code></td><td><code>auto</code></td><td>não</td><td>largura e altura</td><td><a href="width-height.html">Largura e Altura</a></td></tr>
+<tr><td><code>min-width</code>, <code>min-height</code></td><td><code>min-height: 100dvh;</code></td><td><code>auto</code> (calculado <code>0px</code> fora do Flexbox e do Grid)</td><td>não</td><td>o tamanho mínimo: a caixa pode crescer, mas não diminuir disso</td><td><a href="width-height.html">Largura e Altura</a></td></tr>
+<tr><td><code>max-width</code>, <code>max-height</code></td><td><code>max-width: 40rem;</code></td><td><code>none</code></td><td>não</td><td>o tamanho máximo; <code>max-width: 100%</code> é o que impede uma imagem de vazar</td><td><a href="width-height.html">Largura e Altura</a></td></tr>
+<tr><td><code>box-sizing</code></td><td><code>box-sizing: border-box;</code></td><td><code>content-box</code></td><td>não</td><td>se o <code>width</code> inclui o <code>padding</code> e a borda (<code>border-box</code>) ou só o conteúdo</td><td><a href="box-sizing.html">box-sizing</a></td></tr>
+<tr><td><code>aspect-ratio</code></td><td><code>aspect-ratio: 16 / 9;</code></td><td><code>auto</code></td><td>não</td><td>a proporção da caixa: dada a largura, a altura se ajusta</td><td><a href="aspect-ratio.html">Proporção</a></td></tr>
+<tr><td><code>overflow</code> (<code>overflow-x</code>, <code>overflow-y</code>)</td><td><code>overflow: auto;</code></td><td><code>visible</code></td><td>não</td><td>o que fazer com o conteúdo que não cabe: mostrar vazando, cortar (<code>hidden</code>, <code>clip</code>) ou rolar (<code>auto</code>, <code>scroll</code>)</td><td><a href="overflow.html">overflow</a></td></tr>
+<tr><td><code>margin-inline</code>, <code>padding-block</code>, <code>inline-size</code>…</td><td><code>margin-inline: auto;</code></td><td>(os mesmos das versões físicas)</td><td>não</td><td>as versões "lógicas": <code>inline</code> é a direção do texto, <code>block</code> é a direção dos parágrafos</td><td><a href="propriedades-logicas.html">Propriedades Lógicas</a></td></tr>
+</tbody>
+</table>
+</div>
+<p>A ideia de conteúdo + <code>padding</code> + borda + <code>margin</code> está em <a href="box-model.html">O Modelo de Caixa</a>.</p>
+
+<h2 id="borda">Bordas, contornos e sombras</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Propriedade</th><th>Exemplo</th><th>Inicial</th><th>Herda?</th><th>O que faz</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>border-style</code> (<code>border-top-style</code>…)</td><td><code>border-style: dashed;</code></td><td><code>none</code></td><td>não</td><td>o tipo da linha: <code>solid</code>, <code>dashed</code>, <code>dotted</code>, <code>double</code>… Sem ele, não há borda</td><td><a href="border.html">Bordas</a></td></tr>
+<tr><td><code>border-width</code> (<code>border-top-width</code>…)</td><td><code>border-width: 2px;</code></td><td><code>medium</code> (3 px), mas calculado <code>0px</code> enquanto o estilo for <code>none</code></td><td>não</td><td>a espessura</td><td><a href="border.html">Bordas</a></td></tr>
+<tr><td><code>border-color</code> (<code>border-top-color</code>…)</td><td><code>border-color: tomato;</code></td><td>a cor do texto (<code>currentColor</code>)</td><td>não</td><td>a cor da borda</td><td><a href="border.html">Bordas</a></td></tr>
+<tr><td><code>border-radius</code> (<code>border-top-left-radius</code>…)</td><td><code>border-radius: 12px;</code></td><td><code>0px</code></td><td>não</td><td>arredonda os cantos; <code>50%</code> num quadrado faz um círculo</td><td><a href="border-radius.html">Cantos Arredondados</a></td></tr>
+<tr><td><code>outline</code> (<code>outline-style</code>, <code>-width</code>, <code>-color</code>)</td><td><code>outline: 3px solid orange;</code></td><td>estilo <code>none</code></td><td>não</td><td>um contorno por fora da borda, que não ocupa espaço; é o indicador de foco do navegador</td><td><a href="outline.html">Contorno</a></td></tr>
+<tr><td><code>outline-offset</code></td><td><code>outline-offset: 2px;</code></td><td><code>0px</code></td><td>não</td><td>afasta o contorno da borda</td><td><a href="outline.html">Contorno</a></td></tr>
+<tr><td><code>box-shadow</code></td><td><code>box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);</code></td><td><code>none</code></td><td>não</td><td>sombra da caixa: deslocamento x, y, desfoque, espalhamento, cor; <code>inset</code> desenha por dentro</td><td><a href="box-shadow.html">Sombra</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="display">Exibição e posição</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Propriedade</th><th>Exemplo</th><th>Inicial</th><th>Herda?</th><th>O que faz</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>display</code></td><td><code>display: flex;</code></td><td><code>inline</code> (mas cada elemento HTML já vem com o seu: <code>&lt;div&gt;</code> e <code>&lt;p&gt;</code> são <code>block</code>)</td><td>não</td><td>como a caixa se comporta: <code>block</code>, <code>inline</code>, <code>inline-block</code>, <code>flex</code>, <code>grid</code>, <code>none</code> (some)</td><td><a href="display.html">display</a></td></tr>
+<tr><td><code>visibility</code></td><td><code>visibility: hidden;</code></td><td><code>visible</code></td><td>sim</td><td>esconde sem tirar o lugar (diferente de <code>display: none</code>)</td><td><a href="esconder.html">Escondendo</a></td></tr>
+<tr><td><code>position</code></td><td><code>position: relative;</code></td><td><code>static</code></td><td>não</td><td>como a caixa é posicionada: <code>relative</code>, <code>absolute</code>, <code>fixed</code>, <code>sticky</code></td><td><a href="position.html">position</a></td></tr>
+<tr><td><code>top</code>, <code>right</code>, <code>bottom</code>, <code>left</code> (atalho <code>inset</code>)</td><td><code>top: 0;</code></td><td><code>auto</code></td><td>não</td><td>a distância das bordas da referência; só valem com <code>position</code> diferente de <code>static</code></td><td><a href="position-absolute.html">absolute</a>, <a href="position-sticky.html">sticky</a></td></tr>
+<tr><td><code>z-index</code></td><td><code>z-index: 10;</code></td><td><code>auto</code></td><td>não</td><td>quem fica por cima quando caixas posicionadas se sobrepõem</td><td><a href="z-index.html">Camadas</a></td></tr>
+<tr><td><code>float</code></td><td><code>float: left;</code></td><td><code>none</code></td><td>não</td><td>tira a caixa do fluxo e encosta num lado, com o texto contornando (uma imagem num artigo); não use para layout</td><td><a href="float.html">float</a></td></tr>
+<tr><td><code>clear</code></td><td><code>clear: both;</code></td><td><code>none</code></td><td>não</td><td>faz a caixa descer abaixo dos <code>float</code> anteriores</td><td><a href="float.html">float</a></td></tr>
+<tr><td><code>container-type</code></td><td><code>container-type: inline-size;</code></td><td><code>normal</code></td><td>não</td><td>transforma a caixa num contêiner que as <code>@container</code> dos filhos consultam</td><td><a href="container-queries.html">Container Queries</a></td></tr>
+<tr><td><code>isolation</code></td><td><code>isolation: isolate;</code></td><td><code>auto</code></td><td>não</td><td>cria um "grupo de camadas" próprio (para <code>z-index</code> e <code>mix-blend-mode</code> não escaparem)</td><td><a href="mix-blend-mode.html">Mistura de Cores</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="flex">Flexbox (resumo)</h2>
+<p>Todas as propriedades e valores, com exemplos ao vivo, estão na <a href="ref-flexbox.html">referência de Flexbox</a>. Nenhuma delas herda.</p>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Propriedade</th><th>Vai no</th><th>Inicial</th><th>O que faz</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>flex-direction</code></td><td>pai</td><td><code>row</code></td><td>em linha ou em coluna</td><td><a href="flex-direction.html">flex-direction</a></td></tr>
+<tr><td><code>flex-wrap</code></td><td>pai</td><td><code>nowrap</code></td><td>se os itens descem de linha quando não cabem</td><td><a href="flex-wrap.html">flex-wrap</a></td></tr>
+<tr><td><code>justify-content</code></td><td>pai</td><td><code>normal</code></td><td>distribui os itens no eixo principal</td><td><a href="justify-content.html">justify-content</a></td></tr>
+<tr><td><code>align-items</code></td><td>pai</td><td><code>normal</code> (age como <code>stretch</code>)</td><td>alinha os itens no outro eixo</td><td><a href="align-items.html">align-items</a></td></tr>
+<tr><td><code>gap</code> (<code>row-gap</code>, <code>column-gap</code>)</td><td>pai</td><td><code>normal</code></td><td>espaço entre os itens (vale também no Grid)</td><td><a href="gap.html">gap</a></td></tr>
+<tr><td><code>flex-grow</code>, <code>flex-shrink</code>, <code>flex-basis</code> (atalho <code>flex</code>)</td><td>item</td><td><code>0</code>, <code>1</code>, <code>auto</code></td><td>quanto o item cresce, encolhe e de que tamanho parte</td><td><a href="flex-grow.html">Crescer e Encolher</a></td></tr>
+<tr><td><code>align-self</code>, <code>order</code></td><td>item</td><td><code>auto</code>, <code>0</code></td><td>o alinhamento de um item só; a ordem na tela</td><td><a href="align-self.html">align-self e order</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="grid">Grid (resumo)</h2>
+<p>Tudo, com exemplos, na <a href="ref-grid.html">referência de Grid</a>. Nenhuma delas herda.</p>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Propriedade</th><th>Vai no</th><th>Inicial</th><th>O que faz</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>grid-template-columns</code></td><td>pai</td><td><code>none</code></td><td>as colunas: <code>1fr 2fr</code>, <code>repeat(3, 1fr)</code>, <code>repeat(auto-fit, minmax(10rem, 1fr))</code></td><td><a href="grid-colunas.html">Colunas</a>, <a href="grid-repeat.html">repeat e minmax</a></td></tr>
+<tr><td><code>grid-template-rows</code></td><td>pai</td><td><code>none</code></td><td>as linhas</td><td><a href="grid-linhas.html">Linhas</a></td></tr>
+<tr><td><code>grid-template-areas</code></td><td>pai</td><td><code>none</code></td><td>o "mapa" com nomes de áreas</td><td><a href="grid-areas.html">Áreas com Nome</a></td></tr>
+<tr><td><code>grid-auto-flow</code></td><td>pai</td><td><code>row</code></td><td>como os itens sem lugar marcado são distribuídos (<code>dense</code> preenche buracos)</td><td><a href="ref-grid.html">Grid</a></td></tr>
+<tr><td><code>justify-items</code>, <code>align-items</code>, <code>place-items</code></td><td>pai</td><td><code>normal</code></td><td>alinham cada item dentro da sua célula</td><td><a href="grid-alinhar.html">Alinhando no Grid</a></td></tr>
+<tr><td><code>grid-column</code>, <code>grid-row</code> (<code>grid-column-start</code>…)</td><td>item</td><td><code>auto</code></td><td>em que linhas o item começa e termina: <code>1 / 3</code>, <code>span 2</code>, <code>1 / -1</code></td><td><a href="grid-posicionar.html">Posicionando Itens</a></td></tr>
+<tr><td><code>grid-area</code></td><td>item</td><td><code>auto</code></td><td>em que área com nome o item mora</td><td><a href="grid-areas.html">Áreas com Nome</a></td></tr>
+<tr><td><code>grid-template-columns: subgrid</code></td><td>item que também é grade</td><td>—</td><td>usa as colunas da grade de fora</td><td><a href="subgrid.html">Subgrid</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="listas">Listas e tabelas</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Propriedade</th><th>Exemplo</th><th>Inicial</th><th>Herda?</th><th>O que faz</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>list-style-type</code></td><td><code>list-style-type: square;</code></td><td><code>disc</code> (bolinha)</td><td>sim</td><td>o marcador: <code>disc</code>, <code>circle</code>, <code>square</code>, <code>decimal</code>, <code>none</code>, ou um texto (<code>"✓ "</code>)</td><td><a href="listas.html">Listas</a></td></tr>
+<tr><td><code>list-style-position</code></td><td><code>list-style-position: inside;</code></td><td><code>outside</code></td><td>sim</td><td>se o marcador fica dentro ou fora da caixa do item</td><td><a href="listas.html">Listas</a></td></tr>
+<tr><td><code>border-collapse</code></td><td><code>border-collapse: collapse;</code></td><td><code>separate</code></td><td>sim</td><td>junta as bordas das células numa linha só</td><td><a href="tabelas.html">Tabelas</a></td></tr>
+<tr><td><code>border-spacing</code></td><td><code>border-spacing: 4px;</code></td><td><code>0px</code></td><td>sim</td><td>espaço entre as células (com <code>separate</code>)</td><td><a href="tabelas.html">Tabelas</a></td></tr>
+<tr><td><code>caption-side</code></td><td><code>caption-side: bottom;</code></td><td><code>top</code></td><td>sim</td><td>a legenda (<code>&lt;caption&gt;</code>) em cima ou embaixo</td><td><a href="tabelas.html">Tabelas</a></td></tr>
+<tr><td><code>table-layout</code></td><td><code>table-layout: fixed;</code></td><td><code>auto</code></td><td>não</td><td><code>fixed</code>: as colunas não se ajustam ao conteúdo (tabela mais previsível e rápida)</td><td>—</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="movimento">Transformação, transição e animação</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Propriedade</th><th>Exemplo</th><th>Inicial</th><th>Herda?</th><th>O que faz</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>transform</code></td><td><code>transform: rotate(5deg) scale(1.1);</code></td><td><code>none</code></td><td>não</td><td>move, gira, escala e inclina a caixa sem mexer no lugar dela na página (o calculado vira <code>matrix(…)</code>)</td><td><a href="transform.html">transform</a>, <a href="transform-3d.html">3D</a></td></tr>
+<tr><td><code>transform-origin</code></td><td><code>transform-origin: top left;</code></td><td>o centro (<code>50% 50%</code>)</td><td>não</td><td>o ponto em volta do qual gira e escala</td><td><a href="transform.html">transform</a></td></tr>
+<tr><td><code>transition</code> (<code>-property</code>, <code>-duration</code>, <code>-timing-function</code>, <code>-delay</code>)</td><td><code>transition: transform 0.3s ease;</code></td><td><code>all</code>, <code>0s</code>, <code>ease</code>, <code>0s</code></td><td>não</td><td>faz a mudança de um valor acontecer aos poucos</td><td><a href="transition.html">Transições</a></td></tr>
+<tr><td><code>animation</code> (<code>-name</code>, <code>-duration</code>, <code>-iteration-count</code>…)</td><td><code>animation: pulo 1s infinite;</code></td><td><code>none</code>, <code>0s</code>, <code>1</code></td><td>não</td><td>roda uma animação descrita num <code>@keyframes</code></td><td><a href="animation.html">Animações</a>, <a href="animation-propriedades.html">Controlando</a></td></tr>
+<tr><td><code>will-change</code></td><td><code>will-change: transform;</code></td><td><code>auto</code></td><td>não</td><td>avisa o navegador do que vai mudar; use só quando medir um problema</td><td><a href="performance.html">CSS Rápido</a></td></tr>
+</tbody>
+</table>
+</div>
+<p>E não esqueça de quem prefere menos movimento: <a href="reduced-motion.html">prefers-reduced-motion</a>.</p>
+
+<h2 id="efeitos">Efeitos</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Propriedade</th><th>Exemplo</th><th>Inicial</th><th>Herda?</th><th>O que faz</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>filter</code></td><td><code>filter: grayscale(1);</code></td><td><code>none</code></td><td>não</td><td>filtros de imagem no elemento: desfoque, preto e branco, brilho, contraste…</td><td><a href="filter.html">Filtros</a></td></tr>
+<tr><td><code>backdrop-filter</code></td><td><code>backdrop-filter: blur(8px);</code></td><td><code>none</code></td><td>não</td><td>filtra o que está <strong>atrás</strong> do elemento (o "vidro fosco")</td><td><a href="filter.html">Filtros</a></td></tr>
+<tr><td><code>clip-path</code></td><td><code>clip-path: circle(50%);</code></td><td><code>none</code></td><td>não</td><td>recorta o elemento numa forma</td><td><a href="clip-path.html">Recortes</a></td></tr>
+<tr><td><code>mix-blend-mode</code></td><td><code>mix-blend-mode: multiply;</code></td><td><code>normal</code></td><td>não</td><td>como as cores do elemento se misturam com as de trás</td><td><a href="mix-blend-mode.html">Mistura de Cores</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="interacao">Interação e formulários</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Propriedade</th><th>Exemplo</th><th>Inicial</th><th>Herda?</th><th>O que faz</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>cursor</code></td><td><code>cursor: pointer;</code></td><td><code>auto</code></td><td>sim</td><td>o desenho do ponteiro do mouse em cima do elemento</td><td><a href="cursor.html">Cursor e Interação</a></td></tr>
+<tr><td><code>pointer-events</code></td><td><code>pointer-events: none;</code></td><td><code>auto</code></td><td>sim</td><td><code>none</code>: o mouse "atravessa" o elemento (não clica, não faz <code>:hover</code>)</td><td><a href="cursor.html">Cursor e Interação</a></td></tr>
+<tr><td><code>user-select</code></td><td><code>user-select: none;</code></td><td><code>auto</code></td><td>na prática, sim*</td><td>se o texto pode ser selecionado. *Pela especificação não herda, mas o <code>auto</code> do filho copia o do pai (medido no Chromium)</td><td><a href="cursor.html">Cursor e Interação</a></td></tr>
+<tr><td><code>accent-color</code></td><td><code>accent-color: #c2410c;</code></td><td><code>auto</code></td><td>sim</td><td>a cor das caixas de seleção, botões de rádio, barras de progresso e controles deslizantes</td><td><a href="accent-color.html">accent-color e appearance</a></td></tr>
+<tr><td><code>appearance</code></td><td><code>appearance: none;</code></td><td><code>none</code> (os campos já vêm com <code>auto</code>)</td><td>não</td><td><code>none</code> tira o desenho nativo de um campo, para você desenhar do zero</td><td><a href="accent-color.html">accent-color e appearance</a></td></tr>
+<tr><td><code>caret-color</code></td><td><code>caret-color: tomato;</code></td><td>a cor do texto</td><td>sim</td><td>a cor do cursor que pisca dentro do campo</td><td><a href="accent-color.html">accent-color e appearance</a></td></tr>
+<tr><td><code>resize</code></td><td><code>resize: vertical;</code></td><td><code>none</code> (o <code>&lt;textarea&gt;</code> já vem com <code>both</code>)</td><td>não</td><td>se o usuário pode puxar o canto para mudar o tamanho</td><td><a href="formularios.html">Formulários</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="rolagem">Rolagem</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Propriedade</th><th>Exemplo</th><th>Inicial</th><th>Herda?</th><th>O que faz</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>scroll-behavior</code></td><td><code>scroll-behavior: smooth;</code></td><td><code>auto</code></td><td>não</td><td>rolagem suave até as âncoras (<code>#secao</code>); vai no <code>html</code></td><td><a href="scroll.html">Rolagem Suave</a></td></tr>
+<tr><td><code>scroll-margin-top</code></td><td><code>scroll-margin-top: 5rem;</code></td><td><code>0px</code></td><td>não</td><td>a folga que a rolagem deixa antes do elemento (para não ficar atrás de um topo fixo)</td><td><a href="scroll.html">Rolagem Suave</a></td></tr>
+<tr><td><code>scroll-snap-type</code> e <code>scroll-snap-align</code></td><td><code>scroll-snap-type: x mandatory;</code></td><td><code>none</code></td><td>não</td><td>faz a rolagem "encaixar" em cada item (carrosséis)</td><td><a href="scroll.html">scroll-snap</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="imagens">Imagens e conteúdo gerado</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Propriedade</th><th>Exemplo</th><th>Inicial</th><th>Herda?</th><th>O que faz</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>object-fit</code></td><td><code>object-fit: cover;</code></td><td><code>fill</code> (estica e deforma)</td><td>não</td><td>como a imagem preenche a caixa dela: <code>cover</code> corta, <code>contain</code> cabe inteira</td><td><a href="imagens-responsivas.html">Imagens que se Adaptam</a></td></tr>
+<tr><td><code>object-position</code></td><td><code>object-position: top;</code></td><td><code>50% 50%</code></td><td>não</td><td>que parte da imagem aparece quando ela é cortada</td><td><a href="imagens-responsivas.html">Imagens que se Adaptam</a></td></tr>
+<tr><td><code>content</code></td><td><code>content: "✓ ";</code></td><td><code>normal</code></td><td>não</td><td>o texto (ou imagem) de um <code>::before</code> / <code>::after</code>; sem ele, o pseudo-elemento não aparece</td><td><a href="before-after.html">::before e ::after</a></td></tr>
+<tr><td><code>counter-reset</code>, <code>counter-increment</code></td><td><code>counter-increment: passo;</code></td><td><code>none</code></td><td>não</td><td>contadores próprios, mostrados com <code>content: counter(passo)</code></td><td><a href="listas.html">Listas</a></td></tr>
+<tr><td><code>quotes</code></td><td><code>quotes: "“" "”";</code></td><td><code>auto</code> (as aspas do idioma)</td><td>sim</td><td>as aspas que o <code>&lt;q&gt;</code> e o <code>content: open-quote</code> usam</td><td><a href="ref-pseudo.html">Pseudo-classes e Pseudo-elementos</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="outras">Escrita e outras</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Propriedade</th><th>Exemplo</th><th>Inicial</th><th>Herda?</th><th>O que faz</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>writing-mode</code></td><td><code>writing-mode: vertical-rl;</code></td><td><code>horizontal-tb</code></td><td>sim</td><td>texto na horizontal ou na vertical</td><td><a href="propriedades-logicas.html">Propriedades Lógicas</a></td></tr>
+<tr><td><code>direction</code></td><td><code>direction: rtl;</code></td><td><code>ltr</code></td><td>sim</td><td>da esquerda para a direita ou o contrário (árabe, hebraico); prefira o atributo <code>dir</code> do HTML</td><td><a href="propriedades-logicas.html">Propriedades Lógicas</a></td></tr>
+<tr><td><code>hyphens</code></td><td><code>hyphens: auto;</code></td><td><code>manual</code></td><td>sim</td><td>hifenização automática (precisa do <code>lang</code> certo no HTML)</td><td><a href="texto-longo.html">Texto que Não Cabe</a></td></tr>
+<tr><td><code>tab-size</code></td><td><code>tab-size: 2;</code></td><td><code>8</code></td><td>sim</td><td>a largura do caractere de tabulação em <code>&lt;pre&gt;</code></td><td>—</td></tr>
+<tr><td><code>--qualquer-nome</code></td><td><code>--laranja: #c2410c;</code></td><td>(vazio)</td><td>sim</td><td>uma variável (propriedade personalizada), lida com <code>var(--laranja)</code></td><td><a href="variaveis.html">Variáveis</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="atalhos">Atalhos (propriedades que resumem outras)</h2>
+<p>Um atalho escreve várias propriedades de uma vez. O que você não escrever volta ao valor inicial; por isso um <code>background: tomato;</code> depois de um <code>background-image</code> apaga a imagem. No F12 (aba Computed) e nas metas do guia, aparecem as propriedades longas.</p>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Atalho</th><th>Exemplo</th><th>Resume</th><th>Aula</th></tr></thead>
+<tbody>
+<tr><td><code>margin</code>, <code>padding</code></td><td><code>margin: 0 auto;</code></td><td>os quatro lados: 1 valor (todos), 2 (cima/baixo e lados), 3 (cima, lados, baixo) ou 4 (no sentido do relógio a partir de cima)</td><td><a href="margin.html">Margem</a>, <a href="padding.html">padding</a></td></tr>
+<tr><td><code>border</code></td><td><code>border: 2px solid navy;</code></td><td>largura, estilo e cor dos quatro lados (há também <code>border-top</code>, <code>border-left</code>…)</td><td><a href="border.html">Bordas</a></td></tr>
+<tr><td><code>border-radius</code></td><td><code>border-radius: 12px 0;</code></td><td>os quatro cantos</td><td><a href="border-radius.html">border-radius</a></td></tr>
+<tr><td><code>background</code></td><td><code>background: url("bolo.jpg") center / cover no-repeat;</code></td><td>todas as <code>background-*</code></td><td><a href="background-image.html">Imagem de Fundo</a></td></tr>
+<tr><td><code>font</code></td><td><code>font: italic 700 1.25rem/1.5 Georgia, serif;</code></td><td>estilo, peso, tamanho/altura de linha e família (o tamanho e a família são obrigatórios)</td><td><a href="font-family.html">Fontes</a></td></tr>
+<tr><td><code>text-decoration</code></td><td><code>text-decoration: underline wavy red;</code></td><td>a linha, o estilo e a cor</td><td><a href="text-decoration.html">text-decoration</a></td></tr>
+<tr><td><code>list-style</code></td><td><code>list-style: none;</code></td><td>tipo, posição e imagem do marcador</td><td><a href="listas.html">Listas</a></td></tr>
+<tr><td><code>outline</code></td><td><code>outline: 3px solid orange;</code></td><td>largura, estilo e cor do contorno</td><td><a href="outline.html">Contorno</a></td></tr>
+<tr><td><code>inset</code></td><td><code>inset: 0;</code></td><td><code>top</code>, <code>right</code>, <code>bottom</code>, <code>left</code></td><td><a href="position-absolute.html">absolute</a></td></tr>
+<tr><td><code>flex</code></td><td><code>flex: 1;</code></td><td><code>flex-grow</code>, <code>flex-shrink</code>, <code>flex-basis</code></td><td><a href="flex-grow.html">Crescer e Encolher</a></td></tr>
+<tr><td><code>flex-flow</code></td><td><code>flex-flow: column wrap;</code></td><td><code>flex-direction</code> e <code>flex-wrap</code></td><td><a href="flex-wrap.html">flex-wrap</a></td></tr>
+<tr><td><code>gap</code></td><td><code>gap: 1rem 2rem;</code></td><td><code>row-gap</code> e <code>column-gap</code></td><td><a href="gap.html">gap</a></td></tr>
+<tr><td><code>grid-column</code>, <code>grid-row</code>, <code>grid-area</code></td><td><code>grid-column: 1 / -1;</code></td><td>as linhas de começo e fim</td><td><a href="grid-posicionar.html">Posicionando Itens</a></td></tr>
+<tr><td><code>place-items</code>, <code>place-content</code>, <code>place-self</code></td><td><code>place-items: center;</code></td><td>o <code>align-…</code> e o <code>justify-…</code> correspondentes</td><td><a href="centralizar.html">Centralizando</a></td></tr>
+<tr><td><code>transition</code>, <code>animation</code></td><td><code>transition: opacity 0.3s;</code></td><td>todas as <code>transition-*</code> / <code>animation-*</code></td><td><a href="transition.html">Transições</a>, <a href="animation.html">Animações</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<h2>Experimente: consulte e aplique</h2>
+<p>Um cartão de produto da lojinha, com poucas propriedades. Procure nas tabelas e acrescente o que quiser: uma <code>box-shadow</code>, um <code>text-transform</code> no título, um <code>filter</code> na foto, um <code>transform</code> no <code>:hover</code>.</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="cartao"&gt;
+  &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="400" height="400"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p class="preco"&gt;R$ 45,00&lt;/p&gt;
+  &lt;p class="etiqueta"&gt;Mais pedido&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+  background-color: #fdf6ec;
+}
+
+.cartao {
+  max-width: 14rem;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 12px;
+}
+
+.cartao img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.preco {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* acrescente propriedades aqui */
+</pre>
+</div>
+
+<h3>Missão: a etiqueta "Mais pedido"</h3>
+<div class="tryhtml" data-goal="css:.etiqueta{text-transform}=uppercase,css:.etiqueta{letter-spacing}=1.6px,css:.etiqueta{font-style}=italic,css:.etiqueta{display}=inline-block,css:.etiqueta{border-top-left-radius}=999px">
+<p class="try-task"><strong>Missão:</strong> usando as tabelas, deixe a <code>.etiqueta</code> em maiúsculas (sem mudar o HTML), com <code>0.1em</code> de espaço entre as letras, em itálico, como <code>inline-block</code> e com cantos de pílula (<code>999px</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="etiqueta"&gt;Mais pedido&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.etiqueta {
+  padding: 0.25rem 0.75rem;
+  background-color: #c2410c;
+  color: white;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.etiqueta {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background-color: #c2410c;
+  color: white;
+  font-style: italic;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<h3>Uma propriedade que não existe</h3>
+<pre class="file" data-file="style.css · erro de propósito">h1 {
+  text-color: navy;
+}
+
+p {
+  font-color: gray;
+  background-colour: white;
+}
+</pre>
+<p><strong>O que você vê:</strong> nada muda: o título continua preto, o parágrafo também. <strong>Por quê:</strong> o navegador ignora em silêncio a declaração com um nome que ele não conhece. A cor do texto é <code>color</code> (não existe <code>text-color</code> nem <code>font-color</code>), e o CSS usa o inglês americano: <code>color</code>, nunca <code>colour</code>. No F12, a declaração aparece riscada, com um aviso. O validador:</p>
+<pre class="term" data-cwd="~/ref">$ vnu --css style.css
+"file:/home/ana/ref/style.css":2.15-2.18: error: CSS: “text-color”: Property “text-color” doesn't exist.
+"file:/home/ana/ref/style.css":6.15-6.18: error: CSS: “font-color”: Property “font-color” doesn't exist.
+"file:/home/ana/ref/style.css":7.22-7.26: error: CSS: “background-colour”: Property “background-colour” doesn't exist.</pre>
+</div>
+
+<div class="cenario">
+<h3>Um valor que a propriedade não aceita</h3>
+<pre class="file" data-file="style.css · erro de propósito">.preco {
+  font-weight: bold;
+  font-size: big;
+}
+</pre>
+<p><strong>O que você vê:</strong> o preço fica em negrito, mas no tamanho normal. <strong>Por quê:</strong> só a declaração inválida é descartada; as outras da mesma regra continuam valendo. <code>big</code> não é um valor de <code>font-size</code> (os nomes são <code>small</code>, <code>medium</code>, <code>large</code>, <code>x-large</code>…; melhor ainda, use <code>rem</code>). A coluna "Exemplo" das tabelas mostra um valor válido de cada propriedade. O validador:</p>
+<pre class="term" data-cwd="~/ref">$ vnu --css style.css
+"file:/home/ana/ref/style.css":3.14-3.16: error: CSS: “font-size”: “big” is not a “font-size” value.</pre>
+</div>
+
+<div class="cenario">
+<h3>A propriedade certa no elemento errado</h3>
+<p>O nome e o valor estão certos, mas nada acontece: <code>justify-content: center</code> num elemento que não é <code>flex</code> nem <code>grid</code>; <code>top: 0</code> sem <code>position</code>; <code>z-index</code> em caixa não posicionada; <code>width</code> num <code>&lt;span&gt;</code> (em linha); <code>text-overflow: ellipsis</code> sem <code>overflow: hidden</code>. O validador não acusa nada disso: o CSS é válido. A lista completa, com o conserto de cada um, está em <a href="ref-problemas.html">"Meu CSS Não Funciona"</a>.</p>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A cor do texto</h3>
+<p>Qual é o nome da propriedade que muda a cor do texto?</p>
+<div class="ex-code"><input data-answer="color" aria-label="propriedade">: navy;</div>
+</div>
+
+<div class="exercise">
+<h3>2. O espaço de dentro</h3>
+<p>Qual propriedade cria espaço entre a borda e o conteúdo?</p>
+<div class="ex-code"><input data-answer="padding" aria-label="propriedade">: 1rem;</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. Você pôs <code>font-family</code> no <code>body</code>. Por que todos os parágrafos mudaram de fonte?</p>
+<label><input type="radio" name="q3"> Porque o <code>body</code> é o maior elemento</label>
+<label><input type="radio" name="q3"> Porque <code>font-family</code> herda: os filhos recebem o valor do pai</label>
+<label><input type="radio" name="q3"> Porque o navegador copia todas as propriedades do <code>body</code></label>
+<label><input type="radio" name="q3"> Porque é um atalho</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Qual destas propriedades <strong>não</strong> herda?</p>
+<label><input type="radio" name="q4"> <code>color</code></label>
+<label><input type="radio" name="q4"> <code>line-height</code></label>
+<label><input type="radio" name="q4"> <code>border</code></label>
+<label><input type="radio" name="q4"> <code>text-align</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Para cortar uma foto sem deformar dentro de uma caixa de tamanho fixo, qual propriedade e valor?</p>
+<label><input type="radio" name="q5"> <code>object-fit: cover</code></label>
+<label><input type="radio" name="q5"> <code>background-size: cover</code></label>
+<label><input type="radio" name="q5"> <code>overflow: hidden</code></label>
+<label><input type="radio" name="q5"> <code>object-fit: fill</code></label>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Uma declaração é <code>propriedade: valor;</code>. Nome ou valor errados: o navegador ignora só aquela declaração, em silêncio; o validador aponta.</li>
+  <li>O valor inicial é o da especificação; cada elemento HTML já vem com alguns valores mudados pela folha padrão do navegador.</li>
+  <li>Herdam, em geral, as propriedades de <strong>texto</strong> (cor, fonte, tamanho, altura de linha, alinhamento, listas, cursor). Não herdam as de <strong>caixa</strong> (margem, borda, fundo, tamanho, posição, layout).</li>
+  <li>Os atalhos (<code>margin</code>, <code>border</code>, <code>font</code>, <code>background</code>, <code>flex</code>…) resumem várias propriedades e devolvem ao inicial o que você não escrever.</li>
+  <li>Para o detalhe, siga o link da aula em cada linha; Flexbox, Grid, unidades, cores, funções, seletores e pseudo-classes têm referência própria.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
