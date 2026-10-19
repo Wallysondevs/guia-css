@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS align-items — alinhar os itens na direção cruzada | Guia CSS</title>
+<meta name="description" content="align-items em CSS para quem está começando: stretch, flex-start, flex-end, center e baseline lado a lado, por que os itens do Flexbox têm a mesma altura, centralizar uma foto e um texto, alinhar preços pela linha de base, o align-items numa coluna e as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">align-items</span></h1>
+
+<p class="intro">O <code>justify-content</code> cuida do espaço ao longo da fila de itens. Falta a outra direção: numa fila em linha, onde cada item fica <strong>na altura</strong>? Encostado em cima, embaixo, no meio, esticado? É o trabalho do <code>align-items</code> ("alinhar os itens"). Com ele você resolve um dos problemas mais antigos do CSS, centralizar na vertical, e alinha coisas de tamanhos diferentes: a foto e o nome de um produto, um logo grande e um menu pequeno, preços com letras de tamanhos diferentes.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Os valores <code>stretch</code>, <code>flex-start</code>, <code>flex-end</code>, <code>center</code> e <code>baseline</code>, lado a lado.</li>
+  <li>Por que os itens de um Flexbox ficam da mesma altura (o <code>stretch</code>), e quando isso para de acontecer.</li>
+  <li>Como centralizar uma foto e um texto na mesma linha.</li>
+  <li>Como alinhar textos de tamanhos diferentes pela linha de base.</li>
+  <li>O que muda numa coluna.</li>
+  <li>As mensagens reais do validador e a diferença para o <code>align-content</code>.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="flexbox.html">Introdução ao Flexbox</a>, <a href="flex-direction.html">Direção</a> e <a href="justify-content.html">justify-content</a>. Os resultados são desenhados pelo <strong>seu</strong> navegador; os números em pixels do texto foram medidos no Chromium. As mensagens do validador saíram do validador W3C (<code>vnu</code>), na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: a altura da prateleira</h2>
+<p>Na prateleira da Ana há um pote alto, um médio e um baixinho. Ela pode encostar todos no fundo da prateleira (o jeito normal), pendurá-los no teto, deixá-los flutuando no meio da altura, ou, se fossem de massinha, esticá-los até preencherem a altura toda. Na prateleira deitada, essa é a direção <strong>em pé</strong>: a <strong>direção cruzada</strong> do Flexbox. O <code>align-items</code> decide onde cada item fica nela.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th>Direção</th><th>Numa fila em linha (<code>row</code>)</th></tr>
+<tr><td><code>justify-content</code></td><td>Principal</td><td>Deitada: esquerda ↔ direita</td></tr>
+<tr><td><code>align-items</code></td><td>Cruzada</td><td>Em pé: cima ↕ baixo</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. Os valores, lado a lado</h2>
+<p>Cada caixa tem um pai com 100&nbsp;px de altura e três itens de alturas diferentes (o 2 tem duas linhas, o 3 tem letra maior). Só muda o <code>align-items</code>, escrito no alto:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .caixa { margin-bottom: 10px; padding: 4px; border: 2px dashed gray; font-family: sans-serif; }
+  .caixa p { margin: 0 0 4px; font-weight: bold; }
+  .pai { display: flex; height: 100px; background-color: linen; }
+  .item { width: 90px; padding: 4px 8px; background-color: tomato; color: white; border: 1px solid white; }
+  .grande { font-size: 28px; }
+&lt;/style&gt;
+&lt;div class="caixa"&gt;&lt;p&gt;align-items: stretch (o padrão)&lt;/p&gt;
+  &lt;div class="pai" style="align-items: stretch"&gt;&lt;div class="item"&gt;1&lt;/div&gt;&lt;div class="item"&gt;2&lt;br&gt;linhas&lt;/div&gt;&lt;div class="item grande"&gt;3&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class="caixa"&gt;&lt;p&gt;align-items: flex-start&lt;/p&gt;
+  &lt;div class="pai" style="align-items: flex-start"&gt;&lt;div class="item"&gt;1&lt;/div&gt;&lt;div class="item"&gt;2&lt;br&gt;linhas&lt;/div&gt;&lt;div class="item grande"&gt;3&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class="caixa"&gt;&lt;p&gt;align-items: flex-end&lt;/p&gt;
+  &lt;div class="pai" style="align-items: flex-end"&gt;&lt;div class="item"&gt;1&lt;/div&gt;&lt;div class="item"&gt;2&lt;br&gt;linhas&lt;/div&gt;&lt;div class="item grande"&gt;3&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class="caixa"&gt;&lt;p&gt;align-items: center&lt;/p&gt;
+  &lt;div class="pai" style="align-items: center"&gt;&lt;div class="item"&gt;1&lt;/div&gt;&lt;div class="item"&gt;2&lt;br&gt;linhas&lt;/div&gt;&lt;div class="item grande"&gt;3&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class="caixa"&gt;&lt;p&gt;align-items: baseline&lt;/p&gt;
+  &lt;div class="pai" style="align-items: baseline"&gt;&lt;div class="item"&gt;1&lt;/div&gt;&lt;div class="item"&gt;2&lt;br&gt;linhas&lt;/div&gt;&lt;div class="item grande"&gt;3&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+</pre>
+
+<p>Neste resultado, o valor de cada caixa está no atributo <code>style</code> só para caber tudo num exemplo; no seu site, use classes num <code>style.css</code>.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>Em português</th><th>O que faz</th></tr>
+<tr><td><code>stretch</code> (o padrão)</td><td>"esticar"</td><td>Cada item <strong>estica</strong> até a altura toda do pai: os três ficam com 100&nbsp;px, do teto ao chão</td></tr>
+<tr><td><code>flex-start</code></td><td>"início"</td><td>Cada item com a sua altura, encostado <strong>em cima</strong></td></tr>
+<tr><td><code>flex-end</code></td><td>"fim"</td><td>Encostados <strong>embaixo</strong></td></tr>
+<tr><td><code>center</code></td><td>"centro"</td><td>Cada item <strong>no meio</strong> da altura, com sobra igual em cima e embaixo</td></tr>
+<tr><td><code>baseline</code></td><td>"linha de base"</td><td>Os itens se alinham pela <strong>linha de base</strong> da primeira linha de texto (a linha invisível onde as letras "pisam"): o "1", o "2" e o "3", de tamanhos diferentes, ficam pisando na mesma linha</td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque <code>center</code> por <code>flex-start</code>, <code>flex-end</code>, <code>stretch</code> e <code>baseline</code>, e veja o nome da loja e o menu mudarem de altura dentro do cabeçalho.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;strong class="logo"&gt;Lojinha da Ana&lt;/strong&gt;
+  &lt;nav class="menu"&gt;Bolos · Doces · Contato&lt;/nav&gt;
+&lt;/header&gt;
+</pre>
+<pre class="script" data-file="style.css">.topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+  padding: 0 12px;
+  background-color: navy;
+  color: white;
+}
+
+.logo {
+  font-size: 32px;
+}
+
+.menu {
+  background-color: darkslateblue;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>align-items</dt><dd>Vai no <strong>pai</strong> flex e vale para todos os itens de uma vez. Para mudar um item só, existe o <code>align-self</code> (aula <a href="align-self.html">Um Item Diferente</a>).</dd>
+  <dt>center</dt><dd>O valor: onde os itens ficam na direção cruzada.</dd>
+</dl>
+
+<hr>
+
+<h2>2. O <code>stretch</code>: por que os itens têm a mesma altura</h2>
+<p>Na aula <a href="flexbox.html">Introdução ao Flexbox</a>, você viu que os cartões de uma vitrine flex ficam da mesma altura. É o <code>stretch</code>, o valor padrão: cada item estica até a altura da linha, que é a altura do item mais alto (ou a do pai, se ele tiver uma). Isso resolve um problema antigo: colunas lado a lado, com fundos de alturas iguais, sem conta nenhuma.</p>
+<p>Mas o <code>stretch</code> só estica quem <strong>não tem altura definida</strong>. Um item com <code>height</code> fica com a altura dele:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o cartão do meio tem <code>height: 50px</code> e não esticou. Apague essa linha e veja-o ficar da altura dos outros.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;div class="produto"&gt;Bolo de cenoura com cobertura de chocolate&lt;/div&gt;
+  &lt;div class="produto baixo"&gt;Pudim&lt;/div&gt;
+  &lt;div class="produto"&gt;Torta de limão&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.vitrine {
+  display: flex;
+}
+
+.produto {
+  width: 120px;
+  margin: 4px;
+  padding: 8px;
+  background-color: seagreen;
+  color: white;
+}
+
+.baixo {
+  height: 50px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Centralizar uma foto e um texto</h2>
+<p>O uso mais comum do <code>align-items: center</code>: uma foto (ou ícone) ao lado de um texto, com o texto no meio da altura da foto, e não grudado no topo.</p>
+
+<div class="tryhtml" data-goal="css:.produto{display}=flex,css:.produto{align-items}=center">
+<p class="try-task"><strong>Missão:</strong> em cada produto, o nome está no alto, alinhado com o topo da foto. Centralize o nome na altura da foto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="produto"&gt;
+  &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="" width="64" height="64"&gt;
+  &lt;p&gt;Bolo de cenoura · R$ 45,00&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="produto"&gt;
+  &lt;img src="assets/midia/avatar-ana-96.png" alt="" width="64" height="64"&gt;
+  &lt;p&gt;Encomendas com a Ana&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.produto {
+  display: flex;
+  margin-bottom: 8px;
+  padding: 8px;
+  border: 2px solid peru;
+  background-color: linen;
+}
+
+.produto p {
+  margin: 0 0 0 12px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.produto {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 8px;
+  border: 2px solid peru;
+  background-color: linen;
+}
+
+.produto p {
+  margin: 0 0 0 12px;
+}
+</pre>
+</div>
+
+<h3>No meio do meio: as duas direções</h3>
+<p>Juntando o <code>justify-content: center</code> (meio na principal) com o <code>align-items: center</code> (meio na cruzada), um item fica bem no centro do pai. É a forma mais usada hoje de centralizar qualquer coisa (aula <a href="centralizar.html">Centralizando Qualquer Coisa</a>):</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .palco { display: flex; justify-content: center; align-items: center; height: 160px; background-color: linen; }
+  .selo { padding: 12px 20px; background-color: seagreen; color: white; font-family: sans-serif; }
+&lt;/style&gt;
+&lt;div class="palco"&gt;
+  &lt;p class="selo"&gt;Bem no meio&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<hr>
+
+<h2>4. <code>baseline</code>: textos de tamanhos diferentes</h2>
+<p>Num cartão de preço, o valor é grande e o "por mês" é pequeno. Com <code>center</code>, os dois ficam centralizados, mas as letras não "pisam" na mesma linha, e o olho estranha. Com <code>baseline</code>, as letras de tamanhos diferentes ficam apoiadas na mesma linha, como numa frase:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> compare as duas linhas: em cima, <code>center</code>; embaixo, <code>baseline</code>. Repare no pé do "R$ 45" e do "a fatia".</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="preco centro"&gt;&lt;span class="valor"&gt;R$ 45&lt;/span&gt;&lt;span&gt;o bolo inteiro&lt;/span&gt;&lt;/p&gt;
+&lt;p class="preco base"&gt;&lt;span class="valor"&gt;R$ 5&lt;/span&gt;&lt;span&gt;a fatia&lt;/span&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.preco {
+  display: flex;
+  border-bottom: 1px solid gray;
+}
+
+.centro {
+  align-items: center;
+}
+
+.base {
+  align-items: baseline;
+}
+
+.valor {
+  margin-right: 8px;
+  font-size: 40px;
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>5. Numa coluna, o <code>align-items</code> é horizontal</h2>
+<p>O <code>align-items</code> trabalha sempre na direção <strong>cruzada</strong>. Com <code>flex-direction: column</code> (aula <a href="flex-direction.html">Direção</a>), a cruzada é a deitada: <code>flex-start</code> passa a ser "à esquerda", <code>flex-end</code> "à direita", <code>center</code> "no meio da largura", e o <code>stretch</code> estica na <strong>largura</strong>.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> com <code>stretch</code>, os botões da coluna ocupam a largura toda. Troque por <code>center</code>, <code>flex-start</code> e <code>flex-end</code>, e veja-os ficarem do tamanho do texto, no meio, à esquerda e à direita.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="painel"&gt;
+  &lt;a class="botao" href="bolos.html"&gt;Ver os bolos&lt;/a&gt;
+  &lt;a class="botao" href="doces.html"&gt;Ver os doces&lt;/a&gt;
+  &lt;a class="botao" href="contato.html"&gt;Encomendar&lt;/a&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.painel {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 8px;
+  background-color: linen;
+}
+
+.botao {
+  margin: 4px;
+  padding: 8px 16px;
+  background-color: seagreen;
+  color: white;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Os outros nomes, e o <code>align-content</code></h2>
+<ul>
+  <li><code>start</code> e <code>end</code> também existem e, num Flexbox comum, dão o mesmo que <code>flex-start</code> e <code>flex-end</code>. Há ainda <code>first baseline</code> e <code>last baseline</code> (alinhar pela primeira ou pela última linha de texto); <code>baseline</code> sozinho é o mesmo que <code>first baseline</code>.</li>
+  <li>O <code>align-content</code> parece irmão, mas faz outra coisa: quando os itens quebram em <strong>várias linhas</strong> (com <code>flex-wrap</code>), ele arruma <strong>as linhas</strong> dentro do pai. O <code>align-items</code> arruma <strong>cada item dentro da sua linha</strong>. Detalhes na aula <a href="flex-wrap.html">Quebrando Linha</a>.</li>
+</ul>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>"O <code>center</code> não faz nada": não sobra altura</strong>
+<p><strong>O que o leitor vê:</strong> troca o <code>align-items</code> e nada muda.</p>
+<p><strong>Por quê:</strong> se todos os itens têm a mesma altura e o pai não tem altura própria, a linha é exatamente da altura deles: não sobra nada para alinhar. O efeito só aparece quando há itens de alturas diferentes (como a foto e o texto da missão) ou um pai mais alto que os itens.</p>
+<p><strong>Como consertar:</strong> confira no F12 a altura do pai. Para centralizar na tela, o pai precisa de uma altura (por exemplo, <code>min-height</code>; aula <a href="unidades-viewport.html">Unidades da Tela</a>).</p>
+</div>
+
+<div class="cenario">
+<strong>O item não estica</strong>
+<p><strong>O que o leitor vê:</strong> com <code>stretch</code> (o padrão), um cartão continua mais baixo que os vizinhos.</p>
+<p><strong>Por quê:</strong> ele tem um <code>height</code> (seção 2), ou o pai tem outro <code>align-items</code>, ou o próprio item tem um <code>align-self</code>.</p>
+<p><strong>Como consertar:</strong> tire o <code>height</code> do item (se precisar de um mínimo, use <code>min-height</code>, que deixa esticar).</p>
+</div>
+
+<div class="cenario">
+<strong><code>align-items: middle</code>: <code>“middle” is not a “align-items” value</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.produto {
+  display: flex;
+  align-items: middle;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.16-3.21: error: CSS: “align-items”: “middle” is not a “align-items” value.</pre>
+<p><strong>O que o leitor vê:</strong> o nome continua no alto (o <code>stretch</code> padrão). A declaração foi ignorada e aparece riscada no F12.</p>
+<p><strong>Como consertar:</strong> <code>align-items: center;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>“space-between” is not a “align-items” value</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.topo {
+  display: flex;
+  align-items: space-between;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.16-3.28: error: CSS: “align-items”: “space-between” is not a “align-items” value.</pre>
+<p><strong>Por quê:</strong> numa linha só, cada item tem a sua posição na cruzada; não há "espaço entre" itens para distribuir nessa direção. Os valores <code>space-…</code> são do <code>justify-content</code> (e do <code>align-content</code>, para as linhas).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz (numa fila em linha)</th></tr>
+<tr><td><code>align-items: stretch;</code></td><td>O padrão: os itens esticam até a altura da linha (se não tiverem <code>height</code>)</td></tr>
+<tr><td><code>align-items: flex-start;</code></td><td>Encostados em cima</td></tr>
+<tr><td><code>align-items: flex-end;</code></td><td>Encostados embaixo</td></tr>
+<tr><td><code>align-items: center;</code></td><td>No meio da altura</td></tr>
+<tr><td><code>align-items: baseline;</code></td><td>Pela linha de base do texto</td></tr>
+<tr><td><code>justify-content: center;</code> + <code>align-items: center;</code></td><td>Bem no centro do pai</td></tr>
+<tr><td>Em coluna</td><td>Alinha na horizontal; <code>stretch</code> estica na largura</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. No meio da altura</h3>
+<p>Complete para o texto ficar no meio da altura da foto:</p>
+<div class="ex-code">.produto { display: flex; align-items: <input data-answer="center" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. O padrão</h3>
+<p>Complete com o valor padrão, que estica os itens:</p>
+<div class="ex-code">.vitrine { display: flex; align-items: <input data-answer="stretch" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. A linha das letras</h3>
+<p>Complete para textos de tamanhos diferentes "pisarem" na mesma linha:</p>
+<div class="ex-code">.preco { display: flex; align-items: <input data-answer="baseline" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Numa fila em linha, em que direção o <code>align-items</code> trabalha?</p>
+<label><input type="radio" name="q4"> Deitada, da esquerda para a direita</label>
+<label><input type="radio" name="q4"> Em pé, de cima para baixo (a cruzada)</label>
+<label><input type="radio" name="q4"> Nas duas</label>
+<label><input type="radio" name="q4"> Depende do <code>justify-content</code></label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Num pai flex com <code>align-items: stretch</code>, um item não esticou. O motivo mais provável:</p>
+<label><input type="radio" name="q5"> Falta <code>display: block</code> no item</label>
+<label><input type="radio" name="q5"> O pai não tem <code>justify-content</code></label>
+<label><input type="radio" name="q5"> O item tem um <code>height</code></label>
+<label><input type="radio" name="q5"> O <code>stretch</code> só funciona em coluna</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Com <code>flex-direction: column</code> e <code>align-items: center</code>, os itens ficam…</p>
+<label><input type="radio" name="q6"> no meio da largura do pai, cada um do tamanho do seu conteúdo</label>
+<label><input type="radio" name="q6"> no meio da altura do pai</label>
+<label><input type="radio" name="q6"> esticados na largura toda</label>
+<label><input type="radio" name="q6"> encostados à esquerda</label>
+</div>
+
+<h3>Missão final: o cabeçalho e o preço</h3>
+
+<div class="tryhtml" data-goal="css:.topo{align-items}=center,css:.preco{align-items}=baseline">
+<p class="try-task"><strong>Missão:</strong> duas correções. (1) No cabeçalho, o avatar da Ana é alto e o nome e o botão ficaram grudados no alto: centralize os três na altura. (2) No preço, alinhe o valor grande e o "a fatia" pela <strong>linha de base</strong>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;img src="assets/midia/avatar-ana-96.png" alt="" width="72" height="72"&gt;
+  &lt;strong class="nome"&gt;Padaria da Ana&lt;/strong&gt;
+  &lt;a class="botao" href="contato.html"&gt;Encomendar&lt;/a&gt;
+&lt;/header&gt;
+&lt;p class="preco"&gt;&lt;span class="valor"&gt;R$ 7&lt;/span&gt;&lt;span&gt;a fatia de bolo&lt;/span&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.topo {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px;
+  background-color: linen;
+}
+
+.nome {
+  margin: 0 auto 0 12px;
+  font-size: 24px;
+}
+
+.botao {
+  padding: 8px 16px;
+  background-color: seagreen;
+  color: white;
+}
+
+.preco {
+  display: flex;
+}
+
+.valor {
+  margin-right: 8px;
+  font-size: 40px;
+  font-weight: bold;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.topo {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background-color: linen;
+}
+
+.nome {
+  margin: 0 auto 0 12px;
+  font-size: 24px;
+}
+
+.botao {
+  padding: 8px 16px;
+  background-color: seagreen;
+  color: white;
+}
+
+.preco {
+  display: flex;
+  align-items: baseline;
+}
+
+.valor {
+  margin-right: 8px;
+  font-size: 40px;
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<p>Repare no <code>margin: 0 auto 0 12px</code> do nome: a margem direita <code>auto</code> empurra o botão para a ponta direita, o truque da aula <a href="justify-content.html">justify-content</a>.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>align-items</code> vai no pai flex e posiciona os itens na direção <strong>cruzada</strong> (em pé, numa fila em linha).</li>
+  <li><code>stretch</code> (padrão) estica os itens sem <code>height</code>: por isso os cartões flex têm a mesma altura. <code>flex-start</code>, <code>flex-end</code> e <code>center</code>: em cima, embaixo, no meio. <code>baseline</code>: pela linha das letras.</li>
+  <li>Foto e texto alinhados: <code>align-items: center</code>. Centro do pai: <code>justify-content: center</code> + <code>align-items: center</code>.</li>
+  <li>Em coluna, ele alinha na horizontal, e o <code>stretch</code> estica na largura.</li>
+  <li>Sem altura sobrando, nada muda. <code>middle</code> e <code>space-between</code> não são valores do <code>align-items</code>. Para as linhas de um <code>flex-wrap</code>, o certo é o <code>align-content</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
