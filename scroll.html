@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Rolagem Suave e scroll-snap — scroll-behavior, scroll-margin e carrosséis | Guia CSS</title>
+<meta name="description" content="Rolagem em CSS para quem está começando: scroll-behavior: smooth para os links da mesma página deslizarem, scroll-margin-top e scroll-padding-top para o cabeçalho fixo não cobrir o título, e scroll-snap (scroll-snap-type, scroll-snap-align, scroll-snap-stop) para carrosséis que param certinho em cada foto, com prefers-reduced-motion e as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Rolagem Suave e scroll-snap</span></h1>
+
+<p class="intro">Quando o leitor clica em "Modo de preparo" no sumário da receita, a página <strong>pula</strong> de uma vez para o título, e ele perde a noção de onde está. Num carrossel de fotos, a rolagem para no meio de uma foto, cortada ao meio. O CSS resolve as duas coisas sem nenhuma linha de JavaScript: a rolagem pode <strong>deslizar</strong> até o destino, e um contêiner pode <strong>encaixar</strong> cada item no lugar certo, como as fotos de um álbum. Nesta aula você vai fazer as duas coisas no site da Ana.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li><code>scroll-behavior: smooth</code>: a rolagem que desliza até a âncora, e onde ele precisa ficar (no <code>html</code>, não no <code>body</code>).</li>
+  <li>Como respeitar quem pediu menos movimento, com <code>prefers-reduced-motion</code>.</li>
+  <li><code>scroll-margin-top</code> e <code>scroll-padding-top</code>: o cabeçalho fixo que não cobre mais o título.</li>
+  <li><code>scroll-snap-type</code> e <code>scroll-snap-align</code>: um carrossel que para certinho em cada foto.</li>
+  <li><code>mandatory</code> × <code>proximity</code>, e <code>scroll-snap-stop</code>.</li>
+  <li>Por que um <code>scroll-snap</code> "não faz nada", e as mensagens reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador: clique nos links e role os carrosséis com o mouse, o dedo ou as setas do teclado. As mensagens de erro são do validador W3C (<code>vnu</code>) rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: o elevador e a gaveta com trava</h2>
+<p>Duas comparações do dia a dia:</p>
+<ul>
+  <li><strong>Rolagem suave</strong> é a diferença entre um teletransporte e um elevador com porta de vidro. Os dois levam você ao 8º andar, mas no elevador você <strong>vê</strong> os andares passando e sabe que subiu. Na página, o leitor vê o texto passar e entende que desceu até o "Modo de preparo".</li>
+  <li><strong>scroll-snap</strong> ("encaixe da rolagem") é a gaveta com trava: você empurra de qualquer jeito e ela para <strong>fechada</strong> ou <strong>aberta</strong>, nunca pela metade. O carrossel para sempre com uma foto inteira à mostra.</li>
+</ul>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>Em português</th><th>Vai em quem</th></tr>
+<tr><td><code>scroll-behavior</code></td><td>comportamento da rolagem</td><td>no elemento que <strong>rola</strong> (a página: <code>html</code>)</td></tr>
+<tr><td><code>scroll-margin-top</code></td><td>margem de rolagem em cima</td><td>no <strong>destino</strong> (o título com o <code>id</code>)</td></tr>
+<tr><td><code>scroll-padding-top</code></td><td>espaço interno de rolagem em cima</td><td>no elemento que <strong>rola</strong></td></tr>
+<tr><td><code>scroll-snap-type</code></td><td>tipo de encaixe</td><td>no elemento que <strong>rola</strong> (o carrossel)</td></tr>
+<tr><td><code>scroll-snap-align</code></td><td>alinhamento do encaixe</td><td>em cada <strong>filho</strong> (cada foto)</td></tr>
+</table>
+</div>
+
+<p>Guarde a última coluna: metade dos problemas com rolagem é a propriedade no elemento errado.</p>
+
+<hr>
+
+<h2>1. Rolagem suave: <code>scroll-behavior: smooth</code></h2>
+<p>A receita da Ana tem um sumário no topo com links para as partes da própria página (as âncoras do Guia HTML, <a href="https://wallysondevs.github.io/guia-html/ancoras.html">Âncoras na Mesma Página</a>). Sem CSS, o clique faz a página <strong>pular</strong>. Uma declaração no <code>html</code> faz ela <strong>deslizar</strong>:</p>
+
+<pre class="file" data-file="style.css">html {
+  scroll-behavior: smooth;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>html</dt><dd>O seletor. Quem rola a página inteira é a <strong>janela</strong>, e o CSS fala com ela pelo elemento raiz, o <code>html</code>. Não serve o <code>body</code> (veja <a href="#errado">Quando dá errado</a>).</dd>
+  <dt>scroll-behavior</dt><dd>"Comportamento da rolagem". Vale para a rolagem que o <strong>site</strong> provoca: o clique num link <code>#ingredientes</code>, ou um JavaScript que manda rolar. A rodinha do mouse, o dedo e a barra de rolagem continuam como o leitor está acostumado.</dd>
+  <dt>smooth</dt><dd>"Suave": o navegador anima a rolagem até o destino, em uma fração de segundo. O valor padrão é <code>auto</code>, o pulo imediato.</dd>
+</dl>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> clique em "Modo de preparo" e em "Voltar ao topo": a página desliza. Agora troque <code>smooth</code> por <code>auto</code> na aba <code>style.css</code> e clique de novo: ela pula.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1 id="topo"&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;nav&gt;
+  &lt;a href="#ingredientes"&gt;Ingredientes&lt;/a&gt; ·
+  &lt;a href="#preparo"&gt;Modo de preparo&lt;/a&gt;
+&lt;/nav&gt;
+&lt;section id="ingredientes"&gt;
+  &lt;h2&gt;Ingredientes&lt;/h2&gt;
+  &lt;p&gt;3 cenouras, 3 ovos, 1 xícara de óleo, 2 xícaras de açúcar, 2 xícaras de farinha.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="preparo"&gt;
+  &lt;h2&gt;Modo de preparo&lt;/h2&gt;
+  &lt;p&gt;Bata no liquidificador as cenouras, os ovos e o óleo. Misture o açúcar e a farinha e asse por 40 minutos.&lt;/p&gt;
+  &lt;p&gt;&lt;a href="#topo"&gt;Voltar ao topo&lt;/a&gt;&lt;/p&gt;
+&lt;/section&gt;
+</pre>
+<pre class="script" data-file="style.css">html {
+  scroll-behavior: smooth;
+}
+
+section {
+  min-height: 400px;
+  border-top: 2px solid tomato;
+}
+</pre>
+</div>
+
+<p>O <code>min-height: 400px</code> nas seções só existe para a página ficar comprida e ter o que rolar. Numa receita de verdade, o próprio texto faz isso.</p>
+
+<h3>Quem pediu menos movimento</h3>
+<p>Para algumas pessoas (com labirintite, enxaqueca, alguns tipos de epilepsia), a tela deslizando sozinha causa enjoo de verdade. Os sistemas operacionais têm uma opção "reduzir movimento", e o CSS consegue lê-la com a consulta <code>prefers-reduced-motion</code> (aula <a href="reduced-motion.html">Respeitando Quem Prefere Menos Movimento</a>). O jeito recomendado de ligar a rolagem suave é <strong>só para quem não pediu menos movimento</strong>:</p>
+
+<pre class="file" data-file="style.css">@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>@media (…)</dt><dd>Uma <em>media query</em>: as regras de dentro só valem quando a condição é verdadeira (aula <a href="media-queries.html">Media Queries</a>).</dd>
+  <dt>prefers-reduced-motion</dt><dd>"Prefere movimento reduzido": a opção de acessibilidade do sistema.</dd>
+  <dt>no-preference</dt><dd>"Sem preferência": a pessoa <strong>não</strong> ligou a opção. Só nesse caso a rolagem desliza; para quem ligou, ela continua pulando, sem animação.</dd>
+</dl>
+
+<p>No Chromium, com a opção desligada, o <code>html</code> fica com <code>scroll-behavior: smooth</code>. Com a opção ligada (simulada no F12, na aba <em>Rendering</em>), fica <code>auto</code>. Os dois valores foram conferidos com o estilo calculado.</p>
+
+<div class="tryhtml" data-goal="css:html{scroll-behavior}=smooth,src:prefers-reduced-motion">
+<p class="try-task"><strong>Missão:</strong> a lista de compras da Ana é comprida e o link "Laticínios" pula de uma vez. Faça a página <strong>deslizar</strong>, mas só para quem não pediu menos movimento (use <code>@media (prefers-reduced-motion: no-preference)</code>). Teste clicando no link.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lista de compras&lt;/h1&gt;
+&lt;p&gt;&lt;a href="#laticinios"&gt;Ir para Laticínios&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;Hortifrúti&lt;/h2&gt;
+&lt;ul class="longa"&gt;
+  &lt;li&gt;Cenoura&lt;/li&gt;
+  &lt;li&gt;Banana&lt;/li&gt;
+  &lt;li&gt;Tomate&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="laticinios"&gt;Laticínios&lt;/h2&gt;
+&lt;ul class="longa"&gt;
+  &lt;li&gt;Leite&lt;/li&gt;
+  &lt;li&gt;Manteiga&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.longa {
+  min-height: 500px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.longa {
+  min-height: 500px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. O cabeçalho que cobre o título: <code>scroll-margin-top</code></h2>
+<p>Muitos sites têm um cabeçalho que fica <strong>grudado</strong> no topo enquanto a página rola (<code>position: sticky</code>, aula <a href="position-sticky.html">position: sticky</a>). O problema: quando o link leva ao título, o navegador põe o título <strong>colado no topo da janela</strong>, exatamente atrás do cabeçalho. O leitor chega e não vê o título.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> clique em "Modo de preparo". O título "Modo de preparo" fica escondido atrás da faixa azul. Depois, apague o <code>/*</code> e o <code>*/</code> em volta da regra do <code>h2</code> e clique de novo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  Receitas da Ana ·
+  &lt;a href="#ingredientes"&gt;Ingredientes&lt;/a&gt; ·
+  &lt;a href="#preparo"&gt;Modo de preparo&lt;/a&gt;
+&lt;/header&gt;
+&lt;h2 id="ingredientes"&gt;Ingredientes&lt;/h2&gt;
+&lt;p class="longo"&gt;3 cenouras, 3 ovos, 1 xícara de óleo.&lt;/p&gt;
+&lt;h2 id="preparo"&gt;Modo de preparo&lt;/h2&gt;
+&lt;p class="longo"&gt;Bata tudo e asse por 40 minutos.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.topo {
+  position: sticky;
+  top: 0;
+  padding: 16px;
+  background-color: navy;
+  color: white;
+}
+
+.topo a {
+  color: white;
+}
+
+.longo {
+  min-height: 500px;
+}
+
+/*
+h2 {
+  scroll-margin-top: 4rem;
+}
+*/
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>h2</dt><dd>O seletor aponta para os <strong>destinos</strong> dos links: os títulos com <code>id</code>.</dd>
+  <dt>scroll-margin-top</dt><dd>"Margem de rolagem em cima": quando o navegador rolar <strong>até este elemento</strong>, ele para essa distância <strong>antes</strong>. Não muda nada no desenho da página (não é uma <code>margin</code> de verdade); só muda onde a rolagem para.</dd>
+  <dt>4rem</dt><dd>64 px com a fonte padrão: um pouco mais que a altura do cabeçalho (16 px de preenchimento em cima e embaixo, mais a linha de texto). Use um valor que <strong>sobre</strong> um pouco, para o título não ficar encostado na faixa.</dd>
+</dl>
+
+<p>No Chromium, sem a regra, depois do clique o topo do título fica <strong>em 0 px</strong> do topo da janela, atrás do cabeçalho de 50 px. Com <code>scroll-margin-top: 4rem</code>, fica <strong>a 64 px</strong>, logo abaixo da faixa azul.</p>
+
+<h3>A outra forma: <code>scroll-padding-top</code> no <code>html</code></h3>
+<p>Em vez de dar margem a cada destino, dá para dizer ao <strong>elemento que rola</strong> que o topo dele está "ocupado":</p>
+
+<pre class="file" data-file="style.css">html {
+  scroll-padding-top: 4rem;
+}
+</pre>
+
+<p>O efeito é o mesmo: toda rolagem até uma âncora para 4rem abaixo do topo da janela. A diferença é <strong>onde</strong> a regra mora:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Vai em</th><th>Quando usar</th></tr>
+<tr><td><code>scroll-padding-top</code></td><td>quem rola (<code>html</code>)</td><td>O cabeçalho fixo vale para a página inteira: <strong>uma</strong> regra resolve todas as âncoras. É a escolha mais comum.</td></tr>
+<tr><td><code>scroll-margin-top</code></td><td>o destino (<code>h2</code>, <code>[id]</code>…)</td><td>Só alguns destinos precisam de folga, ou cada um precisa de uma folga diferente (um título grande, uma figura).</td></tr>
+</table>
+</div>
+
+<div class="tip">
+<strong>Dica: use uma variável</strong>
+<p>Se a altura do cabeçalho aparece em dois lugares (no cabeçalho e no <code>scroll-padding-top</code>), guarde-a numa variável, como <code>--altura-topo: 4rem</code> (aula <a href="variaveis.html">Variáveis</a>). Mudou o cabeçalho, muda um número só.</p>
+</div>
+
+<hr>
+
+<h2>3. O carrossel que encaixa: <code>scroll-snap</code></h2>
+<p>A Ana quer mostrar as fotos dos bolos numa faixa que rola para o lado. Primeiro, a faixa sem encaixe: um contêiner com <code>display: flex</code> e <code>overflow-x: auto</code> (aula <a href="overflow.html">overflow</a>).</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> role a faixa para o lado (rodinha com <kbd>Shift</kbd>, arrastar a barra, deslizar o dedo ou as setas do teclado depois de clicar nela). Ela para em qualquer lugar, com fotos cortadas.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="carrossel"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura inteiro" width="400" height="300"&gt;
+  &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Fatia quadrada do bolo" width="400" height="400"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura na mesa" width="400" height="300"&gt;
+  &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Outra fatia do bolo" width="400" height="400"&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.carrossel {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+}
+
+.carrossel img {
+  width: 80%;
+  height: 200px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+</pre>
+</div>
+
+<p>Agora o encaixe. São <strong>duas</strong> declarações, uma no pai e uma nos filhos:</p>
+
+<pre class="file" data-file="style.css">.carrossel {
+  scroll-snap-type: x mandatory;
+}
+
+.carrossel img {
+  scroll-snap-align: start;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>scroll-snap-type</dt><dd>"Tipo de encaixe", no <strong>contêiner que rola</strong>. Liga o encaixe e diz em que direção e com que força.</dd>
+  <dt>x</dt><dd>A direção: <code>x</code> é a horizontal (para o lado), <code>y</code> a vertical, <code>both</code> as duas.</dd>
+  <dt>mandatory</dt><dd>"Obrigatório": quando o leitor solta, a rolagem <strong>sempre</strong> termina num ponto de encaixe. A outra opção é <code>proximity</code> ("proximidade"), que só encaixa se a rolagem parou <strong>perto</strong> de um ponto. Sem a palavra, vale <code>proximity</code>.</dd>
+  <dt>scroll-snap-align</dt><dd>"Alinhamento do encaixe", em <strong>cada filho</strong>: diz qual parte do filho encosta no contêiner.</dd>
+  <dt>start</dt><dd>O <strong>começo</strong> da foto (a borda esquerda) para encostado no começo do carrossel. Os outros valores são <code>center</code> (meio com meio) e <code>end</code> (fim com fim).</dd>
+</dl>
+
+<p>Os três valores de <code>scroll-snap-align</code>, lado a lado. Role cada faixa e repare onde cada item numerado para:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .faixa {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    margin-bottom: 16px;
+    border: 2px dashed #888;
+  }
+  .faixa div {
+    flex: 0 0 60%;
+    height: 70px;
+    padding: 8px;
+    background-color: #ffe0d6;
+    font-family: sans-serif;
+  }
+  .start div { scroll-snap-align: start; }
+  .center div { scroll-snap-align: center; }
+  .end div { scroll-snap-align: end; }
+&lt;/style&gt;
+&lt;p&gt;start: o item encosta à esquerda&lt;/p&gt;
+&lt;div class="faixa start"&gt;&lt;div&gt;1&lt;/div&gt;&lt;div&gt;2&lt;/div&gt;&lt;div&gt;3&lt;/div&gt;&lt;div&gt;4&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;center: o item fica no meio, com um pedaço dos vizinhos&lt;/p&gt;
+&lt;div class="faixa center"&gt;&lt;div&gt;1&lt;/div&gt;&lt;div&gt;2&lt;/div&gt;&lt;div&gt;3&lt;/div&gt;&lt;div&gt;4&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;end: o item encosta à direita&lt;/p&gt;
+&lt;div class="faixa end"&gt;&lt;div&gt;1&lt;/div&gt;&lt;div&gt;2&lt;/div&gt;&lt;div&gt;3&lt;/div&gt;&lt;div&gt;4&lt;/div&gt;&lt;/div&gt;
+</pre>
+
+<p>Repare que o <code>center</code> é o que mais "parece carrossel": o pedaço da próxima foto aparecendo na borda é um convite para rolar. O <code>start</code> é o mais comum em listas de cartões.</p>
+
+<h3><code>mandatory</code> × <code>proximity</code></h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que faz</th><th>Quando usar</th></tr>
+<tr><td><code>x mandatory</code></td><td>Sempre termina num encaixe.</td><td>Carrossel de fotos, galeria em que cada item ocupa quase toda a largura.</td></tr>
+<tr><td><code>x proximity</code> (ou só <code>x</code>)</td><td>Encaixa só quando a rolagem para perto de um ponto; longe, para onde o leitor deixou.</td><td>Listas longas, em que o leitor precisa poder parar entre dois itens.</td></tr>
+<tr><td><code>y mandatory</code></td><td>O mesmo, na vertical.</td><td>Páginas em "telas", uma seção por vez. Cuidado: se uma seção for mais alta que a janela, o leitor pode ter dificuldade de ler o meio dela.</td></tr>
+</table>
+</div>
+
+<h3><code>scroll-snap-stop: always</code>: uma foto por vez</h3>
+<p>Com um movimento rápido (um "peteleco" no celular), a rolagem pode passar por cima de várias fotos e encaixar lá na frente. Para obrigar a parada em <strong>cada</strong> foto:</p>
+
+<pre class="file" data-file="style.css">.carrossel img {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+</pre>
+
+<p>O padrão é <code>normal</code> (pode pular). Use <code>always</code> quando cada item precisa ser visto, como os passos de uma receita. Funciona em todos os navegadores atuais desde 2022 (MDN: <em>Baseline, amplamente disponível</em>).</p>
+
+<div class="note">
+<strong>Suporte</strong>
+<p><code>scroll-behavior</code> e o <code>scroll-snap</code> funcionam no Chrome, Edge, Firefox e Safari atuais (o MDN marca <em>Baseline, amplamente disponível</em>: o <code>scroll-behavior</code> desde março de 2022). O MDN lembra que o navegador <strong>pode</strong> ignorar o <code>scroll-behavior</code>, por exemplo quando o sistema pede menos movimento. Num navegador antigo, nada quebra: a rolagem só pula e para em qualquer lugar.</p>
+</div>
+
+<hr>
+
+<h2>4. Formas de fazer, e qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você quer</th><th>Use</th><th>Evite</th></tr>
+<tr><td>Links da página deslizarem</td><td><code>html { scroll-behavior: smooth; }</code> dentro de <code>@media (prefers-reduced-motion: no-preference)</code></td><td>Uma biblioteca de JavaScript só para isso; pôr no <code>body</code></td></tr>
+<tr><td>Título não ficar atrás do cabeçalho fixo</td><td><code>scroll-padding-top</code> no <code>html</code> (todos) ou <code>scroll-margin-top</code> no destino (alguns)</td><td>Um <code>&lt;div&gt;</code> vazio com altura antes de cada título</td></tr>
+<tr><td>Carrossel que para em cada foto</td><td><code>scroll-snap-type</code> no pai + <code>scroll-snap-align</code> nos filhos</td><td>JavaScript que calcula a posição a cada rolagem</td></tr>
+<tr><td>Rolagem suave só dentro de uma caixa</td><td><code>scroll-behavior: smooth</code> na própria caixa (a que tem <code>overflow: auto</code>)</td><td>Pôr no <code>html</code> esperando que a caixa obedeça</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong><code>scroll-behavior: smooth</code> no <code>body</code>: a página continua pulando</strong>
+<pre class="file" data-file="style.css · erro de propósito">body {
+  scroll-behavior: smooth;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> nada muda; o clique no link pula de uma vez. No Chromium, medindo a rolagem logo depois do clique, a página já estava no destino na primeira medida (sem passos intermediários). Com a mesma regra no <code>html</code>, a rolagem passou por várias posições no caminho.</p>
+<p><strong>Por quê:</strong> quem rola a página é a janela, e ela só obedece ao <code>scroll-behavior</code> do <code>html</code>. O MDN avisa: no <code>body</code>, ele não passa para a janela. No F12, o <code>body</code> mostra <code>scroll-behavior: smooth</code> na aba <em>Computed</em>, sem nada riscado: a declaração é válida, só está no elemento errado. O validador também não reclama.</p>
+<p><strong>Como consertar:</strong> <code>html { scroll-behavior: smooth; }</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O encaixe "não faz nada": as propriedades trocadas de lugar</strong>
+<pre class="file" data-file="style.css · erro de propósito">.carrossel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-align: start;
+}
+
+.carrossel img {
+  scroll-snap-type: x mandatory;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> a faixa rola, mas para em qualquer lugar, como se não houvesse encaixe.</p>
+<p><strong>Por quê:</strong> o <code>scroll-snap-type</code> só tem efeito no elemento <strong>que rola</strong> (o pai, com <code>overflow-x: auto</code>), e o <code>scroll-snap-align</code> só tem efeito nos <strong>filhos</strong> dele. Trocados, as duas declarações são válidas e nenhuma faz nada. O validador fica em silêncio.</p>
+<p><strong>Como consertar:</strong> <code>scroll-snap-type</code> no pai, <code>scroll-snap-align</code> nos filhos. A mesma coisa acontece se o pai não rolar: sem <code>overflow-x: auto</code> (ou com fotos que cabem todas na largura), não há rolagem, e não há o que encaixar.</p>
+</div>
+
+<div class="cenario">
+<strong>Valor fora de ordem ou inventado: a declaração inteira é ignorada</strong>
+<pre class="file" data-file="estilo.css · erro de propósito">.carrossel {
+  overflow-x: auto;
+  scroll-snap-type: mandatory x;
+}
+.foto {
+  scroll-snap-align: left;
+}
+html {
+  scroll-behavior: suave;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css estilo.css
+"file:/home/ana/site/estilo.css":3.31-3.31: error: CSS: “scroll-snap-type”: “mandatory” is not a “scroll-snap-type” value.
+"file:/home/ana/site/estilo.css":6.22-6.25: error: CSS: “scroll-snap-align”: “left” is not a “scroll-snap-align” value.
+"file:/home/ana/site/estilo.css":9.20-9.24: error: CSS: “scroll-behavior”: “suave” is not a “scroll-behavior” value.</pre>
+<p><strong>O que significa:</strong> "<code>mandatory</code> não é um valor de <code>scroll-snap-type</code>" (a ordem é direção primeiro: <code>x mandatory</code>); "<code>left</code> não é um valor de <code>scroll-snap-align</code>" (são <code>start</code>, <code>center</code>, <code>end</code>, que também funcionam em sites escritos da direita para a esquerda); "<code>suave</code> não é um valor de <code>scroll-behavior</code>" (os valores do CSS são sempre em inglês).</p>
+<p><strong>O que o leitor vê:</strong> nada de encaixe nem de rolagem suave. O navegador joga fora cada declaração inválida: no Chromium, o estilo calculado ficou <code>scroll-snap-type: none</code>, <code>scroll-snap-align: none</code> e <code>scroll-behavior: auto</code>, os valores padrão. No F12, as três linhas aparecem <strong>riscadas</strong>, com um ícone de aviso.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>Valores</th><th>Vai em</th></tr>
+<tr><td><code>scroll-behavior</code></td><td><code>auto</code> (pula, padrão) · <code>smooth</code> (desliza)</td><td>quem rola: <code>html</code> ou a caixa com <code>overflow</code></td></tr>
+<tr><td><code>scroll-margin-top</code></td><td>uma medida (<code>4rem</code>); também <code>scroll-margin</code> e os outros lados</td><td>o destino da rolagem</td></tr>
+<tr><td><code>scroll-padding-top</code></td><td>uma medida (<code>4rem</code>); também <code>scroll-padding</code> e os outros lados</td><td>quem rola</td></tr>
+<tr><td><code>scroll-snap-type</code></td><td><code>none</code> (padrão) · <code>x</code>/<code>y</code>/<code>both</code> + <code>mandatory</code>/<code>proximity</code></td><td>quem rola</td></tr>
+<tr><td><code>scroll-snap-align</code></td><td><code>none</code> (padrão) · <code>start</code> · <code>center</code> · <code>end</code></td><td>os filhos</td></tr>
+<tr><td><code>scroll-snap-stop</code></td><td><code>normal</code> (padrão, pode pular itens) · <code>always</code> (para em cada um)</td><td>os filhos</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Deslizar</h3>
+<p>Complete para os links da página deslizarem:</p>
+<div class="ex-code">html {
+  scroll-behavior: <input data-answer="smooth" aria-label="valor">;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. O cabeçalho fixo</h3>
+<p>Complete a propriedade que faz a rolagem parar 4rem antes do título:</p>
+<div class="ex-code">h2 {
+  <input data-answer="scroll-margin-top" aria-label="propriedade">: 4rem;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>3. Encaixe na horizontal</h3>
+<p>Complete o valor para o carrossel sempre parar num encaixe, rolando para o lado:</p>
+<div class="ex-code">.carrossel {
+  scroll-snap-type: <input data-answer="x mandatory" aria-label="valor">;
+}</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. A Ana pôs <code>body { scroll-behavior: smooth; }</code> e a página continua pulando. Por quê?</p>
+<label><input type="radio" name="q4"> Faltou o <code>!important</code></label>
+<label><input type="radio" name="q4"> Quem rola a página é a janela, que obedece ao <code>html</code>, não ao <code>body</code></label>
+<label><input type="radio" name="q4"> O valor certo é <code>suave</code></label>
+<label><input type="radio" name="q4"> O <code>scroll-behavior</code> só funciona no Firefox</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Onde vai o <code>scroll-snap-align</code>?</p>
+<label><input type="radio" name="q5"> No <code>html</code></label>
+<label><input type="radio" name="q5"> No contêiner que rola</label>
+<label><input type="radio" name="q5"> Em cada filho do contêiner que rola</label>
+<label><input type="radio" name="q5"> Em qualquer lugar, tanto faz</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Por que pôr a rolagem suave dentro de <code>@media (prefers-reduced-motion: no-preference)</code>?</p>
+<label><input type="radio" name="q6"> Para quem pediu menos movimento no sistema não ver a tela deslizando sozinha</label>
+<label><input type="radio" name="q6"> Porque sem a media query o navegador ignora o <code>scroll-behavior</code></label>
+<label><input type="radio" name="q6"> Para a página carregar mais rápido</label>
+<label><input type="radio" name="q6"> Para funcionar só no celular</label>
+</div>
+
+<h3>Missão final: o carrossel de bolos</h3>
+
+<div class="tryhtml" data-goal="css:.carrossel{scroll-snap-type}=x mandatory,css:.carrossel img{scroll-snap-align}=center">
+<p class="try-task"><strong>Missão:</strong> faça o carrossel da Ana encaixar: a rolagem deve <strong>sempre</strong> terminar num encaixe (<code>mandatory</code>), na horizontal, com cada foto parando <strong>no meio</strong> da faixa (<code>center</code>). Role para conferir.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Bolos da semana&lt;/h1&gt;
+&lt;div class="carrossel"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura inteiro" width="400" height="300"&gt;
+  &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Fatia quadrada do bolo" width="400" height="400"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura na mesa" width="400" height="300"&gt;
+  &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Outra fatia do bolo" width="400" height="400"&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.carrossel {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+}
+
+.carrossel img {
+  width: 80%;
+  height: 200px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.carrossel {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.carrossel img {
+  width: 80%;
+  height: 200px;
+  flex-shrink: 0;
+  object-fit: cover;
+  scroll-snap-align: center;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>html { scroll-behavior: smooth; }</code> faz os links da mesma página deslizarem em vez de pular. No <code>body</code> não funciona. Ponha dentro de <code>@media (prefers-reduced-motion: no-preference)</code>.</li>
+  <li>O cabeçalho fixo cobre o título? <code>scroll-padding-top</code> no <code>html</code> (vale para todas as âncoras) ou <code>scroll-margin-top</code> no destino.</li>
+  <li>Carrossel que encaixa: <code>scroll-snap-type: x mandatory</code> no contêiner que rola, <code>scroll-snap-align: start | center | end</code> em cada filho.</li>
+  <li><code>mandatory</code> sempre encaixa; <code>proximity</code> (o padrão) só quando para perto. <code>scroll-snap-stop: always</code> para em cada item.</li>
+  <li>Quando "não faz nada": a propriedade está no elemento errado (o validador não avisa), o pai não rola, ou o valor é inválido (<code>mandatory x</code>, <code>left</code>, <code>suave</code>), e aí o validador avisa e o F12 risca a linha.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
