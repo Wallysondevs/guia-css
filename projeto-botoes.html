@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projeto: Coleção de Botões — base, variações, estados e tamanhos | Guia CSS</title>
+<meta name="description" content="Projeto de CSS passo a passo: a coleção de botões da lojinha da Ana, em seis versões. Uma classe base, variações de cor com variáveis (primário, secundário, perigo), os estados :hover, :active, :focus-visible e :disabled, tamanhos com em, transição e prefers-reduced-motion, e os erros comuns (botão que não herda a fonte, link com disabled).">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>Projeto: <span class="hl">Coleção de Botões</span></h1>
+
+<p class="intro">Todo site tem botões, e um site bem-feito tem botões <strong>coerentes</strong>: o mesmo formato, a mesma fonte, cores que dizem o que cada um faz (comprar, ver detalhes, excluir), e estados claros para o mouse, o teclado e o botão desativado. Neste projeto você vai montar a coleção de botões da lojinha da Ana como os sites profissionais fazem: <strong>uma classe base</strong> com o formato, e <strong>classes de variação</strong> que só mudam o necessário. São seis versões, cada uma uma missão.</p>
+
+<div class="note">
+<strong>Você vai usar</strong>
+<ul>
+  <li>Uma classe base e classes de variação (<code>class="botao botao-primario"</code>), como na aula <a href="bem.html">BEM</a>.</li>
+  <li>Variáveis <strong>dentro</strong> de um componente: cada variação só troca o valor delas (aula <a href="variaveis.html">Variáveis</a>).</li>
+  <li><code>:hover</code>, <code>:active</code>, <code>:focus-visible</code>, <code>:disabled</code> e <code>:not()</code> (aulas <a href="hover-focus.html">Estados</a> e <a href="not-is-where.html">:not()</a>).</li>
+  <li>Tamanhos em <code>em</code>, que crescem junto com a letra (aula <a href="unidades.html">Unidades</a>).</li>
+  <li><code>transition</code> e <code>prefers-reduced-motion</code> (aulas <a href="transition.html">Transições</a> e <a href="reduced-motion.html">Menos Movimento</a>).</li>
+</ul>
+</div>
+
+<p>A coleção pronta, a versão 6:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>A coleção pronta:</strong> passe o mouse nos botões, clique e segure (o botão "afunda" 1 pixel), e aperte <kbd>Tab</kbd> dentro do quadro para ver o contorno do foco. O "Esgotado" está desativado: não reage a nada.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;button class="botao botao-primario" type="button"&gt;Comprar&lt;/button&gt;
+  &lt;button class="botao botao-secundario" type="button"&gt;Ver detalhes&lt;/button&gt;
+  &lt;button class="botao botao-perigo" type="button"&gt;Excluir&lt;/button&gt;
+  &lt;a class="botao botao-primario" href="receitas.html"&gt;Receitas&lt;/a&gt;
+  &lt;button class="botao botao-primario" type="button" disabled&gt;Esgotado&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="vitrine"&gt;
+  &lt;button class="botao botao-primario botao-pequeno" type="button"&gt;Pequeno&lt;/button&gt;
+  &lt;button class="botao botao-primario" type="button"&gt;Normal&lt;/button&gt;
+  &lt;button class="botao botao-primario botao-grande" type="button"&gt;Grande&lt;/button&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: sans-serif;
+}
+.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.botao {
+  --fundo: #e5e7eb;
+  --fundo-hover: #d1d5db;
+  --texto: #1f2937;
+  --borda: transparent;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5em 1em;
+  border: 2px solid var(--borda);
+  border-radius: 0.5em;
+  background-color: var(--fundo);
+  color: var(--texto);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+.botao-primario {
+  --fundo: #1d4ed8;
+  --fundo-hover: #1e40af;
+  --texto: #ffffff;
+}
+.botao-secundario {
+  --fundo: transparent;
+  --fundo-hover: #dbeafe;
+  --texto: #1d4ed8;
+  --borda: #1d4ed8;
+}
+.botao-perigo {
+  --fundo: #b91c1c;
+  --fundo-hover: #991b1b;
+  --texto: #ffffff;
+}
+.botao:hover:not(:disabled) {
+  background-color: var(--fundo-hover);
+}
+.botao:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.botao:focus-visible {
+  outline: 3px solid #1f2937;
+  outline-offset: 2px;
+}
+.botao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.botao-pequeno {
+  font-size: 0.875rem;
+}
+.botao-grande {
+  font-size: 1.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .botao {
+    transition: none;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Versão 1: o HTML, e o que o navegador já faz</h2>
+<p>A coleção tem duas fileiras (<code>.vitrine</code>): na primeira, as variações de cor e um <strong>link</strong> com cara de botão; na segunda, os tamanhos. Repare em três detalhes do HTML:</p>
+<ul>
+  <li>Cada botão tem <strong>duas ou três classes</strong>: <code>botao</code> (a base, em todos) e as variações (<code>botao-primario</code>, <code>botao-grande</code>…).</li>
+  <li>Os <code>&lt;button&gt;</code> têm <code>type="button"</code>: fora de um formulário, eles não enviam nada.</li>
+  <li>"Receitas" é um <code>&lt;a href&gt;</code>: ele <strong>leva a outra página</strong>, então é um link, mesmo com aparência de botão (aula <a href="https://wallysondevs.github.io/guia-html/">do Guia HTML</a>). Botão faz uma ação; link leva a um lugar.</li>
+</ul>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> sem CSS, os botões vêm com o visual do sistema (cinza, com borda) e o link vem azul e sublinhado, no meio dos botões. Repare também que a letra dos botões é menor que a do link: os botões não herdam a fonte da página (versão 2).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;button class="botao botao-primario" type="button"&gt;Comprar&lt;/button&gt;
+  &lt;button class="botao botao-secundario" type="button"&gt;Ver detalhes&lt;/button&gt;
+  &lt;button class="botao botao-perigo" type="button"&gt;Excluir&lt;/button&gt;
+  &lt;a class="botao botao-primario" href="receitas.html"&gt;Receitas&lt;/a&gt;
+  &lt;button class="botao botao-primario" type="button" disabled&gt;Esgotado&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="vitrine"&gt;
+  &lt;button class="botao botao-primario botao-pequeno" type="button"&gt;Pequeno&lt;/button&gt;
+  &lt;button class="botao botao-primario" type="button"&gt;Normal&lt;/button&gt;
+  &lt;button class="botao botao-primario botao-grande" type="button"&gt;Grande&lt;/button&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">/* Versão 1: ainda sem estilo */
+</pre>
+</div>
+
+<hr>
+
+<h2>Versão 2: a classe base</h2>
+<p>A classe <code>.botao</code> define tudo o que <strong>todos</strong> os botões têm em comum: o formato. Ela serve igual para <code>&lt;button&gt;</code> e para <code>&lt;a&gt;</code>.</p>
+
+<dl class="anatomy">
+  <dt>display: inline-flex; align-items: center;</dt><dd>O botão fica na linha, como uma palavra, mas organiza o conteúdo por dentro com flexbox: um ícone e o texto ficariam alinhados no meio.</dd>
+  <dt>padding: 0.5em 1em;</dt><dd>O espaço interno em <code>em</code>: metade da altura da letra em cima e embaixo, uma letra inteira dos lados. Se a letra crescer, o botão cresce junto (versão 5).</dd>
+  <dt>border: 2px solid transparent;</dt><dd>Uma borda <strong>invisível</strong>. Parece inútil, mas o botão com contorno (versão 3) terá uma borda colorida de 2px; com a borda transparente nos outros, todos ficam do mesmo tamanho.</dd>
+  <dt>font: inherit;</dt><dd>"Use a fonte do pai". Os botões, ao contrário do resto da página, não herdam a fonte: vêm com a do sistema, menor. Esta linha resolve.</dd>
+  <dt>text-decoration: none;</dt><dd>Tira o sublinhado do link "Receitas".</dd>
+  <dt>cursor: pointer;</dt><dd>A mãozinha do mouse (aula <a href="cursor.html">Cursor</a>).</dd>
+</dl>
+
+<div class="tryhtml" data-goal="css:.vitrine{display}=flex,css:.botao{border-top-left-radius}=8px,css:.botao{padding-left}=16px,src:font:\s*inherit,css:.botao{font-weight}=700,css:a.botao{text-decoration-line}=none,css:.botao{cursor}=pointer">
+<p class="try-task"><strong>Missão (versão 2):</strong> escreva a fonte <code>sans-serif</code> no <code>body</code>; a <code>.vitrine</code> em <code>flex</code>, com <code>flex-wrap: wrap</code>, <code>align-items: center</code>, <code>gap: 8px</code> e <code>margin-bottom: 16px</code>; e a <code>.botao</code> com as declarações da anatomia acima, mais <code>border-radius: 0.5em</code>, fundo <code>#e5e7eb</code>, letra <code>#1f2937</code> e <code>font-weight: 700</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;button class="botao botao-primario" type="button"&gt;Comprar&lt;/button&gt;
+  &lt;button class="botao botao-secundario" type="button"&gt;Ver detalhes&lt;/button&gt;
+  &lt;button class="botao botao-perigo" type="button"&gt;Excluir&lt;/button&gt;
+  &lt;a class="botao botao-primario" href="receitas.html"&gt;Receitas&lt;/a&gt;
+  &lt;button class="botao botao-primario" type="button" disabled&gt;Esgotado&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="vitrine"&gt;
+  &lt;button class="botao botao-primario botao-pequeno" type="button"&gt;Pequeno&lt;/button&gt;
+  &lt;button class="botao botao-primario" type="button"&gt;Normal&lt;/button&gt;
+  &lt;button class="botao botao-primario botao-grande" type="button"&gt;Grande&lt;/button&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">/* Versão 2: a classe base */
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: sans-serif;
+}
+.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.botao {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5em 1em;
+  border: 2px solid transparent;
+  border-radius: 0.5em;
+  background-color: #e5e7eb;
+  color: #1f2937;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+</pre>
+</div>
+
+<p>Agora todos os botões (e o link) são iguais: cinza-claro, cantos arredondados, negrito, mesma fonte da página. Com o <code>font: inherit</code>, os botões passam a usar a mesma letra e o mesmo tamanho do texto da página.</p>
+
+<hr>
+
+<h2>Versão 3: as variações de cor, com variáveis</h2>
+<p>Agora cada variação ganha a sua cor. O jeito ingênuo seria repetir <code>background-color</code>, <code>color</code> e <code>border-color</code> em cada uma. O jeito organizado: a <code>.botao</code> usa <strong>variáveis</strong>, e cada variação só muda o valor delas.</p>
+
+<pre class="file" data-file="style.css">.botao {
+  --fundo: #e5e7eb;
+  --texto: #1f2937;
+  background-color: var(--fundo);
+  color: var(--texto);
+}
+.botao-perigo {
+  --fundo: #b91c1c;
+  --texto: #ffffff;
+}
+</pre>
+
+<p>Como a variável é herdada e segue a cascata como qualquer propriedade, o botão com <code>class="botao botao-perigo"</code> recebe o <code>--fundo</code> da <code>.botao-perigo</code> (que vem depois no arquivo) e o <code>background-color: var(--fundo)</code> da <code>.botao</code> passa a valer vermelho. A regra da <code>.botao</code> não precisa saber que as variações existem.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Variação</th><th><code>--fundo</code></th><th><code>--texto</code></th><th><code>--borda</code></th><th>Uso</th></tr>
+<tr><td><code>.botao-primario</code></td><td><code>#1d4ed8</code></td><td><code>#ffffff</code></td><td>(transparente)</td><td>A ação principal da tela: "Comprar". Uma só por tela, de preferência.</td></tr>
+<tr><td><code>.botao-secundario</code></td><td><code>transparent</code></td><td><code>#1d4ed8</code></td><td><code>#1d4ed8</code></td><td>Ações secundárias: "Ver detalhes". Só o contorno.</td></tr>
+<tr><td><code>.botao-perigo</code></td><td><code>#b91c1c</code></td><td><code>#ffffff</code></td><td>(transparente)</td><td>Ações destrutivas: "Excluir".</td></tr>
+</table>
+</div>
+
+<p>Cada variação também define um <code>--fundo-hover</code>, a cor com o mouse em cima, usada na versão 4. O texto branco no azul <code>#1d4ed8</code> e no vermelho <code>#b91c1c</code> passa com folga do contraste mínimo de 4,5:1 (aula <a href="acessibilidade.html">Acessibilidade</a>).</p>
+
+<div class="tryhtml" data-goal="src:background-color:\s*var\(--fundo\),css:.botao-primario{background-color}=rgb(29, 78, 216),css:.botao-primario{color}=rgb(255, 255, 255),css:.botao-secundario{border-top-color}=rgb(29, 78, 216),css:.botao-secundario{background-color}=rgba(0, 0, 0, 0),css:.botao-perigo{background-color}=rgb(185, 28, 28)">
+<p class="try-task"><strong>Missão (versão 3):</strong> na <code>.botao</code>, crie as variáveis <code>--fundo</code>, <code>--fundo-hover</code>, <code>--texto</code> e <code>--borda</code> e use-as no fundo, na cor e na borda. Depois crie as três variações da tabela, cada uma só com as variáveis.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;button class="botao botao-primario" type="button"&gt;Comprar&lt;/button&gt;
+  &lt;button class="botao botao-secundario" type="button"&gt;Ver detalhes&lt;/button&gt;
+  &lt;button class="botao botao-perigo" type="button"&gt;Excluir&lt;/button&gt;
+  &lt;a class="botao botao-primario" href="receitas.html"&gt;Receitas&lt;/a&gt;
+  &lt;button class="botao botao-primario" type="button" disabled&gt;Esgotado&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="vitrine"&gt;
+  &lt;button class="botao botao-primario botao-pequeno" type="button"&gt;Pequeno&lt;/button&gt;
+  &lt;button class="botao botao-primario" type="button"&gt;Normal&lt;/button&gt;
+  &lt;button class="botao botao-primario botao-grande" type="button"&gt;Grande&lt;/button&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: sans-serif;
+}
+.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.botao {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5em 1em;
+  border: 2px solid transparent;
+  border-radius: 0.5em;
+  background-color: #e5e7eb;
+  color: #1f2937;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Versão 3: variáveis na .botao e as três variações */
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: sans-serif;
+}
+.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.botao {
+  --fundo: #e5e7eb;
+  --fundo-hover: #d1d5db;
+  --texto: #1f2937;
+  --borda: transparent;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5em 1em;
+  border: 2px solid var(--borda);
+  border-radius: 0.5em;
+  background-color: var(--fundo);
+  color: var(--texto);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.botao-primario {
+  --fundo: #1d4ed8;
+  --fundo-hover: #1e40af;
+  --texto: #ffffff;
+}
+.botao-secundario {
+  --fundo: transparent;
+  --fundo-hover: #dbeafe;
+  --texto: #1d4ed8;
+  --borda: #1d4ed8;
+}
+.botao-perigo {
+  --fundo: #b91c1c;
+  --fundo-hover: #991b1b;
+  --texto: #ffffff;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Versão 4: os estados</h2>
+<p>Um botão precisa <strong>responder</strong>: mudar com o mouse em cima, afundar no clique, mostrar onde está o foco do teclado e parecer "apagado" quando não pode ser usado.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Estado</th><th>Seletor</th><th>O que muda</th></tr>
+<tr><td>Mouse em cima</td><td><code>.botao:hover:not(:disabled)</code></td><td>O fundo vira <code>var(--fundo-hover)</code>. O <code>:not(:disabled)</code> deixa o botão desativado de fora.</td></tr>
+<tr><td>Clicando</td><td><code>.botao:active:not(:disabled)</code></td><td><code>transform: translateY(1px)</code>: afunda 1 pixel</td></tr>
+<tr><td>Foco pelo teclado</td><td><code>.botao:focus-visible</code></td><td>Contorno de 3px, afastado 2px do botão</td></tr>
+<tr><td>Desativado</td><td><code>.botao:disabled</code></td><td>Meio transparente (<code>opacity: 0.5</code>) e cursor de "proibido" (<code>not-allowed</code>)</td></tr>
+</table>
+</div>
+
+<p>Repare: <strong>uma</strong> regra de <code>:hover</code> serve para as três variações, porque cada uma já trouxe o seu <code>--fundo-hover</code>. É a vantagem das variáveis da versão 3.</p>
+
+<div class="tryhtml" data-goal="src::hover:not\(:disabled\)\s*\{[^}]*var\(--fundo-hover\),src::focus-visible\s*\{[^}]*outline:,css:.botao:disabled{opacity}=0.5,css:.botao:disabled{cursor}=not-allowed">
+<p class="try-task"><strong>Missão (versão 4):</strong> escreva os quatro estados da tabela. Depois teste: passe o mouse, clique e segure, use o <kbd>Tab</kbd>, e tente passar o mouse no "Esgotado".</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;button class="botao botao-primario" type="button"&gt;Comprar&lt;/button&gt;
+  &lt;button class="botao botao-secundario" type="button"&gt;Ver detalhes&lt;/button&gt;
+  &lt;button class="botao botao-perigo" type="button"&gt;Excluir&lt;/button&gt;
+  &lt;a class="botao botao-primario" href="receitas.html"&gt;Receitas&lt;/a&gt;
+  &lt;button class="botao botao-primario" type="button" disabled&gt;Esgotado&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="vitrine"&gt;
+  &lt;button class="botao botao-primario botao-pequeno" type="button"&gt;Pequeno&lt;/button&gt;
+  &lt;button class="botao botao-primario" type="button"&gt;Normal&lt;/button&gt;
+  &lt;button class="botao botao-primario botao-grande" type="button"&gt;Grande&lt;/button&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: sans-serif;
+}
+.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.botao {
+  --fundo: #e5e7eb;
+  --fundo-hover: #d1d5db;
+  --texto: #1f2937;
+  --borda: transparent;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5em 1em;
+  border: 2px solid var(--borda);
+  border-radius: 0.5em;
+  background-color: var(--fundo);
+  color: var(--texto);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.botao-primario {
+  --fundo: #1d4ed8;
+  --fundo-hover: #1e40af;
+  --texto: #ffffff;
+}
+.botao-secundario {
+  --fundo: transparent;
+  --fundo-hover: #dbeafe;
+  --texto: #1d4ed8;
+  --borda: #1d4ed8;
+}
+.botao-perigo {
+  --fundo: #b91c1c;
+  --fundo-hover: #991b1b;
+  --texto: #ffffff;
+}
+
+/* Versão 4: os estados */
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: sans-serif;
+}
+.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.botao {
+  --fundo: #e5e7eb;
+  --fundo-hover: #d1d5db;
+  --texto: #1f2937;
+  --borda: transparent;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5em 1em;
+  border: 2px solid var(--borda);
+  border-radius: 0.5em;
+  background-color: var(--fundo);
+  color: var(--texto);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.botao-primario {
+  --fundo: #1d4ed8;
+  --fundo-hover: #1e40af;
+  --texto: #ffffff;
+}
+.botao-secundario {
+  --fundo: transparent;
+  --fundo-hover: #dbeafe;
+  --texto: #1d4ed8;
+  --borda: #1d4ed8;
+}
+.botao-perigo {
+  --fundo: #b91c1c;
+  --fundo-hover: #991b1b;
+  --texto: #ffffff;
+}
+.botao:hover:not(:disabled) {
+  background-color: var(--fundo-hover);
+}
+.botao:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.botao:focus-visible {
+  outline: 3px solid #1f2937;
+  outline-offset: 2px;
+}
+.botao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Versão 5: os tamanhos</h2>
+<p>Como o <code>padding</code> e o <code>border-radius</code> da base estão em <code>em</code>, mudar o tamanho de um botão é mudar <strong>só</strong> o <code>font-size</code>: o espaço interno e os cantos acompanham.</p>
+
+<pre class="file" data-file="style.css">.botao-pequeno {
+  font-size: 0.875rem;
+}
+.botao-grande {
+  font-size: 1.25rem;
+}
+</pre>
+
+<p>No botão grande, a letra vai a 20px (1.25 × 16px), e o <code>padding: 0.5em 1em</code> vira 10px e 20px. No pequeno, 14px de letra e 7px e 14px de espaço. Essas regras vêm <strong>depois</strong> da <code>.botao</code> no arquivo: as duas têm a mesma especificidade, e o <code>font: inherit</code> da base também mexe no tamanho da letra; vence a que vem por último (aula <a href="cascata.html">A Cascata</a>).</p>
+
+<div class="tryhtml" data-goal="css:.botao-pequeno{font-size}=14px,css:.botao-grande{font-size}=20px,css:.botao-grande{padding-left}=20px,css:.botao-grande{padding-top}=10px">
+<p class="try-task"><strong>Missão (versão 5):</strong> crie <code>.botao-pequeno</code> (<code>0.875rem</code>) e <code>.botao-grande</code> (<code>1.25rem</code>), no fim do arquivo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;button class="botao botao-primario" type="button"&gt;Comprar&lt;/button&gt;
+  &lt;button class="botao botao-secundario" type="button"&gt;Ver detalhes&lt;/button&gt;
+  &lt;button class="botao botao-perigo" type="button"&gt;Excluir&lt;/button&gt;
+  &lt;a class="botao botao-primario" href="receitas.html"&gt;Receitas&lt;/a&gt;
+  &lt;button class="botao botao-primario" type="button" disabled&gt;Esgotado&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="vitrine"&gt;
+  &lt;button class="botao botao-primario botao-pequeno" type="button"&gt;Pequeno&lt;/button&gt;
+  &lt;button class="botao botao-primario" type="button"&gt;Normal&lt;/button&gt;
+  &lt;button class="botao botao-primario botao-grande" type="button"&gt;Grande&lt;/button&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: sans-serif;
+}
+.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.botao {
+  --fundo: #e5e7eb;
+  --fundo-hover: #d1d5db;
+  --texto: #1f2937;
+  --borda: transparent;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5em 1em;
+  border: 2px solid var(--borda);
+  border-radius: 0.5em;
+  background-color: var(--fundo);
+  color: var(--texto);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.botao-primario {
+  --fundo: #1d4ed8;
+  --fundo-hover: #1e40af;
+  --texto: #ffffff;
+}
+.botao-secundario {
+  --fundo: transparent;
+  --fundo-hover: #dbeafe;
+  --texto: #1d4ed8;
+  --borda: #1d4ed8;
+}
+.botao-perigo {
+  --fundo: #b91c1c;
+  --fundo-hover: #991b1b;
+  --texto: #ffffff;
+}
+.botao:hover:not(:disabled) {
+  background-color: var(--fundo-hover);
+}
+.botao:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.botao:focus-visible {
+  outline: 3px solid #1f2937;
+  outline-offset: 2px;
+}
+.botao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Versão 5: os tamanhos */
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: sans-serif;
+}
+.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.botao {
+  --fundo: #e5e7eb;
+  --fundo-hover: #d1d5db;
+  --texto: #1f2937;
+  --borda: transparent;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5em 1em;
+  border: 2px solid var(--borda);
+  border-radius: 0.5em;
+  background-color: var(--fundo);
+  color: var(--texto);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.botao-primario {
+  --fundo: #1d4ed8;
+  --fundo-hover: #1e40af;
+  --texto: #ffffff;
+}
+.botao-secundario {
+  --fundo: transparent;
+  --fundo-hover: #dbeafe;
+  --texto: #1d4ed8;
+  --borda: #1d4ed8;
+}
+.botao-perigo {
+  --fundo: #b91c1c;
+  --fundo-hover: #991b1b;
+  --texto: #ffffff;
+}
+.botao:hover:not(:disabled) {
+  background-color: var(--fundo-hover);
+}
+.botao:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.botao:focus-visible {
+  outline: 3px solid #1f2937;
+  outline-offset: 2px;
+}
+.botao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.botao-pequeno {
+  font-size: 0.875rem;
+}
+.botao-grande {
+  font-size: 1.25rem;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Versão 6: a transição, e quem prefere menos movimento</h2>
+<p>A troca de cor do <code>:hover</code> acontece de uma vez. Uma <code>transition</code> curta deixa a mudança suave. E, para quem pediu ao sistema "reduzir movimento" (pessoas que sentem tontura com animações), a transição é desligada:</p>
+
+<pre class="file" data-file="style.css">.botao {
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .botao {
+    transition: none;
+  }
+}
+</pre>
+
+<div class="tryhtml" data-goal="src:transition:\s*background-color[^;]*transform,src:@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[^}]*transition:\s*none,css:.botao{transition-property}=background-color\, transform">
+<p class="try-task"><strong>Missão final (versão 6):</strong> acrescente na <code>.botao</code> a <code>transition</code> do fundo (0.2s) e do <code>transform</code> (0.1s), e no fim do arquivo a media query que a desliga para quem prefere menos movimento.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;button class="botao botao-primario" type="button"&gt;Comprar&lt;/button&gt;
+  &lt;button class="botao botao-secundario" type="button"&gt;Ver detalhes&lt;/button&gt;
+  &lt;button class="botao botao-perigo" type="button"&gt;Excluir&lt;/button&gt;
+  &lt;a class="botao botao-primario" href="receitas.html"&gt;Receitas&lt;/a&gt;
+  &lt;button class="botao botao-primario" type="button" disabled&gt;Esgotado&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="vitrine"&gt;
+  &lt;button class="botao botao-primario botao-pequeno" type="button"&gt;Pequeno&lt;/button&gt;
+  &lt;button class="botao botao-primario" type="button"&gt;Normal&lt;/button&gt;
+  &lt;button class="botao botao-primario botao-grande" type="button"&gt;Grande&lt;/button&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: sans-serif;
+}
+.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.botao {
+  --fundo: #e5e7eb;
+  --fundo-hover: #d1d5db;
+  --texto: #1f2937;
+  --borda: transparent;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5em 1em;
+  border: 2px solid var(--borda);
+  border-radius: 0.5em;
+  background-color: var(--fundo);
+  color: var(--texto);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.botao-primario {
+  --fundo: #1d4ed8;
+  --fundo-hover: #1e40af;
+  --texto: #ffffff;
+}
+.botao-secundario {
+  --fundo: transparent;
+  --fundo-hover: #dbeafe;
+  --texto: #1d4ed8;
+  --borda: #1d4ed8;
+}
+.botao-perigo {
+  --fundo: #b91c1c;
+  --fundo-hover: #991b1b;
+  --texto: #ffffff;
+}
+.botao:hover:not(:disabled) {
+  background-color: var(--fundo-hover);
+}
+.botao:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.botao:focus-visible {
+  outline: 3px solid #1f2937;
+  outline-offset: 2px;
+}
+.botao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.botao-pequeno {
+  font-size: 0.875rem;
+}
+.botao-grande {
+  font-size: 1.25rem;
+}
+
+/* Versão 6: a transição e o prefers-reduced-motion */
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: sans-serif;
+}
+.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.botao {
+  --fundo: #e5e7eb;
+  --fundo-hover: #d1d5db;
+  --texto: #1f2937;
+  --borda: transparent;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5em 1em;
+  border: 2px solid var(--borda);
+  border-radius: 0.5em;
+  background-color: var(--fundo);
+  color: var(--texto);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+.botao-primario {
+  --fundo: #1d4ed8;
+  --fundo-hover: #1e40af;
+  --texto: #ffffff;
+}
+.botao-secundario {
+  --fundo: transparent;
+  --fundo-hover: #dbeafe;
+  --texto: #1d4ed8;
+  --borda: #1d4ed8;
+}
+.botao-perigo {
+  --fundo: #b91c1c;
+  --fundo-hover: #991b1b;
+  --texto: #ffffff;
+}
+.botao:hover:not(:disabled) {
+  background-color: var(--fundo-hover);
+}
+.botao:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.botao:focus-visible {
+  outline: 3px solid #1f2937;
+  outline-offset: 2px;
+}
+.botao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.botao-pequeno {
+  font-size: 0.875rem;
+}
+.botao-grande {
+  font-size: 1.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .botao {
+    transition: none;
+  }
+}
+</pre>
+</div>
+
+<p>Para criar mais uma variação agora, bastam quatro variáveis. Tente uma <code>.botao-sucesso</code> verde (<code>--fundo: #15803d</code>, <code>--fundo-hover: #166534</code>, <code>--texto: #ffffff</code>) e troque a classe do "Comprar".</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>A letra do botão é diferente da página</strong>
+<pre class="file" data-file="erro de propósito" data-resultado>&lt;style&gt;
+body {
+  font-family: Georgia, serif;
+}
+&lt;/style&gt;
+&lt;p&gt;Bolo de cenoura: R$ 35,00&lt;/p&gt;
+&lt;button type="button"&gt;Comprar&lt;/button&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> o parágrafo com letra serifada (a Georgia, ou outra serifada se o computador não a tiver) e o botão com uma letra sem serifa, menor. <strong>Por quê:</strong> os navegadores dão aos campos de formulário e botões uma fonte própria, menor que a do texto. No Chromium, o <code>font-size</code> calculado do botão é <code>13.3333px</code>, contra os 16px do parágrafo. <strong>Como consertar:</strong> <code>font: inherit;</code> no botão (ou em <code>button, input, select, textarea</code>, no <a href="reset.html">reset</a>).</p>
+</div>
+
+<div class="cenario">
+<strong>Link "desativado" com <code>disabled</code></strong>
+<pre class="file" data-file="index.html · erro de propósito">&lt;a class="botao botao-primario" href="receitas.html" disabled&gt;Receitas&lt;/a&gt;
+</pre>
+<p><strong>O que acontece:</strong> o link continua clicável, e o <code>.botao:disabled</code> não o deixa apagado. O <code>disabled</code> só existe em botões e campos de formulário. Numa página completa, com o link na linha 8, o validador diz "o atributo <code>disabled</code> não é permitido no elemento <code>a</code>":</p>
+<pre class="term" data-cwd="~/site">$ vnu link.html
+"file:/home/ana/site/link.html":8.1-8.62: error: Attribute “disabled” not allowed on element “a” at this point.</pre>
+<p><strong>Como consertar:</strong> um link que não leva a lugar nenhum não deveria ser link. Se a ação não está disponível, use um <code>&lt;button disabled&gt;</code>, ou tire o link e mostre só o texto.</p>
+</div>
+
+<div class="cenario">
+<strong>O botão desativado reage ao mouse</strong>
+<p>Sem o <code>:not(:disabled)</code>, o <code>.botao:hover</code> também vale para o "Esgotado": ele escurece com o mouse em cima e parece clicável, mas não faz nada. O validador não acusa: o CSS está certo, só faz a coisa errada. <strong>Como consertar:</strong> <code>.botao:hover:not(:disabled)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Os botões "pulam" ao trocar de variação</strong>
+<p>Se a borda só existir no <code>.botao-secundario</code> (<code>border: 2px solid</code>) e os outros ficarem com <code>border: none</code>, o secundário fica 4px mais largo e 4px mais alto que os vizinhos, e a fileira fica desalinhada. <strong>Como consertar:</strong> a borda de 2px na base, <code>transparent</code>, e cada variação só muda a cor dela (versão 2).</p>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A fonte do botão</h3>
+<p>Complete para o botão usar a mesma fonte da página:</p>
+<div class="ex-code">.botao { font: <input data-answer="inherit" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Só os que funcionam</h3>
+<p>Complete para o <code>:hover</code> não valer no botão desativado:</p>
+<div class="ex-code">.botao:hover:<input data-answer="not(:disabled)" aria-label="pseudo-classe"> { … }</div>
+</div>
+
+<div class="exercise">
+<h3>3. A variação</h3>
+<p>Complete para a variação de perigo trocar só a cor de fundo:</p>
+<div class="ex-code">.botao-perigo { <input data-answer="--fundo" aria-label="variável">: #b91c1c; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Por que o <code>padding</code> da <code>.botao</code> está em <code>em</code>?</p>
+<label><input type="radio" name="q4"> Porque <code>px</code> não funciona em botões</label>
+<label><input type="radio" name="q4"> Porque o validador exige</label>
+<label><input type="radio" name="q4"> Para o espaço interno crescer junto com a letra: mudar o <code>font-size</code> muda o botão inteiro</label>
+<label><input type="radio" name="q4"> Para o botão ficar redondo</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. "Receitas" leva a outra página. Qual elemento usar?</p>
+<label><input type="radio" name="q5"> <code>&lt;a href="receitas.html" class="botao"&gt;</code>: leva a um lugar, é link; a cara de botão vem do CSS</label>
+<label><input type="radio" name="q5"> <code>&lt;button&gt;</code> com JavaScript para trocar de página</label>
+<label><input type="radio" name="q5"> <code>&lt;div class="botao"&gt;</code></label>
+<label><input type="radio" name="q5"> Tanto faz</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">6. Para que serve o <code>@media (prefers-reduced-motion: reduce)</code> da versão 6?</p>
+<label><input type="radio" name="q6"> Para o botão ficar mais rápido em celulares</label>
+<label><input type="radio" name="q6"> Para desligar a transição para quem pediu ao sistema menos movimento</label>
+<label><input type="radio" name="q6"> Para o botão não se mexer quando desativado</label>
+<label><input type="radio" name="q6"> Para economizar bateria</label>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Uma classe base (<code>.botao</code>) com o formato, e classes de variação que só mudam o necessário: <code>class="botao botao-primario botao-grande"</code>.</li>
+  <li>Na base: <code>display: inline-flex</code>, <code>padding</code> em <code>em</code>, borda transparente, <code>font: inherit</code>, <code>text-decoration: none</code>, <code>cursor: pointer</code>. Serve para <code>&lt;button&gt;</code> e <code>&lt;a&gt;</code>.</li>
+  <li>Variáveis no componente: as variações só trocam <code>--fundo</code>, <code>--texto</code>, <code>--borda</code>; um único <code>:hover</code> usa o <code>--fundo-hover</code> de cada uma.</li>
+  <li>Estados: <code>:hover:not(:disabled)</code>, <code>:active</code>, <code>:focus-visible</code> com contorno, <code>:disabled</code> apagado.</li>
+  <li>Tamanhos mudando só o <code>font-size</code>. Transição curta, desligada com <code>prefers-reduced-motion</code>.</li>
+  <li>Link leva a um lugar, botão faz uma ação; <code>disabled</code> não existe em <code>&lt;a&gt;</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
