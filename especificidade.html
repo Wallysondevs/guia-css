@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Especificidade — a contagem (a, b, c) | Guia CSS</title>
+<meta name="description" content="Especificidade no CSS para quem nunca escreveu CSS: como o navegador mede a força de um seletor com a contagem (a, b, c) de IDs, classes e elementos, como comparar coluna por coluna, uma tabela com exemplos contados, por que 11 classes não vencem um ID, o que conta zero (*, combinadores, :where) e como manter o CSS fácil de mudar, com especificidade baixa.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Especificidade</span></h1>
+
+<p class="intro">Na aula <a href="cascata.html">A Cascata</a>, você viu que, quando duas regras brigam, o seletor "mais específico" ganha, antes mesmo da ordem no código. Mas o que é "mais específico"? O navegador não adivinha: ele <strong>conta</strong>. Cada seletor recebe uma pontuação de três números, <strong>(a, b, c)</strong>, e quem tem a pontuação maior vence. Nesta aula você vai aprender a fazer essa conta de cabeça.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A contagem <strong>(a, b, c)</strong>: IDs, classes e elementos.</li>
+  <li>Como comparar duas pontuações, coluna por coluna.</li>
+  <li>Uma tabela de seletores já contados.</li>
+  <li>O que conta zero: <code>*</code>, os combinadores e o <code>:where()</code>.</li>
+  <li>Por que onze classes não vencem um ID.</li>
+  <li>Como escrever CSS com especificidade baixa, fácil de mudar depois.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código.</p>
+
+<hr>
+
+<h2>A ideia: o quadro de medalhas</h2>
+<p>Na Olimpíada, os países são ordenados pelo quadro de medalhas. Primeiro olha-se o <strong>ouro</strong>. Quem tem mais ouro fica na frente, não importa quantas pratas o outro tenha. Só se o ouro empatar, olha-se a <strong>prata</strong>. Só se a prata empatar, o <strong>bronze</strong>.</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>País</th><th>Ouro</th><th>Prata</th><th>Bronze</th><th>Posição</th></tr>
+<tr><td>A</td><td>1</td><td>0</td><td>0</td><td><strong>1º</strong>: o único com ouro</td></tr>
+<tr><td>B</td><td>0</td><td>11</td><td>0</td><td>2º: muita prata, mas nenhum ouro</td></tr>
+<tr><td>C</td><td>0</td><td>2</td><td>5</td><td>3º: perdeu na prata, o bronze nem foi olhado</td></tr>
+</table>
+</div>
+<p>A especificidade é um quadro de medalhas para seletores:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Coluna</th><th>Medalha</th><th>O que conta</th><th>Exemplos</th></tr>
+<tr><td><strong>a</strong></td><td>ouro</td><td>Seletores de <strong>ID</strong></td><td><code>#topo</code></td></tr>
+<tr><td><strong>b</strong></td><td>prata</td><td><strong>Classes</strong>, <strong>atributos</strong> e <strong>pseudo-classes</strong></td><td><code>.aviso</code>, <code>[type="email"]</code>, <code>:hover</code>, <code>:first-child</code></td></tr>
+<tr><td><strong>c</strong></td><td>bronze</td><td><strong>Elementos</strong> e <strong>pseudo-elementos</strong></td><td><code>p</code>, <code>li</code>, <code>::before</code>, <code>::first-line</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. Contando um seletor</h2>
+<p>Para contar, leia o seletor da esquerda para a direita e ponha cada pedaço na sua coluna. Vamos contar <code>#menu .item a:hover</code>:</p>
+
+<dl class="anatomy">
+  <dt>#menu</dt><dd>Um ID: <strong>a</strong> = 1.</dd>
+  <dt>(espaço)</dt><dd>Um combinador: não conta nada.</dd>
+  <dt>.item</dt><dd>Uma classe: <strong>b</strong> = 1.</dd>
+  <dt>a</dt><dd>Um elemento: <strong>c</strong> = 1.</dd>
+  <dt>:hover</dt><dd>Uma pseudo-classe: conta como classe, <strong>b</strong> = 2.</dd>
+</dl>
+<p>Resultado: <strong>(1, 2, 1)</strong>. Lê-se "um, dois, um": um ID, duas classes, um elemento.</p>
+
+<hr>
+
+<h2>2. Comparando: coluna por coluna</h2>
+<p>Para saber quem ganha, compare a coluna <strong>a</strong>. Quem tiver mais, ganha, e acabou. Se empatar, compare a <strong>b</strong>. Se empatar de novo, a <strong>c</strong>. Se empatar nas três, a especificidade empatou, e quem decide é a <a href="cascata.html">ordem no código</a>: a última ganha.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Disputa</th><th>Pontuações</th><th>Quem ganha</th><th>Decidiu na coluna</th></tr>
+<tr><td><code>p</code> × <code>.aviso</code></td><td>(0, 0, 1) × (0, 1, 0)</td><td><code>.aviso</code></td><td>b</td></tr>
+<tr><td><code>.aviso</code> × <code>p.aviso</code></td><td>(0, 1, 0) × (0, 1, 1)</td><td><code>p.aviso</code></td><td>c</td></tr>
+<tr><td><code>.cardapio p</code> × <code>.preco</code></td><td>(0, 1, 1) × (0, 1, 0)</td><td><code>.cardapio p</code></td><td>c</td></tr>
+<tr><td><code>.cardapio .preco</code> × <code>.cardapio p</code></td><td>(0, 2, 0) × (0, 1, 1)</td><td><code>.cardapio .preco</code></td><td>b</td></tr>
+<tr><td><code>#topo</code> × <code>.a.b.c.d.e.f.g.h.i.j.k</code></td><td>(1, 0, 0) × (0, 11, 0)</td><td><code>#topo</code></td><td>a</td></tr>
+<tr><td><code>.cartao h2</code> × <code>h2.titulo</code></td><td>(0, 1, 1) × (0, 1, 1)</td><td>A que vier <strong>depois</strong></td><td>empate: ordem</td></tr>
+</table>
+</div>
+
+<div class="warning">
+<strong>Não é um número de três algarismos</strong>
+<p>É tentador juntar (0, 11, 0) em "110" e achar que ganha de (1, 0, 0), "100". Não ganha: as colunas não "vão um" como na conta de somar. Onze pratas nunca viram um ouro. Escreva sempre com vírgulas, (0, 11, 0), para não se confundir.</p>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> quatro regras disputam a cor do mesmo link, com a pontuação de cada uma no comentário. A de maior pontuação, <code>#menu a</code> (1, 0, 1), ganha, e o link fica azul-marinho, mesmo sendo a primeira regra. Apague a regra <code>#menu a</code> e descubra quem ganha depois dela. E depois? Conte antes de olhar o resultado.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav id="menu" class="menu"&gt;
+  &lt;a href="index.html" class="ativo"&gt;Início&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+<pre class="script" data-file="style.css">/* (1, 0, 1) */
+#menu a {
+  color: navy;
+}
+
+/* (0, 2, 0) */
+.menu .ativo {
+  color: crimson;
+}
+
+/* (0, 1, 1) */
+.menu a {
+  color: darkgreen;
+}
+
+/* (0, 0, 2) */
+nav a {
+  color: saddlebrown;
+}
+</pre>
+</div>
+
+<p>Sem o <code>#menu a</code>, ganha <code>.menu .ativo</code> (0, 2, 0): vermelho. Sem ele também, ganha <code>.menu a</code> (0, 1, 1): verde. Por último, <code>nav a</code> (0, 0, 2): marrom. A posição das regras no arquivo não influiu em nenhuma dessas disputas, porque nenhuma pontuação empatou.</p>
+
+<hr>
+
+<h2>3. Tabela de seletores contados</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>a (IDs)</th><th>b (classes…)</th><th>c (elementos…)</th><th>Pontuação</th></tr>
+<tr><td><code>*</code></td><td>0</td><td>0</td><td>0</td><td>(0, 0, 0)</td></tr>
+<tr><td><code>p</code></td><td>0</td><td>0</td><td>1</td><td>(0, 0, 1)</td></tr>
+<tr><td><code>ul li</code></td><td>0</td><td>0</td><td>2</td><td>(0, 0, 2)</td></tr>
+<tr><td><code>p::first-line</code></td><td>0</td><td>0</td><td>2</td><td>(0, 0, 2)</td></tr>
+<tr><td><code>.aviso</code></td><td>0</td><td>1</td><td>0</td><td>(0, 1, 0)</td></tr>
+<tr><td><code>[type="email"]</code></td><td>0</td><td>1</td><td>0</td><td>(0, 1, 0)</td></tr>
+<tr><td><code>a:hover</code></td><td>0</td><td>1</td><td>1</td><td>(0, 1, 1)</td></tr>
+<tr><td><code>.menu &gt; li</code></td><td>0</td><td>1</td><td>1</td><td>(0, 1, 1)</td></tr>
+<tr><td><code>li:first-child</code></td><td>0</td><td>1</td><td>1</td><td>(0, 1, 1)</td></tr>
+<tr><td><code>.cartao .preco</code></td><td>0</td><td>2</td><td>0</td><td>(0, 2, 0)</td></tr>
+<tr><td><code>.cartao.promocao h2</code></td><td>0</td><td>2</td><td>1</td><td>(0, 2, 1)</td></tr>
+<tr><td><code>input[type="email"]:focus</code></td><td>0</td><td>2</td><td>1</td><td>(0, 2, 1)</td></tr>
+<tr><td><code>#topo</code></td><td>1</td><td>0</td><td>0</td><td>(1, 0, 0)</td></tr>
+<tr><td><code>#topo a</code></td><td>1</td><td>0</td><td>1</td><td>(1, 0, 1)</td></tr>
+<tr><td><code>#topo .menu a:hover</code></td><td>1</td><td>2</td><td>1</td><td>(1, 2, 1)</td></tr>
+<tr><td><code>#topo #busca</code></td><td>2</td><td>0</td><td>0</td><td>(2, 0, 0)</td></tr>
+</table>
+</div>
+
+<h3>O que conta zero</h3>
+<ul>
+  <li>O seletor universal <code>*</code> (aula <a href="seletor-universal.html">Seletor Universal</a>).</li>
+  <li>Os combinadores: espaço, <code>&gt;</code>, <code>+</code> e <code>~</code> (aula <a href="combinadores.html">Combinadores</a>). <code>.menu &gt; li</code> e <code>.menu li</code> têm a mesma pontuação.</li>
+  <li>A pseudo-classe <code>:where()</code>, com tudo o que estiver dentro dela: <code>:where(#topo) a</code> é só (0, 0, 1).</li>
+</ul>
+
+<h3>Os casos especiais</h3>
+<ul>
+  <li><code>:is()</code>, <code>:not()</code> e <code>:has()</code> não contam por si mesmos: valem a pontuação do seletor <strong>mais forte</strong> dentro dos parênteses. <code>p:not(.aviso)</code> é (0, 1, 1), e <code>:is(#topo, .menu) a</code> é (1, 0, 1). Detalhes na aula <a href="not-is-where.html">:not(), :is() e :where()</a>.</li>
+  <li>O atributo <code>style</code> no HTML não tem seletor e não entra na conta: ele ganha de qualquer pontuação (aula <a href="cascata.html">A Cascata</a>).</li>
+  <li><code>!important</code> também não é especificidade: ele muda o andar da disputa (aula <a href="important.html">!important</a>).</li>
+</ul>
+
+<hr>
+
+<h2>4. Subindo a pontuação de propósito</h2>
+<p>Quando uma regra sua perde, a saída é escrever um seletor com pontuação <strong>maior ou igual</strong> à da vencedora (se for igual, a sua tem de vir depois). Suba o mínimo necessário.</p>
+
+<div class="tryhtml" data-goal="css:.ativo{color}=rgb(220, 20, 60),css:#menu a:last-child{color}=rgb(0, 0, 128),nsrc:!important">
+<p class="try-task"><strong>Missão:</strong> o link da página atual (<code>class="ativo"</code>) devia ser vermelho (<code>crimson</code>), mas a regra <code>#menu a</code> ganha. Conte as duas pontuações e mude o seletor da regra de baixo para ele ganhar. Sem mexer no HTML e sem <code>!important</code>. O outro link tem de continuar azul-marinho.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav id="menu"&gt;
+  &lt;a href="index.html" class="ativo"&gt;Início&lt;/a&gt;
+  &lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+<pre class="script" data-file="style.css">#menu a {
+  color: navy;
+}
+
+.ativo {
+  color: crimson;
+}
+</pre>
+<pre class="solucao" data-file="style.css">#menu a {
+  color: navy;
+}
+
+#menu .ativo {
+  color: crimson;
+}
+</pre>
+</div>
+
+<p><code>#menu a</code> é (1, 0, 1) e <code>.ativo</code> é (0, 1, 0): perde no ouro. <code>#menu .ativo</code> é (1, 1, 0): empata no ouro e ganha na prata. Repare na corrida que começou: para vencer um ID, você precisou de outro ID. É por isso que a próxima seção existe.</p>
+
+<hr>
+
+<h2 id="baixa">5. A boa prática: especificidade baixa e parecida</h2>
+<p>Um CSS fácil de mudar é aquele em que quase todas as regras têm pontuação <strong>baixa</strong> e <strong>parecida</strong>, como (0, 1, 0) ou (0, 1, 1). Assim, para mudar algo, basta uma regra de mesma força, escrita depois. Na prática:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Faça</th><th>Evite</th><th>Por quê</th></tr>
+<tr><td><code>.ativo</code>, <code>.preco</code></td><td><code>#menu a</code>, <code>#conteudo .preco</code></td><td>Um ID no seletor obriga toda regra que quiser mudá-lo a ter um ID também</td></tr>
+<tr><td><code>.menu-link</code></td><td><code>header nav ul li a</code></td><td>Correntes longas somam pontos e quebram se o HTML mudar</td></tr>
+<tr><td>Uma classe a mais no HTML</td><td>Um seletor mais comprido no CSS</td><td>A classe deixa a pontuação baixa</td></tr>
+<tr><td>Consertar a regra que ganha</td><td><code>!important</code></td><td>O <code>!important</code> só desloca a briga para um andar acima</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Muitas classes contra um ID</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  #aviso {
+    color: navy;
+  }
+  .caixa .nota.destaque.urgente {
+    color: crimson;
+  }
+&lt;/style&gt;
+&lt;div class="caixa"&gt;
+  &lt;p id="aviso" class="nota destaque urgente"&gt;Fechado no feriado.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> o aviso continua azul-marinho.</p>
+<p><strong>Por quê:</strong> (1, 0, 0) contra (0, 4, 0). Decide na coluna <strong>a</strong>: um ID contra nenhum. Pode empilhar quantas classes quiser.</p>
+<p><strong>Como consertar:</strong> troque o <code>id</code> do estilo por uma classe (<code>.aviso</code>, (0, 1, 0)); o <code>id</code> pode continuar no HTML para âncoras e JavaScript (aula <a href="seletor-id.html">Seletor de ID</a>).</p>
+</div>
+
+<div class="cenario">
+<strong>"A minha regra vem depois e mesmo assim perde"</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  ul li {
+    color: navy;
+  }
+  li {
+    color: darkgreen;
+  }
+&lt;/style&gt;
+&lt;ul&gt;
+  &lt;li&gt;Farinha&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<p><strong>O que você vê:</strong> o item fica azul-marinho.</p>
+<p><strong>Por quê:</strong> a ordem só decide no empate. <code>ul li</code> é (0, 0, 2) e <code>li</code> é (0, 0, 1): perdeu no bronze, antes de a ordem ser olhada.</p>
+<p><strong>Como consertar:</strong> conte as duas antes de culpar a ordem. Aqui, <code>ul li</code> também na regra de baixo, ou uma classe nos itens.</p>
+</div>
+
+<div class="cenario">
+<strong>A corrida do "mais forte"</strong>
+<pre class="file" data-file="style.css · erro de propósito">.preco { color: darkgreen; }                          /* (0, 1, 0) */
+.cardapio .preco { color: darkgreen; }                /* (0, 2, 0) */
+#conteudo .cardapio .preco { color: darkgreen; }      /* (1, 2, 0) */
+#conteudo .cardapio .preco { color: darkgreen !important; }
+</pre>
+<p><strong>O que acontece:</strong> cada vez que uma regra perde, alguém escreve uma mais forte. Em pouco tempo o arquivo está cheio de seletores enormes e de <code>!important</code>, e qualquer mudança vira uma investigação.</p>
+<p><strong>Como evitar:</strong> pontuação baixa desde o começo (<a href="#baixa">seção 5</a>). Em projetos grandes, <code>:where()</code> (que zera a pontuação) e <a href="layer.html"><code>@layer</code></a> ajudam a manter a ordem.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Pedaço do seletor</th><th>Coluna</th></tr>
+<tr><td><code>#id</code></td><td>a</td></tr>
+<tr><td><code>.classe</code>, <code>[atributo]</code>, <code>:pseudo-classe</code></td><td>b</td></tr>
+<tr><td><code>elemento</code>, <code>::pseudo-elemento</code></td><td>c</td></tr>
+<tr><td><code>*</code>, combinadores (espaço, <code>&gt;</code>, <code>+</code>, <code>~</code>), <code>:where()</code></td><td>nada</td></tr>
+<tr><td><code>:is()</code>, <code>:not()</code>, <code>:has()</code></td><td>o argumento mais forte</td></tr>
+<tr><td>Comparação</td><td>Coluna a, depois b, depois c; empate total: a última regra ganha</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Conte</h3>
+<p>Qual é a especificidade de <code>.menu a</code>? Escreva no formato (a, b, c).</p>
+<div class="ex-code"><input data-answer="(0, 1, 1)|(0,1,1)|0,1,1|0, 1, 1" aria-label="especificidade"></div>
+</div>
+
+<div class="exercise">
+<h3>2. Conte de novo</h3>
+<p>Qual é a especificidade de <code>#topo .menu li:first-child</code>?</p>
+<div class="ex-code"><input data-answer="(1, 2, 1)|(1,2,1)|1,2,1|1, 2, 1" aria-label="especificidade"></div>
+</div>
+
+<div class="exercise">
+<h3>3. O zero</h3>
+<p>Qual é a especificidade do seletor <code>*</code>?</p>
+<div class="ex-code"><input data-answer="(0, 0, 0)|(0,0,0)|0,0,0|0, 0, 0" aria-label="especificidade"></div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Quem ganha: <code>.a.b.c.d.e.f.g.h.i.j.k</code> (onze classes) ou <code>#x</code>?</p>
+<label><input type="radio" name="q4"> As onze classes, porque 11 é maior que 1</label>
+<label><input type="radio" name="q4"> Empate; ganha a que vier depois</label>
+<label><input type="radio" name="q4"> <code>#x</code>, porque decide na coluna a, e as classes têm zero lá</label>
+<label><input type="radio" name="q4"> Depende do navegador</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. <code>.cartao h2</code> vem antes e <code>h2.titulo</code> vem depois. Quem ganha?</p>
+<label><input type="radio" name="q5"> <code>.cartao h2</code>, porque tem combinador</label>
+<label><input type="radio" name="q5"> <code>h2.titulo</code>: as duas são (0, 1, 1), e no empate ganha a última</label>
+<label><input type="radio" name="q5"> <code>.cartao h2</code>, porque vem antes</label>
+<label><input type="radio" name="q5"> Nenhuma: as duas são ignoradas</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. Qual destes seletores tem especificidade (0, 1, 1)?</p>
+<label><input type="radio" name="q6"> <code>#menu a</code></label>
+<label><input type="radio" name="q6"> <code>.menu .link</code></label>
+<label><input type="radio" name="q6"> <code>ul li</code></label>
+<label><input type="radio" name="q6"> <code>a:hover</code></label>
+</div>
+
+<h3>Missão final: tirando o ID do estilo</h3>
+
+<div class="tryhtml" data-goal="nsel:#menu=0,css:.ativo{color}=rgb(220, 20, 60),css:.menu a:last-child{color}=rgb(0, 0, 128),nsrc:#menu,nsrc:!important">
+<p class="try-task"><strong>Missão:</strong> deixe o CSS do menu com especificidade baixa. (1) No HTML, troque <code>id="menu"</code> por <code>class="menu"</code>. (2) No CSS, troque <code>#menu</code> por <code>.menu</code> nas duas regras. (3) Confira: o link ativo continua vermelho e o outro, azul-marinho? Se não, conte as pontuações e ajuste o seletor do ativo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav id="menu"&gt;
+  &lt;a href="index.html" class="ativo"&gt;Início&lt;/a&gt;
+  &lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+<pre class="script" data-file="style.css">#menu a {
+  color: navy;
+}
+
+#menu .ativo {
+  color: crimson;
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav class="menu"&gt;
+  &lt;a href="index.html" class="ativo"&gt;Início&lt;/a&gt;
+  &lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+<pre class="solucao" data-file="style.css">.menu a {
+  color: navy;
+}
+
+.menu .ativo {
+  color: crimson;
+}
+</pre>
+</div>
+
+<p>Depois da troca, as pontuações caíram de (1, 0, 1) e (1, 1, 0) para (0, 1, 1) e (0, 2, 0). A relação entre as duas continua a mesma (o ativo ganha na prata), mas agora qualquer regra futura com uma ou duas classes consegue mudar o menu, sem precisar de ID nem de <code>!important</code>.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>A especificidade é uma pontuação de três colunas, <strong>(a, b, c)</strong>: IDs; classes, atributos e pseudo-classes; elementos e pseudo-elementos.</li>
+  <li>Compare coluna por coluna, da esquerda para a direita. Não é um número: (0, 11, 0) perde para (1, 0, 0).</li>
+  <li>Empate nas três colunas: a última regra ganha.</li>
+  <li><code>*</code>, combinadores e <code>:where()</code> contam zero. <code>:is()</code>, <code>:not()</code> e <code>:has()</code> valem o argumento mais forte.</li>
+  <li>O atributo <code>style</code> e o <code>!important</code> não são especificidade: estão acima dela na cascata.</li>
+  <li>Boa prática: pontuações baixas e parecidas, com classes; sem IDs no estilo e sem correntes longas.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
