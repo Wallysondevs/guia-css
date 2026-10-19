@@ -105,8 +105,8 @@
 <p>No exemplo, o texto do aviso encosta na borda da faixa azul. Fica apertado. O espaço entre o texto e a beirada do fundo é o <code>padding</code> ("preenchimento"), assunto da aula <a href="padding.html">Espaço Interno</a>. Quase todo elemento com fundo ganha um <code>padding</code>: <code>padding: 12px;</code> já resolve. Experimente acrescentar essa linha no <code>.aviso</code> da caixa acima.</p>
 </div>
 
-<div class="tryhtml" data-goal="css:h1{background-color}=rgb(255, 99, 71)">
-<p class="try-task"><strong>Missão:</strong> pinte o fundo do título de <code>tomato</code> (tomate). O parágrafo não muda.</p>
+<div class="tryhtml" data-goal="css:h1{background-color}=rgb(178, 34, 34)">
+<p class="try-task"><strong>Missão:</strong> pinte o fundo do título de <code>firebrick</code> (vermelho-tijolo). O parágrafo não muda.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;h1&gt;Cardápio da Padaria&lt;/h1&gt;
 &lt;p&gt;Pão francês, pão de queijo e sonho.&lt;/p&gt;
@@ -117,7 +117,7 @@
 </pre>
 <pre class="solucao" data-file="style.css">h1 {
   color: white;
-  background-color: tomato;
+  background-color: firebrick;
 }
 </pre>
 </div>
@@ -242,9 +242,9 @@
 <div class="tryhtml">
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;div class="mural"&gt;
-  &lt;p class="cheio"&gt;tomato (cheio)&lt;/p&gt;
-  &lt;p class="metade"&gt;rgb(255 99 71 / 50%)&lt;/p&gt;
-  &lt;p class="pouco"&gt;#ff634733 (20%)&lt;/p&gt;
+  &lt;p class="cheio"&gt;firebrick (cheio)&lt;/p&gt;
+  &lt;p class="metade"&gt;rgb(178 34 34 / 50%)&lt;/p&gt;
+  &lt;p class="pouco"&gt;#b2222233 (20%)&lt;/p&gt;
   &lt;p class="opaco"&gt;opacity: 0.5&lt;/p&gt;
 &lt;/div&gt;
 </pre>
@@ -258,25 +258,25 @@ p {
 }
 
 .cheio {
-  background-color: tomato;
+  background-color: firebrick;
 }
 
 .metade {
-  background-color: rgb(255 99 71 / 50%);
+  background-color: rgb(178 34 34 / 50%);
 }
 
 .pouco {
-  background-color: #ff634733;
+  background-color: #b2222233;
 }
 
 .opaco {
-  background-color: tomato;
+  background-color: firebrick;
   opacity: 0.5;
 }
 </pre>
 </div>
 
-<p>As três primeiras faixas estão sobre o mural azul-marinho. A cheia é tomate puro; a de 50% mistura o tomate com o azul e fica num tom arroxeado; a de 20% é quase só o azul. Repare no texto: nas três, as letras continuam brancas e nítidas, porque só o <strong>fundo</strong> ficou transparente.</p>
+<p>As três primeiras faixas estão sobre o mural azul-marinho. A cheia é vermelho-tijolo puro; a de 50% mistura o vermelho com o azul e fica num tom arroxeado; a de 20% é quase só o azul. Repare no texto: nas três, as letras continuam brancas e nítidas, porque só o <strong>fundo</strong> ficou transparente.</p>
 
 <p>A última faixa usa <code>opacity: 0.5</code> (aula <a href="opacity.html">Transparência</a>): o <strong>elemento inteiro</strong> fica meio transparente, letras incluídas. O fundo fica com o mesmo tom arroxeado da segunda faixa, mas agora as letras também deixam passar o azul e ficam apagadas, acinzentadas. Por isso:</p>
 
