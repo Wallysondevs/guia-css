@@ -1,0 +1,1502 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Projeto: Galeria de Fotos com Grid — colunas automáticas, recorte quadrado e destaque | Guia CSS</title>
+<meta name="description" content="Projeto do Guia CSS: uma galeria de fotos em seis versões, com Grid de colunas automáticas (auto-fill e minmax), fotos do mesmo tamanho com aspect-ratio e object-fit, legenda sobre a foto, uma foto em destaque e zoom suave no hover e no foco.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Projeto: Galeria de Fotos com Grid</span></h1>
+
+<p class="intro">A Ana quer um álbum no site da lojinha: o bolo, o mapa do bairro, o desenho dela, o logo novo. As fotos têm tamanhos e formatos diferentes (uma é larga, outra é quadrada, o logo é uma faixa comprida), e a página precisa ficar arrumada no celular e no computador. Neste projeto você monta essa galeria em <strong>seis versões</strong>, com Grid. O detalhe bonito: as colunas se ajustam à largura <strong>sozinhas</strong>, sem nenhuma media query.</p>
+
+<div class="note">
+<strong>Você vai aprender (juntando o que já viu)</strong>
+<ul>
+  <li>A fazer uma grade cujo número de colunas depende do espaço: <code>repeat(auto-fill, minmax(10rem, 1fr))</code>.</li>
+  <li>A deixar fotos de formatos diferentes do <strong>mesmo tamanho</strong>, recortadas, com <code>aspect-ratio</code> e <code>object-fit: cover</code>, e quando usar <code>contain</code>.</li>
+  <li>A pôr a legenda <strong>em cima</strong> da foto com <code>position: relative</code> e <code>absolute</code>.</li>
+  <li>A fazer uma foto ocupar 2 × 2 casas da grade, e por que isso fica dentro de um <code>@media</code>.</li>
+  <li>A dar um zoom suave na foto ao passar o mouse <strong>e</strong> ao chegar nela pelo teclado.</li>
+</ul>
+</div>
+
+<p>As descrições do resultado foram conferidas em fotos do Chromium, num quadro de 870 px (o de um computador, nesta coluna do guia) e num de 375 ou 320 px (celulares). As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>). As imagens são a mídia de exemplo do guia.</p>
+
+<hr>
+
+<h2>O que vamos construir</h2>
+<p>Pense num mural de cortiça com fotos: cada foto num cartãozinho do mesmo tamanho, a etiqueta com o nome colada embaixo, e a foto preferida maior, no canto. Se o mural for mais largo, cabem mais fotos por fileira; se for estreito, menos. É isso que a grade vai fazer.</p>
+
+<p>No fim, num quadro largo, a galeria tem quatro colunas: a foto do bolo grande ocupa um quadrado de 2 × 2 casas à esquerda, e as outras seis fotos ficam em quadrados menores em volta, cada uma com a legenda em letras brancas sobre uma faixa escura transparente, no pé da foto. Num celular, ficam duas colunas (ou uma, numa tela bem estreita), e o bolo fica do tamanho das outras.</p>
+
+<h3>O HTML (é o mesmo em todas as versões)</h3>
+<p>Uma lista (<code>&lt;ul class="galeria"&gt;</code>), porque é mesmo uma lista de fotos; cada item tem um <code>&lt;figure&gt;</code> com a foto e a legenda (<code>&lt;figcaption&gt;</code>), como no <a href="https://wallysondevs.github.io/guia-html/figure.html">Guia HTML</a>. Cada foto está dentro de um link para a versão grande. O primeiro item tem a classe <code>destaque</code>, e o logo, a classe <code>inteira</code> (você vai ver por quê na versão 3).</p>
+
+<pre class="file" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Álbum da Lojinha da Ana&lt;/h1&gt;
+  &lt;p&gt;Fotos da cozinha, do bairro e da equipe. Clique numa foto para vê-la inteira.&lt;/p&gt;
+  &lt;ul class="galeria"&gt;
+    &lt;li class="destaque"&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/bolo-1200.jpg"&gt;&lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate num prato branco, sobre a mesa da cozinha" width="800" height="600"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O bolo de cenoura, o mais pedido&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/bolo-quadrado-800.jpg"&gt;&lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="O bolo visto de perto, com cenourinhas e confeitos na cobertura" width="400" height="400"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;De pertinho&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/video-bolo-poster.jpg"&gt;&lt;img src="assets/midia/video-bolo-poster.jpg" alt="Cena do vídeo da receita: o bolo pronto, de lado" width="640" height="360"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;Cena do vídeo&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/mapa-800.png"&gt;&lt;img src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana na Rua das Flores, perto da Av. Central" width="400" height="250"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;Onde fica a lojinha&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/avatar-ana.svg"&gt;&lt;img src="assets/midia/avatar-ana-192.png" alt="Desenho da Ana sorrindo, de coque e blusa verde" width="192" height="192"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;A Ana, a dona&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/logo-lojinha.svg"&gt;&lt;img class="inteira" src="assets/midia/logo-lojinha-400.png" alt="Logo da Lojinha da Ana: uma fachada com toldo listrado" width="400" height="160"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O logo novo&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/apple-touch-icon.png"&gt;&lt;img src="assets/midia/apple-touch-icon.png" alt="Ícone do site: um bolo com uma vela, em fundo laranja" width="180" height="180"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O ícone do site&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/main&gt;
+</pre>
+
+<p>Repare nos <code>width</code> e <code>height</code> de cada <code>&lt;img&gt;</code>: são os tamanhos reais dos arquivos. Eles dizem ao navegador o formato de cada foto antes de ela chegar.</p>
+
+<p>Com o <code>style.css</code> vazio, cada foto aparece no tamanho natural, uma embaixo da outra (o bolo com 800 px de largura passa da tela do celular), com a legenda embaixo, o recuo de 40 px do <code>&lt;figure&gt;</code> e as bolinhas da lista.</p>
+
+<hr>
+
+<h2 id="versao1">Versão 1 · Base: página centralizada e fotos que cabem</h2>
+
+<pre class="file" data-file="style.css (versão 1)">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #f3f4f6;
+}
+
+.pagina {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>box-sizing</code>, <code>body</code></dt>
+  <dd>O chão de sempre: largura que inclui borda e preenchimento, fonte do sistema, cinza bem claro no fundo (<code>#f3f4f6</code>), para os cartões brancos da versão 4 aparecerem. Aula: <a href="box-sizing.html">box-sizing</a>.</dd>
+  <dt><code>.pagina</code></dt>
+  <dd>Uma coluna de até 60rem (960 px), centralizada, com 1rem de respiro. Mais larga que a de um texto, porque fotos aproveitam espaço. Aula: <a href="centralizar.html">Centralizando</a>.</dd>
+  <dt><code>.galeria img { display: block; width: 100%; height: auto; }</code></dt>
+  <dd>Cada foto fica da largura de quem a contém e a altura acompanha o formato dela. Aula: <a href="imagens-responsivas.html">Imagens que se Adaptam</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> num quadro de 870 px, as fotos continuam empilhadas, mas agora <strong>todas</strong> com a mesma largura (718 px: a coluna de 838 px menos o recuo de 40 px da lista e os 40 + 40 px de margem do <code>&lt;figure&gt;</code>), até o avatar de 192 px e o ícone de 180 px, que ficam enormes e um pouco borrados. A página fica comprida: mais de 4 mil pixels de altura. É hora da grade.</p>
+
+<h3>Experimente: a versão 1</h3>
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Álbum da Lojinha da Ana&lt;/h1&gt;
+  &lt;p&gt;Fotos da cozinha, do bairro e da equipe. Clique numa foto para vê-la inteira.&lt;/p&gt;
+  &lt;ul class="galeria"&gt;
+    &lt;li class="destaque"&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/bolo-1200.jpg"&gt;&lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate num prato branco, sobre a mesa da cozinha" width="800" height="600"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O bolo de cenoura, o mais pedido&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/bolo-quadrado-800.jpg"&gt;&lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="O bolo visto de perto, com cenourinhas e confeitos na cobertura" width="400" height="400"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;De pertinho&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/video-bolo-poster.jpg"&gt;&lt;img src="assets/midia/video-bolo-poster.jpg" alt="Cena do vídeo da receita: o bolo pronto, de lado" width="640" height="360"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;Cena do vídeo&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/mapa-800.png"&gt;&lt;img src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana na Rua das Flores, perto da Av. Central" width="400" height="250"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;Onde fica a lojinha&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/avatar-ana.svg"&gt;&lt;img src="assets/midia/avatar-ana-192.png" alt="Desenho da Ana sorrindo, de coque e blusa verde" width="192" height="192"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;A Ana, a dona&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/logo-lojinha.svg"&gt;&lt;img class="inteira" src="assets/midia/logo-lojinha-400.png" alt="Logo da Lojinha da Ana: uma fachada com toldo listrado" width="400" height="160"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O logo novo&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/apple-touch-icon.png"&gt;&lt;img src="assets/midia/apple-touch-icon.png" alt="Ícone do site: um bolo com uma vela, em fundo laranja" width="180" height="180"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O ícone do site&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #f3f4f6;
+}
+
+.pagina {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+</pre>
+</div>
+
+<h3>Missão 1</h3>
+<div class="tryhtml" data-goal="css:.pagina{max-width}=960px,css:.galeria img{display}=block,src:\.galeria img\s*\{[^}]*width:\s*100%">
+<p class="try-task"><strong>Missão:</strong> limite a <code>.pagina</code> a <code>60rem</code>, centralizada, e faça as fotos da <code>.galeria</code> virarem bloco e ocuparem a largura toda, sem achatar.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Álbum da Lojinha da Ana&lt;/h1&gt;
+  &lt;ul class="galeria"&gt;
+    &lt;li&gt;&lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="800" height="600"&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;img src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana" width="400" height="250"&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+.pagina {
+  padding: 1rem;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+.pagina {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao2">Versão 2 · A grade com colunas automáticas</h2>
+<p>Poderíamos escrever "quatro colunas no computador, duas no celular" com media queries. Mas o Grid sabe fazer a conta sozinho: "ponha quantas colunas de pelo menos 10rem couberem, e reparta a sobra entre elas".</p>
+
+<pre class="file" data-file="style.css (versão 2: o que entra)">
+.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria figure {
+  margin: 0;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>display: grid</code></dt>
+  <dd>A lista vira uma grade; os <code>&lt;li&gt;</code> viram as peças. Aula: <a href="grid.html">Introdução ao Grid</a>.</dd>
+  <dt><code>repeat(auto-fill, …)</code></dt>
+  <dd>"Repita a coluna quantas vezes couber." O navegador mede a largura da lista e decide o número.</dd>
+  <dt><code>minmax(10rem, 1fr)</code></dt>
+  <dd>Cada coluna tem no mínimo 10rem (160 px) e no máximo <code>1fr</code>, uma fatia igual da sobra. Assim, as colunas nunca ficam estreitas demais e nunca sobra um vão no fim da fileira. Aula: <a href="grid-repeat.html">repeat, minmax e auto-fit</a>.</dd>
+  <dt><code>gap: 1rem</code></dt>
+  <dd>16 px entre as fotos, nas duas direções. Aula: <a href="gap.html">Espaço entre Itens</a>.</dd>
+  <dt><code>margin: 0; padding: 0; list-style: none</code> e <code>.galeria figure { margin: 0; }</code></dt>
+  <dd>Tiram as bolinhas e os recuos que o navegador põe na lista e no <code>&lt;figure&gt;</code>. Aula: <a href="listas.html">Estilizando Listas</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 870 px, a lista tem 838 px, e cabem <strong>quatro colunas</strong> de 197,5 px (quatro de 160 px mais três vãos de 16 px dão 688 px; cinco dariam 864, e não cabem). No quadro de 375 px, são <strong>duas colunas</strong> de 163,5 px. Só que as fotos têm alturas diferentes: o bolo, o vídeo e o mapa são largos e baixos, o recorte quadrado e o avatar são altos, o logo é uma faixa fininha. As fileiras ficam desalinhadas, com as legendas em alturas diferentes.</p>
+
+<h3>Experimente: a versão 2</h3>
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Álbum da Lojinha da Ana&lt;/h1&gt;
+  &lt;p&gt;Fotos da cozinha, do bairro e da equipe. Clique numa foto para vê-la inteira.&lt;/p&gt;
+  &lt;ul class="galeria"&gt;
+    &lt;li class="destaque"&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/bolo-1200.jpg"&gt;&lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate num prato branco, sobre a mesa da cozinha" width="800" height="600"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O bolo de cenoura, o mais pedido&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/bolo-quadrado-800.jpg"&gt;&lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="O bolo visto de perto, com cenourinhas e confeitos na cobertura" width="400" height="400"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;De pertinho&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/video-bolo-poster.jpg"&gt;&lt;img src="assets/midia/video-bolo-poster.jpg" alt="Cena do vídeo da receita: o bolo pronto, de lado" width="640" height="360"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;Cena do vídeo&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/mapa-800.png"&gt;&lt;img src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana na Rua das Flores, perto da Av. Central" width="400" height="250"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;Onde fica a lojinha&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/avatar-ana.svg"&gt;&lt;img src="assets/midia/avatar-ana-192.png" alt="Desenho da Ana sorrindo, de coque e blusa verde" width="192" height="192"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;A Ana, a dona&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/logo-lojinha.svg"&gt;&lt;img class="inteira" src="assets/midia/logo-lojinha-400.png" alt="Logo da Lojinha da Ana: uma fachada com toldo listrado" width="400" height="160"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O logo novo&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/apple-touch-icon.png"&gt;&lt;img src="assets/midia/apple-touch-icon.png" alt="Ícone do site: um bolo com uma vela, em fundo laranja" width="180" height="180"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O ícone do site&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #f3f4f6;
+}
+
+.pagina {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria figure {
+  margin: 0;
+}
+</pre>
+</div>
+
+<p>Brinque: troque <code>10rem</code> por <code>6rem</code> e por <code>20rem</code> e conte as colunas. Abra o resultado numa aba nova (↗) e estreite a janela: as colunas caem de 4 para 3, 2 e 1, sem nenhuma media query.</p>
+
+<div class="tip"><strong><code>auto-fill</code> ou <code>auto-fit</code>?</strong> Com muitas fotos, dá no mesmo. A diferença aparece quando há <strong>menos</strong> fotos do que colunas: <code>auto-fill</code> mantém as colunas vazias (as fotos ficam do tamanho normal, à esquerda); <code>auto-fit</code> some com elas e as fotos esticam para ocupar a fileira. Para galeria, <code>auto-fill</code> evita uma única foto gigante.</div>
+
+<h3>Missão 2</h3>
+<div class="tryhtml" data-goal="css:.galeria{display}=grid,src:repeat\(\s*auto-(fill|fit)\s*\,\s*minmax\(,css:.galeria{row-gap}=16px,css:.galeria{list-style-type}=none,css:.galeria{padding-left}=0px">
+<p class="try-task"><strong>Missão:</strong> transforme a <code>.galeria</code> numa grade de colunas automáticas de no mínimo <code>10rem</code>, com <code>1rem</code> de espaço, sem bolinhas e sem o recuo da lista.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul class="galeria"&gt;
+  &lt;li class="destaque"&gt;&lt;figure&gt;&lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="800" height="600"&gt;&lt;figcaption&gt;O bolo&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;img src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana" width="400" height="250"&gt;&lt;figcaption&gt;O mapa&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;img src="assets/midia/avatar-ana-192.png" alt="Desenho da Ana sorrindo" width="192" height="192"&gt;&lt;figcaption&gt;A Ana&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;img class="inteira" src="assets/midia/logo-lojinha-400.png" alt="Logo da Lojinha da Ana" width="400" height="160"&gt;&lt;figcaption&gt;O logo&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;img src="assets/midia/video-bolo-poster.jpg" alt="Cena do vídeo da receita" width="640" height="360"&gt;&lt;figcaption&gt;O vídeo&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.galeria figure {
+  margin: 0;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.galeria figure {
+  margin: 0;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao3">Versão 3 · Todas as fotos quadradas, sem deformar</h2>
+<p>Num mural, todas as fotos são reveladas no mesmo tamanho; o fotógrafo recorta as sobras. No CSS, dizemos o formato da caixa (<code>aspect-ratio</code>) e como a foto se ajeita dentro dela (<code>object-fit</code>).</p>
+
+<pre class="file" data-file="style.css (versão 3: o que entra)">
+.galeria img {
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.galeria .inteira {
+  object-fit: contain;
+  background-color: #fff;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>aspect-ratio: 1</code></dt>
+  <dd>A caixa da imagem passa a ser quadrada (1 de largura para 1 de altura; o navegador guarda como <code>1 / 1</code>). Ela vence a proporção que os atributos <code>width</code> e <code>height</code> informavam. Aula: <a href="aspect-ratio.html">Proporção</a>.</dd>
+  <dt><code>object-fit: cover</code></dt>
+  <dd>A foto <strong>cobre</strong> a caixa inteira, sem deformar: aumenta até não sobrar espaço e corta o que passar, igualmente dos dois lados. Sem o <code>object-fit</code>, a foto seria espremida para caber no quadrado (o bolo largo ficaria magrinho). Aula: <a href="imagens-responsivas.html">Imagens que se Adaptam</a>.</dd>
+  <dt><code>.galeria .inteira { object-fit: contain; }</code></dt>
+  <dd>O logo é uma faixa de 400 × 160: com <code>cover</code>, só o meio dele apareceria (um pedaço da fachada e do "Lojinha"). <code>contain</code> faz o contrário: a foto cabe <strong>inteira</strong> na caixa, e sobram faixas vazias, aqui pintadas de branco. Use <code>contain</code> em logos, desenhos e capturas de tela, que não podem perder nada.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 870 px, as sete fotos ficam em quadrados de 197,5 px, alinhadas em duas fileiras certinhas (4 + 3), com as legendas na mesma altura. O bolo da primeira foto e o do vídeo aparecem cortados nas laterais, mais "de perto"; o mapa perde as pontas da esquerda e da direita; o logo aparece inteiro, no meio de um quadrado branco.</p>
+
+<h3>Experimente: a versão 3</h3>
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Álbum da Lojinha da Ana&lt;/h1&gt;
+  &lt;p&gt;Fotos da cozinha, do bairro e da equipe. Clique numa foto para vê-la inteira.&lt;/p&gt;
+  &lt;ul class="galeria"&gt;
+    &lt;li class="destaque"&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/bolo-1200.jpg"&gt;&lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate num prato branco, sobre a mesa da cozinha" width="800" height="600"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O bolo de cenoura, o mais pedido&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/bolo-quadrado-800.jpg"&gt;&lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="O bolo visto de perto, com cenourinhas e confeitos na cobertura" width="400" height="400"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;De pertinho&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/video-bolo-poster.jpg"&gt;&lt;img src="assets/midia/video-bolo-poster.jpg" alt="Cena do vídeo da receita: o bolo pronto, de lado" width="640" height="360"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;Cena do vídeo&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/mapa-800.png"&gt;&lt;img src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana na Rua das Flores, perto da Av. Central" width="400" height="250"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;Onde fica a lojinha&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/avatar-ana.svg"&gt;&lt;img src="assets/midia/avatar-ana-192.png" alt="Desenho da Ana sorrindo, de coque e blusa verde" width="192" height="192"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;A Ana, a dona&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/logo-lojinha.svg"&gt;&lt;img class="inteira" src="assets/midia/logo-lojinha-400.png" alt="Logo da Lojinha da Ana: uma fachada com toldo listrado" width="400" height="160"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O logo novo&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/apple-touch-icon.png"&gt;&lt;img src="assets/midia/apple-touch-icon.png" alt="Ícone do site: um bolo com uma vela, em fundo laranja" width="180" height="180"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O ícone do site&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #f3f4f6;
+}
+
+.pagina {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria figure {
+  margin: 0;
+}
+
+.galeria img {
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.galeria .inteira {
+  object-fit: contain;
+  background-color: #fff;
+}
+</pre>
+</div>
+
+<p>Brinque: apague a linha <code>object-fit: cover;</code> e veja as fotos se deformarem para caber no quadrado. Troque <code>aspect-ratio: 1</code> por <code>aspect-ratio: 4 / 3</code>. No primeiro bloco, acrescente <code>object-position: left;</code> e veja o corte mudar de lado.</p>
+
+<h3>Missão 3</h3>
+<div class="tryhtml" data-goal="css:.galeria img{aspect-ratio}=1 / 1,css:.galeria img{object-fit}=cover,css:.galeria .inteira{object-fit}=contain">
+<p class="try-task"><strong>Missão:</strong> deixe todas as fotos quadradas, recortadas sem deformar, e faça o logo (<code>.inteira</code>) caber inteiro.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul class="galeria"&gt;
+  &lt;li class="destaque"&gt;&lt;figure&gt;&lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="800" height="600"&gt;&lt;figcaption&gt;O bolo&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;img src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana" width="400" height="250"&gt;&lt;figcaption&gt;O mapa&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;img src="assets/midia/avatar-ana-192.png" alt="Desenho da Ana sorrindo" width="192" height="192"&gt;&lt;figcaption&gt;A Ana&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;img class="inteira" src="assets/midia/logo-lojinha-400.png" alt="Logo da Lojinha da Ana" width="400" height="160"&gt;&lt;figcaption&gt;O logo&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;img src="assets/midia/video-bolo-poster.jpg" alt="Cena do vídeo da receita" width="640" height="360"&gt;&lt;figcaption&gt;O vídeo&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria figure {
+  margin: 0;
+}
+
+.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria figure {
+  margin: 0;
+}
+
+.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.galeria .inteira {
+  object-fit: contain;
+  background-color: #fff;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao4">Versão 4 · Cartões com a legenda sobre a foto</h2>
+<p>A legenda vai virar uma etiqueta colada no pé da foto, por cima dela. Para isso, ela sai do fluxo normal (<code>position: absolute</code>) e se posiciona em relação ao <code>&lt;figure&gt;</code> (<code>position: relative</code>).</p>
+
+<pre class="file" data-file="style.css (versão 4: o que entra)">
+.galeria figure {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.2);
+}
+
+.galeria figcaption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #fff;
+  background-color: rgb(0 0 0 / 0.6);
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>.galeria figure { position: relative; }</code></dt>
+  <dd>Não move o <code>&lt;figure&gt;</code> do lugar. Só faz dele a <strong>referência</strong> para os filhos com <code>position: absolute</code>. Aula: <a href="position-relative.html">position: relative</a>.</dd>
+  <dt><code>overflow: hidden</code> + <code>border-radius: 8px</code></dt>
+  <dd>Arredonda o cartão e esconde o que passa dele: os cantos da foto e da legenda ficam arredondados junto. Aulas: <a href="overflow.html">overflow</a> e <a href="border-radius.html">border-radius</a>.</dd>
+  <dt><code>box-shadow: 0 2px 6px rgb(0 0 0 / 0.2)</code></dt>
+  <dd>Uma sombra suave, 2 px para baixo, espalhada em 6 px, preta com 20% de opacidade: o cartão parece "descolado" do fundo. Aula: <a href="box-shadow.html">Sombra</a>.</dd>
+  <dt><code>figcaption { position: absolute; bottom: 0; left: 0; right: 0; }</code></dt>
+  <dd>A legenda sai do fluxo e gruda no pé do <code>&lt;figure&gt;</code>, de ponta a ponta. Aula: <a href="position-absolute.html">position: absolute</a>.</dd>
+  <dt><code>color: #fff</code> + <code>background-color: rgb(0 0 0 / 0.6)</code></dt>
+  <dd>Letra branca sobre uma faixa preta com 60% de opacidade: dá para ler em cima de qualquer foto, clara ou escura, e a foto ainda aparece por trás. Aula: <a href="opacity.html">Transparência</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> cada foto vira um cartão quadrado com cantos arredondados e uma sombra leve. As legendas não ocupam mais espaço embaixo: ficam numa faixa escura transparente no pé de cada foto, em letras brancas. A legenda maior, "O bolo de cenoura, o mais pedido", quebra em duas linhas e cobre mais da foto. A grade fica mais baixa, porque as legendas não somam altura.</p>
+
+<h3>Experimente: a versão 4</h3>
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Álbum da Lojinha da Ana&lt;/h1&gt;
+  &lt;p&gt;Fotos da cozinha, do bairro e da equipe. Clique numa foto para vê-la inteira.&lt;/p&gt;
+  &lt;ul class="galeria"&gt;
+    &lt;li class="destaque"&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/bolo-1200.jpg"&gt;&lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate num prato branco, sobre a mesa da cozinha" width="800" height="600"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O bolo de cenoura, o mais pedido&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/bolo-quadrado-800.jpg"&gt;&lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="O bolo visto de perto, com cenourinhas e confeitos na cobertura" width="400" height="400"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;De pertinho&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/video-bolo-poster.jpg"&gt;&lt;img src="assets/midia/video-bolo-poster.jpg" alt="Cena do vídeo da receita: o bolo pronto, de lado" width="640" height="360"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;Cena do vídeo&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/mapa-800.png"&gt;&lt;img src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana na Rua das Flores, perto da Av. Central" width="400" height="250"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;Onde fica a lojinha&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/avatar-ana.svg"&gt;&lt;img src="assets/midia/avatar-ana-192.png" alt="Desenho da Ana sorrindo, de coque e blusa verde" width="192" height="192"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;A Ana, a dona&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/logo-lojinha.svg"&gt;&lt;img class="inteira" src="assets/midia/logo-lojinha-400.png" alt="Logo da Lojinha da Ana: uma fachada com toldo listrado" width="400" height="160"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O logo novo&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/apple-touch-icon.png"&gt;&lt;img src="assets/midia/apple-touch-icon.png" alt="Ícone do site: um bolo com uma vela, em fundo laranja" width="180" height="180"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O ícone do site&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #f3f4f6;
+}
+
+.pagina {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria figure {
+  margin: 0;
+}
+
+.galeria img {
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.galeria .inteira {
+  object-fit: contain;
+  background-color: #fff;
+}
+
+.galeria figure {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.2);
+}
+
+.galeria figcaption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #fff;
+  background-color: rgb(0 0 0 / 0.6);
+}
+</pre>
+</div>
+
+<p>Brinque: troque <code>bottom: 0;</code> por <code>top: 0;</code> e a etiqueta sobe. Troque o <code>0.6</code> por <code>1</code> (faixa preta sólida) e por <code>0.2</code> (quase invisível: repare como a letra fica difícil de ler sobre a parte clara das fotos).</p>
+
+<h3>Missão 4</h3>
+<div class="tryhtml" data-goal="css:.galeria figure{position}=relative,css:.galeria figcaption{position}=absolute,css:.galeria figcaption{bottom}=0px,css:.galeria figcaption{left}=0px">
+<p class="try-task"><strong>Missão:</strong> as legendas já têm a faixa escura, mas estão embaixo das fotos. Cole cada uma no pé da sua foto, por cima dela, de ponta a ponta.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul class="galeria"&gt;
+  &lt;li class="destaque"&gt;&lt;figure&gt;&lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="800" height="600"&gt;&lt;figcaption&gt;O bolo&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;img src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana" width="400" height="250"&gt;&lt;figcaption&gt;O mapa&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;img src="assets/midia/avatar-ana-192.png" alt="Desenho da Ana sorrindo" width="192" height="192"&gt;&lt;figcaption&gt;A Ana&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;img class="inteira" src="assets/midia/logo-lojinha-400.png" alt="Logo da Lojinha da Ana" width="400" height="160"&gt;&lt;figcaption&gt;O logo&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;img src="assets/midia/video-bolo-poster.jpg" alt="Cena do vídeo da receita" width="640" height="360"&gt;&lt;figcaption&gt;O vídeo&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria figure {
+  margin: 0;
+}
+
+.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.galeria figure {
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.galeria figcaption {
+  padding: 0.5rem 0.75rem;
+  color: #fff;
+  background-color: rgb(0 0 0 / 0.6);
+}
+</pre>
+<pre class="solucao" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria figure {
+  margin: 0;
+}
+
+.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.galeria figure {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.galeria figcaption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.5rem 0.75rem;
+  color: #fff;
+  background-color: rgb(0 0 0 / 0.6);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao5">Versão 5 · Uma foto em destaque</h2>
+<p>A foto do bolo é a mais importante: ela vai ocupar duas colunas e duas linhas da grade. Mas só quando houver colunas para isso.</p>
+
+<pre class="file" data-file="style.css (versão 5: o que entra)">
+@media (min-width: 30rem) {
+  .destaque {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>grid-column: span 2</code> e <code>grid-row: span 2</code></dt>
+  <dd>"Ocupe duas casas na largura e duas na altura, a partir de onde você cair." As outras peças se acomodam em volta, nas casas livres. Aula: <a href="grid-posicionar.html">Posicionando Itens</a>.</dd>
+  <dt><code>@media (min-width: 30rem)</code></dt>
+  <dd>Só a partir de 480 px. Num celular estreito, a grade tem uma coluna só, e pedir duas faria o Grid <strong>inventar</strong> uma segunda coluna (veja em "Quando dá errado"). Aula: <a href="media-queries.html">Media Queries</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 870 px, o bolo vira um quadrado grande de 411 × 411 px no canto de cima à esquerda (duas colunas de 197,5 px mais o vão de 16 px). À direita dele, ficam "De pertinho" e "Cena do vídeo" em cima, "Onde fica a lojinha" e "A Ana, a dona" embaixo; na terceira fileira, o logo e o ícone. Como a foto também é quadrada, o destaque fecha certinho com as quatro fotos ao lado. Nos quadros de 375 e 320 px, nada muda: o bolo fica do tamanho das outras.</p>
+
+<h3>Experimente: a versão 5</h3>
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Álbum da Lojinha da Ana&lt;/h1&gt;
+  &lt;p&gt;Fotos da cozinha, do bairro e da equipe. Clique numa foto para vê-la inteira.&lt;/p&gt;
+  &lt;ul class="galeria"&gt;
+    &lt;li class="destaque"&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/bolo-1200.jpg"&gt;&lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate num prato branco, sobre a mesa da cozinha" width="800" height="600"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O bolo de cenoura, o mais pedido&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/bolo-quadrado-800.jpg"&gt;&lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="O bolo visto de perto, com cenourinhas e confeitos na cobertura" width="400" height="400"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;De pertinho&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/video-bolo-poster.jpg"&gt;&lt;img src="assets/midia/video-bolo-poster.jpg" alt="Cena do vídeo da receita: o bolo pronto, de lado" width="640" height="360"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;Cena do vídeo&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/mapa-800.png"&gt;&lt;img src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana na Rua das Flores, perto da Av. Central" width="400" height="250"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;Onde fica a lojinha&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/avatar-ana.svg"&gt;&lt;img src="assets/midia/avatar-ana-192.png" alt="Desenho da Ana sorrindo, de coque e blusa verde" width="192" height="192"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;A Ana, a dona&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/logo-lojinha.svg"&gt;&lt;img class="inteira" src="assets/midia/logo-lojinha-400.png" alt="Logo da Lojinha da Ana: uma fachada com toldo listrado" width="400" height="160"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O logo novo&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/apple-touch-icon.png"&gt;&lt;img src="assets/midia/apple-touch-icon.png" alt="Ícone do site: um bolo com uma vela, em fundo laranja" width="180" height="180"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O ícone do site&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #f3f4f6;
+}
+
+.pagina {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria figure {
+  margin: 0;
+}
+
+.galeria img {
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.galeria .inteira {
+  object-fit: contain;
+  background-color: #fff;
+}
+
+.galeria figure {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.2);
+}
+
+.galeria figcaption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #fff;
+  background-color: rgb(0 0 0 / 0.6);
+}
+
+@media (min-width: 30rem) {
+  .destaque {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+}
+</pre>
+</div>
+
+<p>Brinque: troque <code>grid-row: span 2</code> por <code>span 1</code> e veja o bolo "esticado" na largura empurrar as outras fotos. Ponha a classe <code>destaque</code> no item do mapa, em vez do bolo.</p>
+
+<h3>Missão 5</h3>
+<div class="tryhtml" data-goal="css:.destaque{grid-column-start}=span 2,css:.destaque{grid-row-start}=span 2">
+<p class="try-task"><strong>Missão:</strong> nesta grade de 4 colunas fixas, faça o item <code>.destaque</code> ocupar 2 colunas e 2 linhas.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul class="galeria"&gt;
+  &lt;li class="destaque"&gt;&lt;figure&gt;&lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="800" height="600"&gt;&lt;figcaption&gt;O bolo&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;img src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana" width="400" height="250"&gt;&lt;figcaption&gt;O mapa&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;img src="assets/midia/avatar-ana-192.png" alt="Desenho da Ana sorrindo" width="192" height="192"&gt;&lt;figcaption&gt;A Ana&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;img class="inteira" src="assets/midia/logo-lojinha-400.png" alt="Logo da Lojinha da Ana" width="400" height="160"&gt;&lt;figcaption&gt;O logo&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;img src="assets/midia/video-bolo-poster.jpg" alt="Cena do vídeo da receita" width="640" height="360"&gt;&lt;figcaption&gt;O vídeo&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria figure {
+  margin: 0;
+}
+
+.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria figure {
+  margin: 0;
+}
+
+.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.destaque {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao6">Versão 6 · Zoom no mouse e no teclado</h2>
+<p>Falta o toque final: quando a pessoa passa o mouse numa foto, ela cresce um pouquinho dentro do cartão, como quem chega mais perto do mural. Quem navega pelo teclado (<kbd>Tab</kbd>) precisa ver o mesmo efeito e saber em que foto está.</p>
+
+<pre class="file" data-file="style.css (versão 6: o que entra)">
+.galeria img {
+  transition: transform 0.3s;
+}
+
+.galeria a:hover img,
+.galeria a:focus-visible img {
+  transform: scale(1.05);
+}
+
+.galeria figure:focus-within {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .galeria img {
+    transition: none;
+  }
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>transition: transform 0.3s</code></dt>
+  <dd>Quando o <code>transform</code> mudar, a mudança leva 0,3 s, em vez de acontecer de uma vez. Fica na regra da imagem "parada", para valer na ida e na volta. Aula: <a href="transition.html">Transições</a>.</dd>
+  <dt><code>a:hover img</code>, <code>a:focus-visible img</code> → <code>transform: scale(1.05)</code></dt>
+  <dd>Com o mouse em cima do link, ou com o foco do teclado nele, a foto cresce 5%. O <code>overflow: hidden</code> do cartão (versão 4) corta o que passa: o cartão fica do mesmo tamanho, só a foto "se aproxima". Aulas: <a href="hover-focus.html">:hover, :focus e :active</a> e <a href="transform.html">transform</a>.</dd>
+  <dt><code>figure:focus-within</code></dt>
+  <dd>"O <code>&lt;figure&gt;</code> que tem alguma coisa focada dentro." Ganha um contorno azul de 3 px, 2 px para fora do cartão. O contorno fica no cartão, e não no link, porque o <code>overflow: hidden</code> cortaria um contorno desenhado dentro dele. Aula: <a href="outline.html">Contorno</a>.</dd>
+  <dt><code>@media (prefers-reduced-motion: reduce)</code></dt>
+  <dd>Para quem pediu ao sistema menos animação, a foto muda sem a transição. Aula: <a href="reduced-motion.html">Respeitando Quem Prefere Menos Movimento</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> parada, a galeria fica igual à versão 5. Com o mouse sobre "De pertinho", o bolo cresce suavemente dentro do cartão (o estilo calculado do <code>transform</code> vira <code>matrix(1.05, 0, 0, 1.05, 0, 0)</code>, o jeito do navegador guardar <code>scale(1.05)</code>). Com o foco do teclado no segundo link (<kbd>Tab</kbd>, <kbd>Tab</kbd>), o cartão "De pertinho" ganha o contorno azul em volta e a foto cresce do mesmo jeito.</p>
+
+<h3>Experimente: a versão 6 (a página completa)</h3>
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Álbum da Lojinha da Ana&lt;/h1&gt;
+  &lt;p&gt;Fotos da cozinha, do bairro e da equipe. Clique numa foto para vê-la inteira.&lt;/p&gt;
+  &lt;ul class="galeria"&gt;
+    &lt;li class="destaque"&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/bolo-1200.jpg"&gt;&lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate num prato branco, sobre a mesa da cozinha" width="800" height="600"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O bolo de cenoura, o mais pedido&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/bolo-quadrado-800.jpg"&gt;&lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="O bolo visto de perto, com cenourinhas e confeitos na cobertura" width="400" height="400"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;De pertinho&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/video-bolo-poster.jpg"&gt;&lt;img src="assets/midia/video-bolo-poster.jpg" alt="Cena do vídeo da receita: o bolo pronto, de lado" width="640" height="360"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;Cena do vídeo&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/mapa-800.png"&gt;&lt;img src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana na Rua das Flores, perto da Av. Central" width="400" height="250"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;Onde fica a lojinha&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/avatar-ana.svg"&gt;&lt;img src="assets/midia/avatar-ana-192.png" alt="Desenho da Ana sorrindo, de coque e blusa verde" width="192" height="192"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;A Ana, a dona&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/logo-lojinha.svg"&gt;&lt;img class="inteira" src="assets/midia/logo-lojinha-400.png" alt="Logo da Lojinha da Ana: uma fachada com toldo listrado" width="400" height="160"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O logo novo&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;figure&gt;
+        &lt;a href="assets/midia/apple-touch-icon.png"&gt;&lt;img src="assets/midia/apple-touch-icon.png" alt="Ícone do site: um bolo com uma vela, em fundo laranja" width="180" height="180"&gt;&lt;/a&gt;
+        &lt;figcaption&gt;O ícone do site&lt;/figcaption&gt;
+      &lt;/figure&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #f3f4f6;
+}
+
+.pagina {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria figure {
+  margin: 0;
+}
+
+.galeria img {
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.galeria .inteira {
+  object-fit: contain;
+  background-color: #fff;
+}
+
+.galeria figure {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.2);
+}
+
+.galeria figcaption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #fff;
+  background-color: rgb(0 0 0 / 0.6);
+}
+
+@media (min-width: 30rem) {
+  .destaque {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+}
+
+.galeria img {
+  transition: transform 0.3s;
+}
+
+.galeria a:hover img,
+.galeria a:focus-visible img {
+  transform: scale(1.05);
+}
+
+.galeria figure:focus-within {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .galeria img {
+    transition: none;
+  }
+}
+</pre>
+</div>
+
+<p>Brinque: passe o mouse nas fotos; clique dentro do quadro e use <kbd>Tab</kbd>. Troque <code>scale(1.05)</code> por <code>scale(1.2) rotate(3deg)</code>. Tire o <code>overflow: hidden</code> do <code>.galeria figure</code> e veja a foto escapar do cartão no zoom. (Clicar numa foto abre a versão grande dentro do quadro; o ↻ volta à galeria.)</p>
+
+<h3>Missão 6</h3>
+<div class="tryhtml" data-goal="css:.galeria img{transition-duration}=0.3s,src::hover\s+img,src::focus-visible\s+img,src:scale\(\s*1\.05\s*\)">
+<p class="try-task"><strong>Missão:</strong> faça a foto crescer para <code>scale(1.05)</code> quando o mouse passar no link <strong>e</strong> quando o link receber o foco do teclado (<code>:focus-visible</code>), com uma transição de <code>0.3s</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul class="galeria"&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;a href="assets/midia/bolo-1200.jpg"&gt;&lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="800" height="600"&gt;&lt;/a&gt;&lt;figcaption&gt;O bolo&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;figure&gt;&lt;a href="assets/midia/mapa-800.png"&gt;&lt;img src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana" width="400" height="250"&gt;&lt;/a&gt;&lt;figcaption&gt;O mapa&lt;/figcaption&gt;&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria figure {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria figure {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.galeria img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.galeria img {
+  transition: transform 0.3s;
+}
+
+.galeria a:hover img,
+.galeria a:focus-visible img {
+  transform: scale(1.05);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Formas diferentes de fazer as mesmas coisas</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Para</th><th>Usamos</th><th>Também daria</th><th>Quando preferir a outra</th></tr></thead>
+<tbody>
+<tr><td>Número de colunas</td><td><code>repeat(auto-fill, minmax(10rem, 1fr))</code></td><td><code>repeat(2, 1fr)</code> no celular e <code>repeat(4, 1fr)</code> num <code>@media</code></td><td>Quando o design pede um número <strong>exato</strong> de colunas em cada tamanho de tela.</td></tr>
+<tr><td>Grade de fotos</td><td>Grid</td><td>Flexbox com <code>flex-wrap</code></td><td>Para fotos de larguras diferentes numa "faixa" (como fileiras de altura igual). Grid alinha linhas <strong>e</strong> colunas; veja <a href="flex-ou-grid.html">Flexbox ou Grid?</a>.</td></tr>
+<tr><td>Fotos do mesmo tamanho</td><td><code>aspect-ratio</code> + <code>object-fit: cover</code></td><td>Uma <code>height</code> fixa + <code>object-fit: cover</code></td><td>Quando a altura não pode depender da largura da coluna (uma faixa de miniaturas de 120 px).</td></tr>
+<tr><td>Foto inteira</td><td><code>object-fit: contain</code></td><td>Deixar sem <code>aspect-ratio</code></td><td>Quando não há problema de as alturas ficarem diferentes.</td></tr>
+<tr><td>Legenda</td><td>Por cima da foto (<code>absolute</code>)</td><td>Embaixo da foto, no fluxo normal</td><td>Legendas longas, que cobririam a foto; ou fotos em que o pé importa.</td></tr>
+<tr><td>Destaque só no grande</td><td><code>@media (min-width: 30rem)</code></td><td><code>grid-column: 1 / -1</code> (a fileira toda)</td><td>Quando o destaque deve ser uma faixa da largura toda, em qualquer tela.</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<h2>Quando dá errado</h2>
+
+<div class="cenario">
+<h3>Fotos de alturas diferentes, legendas desalinhadas</h3>
+<p>É a versão 2: cada foto ocupa a largura da coluna e a altura que o formato dela pede. O bolo do vídeo (640 × 360) fica baixo; o recorte quadrado, alto; o logo, uma faixa fininha. <strong>Por quê:</strong> a grade iguala as larguras, nunca o formato das fotos. <strong>Conserto:</strong> versão 3 (<code>aspect-ratio</code> + <code>object-fit</code>). Não tente consertar com <code>height</code> fixa sem <code>object-fit</code>: as fotos ficam deformadas.</p>
+</div>
+
+<div class="cenario">
+<h3>A grade vira uma coluna só, com fotos enormes</h3>
+<pre class="file" data-file="style.css · erro de propósito">.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem 1fr));
+  gap: 1rem;
+}
+</pre>
+<p><strong>O que você vê:</strong> no quadro de 870 px, cada foto ocupa a largura toda (838 px), uma embaixo da outra, e a página passa de 6 mil pixels de altura. <strong>Por quê:</strong> faltou a vírgula entre <code>10rem</code> e <code>1fr</code>. O valor inteiro fica inválido e o navegador descarta a declaração: o <code>display: grid</code> continua valendo, mas sem colunas definidas a grade tem uma coluna só (o estilo calculado mostra <code>838px</code>). O validador:</p>
+<pre class="term" data-cwd="~/galeria">$ vnu --css style.css
+"file:/home/ana/galeria/style.css":3.61-3.61: error: CSS: “grid-template-columns”: “ ” is an incorrect operator.</pre>
+<p>"O espaço é um operador incorreto": no lugar dele devia haver uma vírgula.</p>
+</div>
+
+<div class="cenario">
+<h3>As fotos voltam ao formato natural</h3>
+<pre class="file" data-file="style.css · erro de propósito">.galeria img {
+  aspect-ratio: 1:1;
+  object-fit: cover;
+}
+</pre>
+<p><strong>O que você vê:</strong> as fotos voltam às alturas diferentes da versão 2, com as legendas em alturas diferentes; o logo vira uma tira estreita, com a legenda escura cobrindo quase tudo. <strong>Por quê:</strong> a proporção se escreve com barra, <code>1 / 1</code> (ou só <code>1</code>), nunca com dois-pontos. O navegador descarta o <code>aspect-ratio</code>, e o estilo calculado fica <code>auto 800 / 600</code> no bolo: a proporção dos atributos do HTML. O validador se perde no <code>:</code> a mais e acusa três "Parse Error" (erro de leitura) seguidos, a partir da linha 2:</p>
+<pre class="term" data-cwd="~/galeria">$ vnu --css style.css
+"file:/home/ana/galeria/style.css":2.21-3.2: error: CSS: Parse Error.
+"file:/home/ana/galeria/style.css":3.21-3.21: error: CSS: Parse Error.
+"file:/home/ana/galeria/style.css":4.2-5.1: error: CSS: Parse Error.</pre>
+</div>
+
+<div class="cenario">
+<h3>Todas as legendas vão parar no pé da tela</h3>
+<p>Na versão 4, sem o <code>position: relative</code> no <code>.galeria figure</code>:</p>
+<pre class="file" data-file="style.css · erro de propósito">.galeria figure {
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.galeria figcaption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+</pre>
+<p><strong>O que você vê:</strong> as fotos ficam sem legenda, e as sete legendas aparecem <strong>empilhadas umas sobre as outras</strong> numa faixa escura da largura toda, no pé da primeira "tela" da página. As letras se embaralham; a que mais se lê é a última, "O ícone do site". <strong>Por quê:</strong> um elemento <code>absolute</code> se posiciona em relação ao ancestral posicionado mais próximo. Sem nenhum, a referência é a janela inicial da página, e o <code>bottom: 0</code> de todas aponta para o mesmo lugar. O validador não acusa nada: o CSS é válido.</p>
+</div>
+
+<div class="cenario">
+<h3>No celular, aparece uma coluna estreita e torta</h3>
+<p>Se o destaque ficar fora do <code>@media</code>:</p>
+<pre class="file" data-file="style.css · erro de propósito">.destaque {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+</pre>
+<p><strong>O que você vê</strong> num quadro de 320 px: o bolo ocupa a largura toda, e as outras fotos ficam em duas colunas de larguras <strong>diferentes</strong>, 160 px e 112 px; nas fotos da coluna estreita, a legenda quebra em duas linhas e cobre metade da foto. <strong>Por quê:</strong> ali só cabe uma coluna de 10rem. Pedindo duas, o Grid cria uma segunda coluna "extra" (implícita), fora da regra do <code>minmax</code>. O estilo calculado do <code>grid-template-columns</code> mostra <code>160px 112px</code>. <strong>Conserto:</strong> o destaque só a partir de uma largura em que caibam duas colunas.</p>
+</div>
+
+<hr>
+
+<h2>Referência: o que o projeto usou</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Versão</th><th>Propriedades</th><th>Aulas</th></tr></thead>
+<tbody>
+<tr><td>1 · Base</td><td><code>max-width</code>, <code>margin: 0 auto</code>, <code>width: 100%</code>, <code>height: auto</code></td><td><a href="imagens-responsivas.html">Imagens que se Adaptam</a></td></tr>
+<tr><td>2 · Grade</td><td><code>display: grid</code>, <code>grid-template-columns</code>, <code>repeat()</code>, <code>auto-fill</code>, <code>minmax()</code>, <code>gap</code>, <code>list-style</code></td><td><a href="grid.html">Grid</a>, <a href="grid-repeat.html">repeat e minmax</a></td></tr>
+<tr><td>3 · Quadradas</td><td><code>aspect-ratio</code>, <code>object-fit</code></td><td><a href="aspect-ratio.html">aspect-ratio</a></td></tr>
+<tr><td>4 · Cartões</td><td><code>position</code>, <code>bottom</code>/<code>left</code>/<code>right</code>, <code>overflow</code>, <code>border-radius</code>, <code>box-shadow</code>, <code>rgb()</code> com alfa</td><td><a href="position-absolute.html">position: absolute</a>, <a href="box-shadow.html">box-shadow</a></td></tr>
+<tr><td>5 · Destaque</td><td><code>grid-column</code>, <code>grid-row</code>, <code>span</code>, <code>@media</code></td><td><a href="grid-posicionar.html">Posicionando Itens</a></td></tr>
+<tr><td>6 · Zoom</td><td><code>transition</code>, <code>transform: scale()</code>, <code>:hover</code>, <code>:focus-visible</code>, <code>:focus-within</code>, <code>outline</code>, <code>prefers-reduced-motion</code></td><td><a href="transition.html">Transições</a>, <a href="hover-focus.html">Estados</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Desafios extras</h2>
+<ul>
+  <li>Troque o recorte da foto do mapa para mostrar a lojinha bem no meio (<code>object-position</code>).</li>
+  <li>Use <code>&lt;picture&gt;</code> ou <code>srcset</code> para mandar a foto do destaque em <code>bolo-1200.jpg</code> só para as telas grandes (Guia HTML).</li>
+  <li>Faça a legenda aparecer só no hover, deslizando de baixo (<code>transform: translateY(100%)</code> com <code>transition</code>). E lembre do teclado e das telas de toque, que não têm hover.</li>
+</ul>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Colunas automáticas</h3>
+<p>Complete para criar quantas colunas de no mínimo 10rem couberem:</p>
+<div class="ex-code">grid-template-columns: repeat(<input data-answer="auto-fill|auto-fit" aria-label="quantas">, minmax(10rem, 1fr));</div>
+</div>
+
+<div class="exercise">
+<h3>2. Recortar sem deformar</h3>
+<p>Qual valor de <code>object-fit</code> preenche a caixa toda, cortando as sobras?</p>
+<div class="ex-code">object-fit: <input data-answer="cover" aria-label="valor">;</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. O logo da lojinha ficou cortado no quadrado. O que usar nele?</p>
+<label><input type="radio" name="q3"> <code>object-fit: cover</code></label>
+<label><input type="radio" name="q3"> <code>aspect-ratio: auto</code> e mais nada muda</label>
+<label><input type="radio" name="q3"> <code>object-fit: contain</code></label>
+<label><input type="radio" name="q3"> <code>overflow: visible</code></label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. A legenda com <code>position: absolute; bottom: 0</code> foi parar no pé da tela, e não no pé da foto. O que faltou?</p>
+<label><input type="radio" name="q4"> <code>position: absolute</code> no <code>&lt;img&gt;</code></label>
+<label><input type="radio" name="q4"> <code>position: relative</code> no <code>&lt;figure&gt;</code></label>
+<label><input type="radio" name="q4"> <code>z-index: 1</code> na legenda</label>
+<label><input type="radio" name="q4"> <code>display: grid</code> no <code>&lt;figure&gt;</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Por que o zoom também usa <code>:focus-visible</code>, e não só <code>:hover</code>?</p>
+<label><input type="radio" name="q5"> Para quem navega pelo teclado ver em que foto está e ter o mesmo efeito</label>
+<label><input type="radio" name="q5"> Porque <code>:hover</code> não funciona em imagens</label>
+<label><input type="radio" name="q5"> Para a transição ficar mais rápida</label>
+<label><input type="radio" name="q5"> Porque o validador exige</label>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>repeat(auto-fill, minmax(10rem, 1fr))</code>: quantas colunas couberem, cada uma com no mínimo 10rem, repartindo a sobra. Responsivo sem media query.</li>
+  <li><code>aspect-ratio: 1</code> + <code>object-fit: cover</code>: fotos de formatos diferentes no mesmo quadrado, recortadas sem deformar. <code>contain</code> para o que não pode ser cortado.</li>
+  <li>Legenda sobre a foto: <code>position: relative</code> no pai, <code>position: absolute; bottom: 0; left: 0; right: 0</code> na legenda, fundo escuro transparente para o contraste.</li>
+  <li>Destaque com <code>grid-column: span 2</code> e <code>grid-row: span 2</code>, dentro de um <code>@media</code>, para não criar uma coluna extra no celular.</li>
+  <li>Zoom com <code>transition</code> + <code>transform: scale()</code> no <code>:hover</code> <strong>e</strong> no <code>:focus-visible</code>; <code>overflow: hidden</code> no cartão; menos movimento para quem pediu.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
