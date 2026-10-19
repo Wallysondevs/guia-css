@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projeto: Cartão de Perfil — passo a passo com CSS | Guia CSS</title>
+<meta name="description" content="Projeto de CSS passo a passo: o cartão de perfil da Ana, em seis versões. Do HTML sem estilo à caixa com sombra, a foto redonda, a tipografia, os links como botões com :hover e :focus-visible, e as variáveis que trocam a cor do cartão inteiro numa linha.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>Projeto: <span class="hl">Cartão de Perfil</span></h1>
+
+<p class="intro">Hora de juntar as peças. Neste projeto você vai construir, do zero, o cartão de perfil da Ana: a foto redonda, o nome, uma frase sobre ela e dois botões. É o tipo de componente que aparece em todo lugar: na página "Sobre", num blog, numa rede social. Você vai montar o cartão em <strong>seis versões</strong>, uma novidade por vez, e cada versão é uma missão no editor. A solução de uma versão é o ponto de partida da seguinte.</p>
+
+<div class="note">
+<strong>Você vai usar</strong>
+<ul>
+  <li>O modelo de caixa: <code>box-sizing</code>, <code>max-width</code>, <code>margin: auto</code>, <code>padding</code> (aulas <a href="box-model.html">O Modelo de Caixa</a> e <a href="box-sizing.html">box-sizing</a>).</li>
+  <li><code>border-radius</code> e <code>box-shadow</code> (aulas <a href="border-radius.html">Cantos Arredondados</a> e <a href="box-shadow.html">Sombra</a>).</li>
+  <li>Tipografia: <code>font-size</code> em <code>rem</code>, <code>line-height</code>, cores suaves.</li>
+  <li>Flexbox e <code>gap</code> para os botões (aulas <a href="flexbox.html">Flexbox</a> e <a href="gap.html">gap</a>).</li>
+  <li><code>:hover</code> e <code>:focus-visible</code> (aula <a href="hover-focus.html">Estados</a>).</li>
+  <li>Variáveis (aula <a href="variaveis.html">Variáveis</a>).</li>
+</ul>
+</div>
+
+<p>Este é o cartão pronto, a versão 6. Repare nas partes; cada uma vai aparecer numa versão:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>O cartão pronto:</strong> passe o mouse nos botões e aperte <kbd>Tab</kbd> dentro do quadro para ver o contorno do foco.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="perfil"&gt;
+  &lt;img class="perfil-foto" src="assets/midia/avatar-ana.svg" alt="Foto da Ana" width="96" height="96"&gt;
+  &lt;h2 class="perfil-nome"&gt;Ana Lima&lt;/h2&gt;
+  &lt;p class="perfil-cargo"&gt;Confeiteira · Lojinha da Ana&lt;/p&gt;
+  &lt;p class="perfil-bio"&gt;Faz bolos caseiros desde 2015 e ensina as receitas da família no blog.&lt;/p&gt;
+  &lt;ul class="perfil-links"&gt;
+    &lt;li&gt;&lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="contato.html"&gt;Contato&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --cor-destaque: #0f766e;
+  --cor-texto: #222222;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  font-family: sans-serif;
+  background-color: #f3f0eb;
+}
+.perfil {
+  max-width: 320px;
+  margin: 24px auto;
+  padding: 24px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+.perfil-foto {
+  border: 4px solid var(--cor-destaque);
+  border-radius: 50%;
+}
+.perfil-nome {
+  margin: 8px 0 0;
+  font-size: 1.5rem;
+}
+.perfil-cargo {
+  margin-top: 4px;
+  color: #666666;
+  font-size: 0.875rem;
+}
+.perfil-bio {
+  line-height: 1.5;
+}
+.perfil-links {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.perfil-links a {
+  display: block;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background-color: var(--cor-destaque);
+  color: white;
+  text-decoration: none;
+}
+.perfil-links a:hover {
+  background-color: var(--cor-texto);
+}
+.perfil-links a:focus-visible {
+  outline: 3px solid var(--cor-texto);
+  outline-offset: 2px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Versão 1: o HTML, sem estilo</h2>
+<p>Todo projeto começa pelo <strong>conteúdo</strong>. O HTML do cartão é um <code>&lt;article&gt;</code> (um bloco que faz sentido sozinho, aula <a href="https://wallysondevs.github.io/guia-html/">do Guia HTML</a>) com a foto, o nome num título, duas frases e uma lista de links. Cada parte já ganha uma <strong>classe</strong> com o prefixo <code>perfil-</code>, para o CSS achar cada uma sem depender da ordem nem do elemento:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Classe</th><th>Elemento</th><th>O que é</th></tr>
+<tr><td><code>perfil</code></td><td><code>&lt;article&gt;</code></td><td>O cartão inteiro</td></tr>
+<tr><td><code>perfil-foto</code></td><td><code>&lt;img&gt;</code></td><td>A foto (o <code>width</code> e o <code>height</code> reservam o espaço, aula <a href="performance.html">CSS Rápido</a>)</td></tr>
+<tr><td><code>perfil-nome</code></td><td><code>&lt;h2&gt;</code></td><td>O nome</td></tr>
+<tr><td><code>perfil-cargo</code></td><td><code>&lt;p&gt;</code></td><td>A profissão, em letra menor e cinza</td></tr>
+<tr><td><code>perfil-bio</code></td><td><code>&lt;p&gt;</code></td><td>A frase sobre ela</td></tr>
+<tr><td><code>perfil-links</code></td><td><code>&lt;ul&gt;</code></td><td>A lista de links, que vai virar uma fileira de botões</td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> este é o cartão só com os estilos padrão do navegador: foto, título grande em negrito, parágrafos com margem, lista com marcadores, links azuis sublinhados. Funciona, mas não parece um cartão. Leia o HTML com calma: ele não vai mudar até o fim do projeto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="perfil"&gt;
+  &lt;img class="perfil-foto" src="assets/midia/avatar-ana.svg" alt="Foto da Ana" width="96" height="96"&gt;
+  &lt;h2 class="perfil-nome"&gt;Ana Lima&lt;/h2&gt;
+  &lt;p class="perfil-cargo"&gt;Confeiteira · Lojinha da Ana&lt;/p&gt;
+  &lt;p class="perfil-bio"&gt;Faz bolos caseiros desde 2015 e ensina as receitas da família no blog.&lt;/p&gt;
+  &lt;ul class="perfil-links"&gt;
+    &lt;li&gt;&lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="contato.html"&gt;Contato&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">/* Versão 1: ainda sem estilo */
+</pre>
+</div>
+
+<hr>
+
+<h2>Versão 2: a caixa</h2>
+<p>Primeiro, o cartão vira um cartão: uma caixa branca, com largura máxima, centralizada, com espaço por dentro, cantos arredondados e uma sombra leve que a "descola" do fundo bege da página.</p>
+
+<dl class="anatomy">
+  <dt>* { box-sizing: border-box; }</dt><dd>A largura passa a incluir o <code>padding</code> e a borda: um cartão de 320px mede 320px, e não 368px (aula <a href="box-sizing.html">box-sizing</a>). Vai no começo de quase todo projeto.</dd>
+  <dt>max-width: 320px;</dt><dd>"No máximo 320 pixels". Numa tela larga, o cartão não se estica; num celular estreito, ele encolhe. Com <code>width: 320px</code> ele não encolheria (veja <a href="#errado">Quando dá errado</a>).</dd>
+  <dt>margin: 24px auto;</dt><dd>24px em cima e embaixo; <code>auto</code> dos lados divide a sobra igualmente, e o cartão fica no meio (aula <a href="centralizar.html">Centralizando</a>).</dd>
+  <dt>box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);</dt><dd>Sombra 4px para baixo, espalhada em 12px, preta com 15% de opacidade: discreta.</dd>
+</dl>
+
+<div class="tryhtml" data-goal="css:.perfil{max-width}=320px,css:.perfil{padding-top}=24px,css:.perfil{border-top-left-radius}=12px,css:.perfil{background-color}=rgb(255, 255, 255),src:box-shadow:">
+<p class="try-task"><strong>Missão (versão 2):</strong> no <code>style.css</code>, ponha <code>box-sizing: border-box</code> em tudo; no <code>body</code>, a fonte <code>sans-serif</code> e o fundo <code>#f3f0eb</code>; e no <code>.perfil</code>: <code>max-width: 320px</code>, <code>margin: 24px auto</code>, <code>padding: 24px</code>, <code>border-radius: 12px</code>, fundo <code>#ffffff</code> e uma <code>box-shadow</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="perfil"&gt;
+  &lt;img class="perfil-foto" src="assets/midia/avatar-ana.svg" alt="Foto da Ana" width="96" height="96"&gt;
+  &lt;h2 class="perfil-nome"&gt;Ana Lima&lt;/h2&gt;
+  &lt;p class="perfil-cargo"&gt;Confeiteira · Lojinha da Ana&lt;/p&gt;
+  &lt;p class="perfil-bio"&gt;Faz bolos caseiros desde 2015 e ensina as receitas da família no blog.&lt;/p&gt;
+  &lt;ul class="perfil-links"&gt;
+    &lt;li&gt;&lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="contato.html"&gt;Contato&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">/* Versão 2: a caixa */
+</pre>
+<pre class="solucao" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  font-family: sans-serif;
+  background-color: #f3f0eb;
+}
+.perfil {
+  max-width: 320px;
+  margin: 24px auto;
+  padding: 24px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+</pre>
+</div>
+
+<p>O resultado: uma caixa branca de cantos arredondados, com sombra, no meio do fundo bege. Dentro dela, o conteúdo ainda está alinhado à esquerda, e a lista ainda tem marcadores.</p>
+
+<hr>
+
+<h2>Versão 3: a foto redonda e tudo no centro</h2>
+<p>Duas regras curtas mudam muito a cara do cartão:</p>
+<ul>
+  <li><code>text-align: center</code> no <code>.perfil</code> centraliza o texto <strong>e a foto</strong>, porque o <code>&lt;img&gt;</code> é um elemento em linha, como uma letra grande (aula <a href="display.html">display</a>). E a propriedade é herdada: vale para todo o conteúdo do cartão (aula <a href="heranca.html">Herança</a>).</li>
+  <li><code>border-radius: 50%</code> numa imagem quadrada vira um <strong>círculo</strong>: o raio de cada canto é metade do lado. A borda de 4px na cor de destaque faz a moldura. O desenho da Ana já é redondo, mas o arquivo é um quadrado de 96 por 96 pixels com os cantos transparentes: sem o <code>border-radius</code>, a moldura seria um quadrado em volta do círculo.</li>
+</ul>
+
+<div class="tryhtml" data-goal="css:.perfil{text-align}=center,css:.perfil-foto{border-top-left-radius}=50%,css:.perfil-foto{border-top-width}=4px,css:.perfil-foto{border-top-color}=rgb(194, 65, 12)">
+<p class="try-task"><strong>Missão (versão 3):</strong> centralize o conteúdo do cartão (<code>text-align: center</code> no <code>.perfil</code>) e deixe a foto redonda, com uma borda de <code>4px solid #c2410c</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="perfil"&gt;
+  &lt;img class="perfil-foto" src="assets/midia/avatar-ana.svg" alt="Foto da Ana" width="96" height="96"&gt;
+  &lt;h2 class="perfil-nome"&gt;Ana Lima&lt;/h2&gt;
+  &lt;p class="perfil-cargo"&gt;Confeiteira · Lojinha da Ana&lt;/p&gt;
+  &lt;p class="perfil-bio"&gt;Faz bolos caseiros desde 2015 e ensina as receitas da família no blog.&lt;/p&gt;
+  &lt;ul class="perfil-links"&gt;
+    &lt;li&gt;&lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="contato.html"&gt;Contato&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  font-family: sans-serif;
+  background-color: #f3f0eb;
+}
+.perfil {
+  max-width: 320px;
+  margin: 24px auto;
+  padding: 24px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Versão 3: centralize o cartão e arredonde a foto */
+</pre>
+<pre class="solucao" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  font-family: sans-serif;
+  background-color: #f3f0eb;
+}
+.perfil {
+  max-width: 320px;
+  margin: 24px auto;
+  padding: 24px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+.perfil-foto {
+  border: 4px solid #c2410c;
+  border-radius: 50%;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Versão 4: a tipografia</h2>
+<p>Agora, a <strong>hierarquia</strong>: o nome é a coisa mais importante, o cargo é um detalhe e a bio é para ler com calma.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Parte</th><th>Declarações</th><th>Por quê</th></tr>
+<tr><td><code>.perfil-nome</code></td><td><code>margin: 8px 0 0;</code> <code>font-size: 1.5rem;</code></td><td>O <code>h2</code> padrão tem margens grandes; aqui o nome fica pertinho da foto. <code>1.5rem</code> = 24px, em <code>rem</code> para respeitar o tamanho de letra escolhido pelo leitor (aula <a href="unidades.html">Unidades</a>).</td></tr>
+<tr><td><code>.perfil-cargo</code></td><td><code>margin-top: 4px;</code> <code>color: #666666;</code> <code>font-size: 0.875rem;</code></td><td>Cinza e menor: informação secundária. O cinza <code>#666666</code> no branco ainda tem contraste suficiente (aula <a href="acessibilidade.html">Acessibilidade</a>).</td></tr>
+<tr><td><code>.perfil-bio</code></td><td><code>line-height: 1.5;</code></td><td>Linhas mais espaçadas, fáceis de ler (aula <a href="line-height.html">Espaçamento</a>).</td></tr>
+</table>
+</div>
+
+<div class="tryhtml" data-goal="css:.perfil-nome{font-size}=24px,css:.perfil-nome{margin-top}=8px,css:.perfil-cargo{color}=rgb(102, 102, 102),css:.perfil-cargo{font-size}=14px,css:.perfil-bio{line-height}=24px">
+<p class="try-task"><strong>Missão (versão 4):</strong> escreva as três regras da tabela: o nome com <code>1.5rem</code> e margem <code>8px 0 0</code>; o cargo cinza (<code>#666666</code>), com <code>0.875rem</code> e <code>margin-top: 4px</code>; a bio com <code>line-height: 1.5</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="perfil"&gt;
+  &lt;img class="perfil-foto" src="assets/midia/avatar-ana.svg" alt="Foto da Ana" width="96" height="96"&gt;
+  &lt;h2 class="perfil-nome"&gt;Ana Lima&lt;/h2&gt;
+  &lt;p class="perfil-cargo"&gt;Confeiteira · Lojinha da Ana&lt;/p&gt;
+  &lt;p class="perfil-bio"&gt;Faz bolos caseiros desde 2015 e ensina as receitas da família no blog.&lt;/p&gt;
+  &lt;ul class="perfil-links"&gt;
+    &lt;li&gt;&lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="contato.html"&gt;Contato&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  font-family: sans-serif;
+  background-color: #f3f0eb;
+}
+.perfil {
+  max-width: 320px;
+  margin: 24px auto;
+  padding: 24px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+.perfil-foto {
+  border: 4px solid #c2410c;
+  border-radius: 50%;
+}
+
+/* Versão 4: a tipografia */
+</pre>
+<pre class="solucao" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  font-family: sans-serif;
+  background-color: #f3f0eb;
+}
+.perfil {
+  max-width: 320px;
+  margin: 24px auto;
+  padding: 24px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+.perfil-foto {
+  border: 4px solid #c2410c;
+  border-radius: 50%;
+}
+.perfil-nome {
+  margin: 8px 0 0;
+  font-size: 1.5rem;
+}
+.perfil-cargo {
+  margin-top: 4px;
+  color: #666666;
+  font-size: 0.875rem;
+}
+.perfil-bio {
+  line-height: 1.5;
+}
+</pre>
+</div>
+
+<p>Conferido no Chromium: o <code>line-height: 1.5</code>, com a letra de 16px, vira <code>24px</code> na aba Computed; o <code>0.875rem</code> do cargo vira <code>14px</code>.</p>
+
+<hr>
+
+<h2>Versão 5: os links viram botões</h2>
+<p>A lista de links vira uma fileira de botões. São três passos, na mesma ordem em que o navegador os aplica:</p>
+<ol class="passo">
+  <li><strong>A lista</strong> (<code>.perfil-links</code>): sem marcadores (<code>list-style: none</code>), sem o recuo padrão (<code>padding: 0</code>, <code>margin: 0</code>) e com os itens lado a lado, no centro e com 8px entre eles (<code>display: flex</code>, <code>justify-content: center</code>, <code>gap: 8px</code>).</li>
+  <li><strong>O link</strong> (<code>.perfil-links a</code>): <code>display: block</code> para o <code>padding</code> funcionar em toda a volta, fundo na cor de destaque, letra branca, sem sublinhado e cantos arredondados.</li>
+  <li><strong>Os estados</strong>: <code>:hover</code> escurece o fundo com o mouse em cima; <code>:focus-visible</code> desenha um contorno grosso quando o leitor chega pelo teclado. Sem ele, quem navega com <kbd>Tab</kbd> não saberia onde está.</li>
+</ol>
+
+<div class="tryhtml" data-goal="css:.perfil-links{display}=flex,css:.perfil-links{justify-content}=center,css:.perfil-links{list-style-type}=none,css:.perfil-links a{text-decoration-line}=none,css:.perfil-links a{background-color}=rgb(194, 65, 12),css:.perfil-links a{color}=rgb(255, 255, 255),src::hover\s*\{[^}]*background-color,src::focus-visible\s*\{[^}]*outline">
+<p class="try-task"><strong>Missão (versão 5):</strong> transforme a lista de links numa fileira de botões centralizados: a lista sem marcadores e em <code>flex</code>; cada link com fundo <code>#c2410c</code>, letra <code>white</code>, sem sublinhado; um <code>:hover</code> com fundo <code>#222222</code> e um <code>:focus-visible</code> com <code>outline</code>. Depois, passe o mouse e use o <kbd>Tab</kbd>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="perfil"&gt;
+  &lt;img class="perfil-foto" src="assets/midia/avatar-ana.svg" alt="Foto da Ana" width="96" height="96"&gt;
+  &lt;h2 class="perfil-nome"&gt;Ana Lima&lt;/h2&gt;
+  &lt;p class="perfil-cargo"&gt;Confeiteira · Lojinha da Ana&lt;/p&gt;
+  &lt;p class="perfil-bio"&gt;Faz bolos caseiros desde 2015 e ensina as receitas da família no blog.&lt;/p&gt;
+  &lt;ul class="perfil-links"&gt;
+    &lt;li&gt;&lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="contato.html"&gt;Contato&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  font-family: sans-serif;
+  background-color: #f3f0eb;
+}
+.perfil {
+  max-width: 320px;
+  margin: 24px auto;
+  padding: 24px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+.perfil-foto {
+  border: 4px solid #c2410c;
+  border-radius: 50%;
+}
+.perfil-nome {
+  margin: 8px 0 0;
+  font-size: 1.5rem;
+}
+.perfil-cargo {
+  margin-top: 4px;
+  color: #666666;
+  font-size: 0.875rem;
+}
+.perfil-bio {
+  line-height: 1.5;
+}
+
+/* Versão 5: os links viram botões */
+</pre>
+<pre class="solucao" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  font-family: sans-serif;
+  background-color: #f3f0eb;
+}
+.perfil {
+  max-width: 320px;
+  margin: 24px auto;
+  padding: 24px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+.perfil-foto {
+  border: 4px solid #c2410c;
+  border-radius: 50%;
+}
+.perfil-nome {
+  margin: 8px 0 0;
+  font-size: 1.5rem;
+}
+.perfil-cargo {
+  margin-top: 4px;
+  color: #666666;
+  font-size: 0.875rem;
+}
+.perfil-bio {
+  line-height: 1.5;
+}
+.perfil-links {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.perfil-links a {
+  display: block;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: white;
+  text-decoration: none;
+}
+.perfil-links a:hover {
+  background-color: #222222;
+}
+.perfil-links a:focus-visible {
+  outline: 3px solid #222222;
+  outline-offset: 2px;
+}
+</pre>
+</div>
+
+<p>Contraste: a letra branca no laranja-escuro <code>#c2410c</code> passa da proporção mínima de 4,5:1 pedida para texto comum. Um laranja mais claro, como <code>tomato</code>, não passaria.</p>
+
+<hr>
+
+<h2>Versão 6: variáveis, e a cor muda numa linha</h2>
+<p>A cor <code>#c2410c</code> aparece em dois lugares (a moldura da foto e o fundo dos botões), e o <code>#222222</code> em outros dois (o <code>:hover</code> e o contorno do foco). Se a Ana quiser o cartão verde, terá de caçar cada um. Com <strong>variáveis</strong>, a cor é declarada uma vez no <code>:root</code> e usada com <code>var()</code>:</p>
+
+<pre class="file" data-file="style.css">:root {
+  --cor-destaque: #c2410c;
+  --cor-texto: #222222;
+}
+.perfil-foto {
+  border: 4px solid var(--cor-destaque);
+}
+</pre>
+
+<div class="tryhtml" data-largura="375" data-goal="src:--cor-destaque:\s*#0f766e,src:var\(--cor-destaque\),nsrc:#c2410c,css:.perfil-foto{border-top-color}=rgb(15, 118, 110),css:.perfil-links a{background-color}=rgb(15, 118, 110)">
+<p class="try-task"><strong>Missão final (versão 6):</strong> crie no <code>:root</code> as variáveis <code>--cor-destaque</code> e <code>--cor-texto</code>, troque todos os <code>#c2410c</code> por <code>var(--cor-destaque)</code> (e os <code>#222222</code> por <code>var(--cor-texto)</code>), e então mude a cor de destaque para o verde-petróleo <code>#0f766e</code>, numa linha só. O quadro está com a largura de um celular (375 px): o cartão cabe sem rolagem lateral.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="perfil"&gt;
+  &lt;img class="perfil-foto" src="assets/midia/avatar-ana.svg" alt="Foto da Ana" width="96" height="96"&gt;
+  &lt;h2 class="perfil-nome"&gt;Ana Lima&lt;/h2&gt;
+  &lt;p class="perfil-cargo"&gt;Confeiteira · Lojinha da Ana&lt;/p&gt;
+  &lt;p class="perfil-bio"&gt;Faz bolos caseiros desde 2015 e ensina as receitas da família no blog.&lt;/p&gt;
+  &lt;ul class="perfil-links"&gt;
+    &lt;li&gt;&lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="contato.html"&gt;Contato&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  font-family: sans-serif;
+  background-color: #f3f0eb;
+}
+.perfil {
+  max-width: 320px;
+  margin: 24px auto;
+  padding: 24px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+.perfil-foto {
+  border: 4px solid #c2410c;
+  border-radius: 50%;
+}
+.perfil-nome {
+  margin: 8px 0 0;
+  font-size: 1.5rem;
+}
+.perfil-cargo {
+  margin-top: 4px;
+  color: #666666;
+  font-size: 0.875rem;
+}
+.perfil-bio {
+  line-height: 1.5;
+}
+.perfil-links {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.perfil-links a {
+  display: block;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: white;
+  text-decoration: none;
+}
+.perfil-links a:hover {
+  background-color: #222222;
+}
+.perfil-links a:focus-visible {
+  outline: 3px solid #222222;
+  outline-offset: 2px;
+}
+
+/* Versão 6: crie as variáveis no :root e use var() */
+</pre>
+<pre class="solucao" data-file="style.css">:root {
+  --cor-destaque: #0f766e;
+  --cor-texto: #222222;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  font-family: sans-serif;
+  background-color: #f3f0eb;
+}
+.perfil {
+  max-width: 320px;
+  margin: 24px auto;
+  padding: 24px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+.perfil-foto {
+  border: 4px solid var(--cor-destaque);
+  border-radius: 50%;
+}
+.perfil-nome {
+  margin: 8px 0 0;
+  font-size: 1.5rem;
+}
+.perfil-cargo {
+  margin-top: 4px;
+  color: #666666;
+  font-size: 0.875rem;
+}
+.perfil-bio {
+  line-height: 1.5;
+}
+.perfil-links {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.perfil-links a {
+  display: block;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background-color: var(--cor-destaque);
+  color: white;
+  text-decoration: none;
+}
+.perfil-links a:hover {
+  background-color: var(--cor-texto);
+}
+.perfil-links a:focus-visible {
+  outline: 3px solid var(--cor-texto);
+  outline-offset: 2px;
+}
+</pre>
+</div>
+
+<p>Agora experimente outras cores na linha do <code>--cor-destaque</code>: <code>#1d4ed8</code> (azul), <code>#7e22ce</code> (roxo). A moldura e os dois botões mudam juntos. Os botões do quadro de 375 px ficam lado a lado, e o cartão encolhe até caber, graças ao <code>max-width</code>.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Foto oval em vez de redonda</strong>
+<pre class="file" data-file="erro de propósito" data-resultado>&lt;style&gt;
+img {
+  border-radius: 50%;
+}
+&lt;/style&gt;
+&lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="200" height="150"&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> uma <strong>elipse</strong>, mais larga que alta. <strong>Por quê:</strong> <code>50%</code> é metade de cada lado: 50% da largura na horizontal, 50% da altura na vertical. Numa imagem retangular, os cantos viram uma elipse. <strong>Como consertar:</strong> use uma foto quadrada, ou force o quadrado com <code>aspect-ratio: 1;</code> e <code>object-fit: cover;</code> (aulas <a href="aspect-ratio.html">Proporção</a> e <a href="imagens-responsivas.html">Imagens que se Adaptam</a>).</p>
+</div>
+
+<div class="cenario">
+<strong><code>width</code> em vez de <code>max-width</code>: o cartão vaza no celular</strong>
+<p>Com <code>width: 400px</code>, o cartão mede 400px sempre. Numa tela de 375px, ele passa da borda e aparece a rolagem lateral. Com <code>max-width: 400px</code>, ele mede <strong>até</strong> 400px e encolhe quando falta espaço. Nenhum validador acusa: as duas regras são válidas. Teste sempre com o quadro em 375 px (o botão <strong>375</strong> da barra do quadro).</p>
+</div>
+
+<div class="cenario">
+<strong>Os botões não ficam lado a lado</strong>
+<p>Se o <code>display: flex</code> for escrito no <code>.perfil-links li</code> ou no <code>.perfil-links a</code>, nada muda de lugar: o <code>flex</code> organiza os <strong>filhos</strong> de quem o recebe. Quem tem os itens como filhos é o <code>&lt;ul&gt;</code>, ou seja, o <code>.perfil-links</code> (aula <a href="flexbox.html">Flexbox</a>). No F12, o <code>&lt;ul&gt;</code> com flex ganha uma etiqueta "flex" ao lado, no painel de elementos.</p>
+</div>
+
+<div class="cenario">
+<strong>O botão "some" do foco do teclado</strong>
+<p>Um <code>outline: none</code> nos links, para tirar o contorno "feio", deixa quem navega pelo teclado sem saber onde está. O validador não reclama. <strong>Como consertar:</strong> nunca tire o contorno sem pôr outro no lugar; o <code>:focus-visible</code> da versão 5 mostra o contorno só para quem usa o teclado (aula <a href="outline.html">Contorno</a>).</p>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Foto redonda</h3>
+<p>Complete para deixar uma foto quadrada redonda:</p>
+<div class="ex-code">.perfil-foto { border-radius: <input data-answer="50%" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. No meio da tela</h3>
+<p>Complete para centralizar o cartão na horizontal:</p>
+<div class="ex-code">.perfil { max-width: 320px; margin: 24px <input data-answer="auto" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Usar a variável</h3>
+<p>Complete para usar a cor de destaque:</p>
+<div class="ex-code">background-color: <input data-answer="var(--cor-destaque)" aria-label="valor">;</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Por que <code>text-align: center</code> no <code>.perfil</code> também centraliza a foto?</p>
+<label><input type="radio" name="q4"> Porque <code>text-align</code> centraliza qualquer elemento</label>
+<label><input type="radio" name="q4"> Porque o <code>&lt;img&gt;</code> é um elemento em linha, alinhado como o texto, e a propriedade é herdada</label>
+<label><input type="radio" name="q4"> Porque a foto tem <code>border-radius</code></label>
+<label><input type="radio" name="q4"> Não centraliza</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Em qual elemento vai o <code>display: flex</code> para os botões ficarem lado a lado?</p>
+<label><input type="radio" name="q5"> Em cada <code>&lt;a&gt;</code></label>
+<label><input type="radio" name="q5"> Em cada <code>&lt;li&gt;</code></label>
+<label><input type="radio" name="q5"> No <code>&lt;ul class="perfil-links"&gt;</code>, o pai dos itens</label>
+<label><input type="radio" name="q5"> No <code>&lt;body&gt;</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Qual a vantagem do <code>--cor-destaque</code> na versão 6?</p>
+<label><input type="radio" name="q6"> Mudar a cor num lugar só e todos os usos acompanharem</label>
+<label><input type="radio" name="q6"> Deixar o site mais rápido</label>
+<label><input type="radio" name="q6"> É obrigatório para usar <code>border</code></label>
+<label><input type="radio" name="q6"> Nenhuma: é só outro nome para a cor</label>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O projeto começa pelo HTML, com uma classe por parte (<code>perfil-foto</code>, <code>perfil-nome</code>…), e o CSS vem em camadas: caixa, alinhamento, tipografia, botões, variáveis.</li>
+  <li>A caixa: <code>box-sizing: border-box</code>, <code>max-width</code> (não <code>width</code>), <code>margin: auto</code>, <code>padding</code>, <code>border-radius</code>, <code>box-shadow</code>.</li>
+  <li>Foto redonda: <code>border-radius: 50%</code> numa imagem quadrada.</li>
+  <li>Hierarquia: nome maior, cargo cinza e menor, bio com <code>line-height: 1.5</code>.</li>
+  <li>Links como botões: <code>flex</code> no <code>&lt;ul&gt;</code>, <code>display: block</code> e <code>padding</code> no <code>&lt;a&gt;</code>, <code>:hover</code> e <code>:focus-visible</code>.</li>
+  <li>Variáveis no <code>:root</code>: a cor do cartão inteiro muda numa linha.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
