@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tutorial CSS — aprenda a dar cor, forma e layout aos sites, como numa escola | Guia CSS</title>
+<meta name="description" content="Curso de CSS do zero ao avançado, em português, para quem já viu um pouco de HTML: cores, fontes, o modelo de caixa, Flexbox, Grid, páginas que se adaptam ao celular, animações e o CSS moderno (aninhamento, :has, @layer, @container, oklch). Cada exemplo é desenhado de verdade pelo seu navegador, com editor Experimente, missões, projetos e exercícios.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="hero">
+<h1>Tutorial CSS</h1>
+<p>Aprenda <strong>CSS do zero</strong>, como numa escola: cores, fontes, espaços, colunas, páginas que se ajeitam no celular e animações. Cada pedacinho de código é explicado, você vê o resultado de verdade logo embaixo e pratica num editor aqui mesmo na página. Os resultados não são imagens: quem desenha cada exemplo é o <strong>seu próprio navegador</strong>, na hora. Para começar, basta já ter visto um pouco de HTML.</p>
+<a class="btn btn-lg" href="introducao.html">Comece pelo Nível 1 &#10095;</a>
+</div>
+
+<div class="pager"></div>
+
+<h2>Experimente agora</h2>
+<p>A caixa abaixo é o editor <strong>Experimente</strong> do guia. A aba <code>index.html</code> tem o HTML de um cartão da Lojinha da Ana; a aba <code>style.css</code> tem a aparência dele: as cores, os cantos redondos, a sombra. Embaixo, o resultado, desenhado pelo seu navegador. Mude o CSS e veja o cartão mudar junto. Passe o mouse no botão: ele escurece.</p>
+
+<div class="tryhtml" data-goal="css:.botao{background-color}=rgb(46, 139, 87)">
+<p class="try-task"><strong>Missão:</strong> na aba <code>style.css</code>, troque a cor do botão de <code>tomato</code> para <code>seagreen</code> (verde-mar). Mexa só na palavra da cor, na linha <code>background-color: tomato;</code> dentro de <code>.botao</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Com cobertura de chocolate. Serve 10 pessoas.&lt;/p&gt;
+  &lt;p class="preco"&gt;R$ 45,00&lt;/p&gt;
+  &lt;button class="botao"&gt;Encomendar&lt;/button&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+  background-color: #f6efe6;
+}
+.cartao {
+  max-width: 280px;
+  padding: 16px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 15%);
+}
+.cartao img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+.preco {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #8a4b12;
+}
+.botao {
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background-color: tomato;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.botao:hover {
+  filter: brightness(85%);
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+  background-color: #f6efe6;
+}
+.cartao {
+  max-width: 280px;
+  padding: 16px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 15%);
+}
+.cartao img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+.preco {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #8a4b12;
+}
+.botao {
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background-color: seagreen;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.botao:hover {
+  filter: brightness(85%);
+}
+</pre>
+</div>
+
+<p>O que aconteceu: o HTML diz <strong>o que</strong> cada coisa é (um título, um parágrafo, um botão), e o CSS diz <strong>como</strong> cada coisa aparece. Cada bloco do <code>style.css</code> é uma <strong>regra</strong>: primeiro o <strong>seletor</strong>, que escolhe os elementos (<code>.botao</code> = "os elementos com <code>class="botao"</code>"), e entre chaves as <strong>declarações</strong>, cada uma com uma propriedade, dois-pontos, um valor e ponto e vírgula. <code>background-color: seagreen;</code> quer dizer "cor de fundo: verde-mar".</p>
+<p>Tente mais: troque <code>12px</code> do <code>border-radius</code> do cartão por <code>0</code> (os cantos ficam retos) ou apague a linha do <code>box-shadow</code> (a sombra some). Se algo der errado, o botão <strong>Restaurar</strong> volta tudo ao começo.</p>
+
+<h3>Uma página que se ajeita na tela</h3>
+<p>Um site moderno se arruma sozinho: três colunas numa tela larga, uma coluna no celular. Na barra do Resultado abaixo, clique em <strong>375</strong> (a largura de um celular), <strong>768</strong> (um tablet) e <strong>cheia</strong>, e veja os cartões se rearrumarem. Quem faz isso é uma única linha de CSS, com <code>grid-template-columns</code>, que você vai entender na aula <a href="grid-repeat.html">repeat, minmax e auto-fit</a>.</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Doces da semana&lt;/h1&gt;
+&lt;div class="vitrine"&gt;
+  &lt;p class="doce"&gt;Bolo de cenoura&lt;/p&gt;
+  &lt;p class="doce"&gt;Brigadeiro&lt;/p&gt;
+  &lt;p class="doce"&gt;Pão de mel&lt;/p&gt;
+  &lt;p class="doce"&gt;Cocada&lt;/p&gt;
+  &lt;p class="doce"&gt;Pudim&lt;/p&gt;
+  &lt;p class="doce"&gt;Quindim&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+.vitrine {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+.doce {
+  margin: 0;
+  padding: 24px 16px;
+  border-radius: 8px;
+  background-color: wheat;
+  text-align: center;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>O que é este guia</h2>
+<p>O <strong>CSS</strong> (<em>Cascading Style Sheets</em>, "folhas de estilo em cascata") é a linguagem que dá a <strong>aparência</strong> às páginas da Web. O HTML monta a estrutura (título, parágrafo, lista, imagem); o CSS escolhe as cores, as fontes, os tamanhos, os espaços e onde cada coisa fica na tela. É como uma casa: o HTML é a parede e o telhado; o CSS é a tinta, os móveis e a decoração. O CSS foi proposto em 1994, por Håkon Wium Lie, e hoje é mantido pelo W3C, o mesmo consórcio que cuida dos padrões da Web.</p>
+
+<p>Quem aprende CSS consegue:</p>
+<ul>
+  <li>dar cor, fonte e espaço a qualquer página, num arquivo só, que vale para o site inteiro;</li>
+  <li>montar layouts com colunas, menus, cartões e galerias usando <strong>Flexbox</strong> e <strong>Grid</strong>;</li>
+  <li>fazer páginas que funcionam bem do celular ao computador (<strong>responsivas</strong>), com tema escuro;</li>
+  <li>criar botões, efeitos de passar o mouse, transições e animações;</li>
+  <li>usar o CSS moderno, que os navegadores de hoje já entendem: variáveis, <code>clamp()</code>, <code>:has()</code>, aninhamento, <code>@layer</code>, <code>@container</code> e as cores <code>oklch()</code>;</li>
+  <li>organizar o CSS de um site grande sem que uma regra brigue com a outra.</li>
+</ul>
+
+<p>O guia é para quem <strong>já viu um pouco de HTML</strong> (o <a href="https://wallysondevs.github.io/guia-html/">Guia HTML</a> ensina do zero) e <strong>nunca escreveu CSS</strong>. Ele começa na primeira regra e vai até layouts completos, animações e boas práticas. O CSS tem uma armadilha: quando você erra, o navegador <strong>não avisa</strong>. Ele pula a linha errada em silêncio e segue com o resto. Por isso o guia ensina, desde o começo, a achar o erro com o F12 e com o validador do W3C.</p>
+
+<hr>
+
+<h2>Como as aulas funcionam</h2>
+<p>Nenhum código aparece "seco". Toda aula segue o mesmo caminho:</p>
+<ol class="passo">
+  <li><strong>A ideia primeiro.</strong> Antes do código, você entende o problema que ele resolve, com uma comparação do dia a dia.</li>
+  <li><strong>Anatomia.</strong> Cada parte de uma regra nova é separada e explicada: o seletor, a propriedade, o valor, os dois-pontos e o ponto e vírgula.</li>
+  <li><strong>O resultado real.</strong> Logo abaixo de cada exemplo aparece um quadro "Resultado", desenhado pelo seu navegador a partir daquele código. Quando há várias opções (como os tipos de borda), elas aparecem lado a lado.</li>
+  <li><strong>Experimente.</strong> Pelo menos duas caixas por aula para você mudar o código e ver o resultado na hora, muitas com uma <strong>missão</strong> que confere sozinha se você acertou.</li>
+  <li><strong>Várias formas de fazer.</strong> Quase sempre há mais de um caminho, e uma tabela "qual usar" mostra quando escolher cada um.</li>
+  <li><strong>Quando dá errado.</strong> O código com erro, o que você vê na tela (quase sempre: nada muda), por que aconteceu e a mensagem real do validador W3C, traduzida e explicada.</li>
+  <li><strong>Exercícios e resumo.</strong> Perguntas com correção na hora e uma lista curta do que levar da aula.</li>
+</ol>
+
+<h3>Exemplo: a anatomia de uma regra</h3>
+<p>Veja como as aulas desmontam uma regra de CSS. Primeiro o código, com o resultado embaixo:</p>
+
+<pre class="file" data-file="exemplo.html" data-resultado>&lt;style&gt;
+  h1 { color: tomato; }
+&lt;/style&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+</pre>
+
+<p>Agora cada parte da linha <code>h1 { color: tomato; }</code>:</p>
+
+<dl class="anatomy">
+  <dt>h1</dt><dd>O <strong>seletor</strong>: escolhe <strong>quais</strong> elementos a regra pinta. Aqui, todos os <code>&lt;h1&gt;</code> da página (aula <a href="sintaxe.html">Regras, Seletores e Declarações</a>).</dd>
+  <dt>{ }</dt><dd>As <strong>chaves</strong>: guardam as declarações da regra. Tudo entre elas vale para o seletor.</dd>
+  <dt>color</dt><dd>A <strong>propriedade</strong>: <strong>o que</strong> mudar. <code>color</code> ("cor") é a cor do texto.</dd>
+  <dt>:</dt><dd>Os <strong>dois-pontos</strong> separam a propriedade do valor.</dd>
+  <dt>tomato</dt><dd>O <strong>valor</strong>: <strong>como</strong> fica. <code>tomato</code> ("tomate") é um dos nomes de cor que o CSS conhece (aula <a href="cores.html">Cores por Nome</a>).</dd>
+  <dt>;</dt><dd>O <strong>ponto e vírgula</strong> fecha a declaração. Esquecer o <code>;</code> é o erro mais comum de quem começa: a declaração seguinte some junto.</dd>
+</dl>
+
+<p>Uma propriedade com o seu valor (<code>color: tomato;</code>) se chama <strong>declaração</strong>. O seletor com as declarações entre chaves se chama <strong>regra</strong>.</p>
+
+<h3>Exemplo: quando dá errado</h3>
+<p>Agora a Ana errou uma letra: escreveu <code>colr</code> em vez de <code>color</code>. Veja o que o navegador faz:</p>
+
+<pre class="file" data-file="exemplo.html · erro de propósito" data-resultado>&lt;style&gt;
+  h1 { colr: tomato; }
+&lt;/style&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+</pre>
+
+<p>Nada. O título fica preto, nenhuma mensagem aparece, e o resto da página segue normal. O navegador não conhece a propriedade <code>colr</code>, então pula a declaração inteira. Para achar esse tipo de erro, as aulas mostram o <strong>terminal</strong> da máquina fictícia do guia (o computador <code>notebook</code>, da usuária <code>ana</code>) com o <strong>validador do W3C</strong>, o comando <code>vnu</code>, o mesmo programa do site validator.w3.org:</p>
+
+<pre class="term" data-cwd="~/site">$ cat style.css
+h1 {
+  colr: tomato;
+}
+$ vnu --css style.css
+"file:/home/ana/site/style.css":2.9-2.14: error: CSS: “colr”: Property “colr” doesn't exist.
+$ echo $?
+1                                    « 1: o validador achou erro</pre>
+
+<p>A mensagem sai em inglês: "a propriedade <code>colr</code> não existe". O <code>2.9-2.14</code> é a posição: linha 2, das colunas 9 a 14 (o validador marca o valor, <code>tomato</code>, mas o problema é o nome da propriedade, na mesma linha). O guia traduz e explica cada mensagem assim, e mostra também como achar o erro no F12, a ferramenta que todo navegador traz (aula <a href="devtools.html">Inspecionando com o F12</a>).</p>
+
+<hr>
+
+<h2>Escolha sua trilha</h2>
+<p>O guia tem três níveis, uma seção de projetos e uma de referência. Os níveis foram pensados para serem feitos em ordem: cada aula usa o que as anteriores ensinaram.</p>
+<div class="trilhas">
+  <div class="trilha n1">
+    <h3>Nível 1 · Iniciante</h3>
+    <p>CSS do zero.</p>
+    <ul>
+      <li><a href="introducao.html">Começando</a>: o que é CSS, onde colocar, o editor do guia, a primeira regra e o F12</li>
+      <li><a href="seletores.html">Seletores</a> e <a href="cascata.html">a Cascata</a>: elemento, classe, id, especificidade e herança</li>
+      <li><a href="cores.html">Cores</a> e <a href="font-family.html">Texto e Fontes</a>: nomes, hex, <code>rgb()</code>, <code>hsl()</code>, fontes da internet</li>
+      <li><a href="unidades.html">Unidades</a> e <a href="background-color.html">Fundos</a>: <code>px</code>, <code>rem</code>, <code>%</code>, <code>vw</code>, imagens e degradês</li>
+      <li><a href="box-model.html">O Modelo de Caixa</a>: margem, <code>padding</code>, borda e sombra; <a href="links.html">links, listas e tabelas</a></li>
+    </ul>
+    <a class="btn" href="introducao.html">Começar &#10095;</a>
+  </div>
+  <div class="trilha n2">
+    <h3>Nível 2 · Intermediário</h3>
+    <p>Layout e páginas que se adaptam.</p>
+    <ul>
+      <li><a href="display.html">Display e Posição</a>: <code>display</code>, <code>position</code>, <code>z-index</code></li>
+      <li><a href="flexbox.html">Flexbox</a> e <a href="grid.html">Grid</a>: linhas, colunas, alinhamento e centralização</li>
+      <li><a href="hover-focus.html">Seletores Avançados</a>: <code>:hover</code>, <code>::before</code>, <code>:nth-child</code>, <code>:has()</code></li>
+      <li><a href="responsivo.html">Responsivo</a>: <code>@media</code>, mobile first, <code>clamp()</code>, <code>@container</code>; <a href="formularios.html">formulários e botões</a></li>
+    </ul>
+    <a class="btn" href="display.html">Começar &#10095;</a>
+  </div>
+  <div class="trilha n3">
+    <h3>Nível 3 · Avançado</h3>
+    <p>CSS moderno, efeitos e organização.</p>
+    <ul>
+      <li><a href="variaveis.html">Variáveis e Funções</a>: custom properties, <code>calc()</code>, tema escuro, <code>oklch()</code></li>
+      <li><a href="transform.html">Efeitos</a>: <code>transform</code>, transições, animações, filtros e recortes</li>
+      <li><a href="aninhamento.html">CSS Moderno</a>: aninhamento, <code>@layer</code>, <code>@scope</code>, subgrid, <code>@supports</code></li>
+      <li><a href="reset.html">Organização e Boas Práticas</a>: BEM, acessibilidade, impressão, desempenho</li>
+    </ul>
+    <a class="btn" href="variaveis.html">Começar &#10095;</a>
+  </div>
+  <div class="trilha proj">
+    <h3>Projetos</h3>
+    <p>Páginas completas, construídas passo a passo.</p>
+    <ul>
+      <li><a href="projeto-cartao.html">Cartão de perfil</a> e <a href="projeto-botoes.html">coleção de botões</a></li>
+      <li><a href="projeto-menu.html">Menu responsivo</a> e <a href="projeto-receita.html">página de receita</a></li>
+      <li><a href="projeto-galeria.html">Galeria com Grid</a> e <a href="projeto-precos.html">tabela de preços</a></li>
+      <li><a href="projeto-landing.html">Página de apresentação</a> e <a href="projeto-blog.html">layout de blog</a></li>
+    </ul>
+    <a class="btn" href="projeto-cartao.html">Ver projetos &#10095;</a>
+  </div>
+  <div class="trilha ref">
+    <h3>Referência</h3>
+    <p>Consulta rápida para quando você já sabe o que procura.</p>
+    <ul>
+      <li><a href="ref-propriedades.html">Propriedades</a>, <a href="ref-seletores.html">seletores</a> e <a href="ref-pseudo.html">pseudo-classes</a></li>
+      <li><a href="ref-unidades.html">Unidades</a>, <a href="ref-cores.html">nomes de cores</a> e <a href="ref-funcoes.html">funções</a></li>
+      <li><a href="ref-flexbox.html">Flexbox</a> e <a href="ref-grid.html">Grid</a> num relance</li>
+      <li><a href="ref-problemas.html">"Meu CSS não funciona"</a>: os problemas mais comuns</li>
+    </ul>
+    <a class="btn" href="ref-propriedades.html">Consultar &#10095;</a>
+  </div>
+</div>
+
+<hr>
+
+<h2>Como estudar</h2>
+<p>CSS se aprende mexendo, como pintar uma parede: você pinta, olha, ajusta. Para cada aula, siga estes quatro passos:</p>
+<ol class="passo">
+  <li><strong>Leia com calma.</strong> Leia a ideia, a anatomia e o resultado. Não pule a parte "Quando dá errado": no CSS, o erro não avisa, e quem conhece os erros comuns acha o problema em minutos.</li>
+  <li><strong>Mexa nos exemplos.</strong> Em toda caixa Experimente, troque uma cor, um tamanho, apague uma linha de propósito e veja o que acontece. Não tem como estragar nada.</li>
+  <li><strong>Faça as missões.</strong> As caixas com <strong>Missão</strong> conferem sozinhas se você acertou. Tente de verdade antes de abrir a solução; se abrir, digite a solução você mesmo em vez de só olhar.</li>
+  <li><strong>Repita no seu computador.</strong> Crie a pasta do seu site com o <code>index.html</code> e o <code>style.css</code>, escreva no seu editor e abra no navegador (aula <a href="primeiro-estilo.html">Seu Primeiro Estilo</a>). Lá você usa o F12 à vontade e vê o site num celular de verdade.</li>
+</ol>
+
+<div class="tip">
+<strong>A regra de ouro</strong>
+<p>Ler não basta: digite cada exemplo. Copiar e colar ensina pouco; digitar faz você reparar em cada chave, cada dois-pontos e cada ponto e vírgula. E uma mudança por vez: mude uma linha, olhe o resultado, depois mude a próxima.</p>
+</div>
+
+<h3>O editor do guia</h3>
+<p>As caixas Experimente não imitam um navegador: o resultado é desenhado pelo <strong>seu</strong> navegador, num quadro separado do resto da página, a partir do código que está na caixa naquele momento. Cada arquivo tem a sua <strong>aba</strong> (<code>index.html</code> e <code>style.css</code>), os botões <strong>375 · 768 · cheia</strong> mudam a largura do quadro para você ver a página como num celular, e o <strong>◐</strong> liga o tema escuro só no quadro. Tudo isso é explicado na aula <a href="simulador.html">O Editor do Guia</a>.</p>
+
+<hr>
+
+<h2>Como ler este guia</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Elemento</th><th>O que significa</th></tr>
+<tr><td>Caixa com o nome <code>style.css</code> no canto</td><td>O conteúdo de um arquivo. O nome no canto é o nome do arquivo.</td></tr>
+<tr><td>Quadro <strong>Resultado</strong> embaixo do código</td><td>O que o seu navegador desenha a partir daquele código, na hora. É o resultado real, não uma imagem.</td></tr>
+<tr><td>Caixa <strong>Quando dá errado</strong></td><td>Código com um erro colocado de propósito, para você ver o que o navegador faz e o que o validador diz. Não copie para o seu site.</td></tr>
+<tr><td><code>ana@notebook:~/site$</code></td><td>O prompt do terminal: usuária <code>ana</code>, na máquina <code>notebook</code>, na pasta <code>~/site</code>. O que vem depois é o comando digitado.</td></tr>
+<tr><td>Linhas sem prompt</td><td>A resposta do computador: o conteúdo de um arquivo ou a mensagem do validador.</td></tr>
+<tr><td><span class="t-a">← etiqueta</span></td><td>Uma explicação do guia sobre aquela linha. Não aparece no terminal real.</td></tr>
+<tr><td><code>rgb(255, 99, 71)</code> nas missões</td><td>A cor do jeito que o navegador guarda por dentro: <code>tomato</code> vira <code>rgb(255, 99, 71)</code>. As missões conferem o que o navegador calculou, e não o texto que você digitou.</td></tr>
+</table>
+</div>
+
+<div class="note">
+<strong>Versão de referência: o CSS dos navegadores atuais</strong>
+<p>O CSS não tem mais um número de versão único: depois do CSS 2.1, ele virou um conjunto de módulos (Cores, Flexbox, Grid…), cada um atualizado no seu ritmo, e o que as pessoas chamam de "CSS3" é esse conjunto. O guia ensina o CSS que os navegadores de 2025–2026 (Chrome, Edge, Firefox e Safari) entendem; quando um recurso é novo demais e ainda não funciona em todos, a aula avisa. Os resultados foram conferidos no Chromium 155, e as mensagens de erro, com o validador oficial do W3C, o <code>vnu</code> versão 26.10.12, o mesmo do site validator.w3.org.</p>
+</div>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
