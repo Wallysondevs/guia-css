@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS text-decoration — sublinhado, riscado e linha em cima | Guia CSS</title>
+<meta name="description" content="A propriedade text-decoration para quem nunca escreveu CSS: underline, overline, line-through e none lado a lado, a cor, o estilo (wavy, dotted, double), a espessura e a distância do sublinhado, tirar o sublinhado dos links sem prejudicar a acessibilidade, del × line-through e os erros comuns (valor inventado, none no filho que não tira a linha do pai).">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">text-decoration</span></h1>
+
+<p class="intro">O sublinhado dos links, o preço antigo riscado numa promoção, uma linha ondulada embaixo de um título: tudo isso é <code>text-decoration</code>, "decoração do texto". São linhas que o navegador desenha junto com as letras. Nesta aula você vai ver cada tipo de linha lado a lado, escolher a cor, o estilo e a grossura, tirar o sublinhado de um menu sem deixar os links escondidos e entender por que, às vezes, um <code>none</code> não tira a linha.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Os quatro tipos de linha: <code>underline</code>, <code>overline</code>, <code>line-through</code> e <code>none</code>.</li>
+  <li>As propriedades longas: <code>text-decoration-line</code>, <code>-color</code>, <code>-style</code> e <code>-thickness</code>, e o atalho <code>text-decoration</code>.</li>
+  <li>Como afastar o sublinhado das letras com <code>text-underline-offset</code>.</li>
+  <li>Quando tirar o sublinhado dos links, e quando não tirar.</li>
+  <li>A diferença entre riscar com CSS e usar o <code>&lt;del&gt;</code> do HTML.</li>
+  <li>Os erros comuns: valor inventado (com a mensagem do validador W3C) e o <code>none</code> num filho que não apaga a linha do pai.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a caneta e a régua</h2>
+<p>Imagine que você tem um texto impresso, uma caneta e uma régua. Você pode passar uma linha <strong>embaixo</strong> das palavras (sublinhar), <strong>em cima</strong> delas ou <strong>no meio</strong>, riscando. Pode trocar a cor da caneta, fazer a linha mais grossa, pontilhada ou ondulada. Em nenhum caso as letras mudam: a linha é um enfeite por cima delas.</p>
+<p>O <code>text-decoration</code> é essa caneta. Ele não muda a fonte, o tamanho nem a cor das letras: só desenha linhas.</p>
+
+<hr>
+
+<h2>1. Os tipos de linha, lado a lado</h2>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .embaixo { text-decoration: underline; }
+  .em-cima { text-decoration: overline; }
+  .riscado { text-decoration: line-through; }
+  .duas { text-decoration: underline overline; }
+&lt;/style&gt;
+&lt;p class="embaixo"&gt;underline: sublinhado&lt;/p&gt;
+&lt;p class="em-cima"&gt;overline: linha em cima&lt;/p&gt;
+&lt;p class="riscado"&gt;line-through: riscado&lt;/p&gt;
+&lt;p class="duas"&gt;underline overline: as duas&lt;/p&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>.embaixo</dt><dd>O seletor: os elementos com <code>class="embaixo"</code>.</dd>
+  <dt>text-decoration</dt><dd>A propriedade: "decoração do texto", as linhas desenhadas junto com as letras.</dd>
+  <dt>underline</dt><dd>O valor: "sublinhado", a linha <em>under</em> ("embaixo de") as letras.</dd>
+  <dt>;</dt><dd>Fecha a declaração.</dd>
+</dl>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que desenha</th><th>Uso comum</th></tr>
+<tr><td><code>underline</code></td><td>Linha embaixo das letras</td><td>Links (é o padrão deles)</td></tr>
+<tr><td><code>overline</code></td><td>Linha em cima das letras</td><td>Raro; um enfeite de título</td></tr>
+<tr><td><code>line-through</code></td><td>Linha no meio, riscando</td><td>Preço antigo, item de lista já feito</td></tr>
+<tr><td><code>none</code></td><td>Nenhuma linha</td><td>Tirar o sublinhado de um link de menu ou de botão</td></tr>
+<tr><td><code>underline overline</code></td><td>Mais de uma linha, separadas por espaço</td><td>Pode juntar os três tipos</td></tr>
+</table>
+</div>
+
+<p>O valor inicial é <code>none</code>. Quem já nasce com linha são alguns elementos do HTML, por causa do estilo padrão do navegador: o link <code>&lt;a href&gt;</code> e o <code>&lt;ins&gt;</code> (inserido) vêm sublinhados; o <code>&lt;del&gt;</code> (apagado) e o <code>&lt;s&gt;</code> vêm riscados.</p>
+
+<div class="tryhtml" data-goal="css:.antigo{text-decoration-line}=line-through">
+<p class="try-task"><strong>Missão:</strong> a lojinha está em promoção. Risque o preço antigo (o <code>span</code> com a classe <code>antigo</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p&gt;De &lt;span class="antigo"&gt;R$ 50,00&lt;/span&gt; por R$ 45,00&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.antigo {
+  color: gray;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.antigo {
+  color: gray;
+  text-decoration: line-through;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. O estilo da linha: <code>text-decoration-style</code></h2>
+<p>A linha pode ser contínua, dupla, pontilhada, tracejada ou ondulada. Para mudar só o estilo, existe uma propriedade própria:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  p {
+    text-decoration-line: underline;
+  }
+  .solid { text-decoration-style: solid; }
+  .double { text-decoration-style: double; }
+  .dotted { text-decoration-style: dotted; }
+  .dashed { text-decoration-style: dashed; }
+  .wavy { text-decoration-style: wavy; }
+&lt;/style&gt;
+&lt;p class="solid"&gt;solid: contínua (o padrão)&lt;/p&gt;
+&lt;p class="double"&gt;double: dupla&lt;/p&gt;
+&lt;p class="dotted"&gt;dotted: pontilhada&lt;/p&gt;
+&lt;p class="dashed"&gt;dashed: tracejada&lt;/p&gt;
+&lt;p class="wavy"&gt;wavy: ondulada&lt;/p&gt;
+</pre>
+
+<p>Repare que a regra do <code>p</code> usa <code>text-decoration-line</code>: é a propriedade "longa" que escolhe só o <strong>tipo</strong> de linha. O <code>text-decoration</code> da seção 1 é um <strong>atalho</strong> que junta várias propriedades longas numa só.</p>
+
+<hr>
+
+<h2>3. Cor, grossura e distância</h2>
+<p>Mais três propriedades completam a caneta:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>O que muda</th><th>Valor inicial</th></tr>
+<tr><td><code>text-decoration-color</code></td><td>A cor da linha</td><td><code>currentColor</code>: a mesma cor das letras</td></tr>
+<tr><td><code>text-decoration-thickness</code></td><td>A grossura da linha (<code>2px</code>, <code>0.1em</code>)</td><td><code>auto</code>: o navegador escolhe</td></tr>
+<tr><td><code>text-underline-offset</code></td><td>A distância entre o sublinhado e as letras (só vale para <code>underline</code>)</td><td><code>auto</code></td></tr>
+</table>
+</div>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .caprichado {
+    text-decoration-color: tomato;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 6px;
+  }
+&lt;/style&gt;
+&lt;p&gt;&lt;a href="#"&gt;Link normal&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class="caprichado" href="#"&gt;Link caprichado&lt;/a&gt;&lt;/p&gt;
+</pre>
+
+<p>O segundo link continua azul, mas o sublinhado ficou cor de tomate, mais grosso e mais afastado das letras, passando abaixo da "perna" do <code>p</code>. Não foi preciso escrever <code>underline</code>: o link já vem sublinhado do navegador, e as três propriedades só mudam a linha que existe.</p>
+
+<h3>O atalho com tudo junto</h3>
+<p>O atalho <code>text-decoration</code> aceita o tipo, o estilo, a cor e a grossura numa só declaração, em qualquer ordem:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  h2 {
+    text-decoration: underline wavy tomato 2px;
+  }
+&lt;/style&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+</pre>
+
+<p>Na aba <strong>Computed</strong> (Calculado) do F12, o atalho se desdobra nas propriedades longas: <code>text-decoration-line: underline</code>, <code>text-decoration-style: wavy</code>, <code>text-decoration-color: rgb(255, 99, 71)</code> (o <code>tomato</code> virou números) e <code>text-decoration-thickness: 2px</code>. O <code>text-underline-offset</code> não entra no atalho: ele sempre vai separado.</p>
+
+<div class="note">
+<strong>Suporte nos navegadores</strong>
+<p>As propriedades longas (<code>text-decoration-line</code>, <code>-style</code>, <code>-color</code>, <code>-thickness</code>) e o <code>text-underline-offset</code> funcionam em todos os navegadores atuais, inclusive no Safari desde a versão 12.1. Já o <strong>atalho</strong> com estilo, cor e grossura (<code>text-decoration: underline wavy tomato 2px</code>) só chegou ao Safari na versão 26.2, no fim de 2025 (dados do MDN). Num Safari mais velho, prefira as propriedades longas, ou use o atalho só com o tipo de linha.</p>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Quando usar</th></tr>
+<tr><td><code>text-decoration: underline;</code></td><td>Só pôr ou tirar a linha. Funciona em qualquer navegador</td></tr>
+<tr><td><code>text-decoration: underline wavy tomato 2px;</code></td><td>Tudo de uma vez, em navegadores atuais</td></tr>
+<tr><td>As propriedades longas, uma por linha</td><td>Mudar só um detalhe (a cor, a grossura) de uma linha que já existe, como o sublinhado dos links</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>4. Tirar o sublinhado dos links: quando pode</h2>
+<p>O pedido mais comum é <code>a { text-decoration: none; }</code>. Ele funciona, mas cuidado: o sublinhado é o jeito de o leitor <strong>saber que aquilo é um link</strong>. Só a cor azul não basta, porque muita gente não distingue cores (daltonismo) e a regra de acessibilidade (WCAG) pede que o link não se diferencie do texto só pela cor.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Onde está o link</th><th>Pode tirar o sublinhado?</th></tr>
+<tr><td>No meio de um parágrafo</td><td><strong>Não.</strong> Deixe sublinhado; se quiser, mude a cor, a grossura e a distância da linha</td></tr>
+<tr><td>Num menu de navegação, com cara de menu</td><td>Sim: o lugar e o formato já dizem que é clicável</td></tr>
+<tr><td>Num link com cara de botão (fundo, borda)</td><td>Sim: a caixa avisa que é clicável</td></tr>
+</table>
+</div>
+
+<p>Um meio-termo muito usado é tirar o sublinhado do menu e devolvê-lo quando o mouse passa por cima, com <code>:hover</code> (aula <a href="hover-focus.html">Estados: :hover, :focus e :active</a>):</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> passe o mouse sobre os itens do menu. Depois troque o <code>text-decoration-style</code> para <code>wavy</code> ou <code>dotted</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav&gt;
+  &lt;a href="#"&gt;Início&lt;/a&gt; ·
+  &lt;a href="#"&gt;Receitas&lt;/a&gt; ·
+  &lt;a href="#"&gt;Contato&lt;/a&gt;
+&lt;/nav&gt;
+&lt;p&gt;Veja a &lt;a href="#"&gt;receita do bolo de fubá&lt;/a&gt;, a favorita da casa.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">nav a {
+  text-decoration: none;
+}
+
+nav a:hover {
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+}
+</pre>
+</div>
+
+<p>O link do parágrafo continuou sublinhado: a regra só vale para os links dentro do <code>nav</code>.</p>
+
+<hr>
+
+<h2>5. Riscar com CSS ou com <code>&lt;del&gt;</code>?</h2>
+<p>O HTML tem elementos que já vêm riscados ou sublinhados, e eles <strong>dizem</strong> algo sobre o texto (aula <a href="https://wallysondevs.github.io/guia-html/formatacao.html">Formatação do Guia HTML</a>). O CSS só <strong>desenha</strong>:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;p&gt;De &lt;del&gt;R$ 50,00&lt;/del&gt; por &lt;ins&gt;R$ 45,00&lt;/ins&gt;&lt;/p&gt;
+&lt;p&gt;Pão de queijo: &lt;s&gt;esgotado&lt;/s&gt; chegou fornada nova&lt;/p&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Use</th><th>Quando</th></tr>
+<tr><td><code>&lt;del&gt;</code> / <code>&lt;ins&gt;</code></td><td>O texto foi <strong>apagado</strong> ou <strong>inserido</strong> (um preço trocado, uma correção). Leitores de tela podem anunciar a mudança</td></tr>
+<tr><td><code>&lt;s&gt;</code></td><td>O texto não vale mais, mas continua ali para referência ("esgotado")</td></tr>
+<tr><td><code>text-decoration: line-through</code></td><td>Só aparência, sem significado: um item de lista de tarefas marcado, um enfeite</td></tr>
+</table>
+</div>
+
+<p>E o contrário também vale: se o <code>&lt;del&gt;</code> está certo no HTML, mas a Ana não quer o risco, o CSS tira (<code>del { text-decoration: none; }</code>) e o significado continua no código.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Um valor que não existe: <code>underlined</code>, <code>wave</code></strong>
+<pre class="term" data-cwd="~/site">$ cat style.css
+a {
+  text-decoration: underlined;
+}
+h2 {
+  text-decoration-style: wave;
+}
+p {
+  text-decoration: underline wavy tomato 2px;
+}
+$ vnu --css style.css
+"file:/home/ana/site/style.css":2.20-2.29: error: CSS: “text-decoration”: “underlined” is not a “text-decoration” value.
+"file:/home/ana/site/style.css":5.26-5.29: error: CSS: “text-decoration-style”: “wave” is not a “text-decoration-style” value.</pre>
+<p><strong>O que o leitor vê:</strong> nada muda. Os links continuam com o sublinhado padrão, e o título continua com a linha que tinha antes.</p>
+<p><strong>Por quê:</strong> <code>underlined</code> ("sublinhado", com <em>-ed</em>) e <code>wave</code> ("onda") parecem certos, mas os valores são <code>underline</code> e <code>wavy</code>. O navegador ignora a declaração inteira. No F12, no painel <strong>Styles</strong> (Estilos), ela aparece riscada, com um ícone de aviso. A linha 8, com o atalho completo, está certa: o validador não reclama dela.</p>
+<p><strong>O que o validador diz:</strong> "<code>underlined</code> não é um valor de <code>text-decoration</code>" (linha 2, coluna 20) e "<code>wave</code> não é um valor de <code>text-decoration-style</code>" (linha 5, coluna 26).</p>
+<p><strong>Como consertar:</strong> <code>underline</code> e <code>wavy</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>none</code> no filho não apaga a linha do pai</strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  p {
+    text-decoration: underline;
+  }
+  .destaque {
+    text-decoration: none;
+    color: green;
+  }
+&lt;/style&gt;
+&lt;p&gt;Promoção: &lt;span class="destaque"&gt;só hoje&lt;/span&gt; bolo pela metade&lt;/p&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> "só hoje" ficou verde (a regra funcionou), mas continua sublinhado, com a linha preta do parágrafo passando por baixo.</p>
+<p><strong>Por quê:</strong> quem desenha a linha é o <code>&lt;p&gt;</code>, e ela atravessa tudo o que está dentro dele, inclusive o <code>&lt;span&gt;</code>. O <code>none</code> do span só diz "eu não desenho uma linha <strong>minha</strong>"; ele não tem como apagar a do pai. Por isso a aba Computed do span mostra <code>text-decoration-line: none</code>, e a linha continua lá. O validador não reclama: tudo é válido.</p>
+<p><strong>Como consertar:</strong> tire a linha do pai e ponha só onde ela deve aparecer. Se o parágrafo tem de ser sublinhado menos um pedaço, sublinhe os pedaços com <code>span</code>s próprios, deixando o "só hoje" de fora.</p>
+</div>
+
+<div class="cenario">
+<strong>Tirou o sublinhado de todos os links</strong>
+<p>A Ana escreveu <code>a { text-decoration: none; }</code> no começo do CSS e agora os links no meio dos textos parecem palavras azuis comuns. O navegador fez exatamente o que foi pedido, e o validador não tem o que dizer: é um erro de <strong>acessibilidade</strong>, não de código.</p>
+<p><strong>Como consertar:</strong> restrinja o seletor aos lugares onde o link já tem cara de clicável (<code>nav a</code>, <code>.botao</code>) e deixe os links do texto sublinhados.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>text-decoration: underline;</code></td><td>Sublinha</td></tr>
+<tr><td><code>text-decoration: overline;</code></td><td>Linha em cima</td></tr>
+<tr><td><code>text-decoration: line-through;</code></td><td>Risca</td></tr>
+<tr><td><code>text-decoration: none;</code></td><td>Nenhuma linha (o valor inicial); não apaga a linha de um pai</td></tr>
+<tr><td><code>text-decoration-line: underline overline;</code></td><td>Só o tipo de linha (pode juntar vários)</td></tr>
+<tr><td><code>text-decoration-style: wavy;</code></td><td><code>solid</code>, <code>double</code>, <code>dotted</code>, <code>dashed</code>, <code>wavy</code></td></tr>
+<tr><td><code>text-decoration-color: tomato;</code></td><td>A cor da linha (inicial: a cor do texto)</td></tr>
+<tr><td><code>text-decoration-thickness: 3px;</code></td><td>A grossura da linha</td></tr>
+<tr><td><code>text-underline-offset: 6px;</code></td><td>Afasta o sublinhado das letras (fora do atalho)</td></tr>
+<tr><td><code>text-decoration: underline wavy tomato 2px;</code></td><td>Atalho: tipo, estilo, cor e grossura (Safari só a partir da 26.2)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Riscar</h3>
+<p>Complete para riscar o preço antigo:</p>
+<div class="ex-code">.antigo { text-decoration: <input data-answer="line-through" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Sem linha</h3>
+<p>Complete para tirar o sublinhado dos links do menu:</p>
+<div class="ex-code">nav a { text-decoration: <input data-answer="none" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Linha ondulada</h3>
+<p>Complete o estilo:</p>
+<div class="ex-code">h2 { text-decoration-style: <input data-answer="wavy" aria-label="estilo">; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Qual propriedade afasta o sublinhado das letras?</p>
+<label><input type="radio" name="q4"> <code>text-decoration-thickness</code></label>
+<label><input type="radio" name="q4"> <code>text-decoration-style</code></label>
+<label><input type="radio" name="q4"> <code>text-underline-offset</code></label>
+<label><input type="radio" name="q4"> <code>line-height</code></label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. O parágrafo tem <code>text-decoration: underline</code> e um <code>span</code> dentro dele tem <code>text-decoration: none</code>. O que acontece com o texto do span?</p>
+<label><input type="radio" name="q5"> Fica sem sublinhado</label>
+<label><input type="radio" name="q5"> Continua sublinhado: a linha é desenhada pelo parágrafo</label>
+<label><input type="radio" name="q5"> Fica com dois sublinhados</label>
+<label><input type="radio" name="q5"> O navegador mostra um erro</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. Onde é mais seguro tirar o sublinhado de um link?</p>
+<label><input type="radio" name="q6"> No meio de um parágrafo, desde que o link seja azul</label>
+<label><input type="radio" name="q6"> Em todos os links do site, com <code>a { text-decoration: none; }</code></label>
+<label><input type="radio" name="q6"> Em nenhum lugar: é proibido pelo validador</label>
+<label><input type="radio" name="q6"> Num menu de navegação ou num link com cara de botão</label>
+</div>
+
+<h3>Missão final: o blog da Ana</h3>
+
+<div class="tryhtml" data-goal="css:nav a{text-decoration-line}=none,css:article a{text-decoration-line}=underline,css:article a{text-decoration-color}=rgb(255, 99, 71),css:article a{text-underline-offset}=4px,css:h1{text-decoration-style}=wavy,css:.feito{text-decoration-line}=line-through">
+<p class="try-task"><strong>Missão:</strong> (1) tire o sublinhado só dos links do <code>nav</code>; (2) o link do artigo continua sublinhado, mas com a linha <code>tomato</code> e afastada <code>4px</code> das letras; (3) dê ao título uma linha embaixo, ondulada (<code>wavy</code>); (4) risque o item já feito da lista (classe <code>feito</code>). A regra que já está no CSS tira o sublinhado de todos os links: conserte-a.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav&gt;
+  &lt;a href="#"&gt;Início&lt;/a&gt; · &lt;a href="#"&gt;Blog&lt;/a&gt;
+&lt;/nav&gt;
+&lt;h1&gt;Blog da Ana&lt;/h1&gt;
+&lt;article&gt;
+  &lt;h2&gt;Bolo de fubá, segunda tentativa&lt;/h2&gt;
+  &lt;p&gt;Hoje testei a &lt;a href="#"&gt;receita do bolo de fubá&lt;/a&gt; com erva-doce.&lt;/p&gt;
+  &lt;ul&gt;
+    &lt;li class="feito"&gt;Comprar fubá&lt;/li&gt;
+    &lt;li&gt;Assar o bolo&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">a {
+  text-decoration: none;
+}
+</pre>
+<pre class="solucao" data-file="style.css">nav a {
+  text-decoration: none;
+}
+
+article a {
+  text-decoration-color: tomato;
+  text-underline-offset: 4px;
+}
+
+h1 {
+  text-decoration-line: underline;
+  text-decoration-style: wavy;
+}
+
+.feito {
+  text-decoration: line-through;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>text-decoration</code> desenha linhas junto com o texto: <code>underline</code> (embaixo), <code>overline</code> (em cima), <code>line-through</code> (riscado) ou <code>none</code>. Dá para juntar tipos: <code>underline overline</code>.</li>
+  <li>As propriedades longas mudam um detalhe por vez: <code>text-decoration-line</code>, <code>-style</code> (<code>solid</code>, <code>double</code>, <code>dotted</code>, <code>dashed</code>, <code>wavy</code>), <code>-color</code> e <code>-thickness</code>. O <code>text-underline-offset</code> afasta o sublinhado.</li>
+  <li>O atalho <code>text-decoration: underline wavy tomato 2px</code> junta tudo; no Safari, só a partir da 26.2.</li>
+  <li>A linha do pai atravessa os filhos: um <code>none</code> no filho não a apaga.</li>
+  <li>Links no meio do texto ficam sublinhados (a cor sozinha não basta). Tire a linha só de menus e de links com cara de botão.</li>
+  <li><code>&lt;del&gt;</code>, <code>&lt;ins&gt;</code> e <code>&lt;s&gt;</code> têm significado; o <code>line-through</code> do CSS é só aparência.</li>
+  <li>Valor inventado é ignorado; o validador avisa: <code>“underlined” is not a “text-decoration” value</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
