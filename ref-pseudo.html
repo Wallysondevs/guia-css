@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Pseudo-classes e Pseudo-elementos — tabela de consulta | Guia CSS</title>
+<meta name="description" content="Referência das pseudo-classes (:hover, :focus-visible, :nth-child, :has, :checked, :user-invalid…) e dos pseudo-elementos (::before, ::after, ::first-letter, ::marker, ::placeholder…) do CSS: quando cada um vale, um exemplo, a especificidade, o suporte dos navegadores e a aula que ensina.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Pseudo-classes e Pseudo-elementos</span></h1>
+
+<p class="intro">Uma <strong>pseudo-classe</strong> (com <code>:</code>) escolhe um elemento por um <strong>estado</strong> ou uma <strong>posição</strong> que não está escrita no HTML: o mouse em cima, o campo marcado, o terceiro item da lista. Um <strong>pseudo-elemento</strong> (com <code>::</code>) escolhe um <strong>pedaço</strong> do elemento, ou cria um que não existe: a primeira letra, a bolinha da lista, um enfeite antes do texto. Esta página junta os dois em tabelas de consulta, com a aula que ensina cada um.</p>
+
+<div class="note">
+<strong>Como usar esta página</strong>
+<ul>
+  <li>Procure com <kbd>Ctrl</kbd>+<kbd>F</kbd> pelo nome (<code>nth-child</code>, <code>placeholder</code>).</li>
+  <li>A coluna "Aula" leva à explicação completa, com exemplos ao vivo. Onde aparece "—", o guia ainda não tem uma aula só para aquele seletor.</li>
+  <li>O suporte dos navegadores foi conferido nos dados de compatibilidade do MDN (outubro de 2026). Os recursos recentes estão marcados com <strong>novo</strong>.</li>
+</ul>
+</div>
+
+<p>Atalhos: <a href="#diferenca">: × ::</a> · <a href="#usuario">Ações do usuário</a> · <a href="#links">Links</a> · <a href="#estrutura">Posição na árvore</a> · <a href="#formulas">Fórmulas do :nth-child</a> · <a href="#logicas">:not, :is, :where, :has</a> · <a href="#formularios">Formulários</a> · <a href="#outras">Outras pseudo-classes</a> · <a href="#elementos">Pseudo-elementos</a> · <a href="#especificidade">Especificidade</a> · <a href="#errado">Quando dá errado</a></p>
+
+<hr>
+
+<h2 id="diferenca">Pseudo-classe (<code>:</code>) × pseudo-elemento (<code>::</code>)</h2>
+<p>Pense numa vitrine de padaria. A pseudo-classe é como dizer "o bolo <em>que está em promoção</em>": o bolo existe, você só o escolhe por uma condição. O pseudo-elemento é como dizer "a <em>cobertura</em> do bolo": um pedaço dele, ou um enfeite colado nele.</p>
+<pre class="file" data-file="anatomia">a:hover { … }          /* pseudo-classe: o link, quando o mouse está em cima */
+p::first-letter { … }  /* pseudo-elemento: só a primeira letra do parágrafo */
+a:hover::after { … }   /* os dois juntos: o enfeite depois do link, com o mouse em cima */</pre>
+<dl class="anatomy">
+  <dt>a</dt><dd>O seletor comum, como sempre. Pode ser um elemento, uma classe (<code>.botao:hover</code>) ou ficar de fora: <code>:hover</code> sozinho vale para qualquer elemento.</dd>
+  <dt>:hover</dt><dd>Um dois-pontos: <strong>pseudo-classe</strong>. Vai colado no seletor, sem espaço. Com espaço (<code>a :hover</code>), vira "qualquer coisa com o mouse em cima <em>dentro</em> de um <code>a</code>", outra coisa.</dd>
+  <dt>::first-letter</dt><dd>Dois dois-pontos: <strong>pseudo-elemento</strong>. Só pode haver um por seletor, e ele vem <strong>no fim</strong>.</dd>
+</dl>
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th>Pseudo-classe</th><th>Pseudo-elemento</th></tr>
+<tr><td>Escreve-se</td><td><code>:nome</code></td><td><code>::nome</code></td></tr>
+<tr><td>Escolhe</td><td>o elemento inteiro, numa condição</td><td>um pedaço do elemento, ou um "elemento" criado pelo CSS</td></tr>
+<tr><td>Quantos por seletor</td><td>quantos quiser: <code>input:required:invalid</code></td><td>um, sempre no fim: <code>p::first-line</code></td></tr>
+<tr><td>Especificidade</td><td>vale como uma classe</td><td>vale como um elemento</td></tr>
+<tr><td>Exemplos</td><td><code>:hover</code>, <code>:checked</code>, <code>:nth-child(2)</code>, <code>:has()</code></td><td><code>::before</code>, <code>::after</code>, <code>::marker</code>, <code>::placeholder</code></td></tr>
+</table>
+</div>
+<div class="tip"><strong>E o <code>:before</code> com um dois-pontos só?</strong> No CSS 2 os quatro pseudo-elementos antigos (<code>:before</code>, <code>:after</code>, <code>:first-letter</code>, <code>:first-line</code>) eram escritos com um <code>:</code>. Os navegadores ainda aceitam, e o validador W3C também não reclama (conferido: <code>p:first-letter</code> não deu nenhuma mensagem). Você vai ver isso em CSS antigo. No seu, use <code>::</code>: deixa claro que é um pseudo-elemento. Os pseudo-elementos novos (<code>::marker</code>, <code>::placeholder</code>) só funcionam com <code>::</code>.</div>
+
+<h2 id="usuario">Ações do usuário</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Vale quando…</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td><code>:hover</code></td><td>o ponteiro do mouse está sobre o elemento. No celular, não existe "passar por cima": não esconda nada importante atrás do <code>:hover</code>.</td><td><code>.botao:hover { background-color: navy; }</code></td><td><a href="hover-focus.html">Estados</a></td></tr>
+<tr><td><code>:active</code></td><td>o elemento está sendo apertado (o botão do mouse ainda está pressionado, ou o dedo na tela).</td><td><code>.botao:active { transform: scale(0.97); }</code></td><td><a href="hover-focus.html">Estados</a></td></tr>
+<tr><td><code>:focus</code></td><td>o elemento tem o foco: o campo onde você está digitando, o link onde o <kbd>Tab</kbd> parou.</td><td><code>input:focus { border-color: navy; }</code></td><td><a href="hover-focus.html">Estados</a></td></tr>
+<tr><td><code>:focus-visible</code></td><td>tem o foco <strong>e</strong> o navegador acha que o contorno deve aparecer (quase sempre: ao usar o teclado). Um clique de mouse num botão em geral não liga.</td><td><code>a:focus-visible { outline: 3px solid orange; }</code></td><td><a href="hover-focus.html">Estados</a>, <a href="acessibilidade.html">Acessibilidade</a></td></tr>
+<tr><td><code>:focus-within</code></td><td>o elemento <strong>ou algo dentro dele</strong> tem o foco. Bom para destacar o formulário inteiro enquanto a pessoa preenche.</td><td><code>form:focus-within { background-color: ivory; }</code></td><td><a href="hover-focus.html">Estados</a></td></tr>
+</table>
+</div>
+
+<h2 id="links">Links</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Vale quando…</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td><code>:link</code></td><td>um link (<code>&lt;a href&gt;</code>) que a pessoa <strong>ainda não visitou</strong>.</td><td><code>a:link { color: navy; }</code></td><td><a href="links.html">Estilizando Links</a></td></tr>
+<tr><td><code>:visited</code></td><td>um link já visitado. Por privacidade, só aceita mudar <strong>cores</strong> (<code>color</code>, <code>background-color</code>, <code>border-color</code>…); tamanho, fundo com imagem e o resto são ignorados.</td><td><code>a:visited { color: purple; }</code></td><td><a href="links.html">Estilizando Links</a></td></tr>
+<tr><td><code>:any-link</code></td><td>qualquer link com <code>href</code>, visitado ou não. Atalho para <code>:link, :visited</code>.</td><td><code>a:any-link { text-decoration-thickness: 2px; }</code></td><td><a href="links.html">Estilizando Links</a></td></tr>
+<tr><td><code>:target</code></td><td>o elemento cujo <code>id</code> está no fim do endereço (<code>receita.html#modo-de-preparo</code> liga o <code>#modo-de-preparo</code>).</td><td><code>section:target { background-color: lightyellow; }</code></td><td><a href="links.html">Estilizando Links</a></td></tr>
+</table>
+</div>
+<p>A ordem das regras dos links importa, porque todas têm a mesma especificidade e a última vence: <strong><code>:link</code>, <code>:visited</code>, <code>:hover</code>, <code>:active</code></strong> (em inglês, o lembrete é "<strong>L</strong>o<strong>V</strong>e <strong>HA</strong>te"). Com <code>:hover</code> antes de <code>:visited</code>, um link visitado nunca muda de cor com o mouse em cima. Veja <a href="cascata.html">A Cascata</a>.</p>
+
+<h2 id="estrutura">Posição na árvore (pseudo-classes estruturais)</h2>
+<p>Escolhem pela posição entre os irmãos, sem precisar de uma classe em cada item. A diferença entre <code>-child</code> e <code>-of-type</code>: <code>li:first-child</code> é "o primeiro filho, <em>se</em> ele for um <code>li</code>"; <code>p:first-of-type</code> é "o primeiro <code>p</code>, mesmo que haja um <code>h2</code> antes".</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Escolhe</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td><code>:first-child</code></td><td>o primeiro filho do pai</td><td><code>li:first-child { font-weight: bold; }</code></td><td><a href="nth-child.html">:nth-child</a></td></tr>
+<tr><td><code>:last-child</code></td><td>o último filho</td><td><code>li:last-child { border-bottom: none; }</code></td><td><a href="nth-child.html">:nth-child</a></td></tr>
+<tr><td><code>:only-child</code></td><td>o filho que não tem irmãos</td><td><code>li:only-child { list-style: none; }</code></td><td><a href="nth-child.html">:nth-child</a></td></tr>
+<tr><td><code>:nth-child(<em>fórmula</em>)</code></td><td>os filhos nas posições da fórmula (<a href="#formulas">tabela abaixo</a>), contando todos os irmãos</td><td><code>tr:nth-child(even) { background-color: whitesmoke; }</code></td><td><a href="nth-child.html">:nth-child</a>, <a href="tabelas.html">Tabelas</a></td></tr>
+<tr><td><code>:nth-last-child(<em>fórmula</em>)</code></td><td>o mesmo, contando de trás para a frente</td><td><code>li:nth-last-child(-n+2)</code> = os dois últimos</td><td><a href="nth-child.html">:nth-child</a></td></tr>
+<tr><td><code>:first-of-type</code></td><td>o primeiro irmão daquele tipo de elemento</td><td><code>article p:first-of-type { font-size: 1.2rem; }</code></td><td><a href="nth-child.html">:nth-child</a></td></tr>
+<tr><td><code>:last-of-type</code></td><td>o último daquele tipo</td><td><code>p:last-of-type { margin-bottom: 0; }</code></td><td><a href="nth-child.html">:nth-child</a></td></tr>
+<tr><td><code>:only-of-type</code></td><td>o único irmão daquele tipo</td><td><code>img:only-of-type { width: 100%; }</code></td><td><a href="nth-child.html">:nth-child</a></td></tr>
+<tr><td><code>:nth-of-type(<em>fórmula</em>)</code></td><td>como <code>:nth-child</code>, mas contando só os irmãos do mesmo tipo</td><td><code>p:nth-of-type(2)</code></td><td><a href="nth-child.html">:nth-child</a></td></tr>
+<tr><td><code>:nth-last-of-type(<em>fórmula</em>)</code></td><td>o mesmo, de trás para a frente</td><td><code>p:nth-last-of-type(1)</code> = <code>p:last-of-type</code></td><td><a href="nth-child.html">:nth-child</a></td></tr>
+<tr><td><code>:empty</code></td><td>o elemento sem nada dentro: nem texto, nem espaço, nem filhos (um comentário não conta)</td><td><code>.aviso:empty { display: none; }</code></td><td>—</td></tr>
+<tr><td><code>:root</code></td><td>a raiz do documento: o <code>&lt;html&gt;</code>. Lugar tradicional das variáveis.</td><td><code>:root { --cor-marca: tomato; }</code></td><td><a href="variaveis.html">Variáveis</a></td></tr>
+</table>
+</div>
+
+<h3 id="formulas">As fórmulas do <code>:nth-child()</code></h3>
+<p>A fórmula é <code>an+b</code>: o navegador põe <code>n = 0, 1, 2, 3…</code> e escolhe as posições que dão resultado positivo. As posições começam em <strong>1</strong>, não em 0.</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Fórmula</th><th>Posições</th><th>Para quê</th></tr>
+<tr><td><code>3</code></td><td>3</td><td>só o terceiro</td></tr>
+<tr><td><code>odd</code> ou <code>2n+1</code></td><td>1, 3, 5, 7…</td><td>linhas ímpares (<em>odd</em> = ímpar)</td></tr>
+<tr><td><code>even</code> ou <code>2n</code></td><td>2, 4, 6, 8…</td><td>linhas pares (<em>even</em> = par): a tabela "zebrada"</td></tr>
+<tr><td><code>3n</code></td><td>3, 6, 9…</td><td>de três em três</td></tr>
+<tr><td><code>3n+1</code></td><td>1, 4, 7, 10…</td><td>o primeiro de cada grupo de três (o começo de cada linha numa grade de 3 colunas)</td></tr>
+<tr><td><code>n+4</code></td><td>4, 5, 6, 7…</td><td>do quarto em diante</td></tr>
+<tr><td><code>-n+3</code></td><td>3, 2, 1</td><td>só os três primeiros</td></tr>
+<tr><td><code>n+2 of .novo</code></td><td>do 2.º item com a classe <code>novo</code> em diante</td><td>conta <strong>só</strong> os irmãos que casam com o seletor depois do <code>of</code></td></tr>
+</table>
+</div>
+<p>Conferido no Chromium: em <code>&lt;li class="novo"&gt;a&lt;/li&gt;&lt;li&gt;b&lt;/li&gt;&lt;li class="novo"&gt;c&lt;/li&gt;</code>, o seletor <code>li:nth-child(2 of .novo)</code> escolhe o "c" (o segundo da classe <code>novo</code>), e não o "b" (o segundo filho). A sintaxe <code>of</code> funciona no Chrome 111, Firefox 113 e Safari 9 em diante.</p>
+
+<h2 id="logicas">Pseudo-classes lógicas: <code>:not()</code>, <code>:is()</code>, <code>:where()</code>, <code>:has()</code></h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Escolhe</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td><code>:not(<em>lista</em>)</code></td><td>quem <strong>não</strong> casa com nenhum seletor da lista</td><td><code>li:not(:last-child) { border-bottom: 1px solid silver; }</code></td><td><a href="not-is-where.html">:not, :is, :where</a></td></tr>
+<tr><td><code>:is(<em>lista</em>)</code></td><td>quem casa com <strong>qualquer</strong> um da lista. Encurta seletores repetidos.</td><td><code>:is(h1, h2, h3) a { color: inherit; }</code></td><td><a href="not-is-where.html">:not, :is, :where</a></td></tr>
+<tr><td><code>:where(<em>lista</em>)</code></td><td>igual ao <code>:is()</code>, mas com especificidade <strong>zero</strong>: fácil de sobrescrever. Bom para resets.</td><td><code>:where(ul, ol) { padding-left: 1.5rem; }</code></td><td><a href="not-is-where.html">:not, :is, :where</a>, <a href="reset.html">Reset</a></td></tr>
+<tr><td><code>:has(<em>lista</em>)</code></td><td>o elemento que <strong>tem</strong> dentro dele (ou depois, com <code>+</code>/<code>~</code>) algo que casa com a lista. O "seletor do pai".</td><td><code>.cartao:has(img) { padding-top: 0; }</code></td><td><a href="has.html">:has()</a></td></tr>
+</table>
+</div>
+<div class="note"><strong>Suporte:</strong> <code>:is()</code> e <code>:where()</code> funcionam no Chrome 88, Firefox 78 e Safari 14 em diante. O <code>:has()</code> chegou por último no Firefox: Chrome 105, Safari 15.4 e Firefox <strong>121</strong> (dezembro de 2023). Hoje funciona nos navegadores atualizados, mas um Firefox antigo ignora a regra inteira.</div>
+
+<h2 id="formularios">Formulários</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Vale quando o campo…</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td><code>:checked</code></td><td>está marcado (checkbox, rádio, <code>&lt;option&gt;</code> escolhida)</td><td><code>input:checked + label { font-weight: bold; }</code></td><td><a href="formularios.html">Formulários</a></td></tr>
+<tr><td><code>:indeterminate</code></td><td>checkbox "meio marcado" (pelo JavaScript), rádios de um grupo sem nenhum marcado, <code>&lt;progress&gt;</code> sem valor</td><td><code>progress:indeterminate { opacity: 0.6; }</code></td><td><a href="formularios.html">Formulários</a></td></tr>
+<tr><td><code>:default</code></td><td>é a opção padrão: o checkbox com <code>checked</code> no HTML, o botão de enviar principal</td><td><code>option:default { color: green; }</code></td><td><a href="formularios.html">Formulários</a></td></tr>
+<tr><td><code>:disabled</code> / <code>:enabled</code></td><td>está desativado (<code>disabled</code>) / ativo</td><td><code>button:disabled { cursor: not-allowed; }</code></td><td><a href="formularios.html">Formulários</a>, <a href="botoes.html">Botões</a></td></tr>
+<tr><td><code>:required</code> / <code>:optional</code></td><td>tem / não tem o atributo <code>required</code></td><td><code>input:required { border-left: 4px solid tomato; }</code></td><td><a href="formularios.html">Formulários</a></td></tr>
+<tr><td><code>:valid</code> / <code>:invalid</code></td><td>o valor passa / não passa nas regras (<code>required</code>, <code>type="email"</code>, <code>pattern</code>…). Vale <strong>desde o carregamento</strong>: um campo obrigatório vazio já nasce <code>:invalid</code>.</td><td><code>input:invalid { border-color: crimson; }</code></td><td><a href="formularios.html">Formulários</a></td></tr>
+<tr><td><code>:user-valid</code> / <code>:user-invalid</code> <strong>novo</strong></td><td>como os dois de cima, mas só <strong>depois que a pessoa mexeu</strong> no campo (ou tentou enviar). O formulário não nasce vermelho.</td><td><code>input:user-invalid { border-color: crimson; }</code></td><td><a href="formularios.html">Formulários</a></td></tr>
+<tr><td><code>:in-range</code> / <code>:out-of-range</code></td><td>o número está dentro / fora de <code>min</code> e <code>max</code></td><td><code>input:out-of-range { background-color: mistyrose; }</code></td><td><a href="formularios.html">Formulários</a></td></tr>
+<tr><td><code>:placeholder-shown</code></td><td>está mostrando o texto de exemplo (<code>placeholder</code>), ou seja, está vazio</td><td><code>input:placeholder-shown { border-style: dashed; }</code></td><td><a href="formularios.html">Formulários</a></td></tr>
+<tr><td><code>:read-only</code> / <code>:read-write</code></td><td>não pode / pode ser editado (<code>readonly</code>, ou um elemento comum × um campo ou <code>contenteditable</code>)</td><td><code>input:read-only { background-color: whitesmoke; }</code></td><td><a href="formularios.html">Formulários</a></td></tr>
+<tr><td><code>:autofill</code></td><td>foi preenchido sozinho pelo navegador (o endereço salvo)</td><td><code>input:autofill { outline: 2px solid gold; }</code></td><td>—</td></tr>
+</table>
+</div>
+<div class="note"><strong>Suporte:</strong> <code>:user-valid</code> e <code>:user-invalid</code> funcionam no Chrome 119, Firefox 88 e Safari 16.5 em diante. Em navegadores mais antigos a regra é ignorada: o campo só fica sem o destaque.</div>
+
+<h2 id="outras">Outras pseudo-classes</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Vale quando…</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td><code>:lang(<em>idioma</em>)</code></td><td>o elemento está num idioma (do <code>lang</code> dele ou de um ancestral)</td><td><code>q:lang(en) { quotes: "“" "”"; }</code></td><td>—</td></tr>
+<tr><td><code>:dir(ltr)</code> / <code>:dir(rtl)</code></td><td>o texto corre da esquerda para a direita / da direita para a esquerda</td><td><code>.seta:dir(rtl) { transform: scaleX(-1); }</code></td><td><a href="propriedades-logicas.html">Propriedades Lógicas</a></td></tr>
+<tr><td><code>:open</code> <strong>novo</strong></td><td>um <code>&lt;details&gt;</code> ou <code>&lt;dialog&gt;</code> está aberto, um <code>&lt;select&gt;</code> ou <code>&lt;input&gt;</code> está com a lista aberta</td><td><code>details:open summary { color: navy; }</code></td><td>—</td></tr>
+<tr><td><code>:modal</code></td><td>o elemento está "na frente de tudo", bloqueando o resto: um <code>&lt;dialog&gt;</code> aberto com <code>showModal()</code></td><td><code>dialog:modal { border-radius: 8px; }</code></td><td>—</td></tr>
+<tr><td><code>:popover-open</code></td><td>um elemento com o atributo <code>popover</code> está aberto</td><td><code>[popover]:popover-open { opacity: 1; }</code></td><td>—</td></tr>
+<tr><td><code>:fullscreen</code></td><td>o elemento está em tela cheia (um vídeo, por exemplo)</td><td><code>video:fullscreen { object-fit: contain; }</code></td><td>—</td></tr>
+<tr><td><code>:defined</code></td><td>o elemento é conhecido: todo elemento do HTML, ou um componente personalizado já registrado pelo JavaScript</td><td><code>meu-cartao:not(:defined) { visibility: hidden; }</code></td><td>—</td></tr>
+<tr><td><code>:scope</code></td><td>o ponto de partida: numa folha comum, é o mesmo que <code>:root</code>; dentro de <code>@scope</code>, é a raiz do escopo</td><td><code>@scope (.cartao) { :scope { padding: 1rem; } }</code></td><td><a href="scope.html">@scope</a></td></tr>
+</table>
+</div>
+<div class="note"><strong>Suporte dos mais novos:</strong> <code>:open</code> funciona no Chrome 133, Firefox 136 e Safari 26.5 em diante. <code>:popover-open</code>: Chrome 114, Firefox 125, Safari 17. <code>:modal</code>: Chrome 105, Firefox 103, Safari 15.6. As pseudo-classes de vídeo e áudio (<code>:playing</code>, <code>:paused</code>, <code>:muted</code>) existem no Firefox 150 e no Safari 15.4, mas <strong>ainda não no Chrome</strong>: não conte com elas.</div>
+
+<h2 id="elementos">Pseudo-elementos</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Escolhe ou cria</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td><code>::before</code></td><td>um "filho" de mentira, <strong>antes</strong> do conteúdo. Só aparece com a propriedade <code>content</code> (mesmo vazia: <code>content: ""</code>).</td><td><code>.novo::before { content: "★ "; }</code></td><td><a href="before-after.html">::before e ::after</a></td></tr>
+<tr><td><code>::after</code></td><td>o mesmo, <strong>depois</strong> do conteúdo</td><td><code>a[href^="http"]::after { content: " ↗"; }</code></td><td><a href="before-after.html">::before e ::after</a></td></tr>
+<tr><td><code>::first-letter</code></td><td>a primeira letra de um bloco (a "capitular" dos livros)</td><td><code>p::first-letter { font-size: 2em; }</code></td><td><a href="pseudo-elementos.html">Outros Pseudo-elementos</a></td></tr>
+<tr><td><code>::first-line</code></td><td>a primeira linha de um bloco, como ela ficou na tela (muda quando a largura muda)</td><td><code>p::first-line { font-variant: small-caps; }</code></td><td><a href="pseudo-elementos.html">Outros Pseudo-elementos</a></td></tr>
+<tr><td><code>::marker</code></td><td>o marcador do item de lista: a bolinha ou o número</td><td><code>li::marker { color: tomato; }</code></td><td><a href="pseudo-elementos.html">Outros Pseudo-elementos</a>, <a href="listas.html">Listas</a></td></tr>
+<tr><td><code>::placeholder</code></td><td>o texto de exemplo de um campo (atributo <code>placeholder</code>)</td><td><code>input::placeholder { color: dimgray; }</code></td><td><a href="pseudo-elementos.html">Outros Pseudo-elementos</a></td></tr>
+<tr><td><code>::selection</code></td><td>o trecho que a pessoa selecionou com o mouse</td><td><code>::selection { background-color: gold; }</code></td><td><a href="pseudo-elementos.html">Outros Pseudo-elementos</a></td></tr>
+<tr><td><code>::file-selector-button</code></td><td>o botão "Escolher arquivo" de um <code>&lt;input type="file"&gt;</code></td><td><code>input::file-selector-button { border-radius: 4px; }</code></td><td><a href="pseudo-elementos.html">Outros Pseudo-elementos</a></td></tr>
+<tr><td><code>::backdrop</code></td><td>a camada atrás de um <code>&lt;dialog&gt;</code> modal, de um popover ou de algo em tela cheia</td><td><code>dialog::backdrop { background-color: rgb(0 0 0 / 50%); }</code></td><td>—</td></tr>
+<tr><td><code>::details-content</code> <strong>novo</strong></td><td>a parte de um <code>&lt;details&gt;</code> que abre e fecha (tudo menos o <code>&lt;summary&gt;</code>)</td><td><code>details::details-content { padding: 1rem; }</code></td><td>—</td></tr>
+<tr><td><code>::target-text</code></td><td>o trecho destacado por um link com <code>#:~:text=…</code> (o "rolar até o texto" de resultados de busca)</td><td><code>::target-text { background-color: lightyellow; }</code></td><td>—</td></tr>
+<tr><td><code>::cue</code></td><td>as legendas de um <code>&lt;video&gt;</code> com <code>&lt;track&gt;</code></td><td><code>::cue { background-color: black; }</code></td><td>—</td></tr>
+</table>
+</div>
+<div class="note"><strong>Suporte:</strong> <code>::details-content</code> funciona no Chrome 131, Safari 18.4 e Firefox 143 em diante. <code>::target-text</code>: Chrome 89, Firefox 131, Safari 18.2. O <code>::marker</code> no Safari é parcial: só aceita <code>color</code> e <code>font-size</code>. Os seletores com prefixo (<code>::-webkit-scrollbar</code>, <code>::-moz-range-thumb</code>) não são do padrão e funcionam só em alguns navegadores.</div>
+
+<h2 id="especificidade">Especificidade e combinações</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Vale como</th><th>Exemplo (ID, classe, elemento)</th></tr>
+<tr><td>uma pseudo-classe (<code>:hover</code>, <code>:nth-child()</code>, <code>:checked</code>…)</td><td>uma <strong>classe</strong></td><td><code>a:hover</code> = 0, 1, 1</td></tr>
+<tr><td>um pseudo-elemento (<code>::before</code>, <code>::marker</code>…)</td><td>um <strong>elemento</strong></td><td><code>p::first-letter</code> = 0, 0, 2</td></tr>
+<tr><td><code>:is()</code>, <code>:not()</code>, <code>:has()</code></td><td>o seletor <strong>mais forte</strong> da lista de dentro (o nome em si não conta)</td><td><code>:is(#menu, a)</code> = 1, 0, 0</td></tr>
+<tr><td><code>:where()</code></td><td><strong>zero</strong>, sempre</td><td><code>:where(#menu, a)</code> = 0, 0, 0</td></tr>
+</table>
+</div>
+<p>Como se conta e quem vence: <a href="especificidade.html">Especificidade</a>. Algumas combinações que funcionam:</p>
+<ul>
+  <li><code>a:hover::after</code>: o enfeite do link, só com o mouse em cima (a pseudo-classe vem <strong>antes</strong> do pseudo-elemento).</li>
+  <li><code>input:required:user-invalid</code>: várias pseudo-classes seguidas, todas têm de valer.</li>
+  <li><code>li:not(:last-child)::after</code>: um separador depois de todos, menos o último.</li>
+  <li><code>label:has(input:checked)</code>: o rótulo cujo checkbox está marcado.</li>
+</ul>
+
+<h2 id="experimente">Experimente</h2>
+<p>Uma caixa livre com vários deles ao mesmo tempo. Passe o mouse no botão, use o <kbd>Tab</kbd>, marque a caixa, digite um e-mail errado e saia do campo, selecione um pedaço do texto:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="intro"&gt;Encomendas da padaria da Ana&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Pão de queijo&lt;/li&gt;
+  &lt;li&gt;Bolo de cenoura&lt;/li&gt;
+  &lt;li&gt;Broa de milho&lt;/li&gt;
+  &lt;li&gt;Sonho&lt;/li&gt;
+&lt;/ul&gt;
+&lt;form&gt;
+  &lt;label&gt;&lt;input type="checkbox"&gt; Quero receber em casa&lt;/label&gt;
+  &lt;p&gt;
+    &lt;label for="email"&gt;E-mail&lt;/label&gt;
+    &lt;input id="email" type="email" placeholder="ana@exemplo.com" required&gt;
+  &lt;/p&gt;
+  &lt;button&gt;Encomendar&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">.intro::first-letter {
+  font-size: 2em;
+  color: tomato;
+}
+
+li:nth-child(even) {
+  background-color: lavender;
+}
+
+li::marker {
+  color: tomato;
+}
+
+label:has(input:checked) {
+  font-weight: bold;
+  color: green;
+}
+
+input::placeholder {
+  color: gray;
+}
+
+input:user-invalid {
+  border: 2px solid crimson;
+}
+
+button:hover {
+  background-color: navy;
+  color: white;
+}
+
+button:focus-visible {
+  outline: 3px solid orange;
+}
+
+::selection {
+  background-color: gold;
+}
+</pre>
+</div>
+
+<h2 id="errado">Quando dá errado</h2>
+<div class="cenario">
+<strong>Um nome errado derruba a regra inteira</strong>
+<p>A Ana queria pintar de vermelho os itens com o mouse em cima e também os parágrafos, e escreveu <code>hover</code> errado:</p>
+<pre class="file" data-file="style.css · erro de propósito">li:hovr, p {
+  color: red;
+}</pre>
+<p><strong>O que ela vê:</strong> nada fica vermelho, nem os parágrafos, que não tinham nada a ver com o erro. Conferido no Chromium: o <code>p</code> continuou <code>rgb(0, 0, 0)</code>.</p>
+<p><strong>Por quê:</strong> numa lista de seletores separados por vírgula, se <strong>um</strong> é inválido, o navegador joga fora a <strong>regra inteira</strong>. Uma pseudo-classe que não existe (<code>:hovr</code>), um pseudo-elemento escrito errado (<code>::befor</code>) ou uma fórmula quebrada (<code>:nth-child(2n+)</code>) tornam o seletor inválido. No F12, a regra nem aparece no painel de estilos do elemento, porque ela não casa com nada.</p>
+<p><strong>O validador W3C</strong> aponta o lugar exato:</p>
+<pre class="term" data-cwd="~/ref/pseudo">$ vnu --css hovr.css
+"file:/home/ana/ref/pseudo/hovr.css":1.3-1.6: error: CSS: Unknown pseudo-element or pseudo-class “:hovr”
+$ vnu --css befor.css
+"file:/home/ana/ref/pseudo/befor.css":1.4-1.8: error: CSS: Unknown pseudo-element or pseudo-class “::befor”.
+$ vnu --css nth.css
+"file:/home/ana/ref/pseudo/nth.css":1.17-1.17: error: CSS: Parse Error.</pre>
+<p>"<em>Unknown pseudo-element or pseudo-class</em>" = "pseudo-elemento ou pseudo-classe desconhecido". O <em>Parse Error</em> ("erro de leitura") da fórmula <code>2n+</code> aponta a coluna 17, onde faltou o número.</p>
+<p><strong>Como resolver:</strong> corrija o nome. Se quiser que um seletor ruim não derrube os outros, use <code>:is()</code> ou <code>:where()</code>, que <strong>perdoam</strong> erros na lista de dentro: com <code>:is(li:hovr, h2) { color: green; }</code>, o <code>h2</code> ficou verde no Chromium mesmo com o <code>:hovr</code> errado ao lado.</p>
+</div>
+
+<div class="cenario">
+<strong>Outras armadilhas comuns</strong>
+<ul>
+  <li><strong><code>::before</code> sem <code>content</code></strong>: nada aparece. Ponha <code>content: ""</code> mesmo que o enfeite seja só uma cor de fundo (aula <a href="before-after.html">::before e ::after</a>).</li>
+  <li><strong>Espaço antes do <code>:</code></strong>: <code>a :hover</code> procura algo <em>dentro</em> do link com o mouse em cima; o certo é <code>a:hover</code>.</li>
+  <li><strong><code>:first-child</code> que "não pega"</strong>: <code>p:first-child</code> só vale se o <code>p</code> for o primeiro filho. Com um <code>h2</code> antes, use <code>p:first-of-type</code>.</li>
+  <li><strong><code>::before</code> num <code>&lt;img&gt;</code> ou <code>&lt;input&gt;</code></strong>: não aparece; esses elementos não têm "conteúdo" onde o enfeite possa entrar. Ponha o enfeite num elemento em volta.</li>
+  <li><strong><code>:visited</code> que ignora o tamanho</strong>: só cores funcionam nele, por privacidade.</li>
+</ul>
+</div>
+
+<h2>Missão</h2>
+<div class="tryhtml" data-goal="css:li:nth-child(2){background-color}=rgb(230, 230, 250),css:li:nth-child(4){background-color}=rgb(230, 230, 250),css:li:nth-child(1){background-color}=rgba(0, 0, 0, 0),src:p::first-letter\s*\{[^}]*font-size">
+<p class="try-task"><strong>Missão:</strong> o cardápio da Ana devia sair "zebrado", mas há um erro de digitação no seletor e nada acontece. (1) Conserte o seletor para que os itens <strong>pares</strong> fiquem com o fundo <code>lavender</code>. (2) Crie uma regra para a <strong>primeira letra</strong> do parágrafo ficar com <code>font-size: 2em</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Cardápio de hoje&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Pão francês&lt;/li&gt;
+  &lt;li&gt;Pão de queijo&lt;/li&gt;
+  &lt;li&gt;Bolo de cenoura&lt;/li&gt;
+  &lt;li&gt;Broa de milho&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">li:nth-chlid(even) {
+  background-color: lavender;
+}
+</pre>
+<pre class="solucao" data-file="style.css">li:nth-child(even) {
+  background-color: lavender;
+}
+
+p::first-letter {
+  font-size: 2em;
+  color: tomato;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>:pseudo-classe</code> escolhe o elemento por um estado ou posição; <code>::pseudo-elemento</code> escolhe ou cria um pedaço dele (um só, no fim do seletor).</li>
+  <li>Estados: <code>:hover</code>, <code>:active</code>, <code>:focus</code>, <code>:focus-visible</code>, <code>:focus-within</code>. Links na ordem <code>:link</code>, <code>:visited</code>, <code>:hover</code>, <code>:active</code>.</li>
+  <li>Posição: <code>:first-child</code>, <code>:last-child</code>, <code>:nth-child(an+b)</code>, <code>odd</code>/<code>even</code>, e as versões <code>-of-type</code>.</li>
+  <li>Lógicas: <code>:not()</code>, <code>:is()</code>, <code>:where()</code> (especificidade zero) e <code>:has()</code> (o seletor do pai).</li>
+  <li>Formulários: prefira <code>:user-invalid</code> a <code>:invalid</code> para não pintar o campo de vermelho antes de a pessoa digitar.</li>
+  <li>Pseudo-classe vale como classe; pseudo-elemento, como elemento.</li>
+  <li>Um nome errado invalida a regra inteira, inclusive os outros seletores da lista. O validador avisa: <code>Unknown pseudo-element or pseudo-class</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
