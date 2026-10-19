@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Animações — @keyframes e animation | Guia CSS</title>
+<meta name="description" content="Animações em CSS para quem está começando: a regra @keyframes com from, to e porcentagens, a propriedade animation com nome e duração, repetir para sempre, um ícone de carregando, um selo que pulsa e um aviso que treme, a diferença entre transition e animation e os erros mais comuns, com o resultado desenhado no seu navegador.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Animações</span></h1>
+
+<p class="intro">A <a href="transition.html">transição</a> da aula anterior precisa de um empurrão: o mouse entrar, uma classe mudar. E ela só vai de A para B. Uma <strong>animação</strong> começa sozinha, pode ter várias etapas (A, depois B, depois C) e pode se repetir para sempre. É com ela que se faz o ícone de "carregando" que gira, o selo de "novo" que pulsa, o aviso que treme quando a senha está errada.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A ideia dos <strong>quadros-chave</strong>: você desenha alguns momentos, o navegador desenha o resto.</li>
+  <li>A regra <code>@keyframes</code>, com <code>from</code>, <code>to</code> e porcentagens.</li>
+  <li>A propriedade <code>animation</code>: o nome, a duração e o "para sempre" (<code>infinite</code>).</li>
+  <li>Três animações do dia a dia: girar, pulsar e tremer.</li>
+  <li>Quando usar <code>transition</code> e quando usar <code>animation</code>.</li>
+  <li>Os erros que deixam a animação parada.</li>
+</ul>
+</div>
+
+<p>Antes, veja <a href="transform.html">transform</a> e <a href="transition.html">Transições</a>: os ritmos (<code>ease</code>, <code>linear</code>…) são os mesmos. Os detalhes de controle (atraso, direção, o que acontece no fim) ficam para a próxima aula, <a href="animation-propriedades.html">Controlando Animações</a>. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana.</p>
+
+<hr>
+
+<h2>A ideia: o desenho animado</h2>
+<p>Nos estúdios de desenho animado, o desenhista principal desenha só os <strong>quadros-chave</strong>: o personagem parado, o personagem no alto do pulo, o personagem no chão de novo. Os assistentes desenham os quadros do meio. Em inglês, quadro-chave é <em>keyframe</em>.</p>
+<p>No CSS, você é o desenhista principal e o navegador é o assistente. Você escreve, numa regra <code>@keyframes</code>, como o elemento está em alguns momentos (no começo, no meio, no fim). Depois, liga essa animação num elemento com a propriedade <code>animation</code>, dizendo quanto tempo ela dura. O navegador desenha todos os quadros do meio, como na transição.</p>
+
+<hr>
+
+<h2>1. A primeira animação</h2>
+<p>Um aviso que surge devagar quando a página abre:</p>
+
+<pre class="file" data-file="style.css">@keyframes surgir {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.aviso {
+  animation: surgir 2s;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>@keyframes surgir {</dt><dd>Uma regra <code>@</code> que <strong>cria</strong> uma animação e dá um nome a ela. O nome é seu: <code>surgir</code>, <code>girar</code>, <code>pulsar</code>… (sem espaço e sem acento, como uma classe).</dd>
+  <dt>from { opacity: 0; }</dt><dd>"De": como o elemento está no <strong>começo</strong>. Dentro das chaves, declarações normais.</dd>
+  <dt>to { opacity: 1; }</dt><dd>"Para": como ele está no <strong>fim</strong>.</dd>
+  <dt>.aviso { animation: surgir 2s; }</dt><dd>Liga a animação <code>surgir</code> no <code>.aviso</code>, com a duração de 2 segundos. Sozinho, o <code>@keyframes</code> não faz nada: ele é só a receita. A <code>animation</code> é quem põe a receita no forno.</dd>
+</dl>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o aviso surge quando o quadro é desenhado. Clique em ↻ (na barra do quadro) para ver de novo. Mude o <code>2s</code> para <code>5s</code> e, depois, troque <code>opacity</code> por <code>transform: translateX(-100px)</code> no <code>from</code> e <code>transform: translateX(0)</code> no <code>to</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="aviso"&gt;Pedidos de bolo para o fim de semana até quinta-feira!&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">@keyframes surgir {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.aviso {
+  background-color: #fffaf3;
+  border-left: 4px solid #c2410c;
+  padding: 12px;
+  animation: surgir 2s;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. Mais etapas: porcentagens</h2>
+<p><code>from</code> e <code>to</code> são apelidos de <code>0%</code> e <code>100%</code>. No meio, você pode pôr quantas etapas quiser, cada uma numa porcentagem do tempo:</p>
+
+<pre class="file" data-file="style.css">@keyframes pular {
+  0% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-30px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  65% {
+    transform: translateY(-10px);
+  }
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+}
+</pre>
+
+<p>Com <code>animation: pular 1s</code>, o elemento sobe 30 px até os 0,3 s (30% de 1 segundo), cai até os 0,5 s, dá um pulinho menor de 10 px e fica no chão de 0,8 s até o fim. Duas porcentagens com o mesmo estilo podem dividir a mesma regra, separadas por vírgula (<code>80%, 100%</code>).</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor do quadro-chave</th><th>Quando</th></tr>
+<tr><td><code>from</code> ou <code>0%</code></td><td>no começo</td></tr>
+<tr><td><code>50%</code></td><td>na metade do tempo</td></tr>
+<tr><td><code>to</code> ou <code>100%</code></td><td>no fim</td></tr>
+<tr><td><code>25%, 75%</code></td><td>dois momentos com o mesmo estilo</td></tr>
+</table>
+</div>
+
+<p>Se faltar o <code>0%</code> ou o <code>100%</code>, o navegador usa o estilo normal do elemento nesse ponto. Por isso, o <code>pular</code> poderia nem ter o <code>0%</code>: o elemento já está em <code>translateY(0)</code>.</p>
+
+<hr>
+
+<h2>3. Repetir: <code>infinite</code></h2>
+<p>Por padrão, a animação acontece <strong>uma vez</strong> e para. Para repetir, ponha o número de vezes (<code>3</code>) ou <code>infinite</code> ("infinito") na <code>animation</code>:</p>
+
+<pre class="file" data-file="style.css">.icone {
+  animation: girar 1s linear infinite;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>girar</dt><dd>O nome do <code>@keyframes</code>.</dd>
+  <dt>1s</dt><dd>A duração de <strong>uma</strong> volta.</dd>
+  <dt>linear</dt><dd>O ritmo, como na transição. Para algo que gira sem parar, <code>linear</code> evita aquela "freada" a cada volta que o <code>ease</code> daria.</dd>
+  <dt>infinite</dt><dd>Repete para sempre.</dd>
+</dl>
+
+<hr>
+
+<h2>4. Três animações do dia a dia</h2>
+
+<h3>Girar: o "carregando"</h3>
+<p>Um círculo com uma borda colorida só em cima, girando:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> mude a duração para <code>3s</code> e depois para <code>0.3s</code>. Troque <code>linear</code> por <code>ease-in-out</code> e repare na freada a cada volta.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="carregando" role="status" aria-label="Carregando"&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">@keyframes girar {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.carregando {
+  width: 40px;
+  height: 40px;
+  margin: 20px;
+  border: 5px solid #f6d3c2;
+  border-top-color: #c2410c;
+  border-radius: 50%;
+  animation: girar 1s linear infinite;
+}
+</pre>
+</div>
+
+<p>Repare que o <code>@keyframes girar</code> só tem o <code>to</code>: o começo é o estado normal (sem giro). O <code>role="status"</code> e o <code>aria-label</code> são HTML, para quem usa leitor de tela saber o que é aquele círculo.</p>
+
+<h3>Pulsar: o selo de "novo"</h3>
+<pre class="file" data-file="style.css">@keyframes pulsar {
+  50% {
+    scale: 1.15;
+  }
+}
+
+.selo {
+  animation: pulsar 1.2s ease-in-out infinite;
+}
+</pre>
+<p>Só uma etapa, no meio: o selo cresce 15% na metade do tempo e volta ao tamanho normal (o <code>0%</code> e o <code>100%</code> são o estado normal). A propriedade <code>scale</code> é a separada, da aula <a href="transform.html">transform</a>.</p>
+
+<h3>Tremer: o aviso de erro</h3>
+<pre class="file" data-file="style.css">@keyframes tremer {
+  20%,
+  60% {
+    translate: -6px 0;
+  }
+  40%,
+  80% {
+    translate: 6px 0;
+  }
+}
+
+.erro {
+  animation: tremer 0.4s;
+}
+</pre>
+<p>Esquerda, direita, esquerda, direita, de volta ao lugar, em 0,4 segundo, <strong>uma vez</strong>. É o "não" que a caixa de senha faz no celular.</p>
+
+<div class="tryhtml" data-goal="src:@keyframes\s+pulsar\s*\{[^@]*50%\s*\{[^}]*scale\s*:\s*1\.15,css:.selo{animation-name}=pulsar,css:.selo{animation-duration}=1.2s,css:.selo{animation-iteration-count}=infinite">
+<p class="try-task"><strong>Missão:</strong> o selo "Novo" está parado. Crie um <code>@keyframes pulsar</code> com uma etapa em <code>50%</code> que tenha <code>scale: 1.15;</code>, e ligue-o no <code>.selo</code> com duração de <code>1.2s</code>, ritmo <code>ease-in-out</code> e repetindo para sempre.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Pão de queijo recheado &lt;span class="selo"&gt;Novo&lt;/span&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.selo {
+  display: inline-block;
+  background-color: #c2410c;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+}
+</pre>
+<pre class="solucao" data-file="style.css">@keyframes pulsar {
+  50% {
+    scale: 1.15;
+  }
+}
+
+.selo {
+  display: inline-block;
+  background-color: #c2410c;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  animation: pulsar 1.2s ease-in-out infinite;
+}
+</pre>
+</div>
+
+<p>O <code>display: inline-block</code> não está ali à toa: como o <code>transform</code>, o <code>scale</code> não funciona num elemento em linha comum (aula <a href="transform.html">transform</a>).</p>
+
+<hr>
+
+<h2>5. Duas animações no mesmo elemento</h2>
+<p>Como na transição, separe com vírgula. Um aviso que surge <strong>e</strong> treme:</p>
+<pre class="file" data-file="style.css">.erro {
+  animation: surgir 0.3s, tremer 0.4s;
+}
+</pre>
+<p>As duas começam juntas. Se elas mexerem na <strong>mesma</strong> propriedade (as duas no <code>transform</code>, por exemplo), a que vem por último na lista vence. Por isso o <code>surgir</code> usa <code>opacity</code> e o <code>tremer</code> usa <code>translate</code>: cada uma na sua.</p>
+
+<hr>
+
+<h2>6. <code>transition</code> ou <code>animation</code>?</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th><code>transition</code></th><th><code>animation</code></th></tr>
+<tr><td>Como começa</td><td>quando um valor <strong>muda</strong> (hover, foco, classe nova)</td><td><strong>sozinha</strong>, assim que o elemento aparece com a <code>animation</code></td></tr>
+<tr><td>Etapas</td><td>duas: o antes e o depois</td><td>quantas quiser (<code>0%</code>, <code>30%</code>, <code>50%</code>…)</td></tr>
+<tr><td>Repetir</td><td>não</td><td>sim (<code>3</code>, <code>infinite</code>)</td></tr>
+<tr><td>Volta</td><td>volta suave quando o estado desfaz</td><td>no fim, o elemento volta ao estilo normal de uma vez (a próxima aula mostra como manter o último quadro)</td></tr>
+<tr><td>Bom para</td><td>hover de botões e links, menus abrindo, mudanças de tema</td><td>carregando, chamar atenção, entradas na página, efeitos decorativos</td></tr>
+</table>
+</div>
+
+<div class="warning">
+<strong>Animação demais incomoda</strong>
+<p>Uma coisa piscando ou pulando sem parar tira a atenção do texto, e para algumas pessoas causa enjoo e tontura de verdade. Use <code>infinite</code> só no que tem motivo (o "carregando"), e respeite quem pede menos movimento no sistema: é a aula <a href="reduced-motion.html">Respeitando Quem Prefere Menos Movimento</a>.</p>
+</div>
+
+<hr>
+
+<h2>O que o F12 mostra</h2>
+<p>Na aba Computed, a <code>animation</code> aparece separada nas propriedades longas: <code>animation-name: pulsar</code>, <code>animation-duration: 1.2s</code>, <code>animation-iteration-count: infinite</code>, <code>animation-timing-function: ease-in-out</code> (conferido no Chromium). As propriedades que estão sendo animadas (o <code>scale</code> do selo) mudam o tempo todo: cada vez que você olha, mostram um valor do meio do caminho. O Chrome e o Edge têm também um painel <strong>Animations</strong> (Animações), nas ferramentas extras do F12, que mostra uma linha do tempo e deixa reproduzir a animação mais devagar.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>A animação não acontece (nome diferente)</strong>
+<p><strong>O que aconteceu:</strong> o nome na <code>animation</code> não é igual ao do <code>@keyframes</code>:</p>
+<pre class="file" data-file="style.css · erro de propósito">@keyframes pulsar {
+  50% {
+    scale: 1.15;
+  }
+}
+
+.selo {
+  animation: pulsa 1.2s infinite;
+}
+</pre>
+<p>O navegador procura um <code>@keyframes pulsa</code>, não acha e não faz nada. O validador também não reclama: <code>pulsa</code> é um nome válido (podia estar em outro arquivo). Maiúsculas contam: <code>Pulsar</code> e <code>pulsar</code> são nomes diferentes.</p>
+<p><strong>Como consertar:</strong> copie o nome do <code>@keyframes</code> para a <code>animation</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>A animação não acontece (sem duração)</strong>
+<p><strong>O que aconteceu:</strong> <code>animation: girar;</code>, sem tempo. A duração padrão é <code>0s</code>: a animação acontece em tempo zero, e você não vê nada. Na aba Computed: <code>animation-duration: 0s</code>. O validador não reclama, porque a duração é opcional.</p>
+<p><strong>Como consertar:</strong> sempre um tempo: <code>animation: girar 1s;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: Parse Error.</code> (porcentagem sem %)</strong>
+<p><strong>O que aconteceu:</strong> a porcentagem do quadro-chave ficou sem o <code>%</code>: <code>50 { scale: 1.15; }</code>.</p>
+<pre class="term" data-cwd="~/anim">$ vnu --css semporc.css
+"file:/home/ana/anim/semporc.css":4.4-4.4: error: CSS: Parse Error.
+"file:/home/ana/anim/semporc.css":5.2-6.1: error: CSS: Parse Error.</pre>
+<p>"Erro de leitura", duas vezes, apontando para as chaves que fecham (linhas 4 e 5), e não para o <code>50</code> da linha 2: o validador se perdeu e só percebeu depois. É comum a mensagem de CSS apontar um pouco depois do erro de verdade. O navegador descarta o quadro-chave <code>50</code>, que não é um momento válido, e sobra um <code>@keyframes</code> vazio: o selo não pulsa.</p>
+<p><strong>Como consertar:</strong> <code>50%</code>, com o sinal.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: Unrecognized at-rule “@keyframe”</code></strong>
+<p><strong>O que aconteceu:</strong> faltou o <code>s</code>: <code>@keyframe pulsar { … }</code>.</p>
+<pre class="term" data-cwd="~/anim">$ vnu --css keyframe.css
+"file:/home/ana/anim/keyframe.css":1.1-1.9: error: CSS: Unrecognized at-rule “@keyframe”</pre>
+<p>"Regra <code>@</code> não reconhecida." O navegador também não conhece <code>@keyframe</code> e ignora o bloco inteiro. A <code>animation</code> procura um <code>@keyframes pulsar</code>, não acha, e nada se mexe.</p>
+<p><strong>Como consertar:</strong> <code>@keyframes</code>, no plural: são vários quadros.</p>
+</div>
+
+<div class="cenario">
+<strong>A animação acontece uma vez e para</strong>
+<p><strong>O que aconteceu:</strong> esqueceu o <code>infinite</code>. Sem ele, a animação roda uma vez quando a página abre e o elemento volta ao normal. Às vezes você nem vê, porque ela terminou antes de você rolar até lá.</p>
+<p><strong>Como consertar:</strong> <code>animation: pulsar 1.2s infinite;</code>, ou um número de vezes (<code>3</code>).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>@keyframes nome { from { … } to { … } }</code></td><td>Cria a animação: o começo e o fim</td></tr>
+<tr><td><code>0% { … } 50% { … } 100% { … }</code></td><td>Etapas em porcentagens do tempo</td></tr>
+<tr><td><code>25%, 75% { … }</code></td><td>Dois momentos com o mesmo estilo</td></tr>
+<tr><td><code>animation: nome 2s;</code></td><td>Liga a animação no elemento, com a duração</td></tr>
+<tr><td><code>animation: nome 1s linear infinite;</code></td><td>Com ritmo, repetindo para sempre</td></tr>
+<tr><td><code>animation: nome 0.4s 3;</code></td><td>Repete 3 vezes</td></tr>
+<tr><td><code>animation: a 1s, b 2s;</code></td><td>Duas animações no mesmo elemento</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Criar a animação</h3>
+<p>Complete a regra que cria uma animação chamada <code>girar</code>:</p>
+<div class="ex-code"><input data-answer="@keyframes" aria-label="regra"> girar { to { transform: rotate(1turn); } }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Para sempre</h3>
+<p>Complete para o ícone girar sem parar:</p>
+<div class="ex-code">animation: girar 1s linear <input data-answer="infinite" aria-label="repetição">;</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. <code>from</code> e <code>to</code> são o mesmo que…</p>
+<label><input type="radio" name="q3"> <code>start</code> e <code>end</code></label>
+<label><input type="radio" name="q3"> <code>0%</code> e <code>100%</code></label>
+<label><input type="radio" name="q3"> <code>0s</code> e <code>1s</code></label>
+<label><input type="radio" name="q3"> <code>1</code> e <code>2</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">4. A Ana escreveu o <code>@keyframes brilhar</code> e, no botão, <code>animation: brilhar;</code>. Nada acontece. Por quê?</p>
+<label><input type="radio" name="q4"> Faltou o <code>infinite</code></label>
+<label><input type="radio" name="q4"> Botões não podem ter animação</label>
+<label><input type="radio" name="q4"> O <code>@keyframes</code> tem que vir depois do botão</label>
+<label><input type="radio" name="q4"> Faltou a duração: sem ela, a animação dura 0 segundo</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Para um botão mudar de cor suave quando o mouse passa, o melhor é…</p>
+<label><input type="radio" name="q5"> <code>transition</code>: é uma mudança de estado, do antes para o depois</label>
+<label><input type="radio" name="q5"> <code>animation</code> com <code>infinite</code></label>
+<label><input type="radio" name="q5"> <code>@keyframes</code> sem <code>animation</code></label>
+<label><input type="radio" name="q5"> Nenhum: cor não anima</label>
+</div>
+
+<h3>Missão final: o aviso que treme</h3>
+
+<div class="tryhtml" data-goal="src:@keyframes\s+tremer\s*\{,src:20%\s*\,\s*60%\s*\{[^}]*translate\s*:\s*-6px\s+0,src:40%\s*\,\s*80%\s*\{[^}]*translate\s*:\s*6px\s+0,css:.erro{animation-name}=tremer,css:.erro{animation-duration}=0.4s,css:.erro{animation-iteration-count}=1">
+<p class="try-task"><strong>Missão:</strong> a mensagem de senha errada deve tremer uma vez quando aparece. Crie o <code>@keyframes tremer</code>: em <code>20%, 60%</code>, <code>translate: -6px 0;</code>; em <code>40%, 80%</code>, <code>translate: 6px 0;</code>. Ligue-o no <code>.erro</code> com <code>0.4s</code>, uma vez só. Clique em ↻ para ver de novo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="erro"&gt;Senha incorreta. Tente de novo.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.erro {
+  color: #b91c1c;
+  background-color: #fef2f2;
+  border: 1px solid #b91c1c;
+  padding: 10px;
+  max-width: 280px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">@keyframes tremer {
+  20%,
+  60% {
+    translate: -6px 0;
+  }
+  40%,
+  80% {
+    translate: 6px 0;
+  }
+}
+
+.erro {
+  color: #b91c1c;
+  background-color: #fef2f2;
+  border: 1px solid #b91c1c;
+  padding: 10px;
+  max-width: 280px;
+  animation: tremer 0.4s;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Uma animação tem duas partes: a <strong>receita</strong> (<code>@keyframes nome { … }</code>) e o <strong>liga</strong> (<code>animation: nome duração;</code>).</li>
+  <li>Os quadros-chave são <code>from</code>/<code>to</code> ou porcentagens; o navegador desenha os quadros do meio. Quadro que falta usa o estilo normal.</li>
+  <li>A animação começa sozinha e acontece uma vez; <code>infinite</code> repete para sempre.</li>
+  <li>Girar (<code>rotate(1turn)</code> com <code>linear infinite</code>), pulsar (<code>scale</code> em <code>50%</code>) e tremer (<code>translate</code> para os lados) resolvem a maioria dos casos.</li>
+  <li><code>transition</code> para mudanças de estado; <code>animation</code> para movimentos que começam sozinhos, têm etapas ou se repetem.</li>
+  <li>Erros comuns: nome diferente, sem duração, porcentagem sem <code>%</code>, <code>@keyframe</code> sem <code>s</code>. Os dois primeiros o validador não pega.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
