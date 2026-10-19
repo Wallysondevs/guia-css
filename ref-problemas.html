@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS "Meu CSS Não Funciona" — os problemas mais comuns e como resolver | Guia CSS</title>
+<meta name="description" content="Guia de consulta para quando o CSS não funciona: o arquivo que não carrega, o ponto e vírgula esquecido, a chave que falta, o comentário com //, a classe com maiúscula, a especificidade, o pai sem display: flex, a margem que colapsa, o width no span, o caminho do url(), o hidden que não esconde e o cache. Cada um com o sintoma, como achar no F12 e como resolver.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">"Meu CSS Não Funciona"</span></h1>
+
+<p class="intro">Você escreveu a regra, salvou, recarregou… e nada mudou. Acontece com todo mundo, todo dia. O CSS quase nunca mostra mensagem de erro: o navegador simplesmente <strong>ignora</strong> o que não entendeu e segue em frente. Esta página junta os problemas mais comuns, cada um com o <strong>sintoma</strong>, <strong>como achar no F12</strong> e <strong>como resolver</strong>. Todos os comportamentos foram conferidos no Chromium; as mensagens são do validador W3C (<code>vnu</code> 26.10.12).</p>
+
+<div class="note">
+<strong>Como usar esta página</strong>
+<ul>
+  <li>Comece pelo <a href="#roteiro">roteiro de 5 perguntas</a>: ele encontra quase todos os problemas.</li>
+  <li>Depois procure o seu sintoma na <a href="#tabela">tabela</a> ou com <kbd>Ctrl</kbd>+<kbd>F</kbd> ("riscada", "flex", "margem", "cache").</li>
+  <li>O F12 (as ferramentas do desenvolvedor) é explicado na aula <a href="devtools.html">Inspecionando com o F12</a>. Os nomes dos painéis aqui são os do Chrome e do Edge (em inglês e, entre parênteses, em português); no Firefox, os nomes mudam um pouco, mas as mesmas informações estão lá.</li>
+</ul>
+</div>
+
+<p>Atalhos: <a href="#roteiro">Roteiro</a> · <a href="#tabela">Tabela de sintomas</a> · <a href="#carregou">O CSS não carregou</a> · <a href="#escrita">Erros de escrita</a> · <a href="#casar">A regra não casa</a> · <a href="#perdeu">A regra perdeu</a> · <a href="#layout">Surpresas de layout</a> · <a href="#cache">Cache</a> · <a href="#validador">O validador</a></p>
+
+<hr>
+
+<h2 id="roteiro">O roteiro: 5 perguntas, nesta ordem</h2>
+<p>Pense num chuveiro que não esquenta. Antes de trocar a resistência, você confere: tem energia? O disjuntor está ligado? A chave está no "inverno"? Com o CSS é igual: das causas mais simples para as mais difíceis. Clique com o botão direito no elemento teimoso, escolha <strong>Inspecionar</strong>, e pergunte:</p>
+<ol class="passo">
+  <li><strong>O arquivo CSS carregou?</strong> Na aba <strong>Network</strong> (Rede), recarregue a página: o <code>style.css</code> aparece com status <code>200</code>? Um <code>404</code> (vermelho) ou a ausência do arquivo = problema no <code>&lt;link&gt;</code> (<a href="#carregou">veja abaixo</a>). No Console, um 404 também aparece.</li>
+  <li><strong>A regra aparece no painel Styles (Estilos)?</strong> Com o elemento selecionado na aba <strong>Elements</strong> (Elementos), o painel mostra todas as regras que casam com ele. Se a sua não está lá, o seletor não casa (<a href="#casar">veja abaixo</a>) ou a regra inteira foi descartada por um erro de escrita (<a href="#escrita">veja abaixo</a>).</li>
+  <li><strong>A declaração está riscada?</strong> Riscada <strong>com um ícone de aviso</strong> = o navegador não entendeu (nome ou valor errado). Riscada <strong>sem aviso</strong> = entendeu, mas outra regra venceu (<a href="#perdeu">veja abaixo</a>). <strong>Apagada</strong> (em cinza, com um ícone de informação) = vale, mas não faz efeito ali, como um <code>justify-content</code> num elemento que não é flex (<a href="#layout">veja abaixo</a>).</li>
+  <li><strong>Qual é o valor final?</strong> A aba <strong>Computed</strong> (Calculado) mostra o valor que o navegador usou, já resolvido (<code>rgb(…)</code>, <code>px</code>). Clique na setinha ao lado para ver de qual regra ele veio.</li>
+  <li><strong>É o arquivo certo, salvo, e não é cache?</strong> Parece bobo, mas é comum: você editou outra cópia do arquivo, não salvou, ou o navegador mostra a versão antiga (<a href="#cache">veja abaixo</a>).</li>
+</ol>
+
+<h2 id="tabela">Tabela de sintomas</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Sintoma</th><th>Causa provável</th><th>No F12</th><th>Solução</th></tr>
+<tr><td>Nada do CSS funciona, a página parece "crua"</td><td>o <code>&lt;link&gt;</code> não carregou o arquivo</td><td>Network: <code>404</code> ou arquivo ausente</td><td><a href="#carregou">confira <code>rel</code>, <code>href</code> e o nome</a></td></tr>
+<tr><td>Uma regra inteira não funciona, as outras sim</td><td>seletor errado, comentário com <code>//</code>, chave esquecida antes dela</td><td>a regra não aparece no Styles</td><td><a href="#escrita">erros de escrita</a>, <a href="#casar">seletor</a></td></tr>
+<tr><td>Duas declarações seguidas não funcionam</td><td>faltou o <code>;</code> na primeira</td><td>riscadas, com aviso</td><td><a href="#ponto-virgula">ponto e vírgula</a></td></tr>
+<tr><td>As regras do fim do arquivo "sumiram" ou só valem em alguns lugares</td><td>faltou uma <code>}</code> lá em cima</td><td>as regras aparecem com outro seletor (aninhadas)</td><td><a href="#chave">a chave esquecida</a></td></tr>
+<tr><td>Uma declaração não funciona</td><td>nome ou valor errado</td><td>riscada, com aviso</td><td><a href="#escrita">erros de escrita</a></td></tr>
+<tr><td>A declaração aparece, mas outra cor/tamanho vence</td><td>especificidade ou ordem</td><td>riscada, sem aviso; a vencedora fica acima</td><td><a href="#perdeu">a regra perdeu</a></td></tr>
+<tr><td><code>justify-content</code>, <code>align-items</code>, <code>gap</code> não fazem nada</td><td>o pai não tem <code>display: flex</code> ou <code>grid</code></td><td>apagada, com ícone de informação</td><td><a href="#flex">pai sem flex</a></td></tr>
+<tr><td><code>width</code> e <code>height</code> não mudam o tamanho</td><td>o elemento é <code>inline</code> (<code>span</code>, <code>a</code>)</td><td>Computed até mostra o valor, mas a caixa não muda</td><td><a href="#inline">elemento inline</a></td></tr>
+<tr><td>A margem de cima "vaza" para fora do pai, ou duas margens não se somam</td><td>margens que colapsam</td><td>o desenho do box model (laranja) mostra a margem fora</td><td><a href="#margem">margem que colapsa</a></td></tr>
+<tr><td>A imagem de fundo não aparece</td><td>caminho do <code>url()</code> relativo ao lugar errado</td><td>Network: <code>404</code> da imagem</td><td><a href="#url">o caminho do url()</a></td></tr>
+<tr><td>O elemento com <code>hidden</code> continua aparecendo</td><td>uma regra com <code>display</code> desfaz o <code>hidden</code></td><td>Computed: <code>display: flex</code></td><td><a href="#hidden">o hidden que não esconde</a></td></tr>
+<tr><td><code>z-index</code> não põe o elemento na frente</td><td>falta <code>position</code> (ou ele está preso num contexto de empilhamento)</td><td>—</td><td><a href="#zindex">z-index</a></td></tr>
+<tr><td>A <code>@media</code> não funciona no celular</td><td>falta a meta viewport, ou a ordem das regras</td><td>regras da <code>@media</code> riscadas por regras de baixo</td><td><a href="#media">media query</a></td></tr>
+<tr><td>Mudei o CSS e nada mudou na tela</td><td>cache, arquivo errado ou não salvo</td><td>Sources: o conteúdo do arquivo é o antigo</td><td><a href="#cache">cache</a></td></tr>
+</table>
+</div>
+
+<h2 id="carregou">1. O CSS não carregou</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrito no HTML</th><th>O problema</th></tr>
+<tr><td><code>&lt;link href="style.css"&gt;</code></td><td>faltou <code>rel="stylesheet"</code>: sem ele, o navegador não sabe que é uma folha de estilo e não aplica nada.</td></tr>
+<tr><td><code>&lt;link rel="stylesheet" src="style.css"&gt;</code></td><td>o atributo do <code>&lt;link&gt;</code> é <code>href</code>; <code>src</code> é do <code>&lt;img&gt;</code> e do <code>&lt;script&gt;</code>.</td></tr>
+<tr><td><code>href="estilo.css"</code>, e o arquivo se chama <code>style.css</code></td><td>o nome tem de ser idêntico, inclusive maiúsculas: num servidor de verdade, <code>Style.css</code> é outro arquivo.</td></tr>
+<tr><td><code>href="style.css"</code>, e o arquivo está na pasta <code>css/</code></td><td>o caminho é relativo ao HTML: <code>href="css/style.css"</code> (aula <a href="onde-colocar.html">Três Jeitos de Usar CSS</a>).</td></tr>
+<tr><td>o arquivo se chama <code>style.css.txt</code></td><td>o Windows esconde a extensão: o arquivo parece <code>style.css</code>, mas não é. Mostre as extensões no Explorador de Arquivos.</td></tr>
+<tr><td><code>&lt;style&gt;</code> e <code>&lt;/style&gt;</code> <strong>dentro</strong> do <code>style.css</code></td><td>o arquivo <code>.css</code> tem só CSS. As tags viram parte dos seletores: medido no Chromium, a primeira regra do arquivo (depois do <code>&lt;style&gt;</code>) e a primeira depois do <code>&lt;/style&gt;</code> foram perdidas.</td></tr>
+</table>
+</div>
+<p>O validador do HTML pega os dois primeiros:</p>
+<pre class="term" data-cwd="~/ref/problemas">$ vnu semrel.html
+"file:/home/ana/ref/problemas/semrel.html":6.3-6.25: error: Element “link” is missing one or more of the following attributes: “itemprop”, “property”, “rel”.
+$ vnu src.html
+"file:/home/ana/ref/problemas/src.html":6.3-6.41: error: Attribute “src” not allowed on element “link” at this point.
+"file:/home/ana/ref/problemas/src.html":6.3-6.41: error: A “link” element must have an “href” or “imagesrcset” attribute, or both.</pre>
+<p>No editor do guia, um arquivo que não carregou aparece no console embaixo do quadro. Experimente: o <code>&lt;link&gt;</code> desta caixa pede <code>estilo.css</code>, mas a aba se chama <code>style.css</code>. O título fica preto e o console avisa. Troque o <code>href</code> para <code>style.css</code> e veja o título ficar marrom:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="estilo.css"&gt;
+&lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: saddlebrown;
+}
+</pre>
+</div>
+<p>O console do quadro mostrou, no teste: <code>Não foi possível carregar "estilo.css" (&lt;link&gt;). Confira o nome e o caminho do arquivo.</code> Num site de verdade, o Console do F12 mostra um erro 404 parecido, e a aba Network mostra o <code>estilo.css</code> em vermelho.</p>
+
+<h2 id="escrita">2. Erros de escrita (o navegador não entendeu)</h2>
+
+<h3 id="ponto-virgula">O <code>;</code> esquecido</h3>
+<pre class="file" data-file="style.css · erro de propósito">#aviso {
+  color: red
+  background-color: lightyellow;
+}</pre>
+<p><strong>Sintoma:</strong> <strong>nenhuma</strong> das duas funciona, não só a primeira. <strong>Por quê:</strong> sem o <code>;</code>, o navegador lê tudo como um valor só: a cor seria "<code>red background-color: lightyellow</code>", que não é cor nenhuma. Medido no Chromium: a regra ficou vazia (<code>#aviso { }</code>), com a cor preta e o fundo transparente. <strong>No F12:</strong> a declaração aparece riscada, com aviso. <strong>Solução:</strong> <code>;</code> no fim de <strong>toda</strong> declaração, até da última (aí não é obrigatório, mas evita o erro quando você acrescentar outra linha).</p>
+
+<h3 id="chave">A <code>}</code> esquecida</h3>
+<pre class="file" data-file="style.css · erro de propósito">.titulo {
+  color: green;
+
+.preco {
+  color: green;
+}
+.rodape {
+  color: green;
+}</pre>
+<p><strong>Sintoma:</strong> o <code>.titulo</code> funciona, mas o <code>.preco</code>, o <code>.rodape</code> e tudo o que vem depois param de funcionar (ou funcionam só em alguns lugares). <strong>Por quê:</strong> desde o CSS aninhado, uma regra pode ficar dentro de outra. Sem a <code>}</code>, o navegador entende que o <code>.preco</code> e o <code>.rodape</code> estão <strong>dentro</strong> do <code>.titulo</code>: vira "<code>.preco</code> que está dentro de um <code>.titulo</code>". Medido no Chromium: a regra guardada foi <code>.titulo { color: green; &amp; .preco { … } &amp; .rodape { … } }</code>. <strong>No F12:</strong> procure as regras no Styles: elas aparecem com o seletor do pai na frente. <strong>Solução:</strong> conte as chaves; um editor com recuo automático (indentação) mostra o problema na hora. Veja <a href="aninhamento.html">CSS Aninhado</a>.</p>
+
+<h3 id="comentario">O comentário com <code>//</code></h3>
+<pre class="file" data-file="style.css · erro de propósito">// estilos da padaria
+h1 {
+  color: green;
+}
+p {
+  color: green;
+}</pre>
+<p><strong>Sintoma:</strong> o <code>h1</code> fica preto; o <code>p</code> funciona. <strong>Por quê:</strong> o CSS <strong>não tem</strong> comentário de linha com <code>//</code> (isso é do JavaScript). O navegador lê "<code>// estilos da padaria h1</code>" como um seletor, que é inválido, e descarta a regra inteira. Medido: só o <code>p</code> sobrou nas regras guardadas. <strong>Solução:</strong> o único comentário do CSS é <code>/* … */</code> (aula <a href="comentarios.html">Comentários</a>).</p>
+
+<h3>Nome ou valor errado</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrito</th><th>O certo</th><th>Referência</th></tr>
+<tr><td><code>colr: red;</code>, <code>font-color: red;</code>, <code>text-color: red;</code></td><td><code>color: red;</code></td><td><a href="ref-propriedades.html">Propriedades</a></td></tr>
+<tr><td><code>color: tomatoe;</code>, <code>color: light-blue;</code></td><td><code>tomato</code>, <code>lightblue</code></td><td><a href="ref-cores.html">Nomes de Cores</a></td></tr>
+<tr><td><code>width: 300;</code>, <code>font-size: 20 px;</code></td><td><code>300px</code>, <code>20px</code></td><td><a href="ref-unidades.html">Unidades</a></td></tr>
+<tr><td><code>font-family: “Lato”, sans-serif;</code> (aspas curvas, copiadas de um editor de texto)</td><td><code>"Lato"</code> (aspas retas). As curvas viram <strong>parte do nome</strong>: o navegador procura uma fonte chamada <code>“Lato”</code>, com as aspas, não acha e usa a <code>sans-serif</code>. Nem o F12 risca, nem o validador reclama.</td><td><a href="font-family.html">Fontes</a></td></tr>
+<tr><td><code>color: red !importante;</code></td><td><code>!important</code> (e, melhor ainda, sem ele)</td><td><a href="important.html">!important</a></td></tr>
+<tr><td><code>a:hovr</code>, <code>p::befor</code></td><td><code>:hover</code>, <code>::before</code></td><td><a href="ref-pseudo.html">Pseudo-classes</a></td></tr>
+</table>
+</div>
+<p>O que o validador disse de cada um destes erros de escrita:</p>
+<pre class="term" data-cwd="~/ref/problemas">$ vnu --css colr.css
+"file:/home/ana/ref/problemas/colr.css":2.9-2.11: error: CSS: “colr”: Property “colr” doesn't exist.
+$ vnu --css pontovirgula.css
+"file:/home/ana/ref/problemas/pontovirgula.css":3.3-3.18: error: CSS: “color”: Missing a semicolon before the property name “background-color”.
+$ vnu --css barras.css
+"file:/home/ana/ref/problemas/barras.css":4.2-5.1: error: CSS: Parse Error.
+$ vnu --css tagstyle.css
+"file:/home/ana/ref/problemas/tagstyle.css":1.1-1.7: error: CSS: Parse Error. Style sheets should not include HTML syntax.
+"file:/home/ana/ref/problemas/tagstyle.css":7.1-7.8: error: Stray end tag “style”.
+$ vnu --css importante.css
+"file:/home/ana/ref/problemas/importante.css":2.26-2.26: error: CSS: Parse Error.
+"file:/home/ana/ref/problemas/importante.css":3.2-4.1: error: CSS: Parse Error.
+$ vnu --css px.css
+"file:/home/ana/ref/problemas/px.css":2.17-2.18: error: CSS: “font-size”: Too many values or values are not recognized.</pre>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Mensagem</th><th>Em português</th></tr>
+<tr><td><code>Property “colr” doesn't exist.</code></td><td>a propriedade <code>colr</code> não existe</td></tr>
+<tr><td><code>Missing a semicolon before the property name “background-color”.</code></td><td>falta um <code>;</code> antes de <code>background-color</code>: a mais útil de todas, aponta a linha seguinte à do erro</td></tr>
+<tr><td><code>Parse Error.</code></td><td>"erro de leitura": o validador se perdeu ali. No <code>//</code>, a posição aponta para o <strong>fim</strong> da regra estragada, não para o <code>//</code>; no <code>!importante</code>, aponta a coluna depois da palavra</td></tr>
+<tr><td><code>Style sheets should not include HTML syntax.</code></td><td>"folhas de estilo não devem ter sintaxe de HTML": as tags <code>&lt;style&gt;</code> não vão no <code>.css</code></td></tr>
+<tr><td><code>Too many values or values are not recognized.</code></td><td>valores demais ou não reconhecidos: o <code>20 px</code> separado virou dois valores</td></tr>
+</table>
+</div>
+<p>A <code>}</code> esquecida e as aspas curvas <strong>não</strong> deram nenhuma mensagem: para o validador, aquele CSS é válido. E um seletor como <code>.Cartao</code> também é válido; o validador não tem como saber que no HTML a classe é <code>cartao</code>.</p>
+
+<h2 id="casar">3. A regra não casa com o elemento</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>CSS</th><th>HTML</th><th>Por que não casa</th></tr>
+<tr><td><code>.Cartao { … }</code></td><td><code>class="cartao"</code></td><td>classes e IDs diferenciam <strong>maiúsculas</strong>. Medido: o <code>.Cartao</code> não pegou no <code>class="cartao"</code>. Use sempre minúsculas com hífen.</td></tr>
+<tr><td><code>cartao { … }</code></td><td><code>class="cartao"</code></td><td>faltou o ponto: sem ele, o seletor procura um elemento <code>&lt;cartao&gt;</code> (aula <a href="seletor-classe.html">Seletor de Classe</a>).</td></tr>
+<tr><td><code>.cartao { … }</code></td><td><code>class=".cartao"</code></td><td>o ponto vai só no CSS; no HTML, a classe é <code>cartao</code>.</td></tr>
+<tr><td><code>#menu { … }</code></td><td><code>class="menu"</code></td><td><code>#</code> é para <code>id</code>; para <code>class</code>, ponto.</td></tr>
+<tr><td><code>div .cartao</code></td><td><code>&lt;div class="cartao"&gt;</code></td><td>com espaço, é "um <code>.cartao</code> <strong>dentro</strong> de um <code>div</code>"; para "um <code>div</code> que tem a classe", tudo junto: <code>div.cartao</code> (aula <a href="combinadores.html">Combinadores</a>).</td></tr>
+<tr><td><code>ul &gt; a</code></td><td><code>&lt;ul&gt;&lt;li&gt;&lt;a&gt;</code></td><td>o <code>&gt;</code> é só para filho direto; o <code>a</code> é neto. Use <code>ul a</code>.</td></tr>
+<tr><td><code>li:hovr, p { … }</code></td><td>—</td><td>um seletor inválido na lista derruba a regra para <strong>todos</strong> (veja <a href="ref-pseudo.html#errado">Pseudo-classes</a>).</td></tr>
+</table>
+</div>
+<p><strong>No F12:</strong> a regra não aparece no painel Styles do elemento. Para testar o seletor, abra o <strong>Console</strong> e digite <code>document.querySelectorAll(".cartao")</code>: a resposta mostra quantos elementos casam. Uma lista vazia = o seletor não pega nada.</p>
+
+<h2 id="perdeu">4. A regra perdeu (cascata, especificidade e herança)</h2>
+<p><strong>Sintoma:</strong> a declaração aparece no Styles, mas <strong>riscada, sem ícone de aviso</strong>: outra regra venceu. A vencedora aparece acima dela no painel.</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Quem vence</th><th>O que fazer</th><th>Aula</th></tr>
+<tr><td>dois seletores com a mesma força</td><td>o que vem <strong>depois</strong> no arquivo (ou no arquivo carregado depois)</td><td>reorganize: regras gerais em cima, específicas embaixo</td><td><a href="cascata.html">A Cascata</a></td></tr>
+<tr><td><code>.menu a</code> × <code>a.ativo</code> × <code>#topo a</code></td><td>o mais <strong>específico</strong> (ID &gt; classe &gt; elemento)</td><td>use um seletor um pouco mais específico, ou diminua o outro. Evite IDs no CSS.</td><td><a href="especificidade.html">Especificidade</a></td></tr>
+<tr><td><code>style="…"</code> no HTML</td><td>o atributo <code>style</code> vence qualquer seletor</td><td>tire o estilo do HTML e leve para o <code>.css</code></td><td><a href="onde-colocar.html">Três Jeitos</a></td></tr>
+<tr><td><code>!important</code> em outra regra</td><td>a regra com <code>!important</code></td><td>tire o <code>!important</code> de lá, em vez de pôr outro aqui</td><td><a href="important.html">!important</a></td></tr>
+<tr><td>a cor do pai não chega no link, no botão, no campo</td><td>o estilo do <strong>próprio navegador</strong> para <code>a</code>, <code>button</code>, <code>input</code></td><td><code>color: inherit;</code> ou <code>font: inherit;</code> no elemento</td><td><a href="heranca.html">Herança</a></td></tr>
+<tr><td>a borda do pai não aparece nos filhos</td><td>ninguém: <code>border</code>, <code>margin</code>, <code>padding</code>, <code>background</code> <strong>não</strong> são herdados</td><td>ponha a regra no filho</td><td><a href="heranca.html">Herança</a></td></tr>
+<tr><td>regras em <code>@layer</code></td><td>a camada declarada por último; e CSS fora de camada vence qualquer camada</td><td>confira a ordem das camadas</td><td><a href="layer.html">@layer</a></td></tr>
+</table>
+</div>
+
+<h2 id="layout">5. Surpresas de layout (o CSS está certo, o resultado não)</h2>
+
+<h3 id="flex">Pai sem <code>display: flex</code> (ou <code>grid</code>)</h3>
+<p><code>justify-content</code>, <code>align-items</code>, <code>gap</code> e <code>flex-direction</code> vão no <strong>pai</strong>, e só funcionam se ele for flex ou grid. <code>flex: 1</code>, <code>align-self</code> e <code>order</code> vão nos <strong>filhos diretos</strong>. O validador não reclama: o CSS é válido, só não tem efeito. <strong>No F12:</strong> o Chrome mostra a declaração apagada, com um ícone de informação que explica por que ela não faz efeito; e o selo <strong>flex</strong> ou <strong>grid</strong> ao lado do elemento, na aba Elements, só aparece num contêiner de verdade. Veja <a href="ref-flexbox.html#errado">Flexbox</a>.</p>
+
+<h3 id="inline"><code>width</code> e <code>height</code> num elemento inline</h3>
+<p>Num <code>&lt;span&gt;</code> ou <code>&lt;a&gt;</code>, <code>width: 200px; height: 50px;</code> não muda nada. Medido no Chromium: o <code>span</code> continuou com 8px de largura (a largura da letra) e 17px de altura, embora a aba Computed mostrasse <code>width: 200px</code>. <strong>Por quê:</strong> elementos <code>inline</code> têm o tamanho do texto. <strong>Solução:</strong> <code>display: inline-block</code> ou <code>block</code> (aula <a href="display.html">display</a>).</p>
+
+<h3 id="margem">A margem que colapsa</h3>
+<p>Duas surpresas, as duas medidas no Chromium:</p>
+<ul>
+  <li><strong>Margens vizinhas não se somam.</strong> Um parágrafo com <code>margin-bottom: 20px</code> seguido de outro com <code>margin-top: 30px</code> ficaram a <strong>30px</strong> um do outro, e não 50px: a maior "engole" a menor.</li>
+  <li><strong>A margem do filho vaza para fora do pai.</strong> Um <code>&lt;p&gt;</code> com <code>margin-top: 30px</code> dentro de uma <code>&lt;div&gt;</code> com fundo cinza, sem borda nem <code>padding</code>: o topo da <code>div</code> e o topo do <code>p</code> ficaram na <strong>mesma</strong> altura, e os 30px apareceram <strong>acima</strong> da div, fora do fundo cinza.</li>
+</ul>
+<p><strong>No F12:</strong> passe o mouse no elemento na aba Elements: a margem aparece pintada de laranja na página. <strong>Solução:</strong> use <code>padding</code> no pai em vez de margem no filho, ou faça o pai flex/grid (<code>display: flex; flex-direction: column;</code>), onde as margens não colapsam; ou use <code>gap</code>. Veja <a href="margin.html">Margem</a>.</p>
+
+<h3 id="url">O caminho do <code>url()</code></h3>
+<p>Dentro de um arquivo CSS, o caminho do <code>url()</code> é relativo ao <strong>arquivo CSS</strong>, e não ao HTML. Com o CSS em <code>css/style.css</code> e a imagem em <code>img/bolo.jpg</code>, <code>url("img/bolo.jpg")</code> procura <code>css/img/bolo.jpg</code>, que não existe. O certo é <code>url("../img/bolo.jpg")</code> (o <code>../</code> sobe uma pasta). <strong>No F12:</strong> a aba Network mostra o 404 com o endereço completo que o navegador tentou. A missão do fim desta página tem esse defeito. Veja <a href="background-image.html">Imagem de Fundo</a>.</p>
+
+<h3 id="hidden">O <code>hidden</code> que não esconde</h3>
+<p>Com <code>&lt;div class="menu" hidden&gt;</code> e <code>.menu { display: flex; }</code> no CSS, o menu <strong>aparece</strong>. Medido no Chromium: <code>display</code> calculado <code>flex</code>, com 18px de altura. <strong>Por quê:</strong> o atributo <code>hidden</code> só funciona porque o navegador tem uma regra própria <code>[hidden] { display: none; }</code>, e qualquer regra sua com <code>display</code> vence a do navegador. <strong>Solução:</strong> acrescente <code>[hidden] { display: none !important; }</code> no seu CSS (um dos poucos usos razoáveis do <code>!important</code>), ou esconda com uma classe. Veja <a href="esconder.html">Escondendo</a>.</p>
+
+<h3 id="zindex"><code>z-index</code> que não funciona</h3>
+<p>O <code>z-index</code> só vale em elemento com <code>position</code> diferente de <code>static</code> (ou em item de flex e grid). E um elemento nunca passa à frente de algo que está fora do "grupo" (contexto de empilhamento) do pai dele: um <code>z-index: 9999</code> não ajuda se o pai está atrás. Veja <a href="z-index.html">Camadas</a>.</p>
+
+<h3 id="media">A <code>@media</code> que não vale</h3>
+<ul>
+  <li><strong>No celular, a página aparece encolhida e a <code>@media</code> não age:</strong> falta <code>&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;</code> no <code>head</code> (aula <a href="viewport.html">A Meta Viewport</a>).</li>
+  <li><strong>A regra da <code>@media</code> está riscada:</strong> a <code>@media</code> veio <strong>antes</strong> da regra comum, e a regra comum, que vem depois e tem a mesma especificidade, vence. Ponha as <code>@media</code> no fim.</li>
+  <li><strong>Escrita:</strong> <code>and(max-width…)</code> sem espaço, nome errado (<code>max-widht</code>), chave esquecida. Veja <a href="ref-at-rules.html#errado">Regras @</a>.</li>
+</ul>
+
+<h2 id="cache">6. Mudei e nada mudou: cache e arquivo errado</h2>
+<p>Para economizar internet, o navegador guarda uma cópia do CSS (o <strong>cache</strong>) e pode continuar usando a cópia velha depois que você mudou o arquivo.</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Para</th><th>Faça</th></tr>
+<tr><td>recarregar ignorando o cache</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> ou <kbd>Ctrl</kbd>+<kbd>F5</kbd> (no Mac, <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>)</td></tr>
+<tr><td>nunca usar cache enquanto trabalha</td><td>F12, aba <strong>Network</strong>, marque <strong>Disable cache</strong> (Desativar cache). Só vale com o F12 aberto.</td></tr>
+<tr><td>conferir qual versão o navegador tem</td><td>F12, aba <strong>Sources</strong> (Fontes): abra o <code>style.css</code> e veja se a sua mudança está lá</td></tr>
+<tr><td>obrigar os visitantes do site a baixar a versão nova</td><td>mude o endereço do arquivo a cada versão: <code>href="style.css?v=2"</code> (aula <a href="performance.html">CSS Rápido</a>)</td></tr>
+</table>
+</div>
+<p>Se a mudança não está no Sources mesmo depois do <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>: você não salvou o arquivo, editou uma cópia em outra pasta, ou o <code>&lt;link&gt;</code> aponta para outro arquivo. Num site publicado, o servidor pode demorar alguns minutos para mostrar a versão nova.</p>
+
+<h2 id="validador">7. Peça ajuda ao validador</h2>
+<p>O validador W3C do CSS (<a href="https://jigsaw.w3.org/css-validator/">jigsaw.w3.org/css-validator</a>, ou o <code>vnu --css</code> no terminal) aponta a linha exata de muitos destes erros. Mas lembre:</p>
+<ul>
+  <li>ele <strong>não</strong> acha erro de lógica: seletor que não casa, especificidade, pai sem flex, margem que colapsa, cache;</li>
+  <li>às vezes ele reclama do que está <strong>certo</strong>, porque ainda não conhece um recurso novo (<code>@container</code>, unidades <code>cqi</code>, <code>image-set()</code>): veja <a href="ref-at-rules.html#validador">Regras @</a> e <a href="ref-funcoes.html#errado">Funções</a>;</li>
+  <li>depois de um <em>Parse Error</em>, conserte o primeiro e valide de novo: um erro pode gerar outros.</li>
+</ul>
+
+<h2>Missão: caça aos defeitos</h2>
+<div class="tryhtml" data-goal="css:.titulo{color}=rgb(139, 69, 19),css:.titulo{font-size}=40px,css:.aviso{background-color}=rgb(255, 255, 224),src:url\(\s*[&quot;']?\.\./assets/midia/bolo-400\.jpg">
+<p class="try-task"><strong>Missão:</strong> a página da Ana tem <strong>quatro</strong> defeitos no <code>css/style.css</code> (repare que o CSS está numa pasta). Ache e conserte: (1) o título devia ser marrom (<code>saddlebrown</code>) e (2) com <code>2.5rem</code>; (3) o aviso devia ter fundo <code>lightyellow</code>; (4) a capa devia mostrar a foto do bolo, que está em <code>assets/midia/bolo-400.jpg</code>. Dica: são um comentário, um sinal que falta, uma letra e um caminho.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="css/style.css"&gt;
+&lt;h1 class="titulo"&gt;Padaria da Ana&lt;/h1&gt;
+&lt;p class="aviso"&gt;Hoje tem bolo de cenoura!&lt;/p&gt;
+&lt;div class="capa"&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="css/style.css">// estilos da padaria
+.titulo {
+  color: saddlebrown
+  font-size: 2.5rem;
+}
+
+.Aviso {
+  padding: 0.5rem;
+  background-color: lightyellow;
+}
+
+.capa {
+  height: 150px;
+  background-image: url("assets/midia/bolo-400.jpg");
+  background-size: cover;
+}
+</pre>
+<pre class="solucao" data-file="css/style.css">/* estilos da padaria */
+.titulo {
+  color: saddlebrown;
+  font-size: 2.5rem;
+}
+
+.aviso {
+  padding: 0.5rem;
+  background-color: lightyellow;
+}
+
+.capa {
+  height: 150px;
+  background-image: url("../assets/midia/bolo-400.jpg");
+  background-size: cover;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O CSS não dá erro: ignora o que não entendeu. Investigue com o F12, na ordem: carregou? a regra aparece? está riscada? qual o valor calculado? é o arquivo certo?</li>
+  <li>Riscada com aviso = escrita errada. Riscada sem aviso = perdeu para outra regra. Apagada = sem efeito ali.</li>
+  <li><code>;</code> esquecido derruba duas declarações; <code>}</code> esquecida aninha as regras seguintes; <code>//</code> derruba a regra seguinte.</li>
+  <li>Classes diferenciam maiúsculas; ponto no CSS, sem ponto no HTML.</li>
+  <li>Alinhamentos precisam de pai flex/grid; <code>width</code> não age em <code>inline</code>; margens colapsam; <code>url()</code> é relativo ao arquivo CSS; <code>display</code> desfaz o <code>hidden</code>.</li>
+  <li>Mudou e nada mudou: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> e "Disable cache".</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
