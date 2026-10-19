@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Demonstração do Editor | Guia HTML</title>
+<title>Demonstração do Editor | Guia CSS</title>
 <link rel="stylesheet" href="../assets/style.css">
 <script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <style>body { max-width: 860px; margin: 0 auto; padding: 16px; } .demo-tema { float: right; }</style>
 </head>
 <body>
 <button type="button" class="sim-btn2 secundario demo-tema" id="tema">Tema claro/escuro</button>
-<h1>Demonstração do <span class="hl">Editor</span> do Guia HTML</h1>
+<h1>Demonstração do <span class="hl">Editor</span> do Guia CSS</h1>
 <p>Página de teste do <code>assets/htmlsim.js</code> (não faz parte do menu). Sirva a raiz do site e abra <code>/tools/demo.html</code>. Com <code>?htmlsim=simples</code> no endereço, o editor usa o modo simples (sem service worker).</p>
 
 <h2>1. Missão simples (fragmento)</h2>
@@ -184,6 +184,137 @@
   &lt;source src="assets/midia/video-bolo.mp4" type="video/mp4"&gt;
   &lt;track src="assets/midia/video-bolo.vtt" kind="subtitles" srclang="pt-BR" label="Português" default&gt;
 &lt;/video&gt;
+</pre>
+
+<h2>9. CSS: largura do quadro e <code>@media</code> (<code>data-largura="375"</code>)</h2>
+<div class="tryhtml" data-largura="375" data-goal="css:.cartoes{flex-direction}=column,src:@media">
+<p class="try-task"><strong>Missão:</strong> no celular (quadro de 375 px), os cartões ficam um embaixo do outro. Use os botões 375 / 768 / cheia para ver a <code>@media</code> mudar.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartoes"&gt;
+  &lt;div class="cartao"&gt;Bolo de cenoura&lt;/div&gt;
+  &lt;div class="cartao"&gt;Pão de queijo&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartoes {
+  display: flex;
+  gap: 1rem;
+}
+.cartao {
+  flex: 1;
+  padding: 1rem;
+  background: wheat;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartoes {
+  display: flex;
+  gap: 1rem;
+}
+.cartao {
+  flex: 1;
+  padding: 1rem;
+  background: wheat;
+}
+@media (max-width: 600px) {
+  .cartoes {
+    flex-direction: column;
+  }
+}
+</pre>
+</div>
+
+<h2>10. CSS: <code>:hover</code> e <code>:focus</code> (metas <code>hover:</code> e <code>foco:</code>)</h2>
+<div class="tryhtml" data-goal="hover:.botao{background-color}=rgb(0, 0, 128),foco:.campo{outline-color}=rgb(255, 99, 71),css:.botao{background-color}=rgb(255, 99, 71)">
+<p class="try-task"><strong>Missão:</strong> o botão fica azul-marinho (<code>navy</code>) com o mouse em cima, e o campo ganha contorno <code>tomato</code> quando recebe o foco.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button class="botao"&gt;Comprar&lt;/button&gt;
+&lt;input class="campo" placeholder="Seu e-mail"&gt;
+</pre>
+<pre class="script" data-file="style.css">.botao {
+  background-color: tomato;
+  color: white;
+  border: 0;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.3s;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.botao {
+  background-color: tomato;
+  color: white;
+  border: 0;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.3s;
+}
+.botao:hover {
+  background-color: navy;
+}
+.campo:focus {
+  outline: 3px solid tomato;
+}
+</pre>
+</div>
+
+<h2>11. CSS: pseudo-elemento, tema escuro e animação</h2>
+<div class="tryhtml" data-tema="escuro" data-goal="css:li::before{content}=&quot;★ &quot;,css:body{background-color}=rgb(34, 34, 34),css:.aviso{opacity}=1">
+<p class="try-task"><strong>Missão:</strong> ponha uma estrela antes de cada item, o fundo escuro quando o tema é escuro, e o aviso aparecendo (animação de <code>opacity</code> 0 → 1).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul&gt;&lt;li&gt;Farinha&lt;/li&gt;&lt;li&gt;Ovos&lt;/li&gt;&lt;/ul&gt;
+&lt;p class="aviso"&gt;Promoção de bolo!&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">li {
+  list-style: none;
+}
+</pre>
+<pre class="solucao" data-file="style.css">li {
+  list-style: none;
+}
+li::before {
+  content: "★ ";
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #222;
+    color: white;
+  }
+}
+@keyframes aparecer {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.aviso {
+  animation: aparecer 2s;
+}
+</pre>
+</div>
+
+<h2>12. CSS moderno no validador (<code>--nativo</code>)</h2>
+<div class="tryhtml" data-goal="css:.lista p{color}=rgb(255, 0, 0)">
+<p class="try-task"><strong>Missão:</strong> com <code>@container</code>, o parágrafo fica vermelho quando a lista tem 300 px ou mais.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="lista"&gt;&lt;p&gt;Oi&lt;/p&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.lista {
+  container-type: inline-size;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.lista {
+  container-type: inline-size;
+  &amp; p {
+    color: blue;
+  }
+}
+@container (min-width: 300px) {
+  .lista p {
+    color: red;
+  }
+}
+</pre>
+</div>
+
+<pre class="file" data-file="estreito.html" data-largura="320" data-tema="escuro" data-resultado>&lt;style&gt;
+  body { background: Canvas; color: CanvasText; color-scheme: light dark; }
+  @media (max-width: 400px) { p::after { content: " (tela estreita)"; } }
+&lt;/style&gt;
+&lt;p&gt;Resultado em 320 px, tema escuro&lt;/p&gt;
 </pre>
 
 <script src="../assets/htmlsim.js"></script>

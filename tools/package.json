@@ -1,0 +1,9 @@
+{
+  "name": "guia-css-tools",
+  "private": true,
+  "description": "Ferramentas do Guia CSS (testador de missões)",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer-core": "^23.11.1"
+  }
+}

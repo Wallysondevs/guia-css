@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* Testa as caixas "Experimente" (.tryhtml) e os quadros "Resultado"
-   (pre.file[data-resultado]) do Guia HTML num Chromium DE VERDADE, sem janela,
+   (pre.file[data-resultado]) do Guia CSS num Chromium DE VERDADE, sem janela,
    com o MESMO assets/htmlsim.js que o leitor usa (as metas são as mesmas).
 
    node tools/testar-missoes.js                 todas as páginas *.html
@@ -10,6 +10,10 @@
      --nativo        valida no validador W3C do laboratório (vnu 26.10.12) a solução
                      de cada missão e cada pre.file[data-resultado], e mostra os erros
      --sem-cache     ignora tools/.cache-missoes.json
+
+   As metas hover:/foco: são conferidas com o estado forçado pelo DevTools Protocol
+   (CSS.forcePseudoState no elemento e nos pais, como o mouse/foco de verdade), e as
+   animações/transições finitas são levadas ao fim antes de ler o estilo.
 
    Para cada missão (com data-goal):
      1. o código inicial NÃO pode cumprir a meta;
@@ -29,13 +33,21 @@ const HS = require("../assets/htmlsim.js");
 const RAIZ = path.resolve(__dirname, "..");
 const CACHE = path.join(__dirname, ".cache-missoes.json");
 const CHROMIUM = process.env.CHROMIUM || "/usr/bin/chromium";
-const LAB = path.join(process.env.HOME, "guia-html-lab");
+const LAB = path.join(process.env.HOME, "guia-html-lab"); // o vnu fica no lab do Guia HTML
+const NOME_LAB = "css-nativo";
+/* Erros FALSOS do vnu 26.10.12 com CSS moderno (o validador de CSS dele é antigo): o CSS
+   funciona nos navegadores de 2025–2026, mas o vnu acusa erro. O testador mostra como AVISO. */
+const VNU_FALSOS = [
+  [/Property “(container|container-type|container-name)” doesn't exist/, "@container / container-type"],
+  [/Unrecognized at-rule “@(container|property|starting-style|view-transition|position-try|font-palette-values)”/, "at-rule moderna"],
+];
+function vnuFalso(m) { for (const [re, o] of VNU_FALSOS) if (re.test(m.message || "")) return o; return null; }
 
 function puppeteer() {
   for (const p of [path.join(__dirname, "node_modules/puppeteer-core"), path.join(process.env.HOME, "rascunho/coord/cdp/node_modules/puppeteer-core")]) {
     try { return require(p); } catch (e) { /* próximo */ }
   }
-  throw new Error("puppeteer-core não encontrado: rode  cd ~/guia-html/tools && npm install");
+  throw new Error("puppeteer-core não encontrado: rode  cd ~/guia-css/tools && npm install");
 }
 
 /* ---------- leitura das páginas (sem navegador) ---------- */
@@ -73,6 +85,13 @@ function todosPres(html) {
   }
   return r;
 }
+// data-largura (200 a 2000 px) e data-tema ("escuro" ou "claro") de uma caixa ou de um Resultado
+function atributosQuadro(a) {
+  const p = [];
+  if (a["data-largura"] !== undefined && !(/^\d+$/.test(a["data-largura"]) && +a["data-largura"] >= 200 && +a["data-largura"] <= 2000)) p.push("data-largura=\"" + a["data-largura"] + "\": use um número de px entre 200 e 2000 (ex.: data-largura=\"375\")");
+  if (a["data-tema"] !== undefined && !/^(escuro|claro)$/.test(a["data-tema"])) p.push("data-tema=\"" + a["data-tema"] + "\": use \"escuro\" ou \"claro\"");
+  return p;
+}
 const ENT_SIMPLES = /^&(lt|gt|amp|quot|apos|#34|#39|#x27|#60|#62|#38);$/;
 // "<" ou "&" sem escapar dentro do <pre>; entidades que o leitor veria já convertidas
 function escape(bruto, deCodigo) {
@@ -96,11 +115,13 @@ function escape(bruto, deCodigo) {
 
 /* ---------- servidor de arquivos (só nesta execução, porta livre) ---------- */
 const MIME = { html: "text/html; charset=utf-8", css: "text/css; charset=utf-8", js: "text/javascript; charset=utf-8", json: "application/json", svg: "image/svg+xml", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", avif: "image/avif", gif: "image/gif", ico: "image/x-icon", mp3: "audio/mpeg", ogg: "audio/ogg", oga: "audio/ogg", webm: "video/webm", mp4: "video/mp4", vtt: "text/vtt; charset=utf-8", pdf: "application/pdf", txt: "text/plain; charset=utf-8", woff2: "font/woff2", xml: "application/xml" };
-function servidor() {
+// virtuais: { "/caminho": { tipo, dados } } (o foto.js serve o rascunho do autor assim)
+function servidor(virtuais) {
   return new Promise((ok) => {
     const s = http.createServer((req, res) => {
       let p = decodeURIComponent(new URL(req.url, "http://x").pathname);
       if (p.endsWith("/")) p += "index.html";
+      if (virtuais && virtuais[p]) { res.writeHead(200, { "Content-Type": virtuais[p].tipo, "Cache-Control": "no-store" }); res.end(virtuais[p].dados); return; }
       const f = path.join(RAIZ, path.normalize(p).replace(/^(\.\.[\/\\])+/, ""));
       if (!f.startsWith(RAIZ) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404, { "Content-Type": "text/html; charset=utf-8" }); res.end("<!DOCTYPE html><title>404</title><h1>404</h1>"); return; }
       const dados = fs.readFileSync(f), ext = path.extname(f).slice(1).toLowerCase();
@@ -123,9 +144,9 @@ function servidor() {
 function validarNoLab(docs) {
   // docs: [{id, nome, texto, deslocamento}] → { id: [mensagens] }
   if (!docs.length) return {};
-  const home = path.join(LAB, "homes", "htmlsim-nativo");
+  const home = path.join(LAB, "homes", NOME_LAB);
   if (!fs.existsSync(home)) {
-    const r0 = spawnSync(path.join(LAB, "lab"), ["-n", "htmlsim-nativo", "--", "true"], { encoding: "utf8", timeout: 60000 });
+    const r0 = spawnSync(path.join(LAB, "lab"), ["-n", NOME_LAB, "--", "true"], { encoding: "utf8", timeout: 60000 });
     if (r0.status !== 0) throw new Error("o lab não abriu: " + (r0.stderr || r0.stdout));
   }
   const sub = "vnu-" + process.pid + "-" + Date.now().toString(36);
@@ -141,7 +162,7 @@ function validarNoLab(docs) {
   // HTML e CSS em duas rodadas: com --also-check-css, o vnu 26.10.12 conta as linhas do HTML uma a menos
   const htmls = Object.keys(porArq).filter((f) => f.endsWith(".html")), csss = Object.keys(porArq).filter((f) => f.endsWith(".css"));
   const cmd = "cd " + sub + (htmls.length ? " && vnu --format json --exit-zero-always " + htmls.join(" ") + " 2>&1; echo @@@" : "") + (csss.length ? "; vnu --format json --css --exit-zero-always " + csss.join(" ") + " 2>&1" : "");
-  const r = spawnSync(path.join(LAB, "lab"), ["-n", "htmlsim-nativo", "--", "bash", "-c", cmd], { encoding: "utf8", timeout: 300000, maxBuffer: 64 << 20 });
+  const r = spawnSync(path.join(LAB, "lab"), ["-n", NOME_LAB, "--", "bash", "-c", cmd], { encoding: "utf8", timeout: 300000, maxBuffer: 64 << 20 });
   fs.rmSync(dir, { recursive: true, force: true });
   const mensagens = [];
   for (const parte of String(r.stdout || "").split("@@@")) {
@@ -164,6 +185,47 @@ function linhaVnu(nome, m, v) {
   const pos = !fim ? "" : ini && m.firstColumn ? ini.linha + "." + ini.coluna + "-" + fim.linha + "." + fim.coluna : fim.linha + "." + fim.coluna + "-" + fim.linha + "." + fim.coluna;
   const tipo = m.type === "info" ? (m.subType === "warning" ? "warning" : "info") : m.type;
   return "\"" + nome + "\":" + pos + ": " + tipo + ": " + m.message + (m.lastLine && !fim ? (m.lastLine - v.deslocamento > (v.linhasCodigo || 0) ? "  (depois do fim do seu código: o validador chegou ao fechamento que o testador pôs em volta do fragmento)" : "  (no esqueleto que o testador pôs em volta do fragmento)") : "");
+}
+
+/* Força :hover (ou :focus) no primeiro elemento que casa com `sel` dentro do quadro marcado
+   (o mouse em cima de um elemento também fica em cima de todos os pais; o foco liga o
+   :focus-within nos pais). Devolve uma função que desfaz. `qual`: "caixa" ou "resultado". */
+async function forcarEstado(pg, i, qual, tipo, sel) {
+  const cdp = pg.__cdp || (pg.__cdp = await pg.target().createCDPSession());
+  if (!pg.__cdpPronto) { await cdp.send("DOM.enable"); await cdp.send("CSS.enable"); pg.__cdpPronto = true; }
+  await pg.evaluate((i, qual) => {
+    document.querySelectorAll("iframe[data-hs-alvo]").forEach((f) => f.removeAttribute("data-hs-alvo"));
+    const q = qual === "resultado" ? window.HtmlSim.resultados[i].quadro : window.HtmlSim.caixas[i].quadro;
+    q.frame.setAttribute("data-hs-alvo", "");
+  }, i, qual);
+  const { root } = await cdp.send("DOM.getDocument", { depth: -1, pierce: true });
+  const pais = new Map();
+  let alvo = null;
+  (function andar(n, pai) {
+    if (pai) pais.set(n.nodeId, pai);
+    if (!alvo && n.nodeName === "IFRAME" && (n.attributes || []).includes("data-hs-alvo")) alvo = n;
+    for (const c of (n.children || [])) andar(c, n.nodeId);
+    if (n.contentDocument) andar(n.contentDocument, null);
+  })(root, null);
+  if (!alvo || !alvo.contentDocument) throw new Error("não achei o documento do quadro para forçar o estado");
+  const docId = alvo.contentDocument.nodeId;
+  const { nodeId } = await cdp.send("DOM.querySelector", { nodeId: docId, selector: sel });
+  if (!nodeId) return Object.assign(async () => {}, { achou: false });
+  const forcados = [];
+  const forcar = async (id, cls) => { await cdp.send("CSS.forcePseudoState", { nodeId: id, forcedPseudoClasses: cls }); forcados.push(id); };
+  await forcar(nodeId, tipo === "hover" ? ["hover"] : ["focus", "focus-visible"]);
+  for (let p = pais.get(nodeId); p && p !== docId; p = pais.get(p)) await forcar(p, tipo === "hover" ? ["hover"] : ["focus-within"]);
+  return Object.assign(async () => { for (const id of forcados) { try { await cdp.send("CSS.forcePseudoState", { nodeId: id, forcedPseudoClasses: [] }); } catch (e) { /* o nó já saiu */ } } }, { achou: true });
+}
+// reavalia as metas hover:/foco: de um resultado de testar(), cada uma com o seu estado forçado
+async function metasComEstado(pg, i, res) {
+  for (let k = 0; k < res.metas.length; k++) {
+    const m = res.metas[k], a = HS.analisarMeta(m.meta);
+    if (a.erro || (a.tipo !== "hover" && a.tipo !== "foco")) continue;
+    const desfazer = await forcarEstado(pg, i, "caixa", a.tipo, a.sel);
+    try { res.metas[k] = await pg.evaluate((i, mm) => window.HtmlSim.caixas[i].avaliarMeta(mm, { forcado: true }), i, m.meta); } finally { await desfazer(); }
+  }
+  return res;
 }
 
 function trecho(s, n) { s = String(s || "").replace(/\n$/, ""); if (!s) return "        │ (vazio)"; const l = s.split("\n"); return (l.length > n ? l.slice(0, n).concat(["… (" + (l.length - n) + " linhas a mais)"]) : l).map((x) => "        │ " + x).join("\n"); }
@@ -197,7 +259,7 @@ async function main() {
     const arq = path.isAbsolute(pag) ? pag : fs.existsSync(pag) ? path.resolve(pag) : path.join(RAIZ, pag);
     if (!fs.existsSync(arq)) { console.log("✗ " + pag + ": arquivo não encontrado"); nFalhas++; continue; }
     const rel = path.relative(RAIZ, arq);
-    if (rel.startsWith("..")) { console.log("✗ " + pag + ": a página precisa estar em ~/guia-html (use ~/guia-html-lab/enviar)"); nFalhas++; continue; }
+    if (rel.startsWith("..")) { console.log("✗ " + pag + ": a página precisa estar em ~/guia-css (use ~/guia-css-lab/enviar)"); nFalhas++; continue; }
     const html = fs.readFileSync(arq, "utf8");
     const saida = [];
     let falhasPag = 0;
@@ -213,7 +275,7 @@ async function main() {
       if (e.erros.length) falha(rot + "\n" + e.erros.map((x) => "      " + x).join("\n"));
       if (e.avisos.length) aviso(rot + "\n" + e.avisos.map((x) => "      " + x).join("\n"));
     }
-    if (/class\s*=\s*["'][^"']*\btryc\b/.test(html)) falha("a página usa class=\"tryc\" (do Guia C); no Guia HTML a caixa é class=\"tryhtml\"");
+    if (/class\s*=\s*["'][^"']*\btryc\b/.test(html)) falha("a página usa class=\"tryc\" (do Guia C); no Guia CSS a caixa é class=\"tryhtml\"");
 
     // 2. caixas e quadros: contrato + chaves do cache
     const lista = caixas(html).map((c, i) => {
@@ -234,13 +296,15 @@ async function main() {
       const nomes = abas.map((x) => x.nome);
       if (new Set(nomes).size !== nomes.length) problemas.push("duas abas com o mesmo data-file");
       HS.dividirMetas(meta).forEach((g) => { const r = HS.analisarMeta(g); if (r.erro) problemas.push(r.erro); });
-      const chave = crypto.createHash("sha1").update(versaoMotor + JSON.stringify(["caixa", meta, abas, solucao])).digest("hex");
+      problemas.push(...atributosQuadro(a));
+      const chave = crypto.createHash("sha1").update(versaoMotor + JSON.stringify(["caixa", meta, abas, solucao, a["data-largura"], a["data-tema"]])).digest("hex");
       return { i, linha: c.linha, meta, abas, solucao, problemas, chave, rot: "linha " + c.linha + (meta ? " missão [" + meta + "]" : " (livre)") };
     });
     const resultados = pres.filter((p) => temClasse(p.a, "file") && p.a["data-resultado"] !== undefined).map((p, i) => {
       const nome = p.a["data-file"] || "index.html";
       const problemas = HS.naoDesenha(nome) ? ["data-resultado desenha HTML; \"" + nome + "\" não é HTML (para CSS/JS junto, use um .tryhtml com abas)"] : [];
-      return { i, linha: p.linha, nome, codigo: p.codigo, problemas, chave: crypto.createHash("sha1").update(versaoMotor + JSON.stringify(["res", nome, p.codigo])).digest("hex"), rot: "linha " + p.linha + " Resultado de " + nome };
+      problemas.push(...atributosQuadro(p.a));
+      return { i, linha: p.linha, nome, codigo: p.codigo, problemas, chave: crypto.createHash("sha1").update(versaoMotor + JSON.stringify(["res", nome, p.codigo, p.a["data-largura"], p.a["data-tema"]])).digest("hex"), rot: "linha " + p.linha + " Resultado de " + nome };
     });
     lista.forEach((c) => { if (c.problemas.length) falha(c.rot + "\n" + c.problemas.map((p) => "      " + p).join("\n")); });
     resultados.forEach((r) => { if (r.problemas.length) falha(r.rot + "\n" + r.problemas.map((p) => "      " + p).join("\n")); });
@@ -294,8 +358,10 @@ async function main() {
               if (c.meta) {
                 nMissoes++;
                 ini = await comTempo(pg.evaluate((i) => window.HtmlSim.caixas[i].testar("inicial"), c.i), 20000, "o quadro não terminou de carregar (código inicial)");
+                await metasComEstado(pg, c.i, ini);
                 vigiar();
                 sol = await comTempo(pg.evaluate((i) => window.HtmlSim.caixas[i].testar("solucao"), c.i), 20000, "o quadro não terminou de carregar (solução)");
+                await metasComEstado(pg, c.i, sol);
                 await new Promise((ok) => setTimeout(ok, 300));
                 const nr = notaRede(vistos(), "a solução");
                 if (nr) avisos.push(nr);
@@ -363,14 +429,16 @@ async function main() {
         const msgs = validarNoLab(docs);
         docs.forEach((d) => {
           const ms = msgs[d.id] || [];
-          const erros = ms.filter((m) => m.type === "error" || m.type === "non-document-error");
+          const falsos = ms.filter((m) => vnuFalso(m));
+          const erros = ms.filter((m) => (m.type === "error" || m.type === "non-document-error") && !vnuFalso(m));
           // num fragmento, "nenhum h1" é culpa do esqueleto, e não do exemplo
-          const mostrar = ms.filter((m) => (m.type !== "info" || m.subType === "warning") && !(d.fragmento && /computed heading level of 1/.test(m.message)));
+          const mostrar = ms.filter((m) => !vnuFalso(m) && (m.type !== "info" || m.subType === "warning") && !(d.fragmento && /computed heading level of 1/.test(m.message)));
+          if (falsos.length) aviso(d.alvo.rot + " — W3C (" + d.nome + "): erro FALSO do vnu 26.10.12, que ainda não conhece este CSS moderno (funciona nos navegadores; não é falha):\n" + falsos.map((m) => "      " + linhaVnu(d.nome, m, d.v)).join("\n"));
           const cab = d.alvo.rot + " — W3C (" + d.nome + (d.fragmento ? ", fragmento dentro do esqueleto mínimo" : "") + ")";
           const corpo = mostrar.map((m) => "      " + linhaVnu(d.nome, m, d.v)).join("\n");
           if (d.tipo === "solução" && erros.length) { nVnu++; falha(cab + ": a solução não é HTML válido\n" + corpo); }
           else if (mostrar.length) saida.push("  · " + cab + (erros.length ? " (exemplo com erro? normal no \"quando dá errado\")" : "") + "\n" + corpo);
-          else if (verboso) saida.push("  ✓ " + cab + ": válido");
+          else if (verboso) saida.push("  ✓ " + cab + ": válido" + (falsos.length ? " (fora os erros falsos do aviso acima)" : ""));
         });
         if (!docs.length && verboso) saida.push("  · nada para validar");
       } catch (e) { falha("--nativo: " + e.message); }
@@ -386,4 +454,5 @@ async function main() {
   console.log("\n" + nMissoes + " missões, " + nLivres + " caixas livres, " + nRes + " quadros Resultado" + (nCache ? " (" + nCache + " do cache)" : "") + " — " + (nFalhas ? nFalhas + " falha" + (nFalhas === 1 ? "" : "s") : "nenhuma falha") + (nAvisos ? ", " + nAvisos + " aviso" + (nAvisos === 1 ? "" : "s") : "") + (nativo ? " · W3C: " + (nVnu ? nVnu + " solução(ões) inválida(s)" : "soluções válidas") : ""));
   process.exit(nFalhas ? 1 : 0);
 }
-main().catch((e) => { console.error(e); process.exit(2); });
+if (require.main === module) main().catch((e) => { console.error(e); process.exit(2); });
+module.exports = { RAIZ, CHROMIUM, puppeteer, servidor, caixas, todosPres, attrs, temClasse, forcarEstado, metasComEstado, comTempo, validarNoLab, linhaVnu };

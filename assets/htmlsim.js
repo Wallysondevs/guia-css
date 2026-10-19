@@ -1,5 +1,5 @@
 /* =====================================================================
-   htmlsim.js — o editor "Experimente" do Guia HTML.
+   htmlsim.js — o editor "Experimente" do Guia CSS (herdado do Guia HTML).
    O navegador do LEITOR desenha o código, num <iframe> só para ele.
 
    Monta:
@@ -21,13 +21,15 @@
    ===================================================================== */
 (function () {
   "use strict";
-  var HS = { versao: "1" };
+  var HS = { versao: "2-css" };
 
   /* =====================================================================
      1. Metas (funções puras; o DOM vem de fora)
      ===================================================================== */
-  var NOMES = ["sel", "nsel", "texto", "attr", "css", "console", "src", "nsrc"];
-  var RE_NOME = /^(sel|nsel|texto|attr|css|console|src|nsrc):/;
+  var NOMES = ["sel", "nsel", "texto", "attr", "css", "hover", "foco", "console", "src", "nsrc"];
+  var RE_NOME = /^(sel|nsel|texto|attr|css|hover|foco|console|src|nsrc):/;
+  // pseudo-elementos que o getComputedStyle sabe ler (css:p::before{content}=…)
+  var RE_PSEUDO = /::?(before|after|marker|placeholder|first-line|first-letter|backdrop|file-selector-button|selection)\s*$/i;
   HS.NOMES_METAS = NOMES;
 
   /* Divide data-goal em metas. "\," = vírgula literal; "\\" = uma barra
@@ -88,10 +90,14 @@
         r.attr = esq.slice(a + 1, -1).trim(); r.sel = esq.slice(0, a) || "*";
         if (!/^[^\s"'>\/=]+$/.test(r.attr)) r.erro = "attr: nome de atributo inválido: \"" + r.attr + "\"";
         break;
-      case "css":
+      case "css": case "hover": case "foco":
         var ab = v.indexOf("{"), fe = v.indexOf("}", ab + 1);
-        if (ab < 0 || fe < 0 || v.charAt(fe + 1) !== "=") { r.erro = "css: use css:SELETOR{propriedade}=VALOR"; break; }
-        r.sel = v.slice(0, ab); r.prop = v.slice(ab + 1, fe).trim(); r.valor = v.slice(fe + 2); break;
+        if (ab < 0 || fe < 0 || v.charAt(fe + 1) !== "=") { r.erro = tipo + ": use " + tipo + ":SELETOR{propriedade}=VALOR"; break; }
+        r.sel = v.slice(0, ab); r.prop = v.slice(ab + 1, fe).trim(); r.valor = v.slice(fe + 2);
+        var ps = RE_PSEUDO.exec(r.sel.replace(/\s+$/, ""));
+        if (ps) { r.pseudo = "::" + ps[1].toLowerCase(); r.sel = r.sel.replace(/\s+$/, "").slice(0, ps.index) || "*"; }
+        if (!r.prop) r.erro = tipo + ": falta a propriedade entre { }";
+        break;
       case "console": r.valor = v; break;
       case "src": case "nsrc":
         try { r.re = new RegExp(v, "mi"); } catch (e) { r.erro = tipo + ": regex inválida: " + e.message; }
@@ -131,7 +137,7 @@
       if (a.erro) { r.motivo = a.erro; r.invalida = true; return r; }
       try {
         var doc = ctx.doc, el, lista;
-        if (a.sel !== undefined && /^(sel|nsel|texto|attr|css)$/.test(a.tipo)) {
+        if (a.sel !== undefined && /^(sel|nsel|texto|attr|css|hover|foco)$/.test(a.tipo)) {
           if (!doc) { r.motivo = "a página ainda não foi desenhada"; return r; }
           try { lista = doc.querySelectorAll(a.sel); } catch (e) { r.motivo = "seletor inválido: \"" + a.sel + "\""; r.invalida = true; return r; }
           el = lista[0] || null;
@@ -150,9 +156,23 @@
             if (!r.ok) r.motivo = "hoje " + a.attr + "=\"" + curto(el.getAttribute(a.attr)) + "\""; break;
           case "css":
             if (!el) { r.motivo = "não há nenhum " + a.sel; break; }
-            var cs = (el.ownerDocument.defaultView || window).getComputedStyle(el).getPropertyValue(a.prop).trim();
+            var cs = estiloDe(el, a);
             r.ok = cs === a.valor.trim();
             if (!r.ok) r.motivo = "hoje " + a.prop + " é " + (cs || "(vazio)"); break;
+          case "hover": case "foco":
+            // :hover/:focus: o testador força o estado (CDP CSS.forcePseudoState, ctx.forcado);
+            // no editor do leitor, a meta é conferida quando ele passa o mouse / foca, e fica
+            // marcada como cumprida (ctx.vistos) até o quadro ser desenhado de novo
+            if (!el) { r.motivo = "não há nenhum " + a.sel; break; }
+            if (ctx.vistos && ctx.vistos[m]) { r.ok = true; break; }
+            var pc = a.tipo === "hover" ? ":hover" : ":focus", ativo = false;
+            try { ativo = el.matches(pc); } catch (e) {}
+            if (!ativo) { r.esperando = true; r.motivo = a.tipo === "hover" ? "passe o mouse sobre " + a.sel.trim() + " para conferir" : "clique em " + a.sel.trim() + " (ou chegue nele com Tab) para conferir"; break; }
+            if (ctx.forcado) finalizarAnimacoes(el.ownerDocument);
+            var ce = estiloDe(el, a);
+            r.ok = ce === a.valor.trim();
+            if (r.ok && ctx.vistos) ctx.vistos[m] = true;
+            if (!r.ok) r.motivo = (a.tipo === "hover" ? "com o mouse em cima, " : "com o foco, ") + a.prop + " é " + (ce || "(vazio)"); break;
           case "console":
             r.ok = String(ctx.console || "").indexOf(a.valor) >= 0;
             if (!r.ok) r.motivo = ctx.console ? "o console ainda não mostrou isso" : "o console está vazio"; break;
@@ -164,6 +184,21 @@
     });
   }
   HS.avaliarMetas = avaliarMetas;
+  function estiloDe(el, a) {
+    return (el.ownerDocument.defaultView || window).getComputedStyle(el, a.pseudo || null).getPropertyValue(a.prop).trim();
+  }
+  /* leva ao fim as animações e transições finitas do documento (o testador e o foto.js usam,
+     para a meta ler o estado FINAL); as infinitas ficam como estão */
+  function finalizarAnimacoes(doc) {
+    var n = 0;
+    try {
+      (doc.getAnimations ? doc.getAnimations() : []).forEach(function (an) {
+        try { var t = an.effect && an.effect.getComputedTiming(); if (t && isFinite(t.endTime)) { an.finish(); n++; } } catch (e) {}
+      });
+    } catch (e) {}
+    return n;
+  }
+  HS.finalizarAnimacoes = finalizarAnimacoes;
   HS.falhas = function (meta, ctx) { return avaliarMetas(meta, ctx).filter(function (x) { return !x.ok; }); };
 
   // descrição para o leitor ("Ainda falta: …")
@@ -174,7 +209,9 @@
       case "nsel": return a.n + (a.n === 1 ? " elemento " : " elementos ") + a.sel.trim();
       case "texto": return a.sel.trim() + " com o texto “" + a.valor + "”";
       case "attr": return a.sel.trim() + " com o atributo " + a.attr + (a.valor === null ? "" : "=\"" + a.valor + "\"");
-      case "css": return a.sel.trim() + " com " + a.prop + ": " + a.valor.trim();
+      case "css": return a.sel.trim() + (a.pseudo || "") + " com " + a.prop + ": " + a.valor.trim();
+      case "hover": return a.sel.trim() + (a.pseudo || "") + " com " + a.prop + ": " + a.valor.trim() + " quando o mouse está em cima";
+      case "foco": return a.sel.trim() + (a.pseudo || "") + " com " + a.prop + ": " + a.valor.trim() + " quando recebe o foco";
       case "console": return "o console mostrar “" + a.valor + "”";
       case "src": return "o código com " + a.re.source;
       case "nsrc": return "o código sem " + a.re.source;
@@ -393,7 +430,22 @@
     this.host = host; this.opts = opts; this.id = TOKEN + "-" + (++nQuadros);
     this.pasta = ESCOPO + this.id + "/";
     this.frame = null; this.atual = null; this.endereco = ""; this.geracao = 0;
+    this.largura = opts.largura || null; // px (null = a largura toda da caixa)
+    this.escuro = !!opts.escuro;          // color-scheme: dark no <iframe> → prefers-color-scheme: dark lá dentro
   }
+  /* largura do quadro em px (null = cheia): a página lá dentro vê essa largura de janela
+     (as @media e as unidades vw mudam ao vivo, sem desenhar de novo) */
+  Quadro.prototype.definirLargura = function (px) {
+    this.largura = px ? Math.round(px) : null;
+    this.host.classList.toggle("hs-fixa", !!this.largura);
+    if (this.frame) this.frame.style.width = this.largura ? this.largura + "px" : "";
+  };
+  /* tema do quadro: o Chromium e o Firefox passam o color-scheme do <iframe> para o
+     prefers-color-scheme da página de dentro */
+  Quadro.prototype.definirTema = function (escuro) {
+    this.escuro = !!escuro;
+    if (this.frame) this.frame.classList.toggle("hs-escuro", this.escuro);
+  };
   HS.Quadro = Quadro;
   Quadro.prototype.nomeDe = function (url) {
     // URL dentro da pasta virtual → "sobre.html?x=1#y"; senão null
@@ -447,6 +499,9 @@
     f.setAttribute("allow", "fullscreen; autoplay; clipboard-write");
     f.setAttribute("loading", "eager");
     var antigo = this.frame;
+    if (this.largura) f.style.width = this.largura + "px";
+    this.host.classList.toggle("hs-fixa", !!this.largura);
+    if (this.escuro) f.classList.add("hs-escuro");
     f.__htmlsim = this.ponte(f, ger);
     this.consoleTexto = "";
     this.autofoco = !!extra.autofoco;
@@ -703,6 +758,13 @@
     ".hs-frame-host{position:relative;background:#fff;border:1px solid var(--border);border-top:0;border-radius:0 0 8px 8px;overflow:hidden}",
     ".hs-frame{display:block;width:100%;border:0;background:#fff;color-scheme:light;min-height:60px}",
     ".hs-frame.hs-novo{position:absolute;inset:0;visibility:hidden}",
+    ".hs-frame.hs-escuro{color-scheme:dark;background:#121212}",
+    ".hs-frame-host.hs-fixa{overflow-x:auto;background:repeating-linear-gradient(45deg,var(--sidebar-bg) 0 8px,transparent 8px 16px)}",
+    ".hs-fixa .hs-frame{margin:0 auto;box-shadow:0 0 0 1px var(--border)}",
+    ".hs-fixa .hs-frame.hs-novo{inset:0 auto auto 50%;transform:translateX(-50%)}",
+    ".hs-larg{display:inline-flex;gap:0}.hs-larg button{border-radius:0;margin-left:-1px}.hs-larg button:first-child{border-radius:5px 0 0 5px;margin-left:0}.hs-larg button:last-child{border-radius:0 5px 5px 0}",
+    ".hs-barra button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}",
+    ".hs-px{font:12px 'Ubuntu Mono',ui-monospace,monospace;color:var(--muted);white-space:nowrap}",
     ".hs-janela{margin-top:10px}",
     ".hs-barra{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);border-radius:8px 8px 0 0;background:var(--sidebar-bg);font:13px system-ui,sans-serif;color:var(--muted);min-width:0}",
     ".hs-barra .sim-dots i{background:#c9c8c4}.hs-barra .sim-dots i:first-child{background:#d70a53}",
@@ -751,6 +813,8 @@
     return t.replace(/^\n/, "").replace(/\n$/, "");
   }
   HS.lerPre = lerPre;
+  // data-largura="375" → 375 (entre 200 e 2000 px); sem o atributo → null (a largura toda)
+  function larguraDe(e) { var n = parseInt(e.getAttribute("data-largura"), 10); return n >= 200 && n <= 2000 ? n : null; }
 
   /* ---------- console (o painel) ---------- */
   function Painel(dentro, sempre) {
@@ -827,6 +891,8 @@
       '<div class="ts-editor"><pre class="ts-nums" aria-hidden="true"></pre><textarea class="ts-code" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" aria-label="Código"></textarea></div>' +
       '<div class="hs-w3c" hidden aria-live="polite"></div>' +
       '<div class="hs-janela"><div class="hs-barra"><span class="sim-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="hs-rot">Resultado</span><span class="hs-end" title="O endereço da página mostrada no quadro"></span>' +
+      '<span class="hs-larg" role="group" aria-label="Largura do quadro"><button type="button" data-l="375" title="Largura de um celular (375 px)">375</button><button type="button" data-l="768" title="Largura de um tablet (768 px)">768</button><button type="button" data-l="" title="A largura toda da caixa">cheia</button></span><span class="hs-px" title="A largura da janela que a página do quadro enxerga"></span>' +
+      '<button type="button" class="hs-tema" aria-pressed="false" title="Tema escuro no quadro: liga o @media (prefers-color-scheme: dark) da página">◐</button>' +
       '<button type="button" class="hs-recarregar" title="Volta à primeira página e desenha de novo">↻</button><button type="button" class="hs-abrir" title="Abre o resultado numa aba nova" hidden>↗</button></div><div class="hs-frame-host"></div></div>';
     box.appendChild(w);
     var status = null, falta = null;
@@ -842,31 +908,49 @@
 
     function arquivos() { return abas.map(function (a) { return { nome: a.nome, codigo: a.atual }; }); }
     function fonte() { return abas.map(function (a) { return a.atual; }).join("\n"); }
+    var largInicial = larguraDe(box), temaInicial = box.getAttribute("data-tema") === "escuro";
+    var vistos = {};
     var quadro = new Quadro(w.querySelector(".hs-frame-host"), {
       arquivos: arquivos,
+      largura: largInicial, escuro: temaInicial,
       altura: { min: 120, max: 460 },
       aoConsole: function (t, txt) { painel.add(t, txt); agendarMetas(); },
       aoEndereco: function (e) { endTxt.textContent = e; },
       aoCarregar: function (info) {
-        observar(info.doc);
+        vistos = {};
+        observar(info.doc, info.win);
+        mostrarPx();
         verificar();
         aoCarregarFns.splice(0).forEach(function (f) { f(info); });
       }
     });
     var aoCarregarFns = [];
     var obs = null;
-    function observar(doc) {
+    function observar(doc, win) {
       if (obs) obs.disconnect();
+      try { win.addEventListener("resize", function () { mostrarPx(); agendarMetas(); }); } catch (e) {}
       if (!meta) return;
       try { obs = new MutationObserver(agendarMetas); obs.observe(doc, { subtree: true, childList: true, attributes: true, characterData: true }); } catch (e) {}
-      try { doc.addEventListener("input", agendarMetas, true); doc.addEventListener("change", agendarMetas, true); } catch (e) {}
+      // mouse, foco e o fim das animações/transições: as metas hover:/foco: e o estado final do css:
+      try { ["input", "change", "mouseover", "mouseout", "focusin", "focusout", "transitionend", "animationend"].forEach(function (t) { doc.addEventListener(t, agendarMetas, true); }); } catch (e) {}
     }
+    /* ---------- largura e tema do quadro ---------- */
+    var pxTxt = w.querySelector(".hs-px"), btTema = w.querySelector(".hs-tema");
+    function mostrarPx() {
+      try { var fw = quadro.frame && quadro.frame.contentWindow; pxTxt.textContent = fw ? fw.innerWidth + " px" : ""; } catch (e) { pxTxt.textContent = ""; }
+      Array.prototype.forEach.call(w.querySelectorAll(".hs-larg button"), function (b) { b.setAttribute("aria-pressed", String((+b.getAttribute("data-l") || null) === quadro.largura)); });
+    }
+    function largura(px) { quadro.definirLargura(px); mostrarPx(); agendarMetas(); }
+    function tema(escuro) { quadro.definirTema(escuro); btTema.setAttribute("aria-pressed", String(!!escuro)); agendarMetas(); }
+    Array.prototype.forEach.call(w.querySelectorAll(".hs-larg button"), function (b) { b.addEventListener("click", function () { largura(+b.getAttribute("data-l") || null); }); });
+    btTema.addEventListener("click", function () { tema(!quadro.escuro); });
+    tema(temaInicial); mostrarPx();
     var tMetas = null;
     function agendarMetas() { if (!meta || cumprida) return; clearTimeout(tMetas); tMetas = setTimeout(verificar, 150); }
     function contexto() {
       var doc = null;
       if (quadro.atual === quadro.entrada()) { try { doc = quadro.frame.contentDocument; } catch (e) {} }
-      return { doc: doc, console: quadro.consoleTexto, src: fonte() };
+      return { doc: doc, console: quadro.consoleTexto, src: fonte(), vistos: vistos };
     }
     function verificar() {
       if (!status || cumprida) return;
@@ -874,7 +958,9 @@
       if (!ctx.doc) { status.innerHTML = "Missão em andamento… <span class=\"hs-falta\">(as metas olham a página " + escHtml(quadro.entrada()) + ": volte a ela com o botão ↻)</span>"; return; }
       var f = HS.falhas(meta, ctx);
       if (!f.length) { cumprida = true; status.textContent = "✔ Missão cumprida!"; status.className = "sim-status ok"; return; }
-      status.innerHTML = "Missão em andamento… <span class=\"hs-falta\">Ainda falta: " + f.map(function (x) { return escHtml(x.desc) + (x.motivo && !/^(src|nsrc)$/.test(x.tipo) ? " <small>(" + escHtml(x.motivo) + ")</small>" : ""); }).join("; ") + "</span>";
+      var difLarg = largInicial !== quadro.largura ? " <small>(a missão é conferida com o quadro " + (largInicial ? "em " + largInicial + " px" : "na largura cheia") + ")</small>" : "";
+      var difTema = temaInicial !== quadro.escuro ? " <small>(a missão é conferida com o quadro no tema " + (temaInicial ? "escuro" : "claro") + ": botão ◐)</small>" : "";
+      status.innerHTML = "Missão em andamento… <span class=\"hs-falta\">Ainda falta: " + f.map(function (x) { return escHtml(x.desc) + (x.motivo && !/^(src|nsrc)$/.test(x.tipo) ? " <small>(" + escHtml(x.motivo) + ")</small>" : ""); }).join("; ") + difLarg + difTema + "</span>";
     }
 
     /* ---------- editor ---------- */
@@ -988,6 +1074,12 @@
       box: box, meta: meta, quadro: quadro,
       abas: function () { return abas.map(function (a) { return { nome: a.nome, codigo: a.atual }; }); },
       cumprida: function () { return cumprida; },
+      largura: largura, tema: tema, largInicial: largInicial, temaInicial: temaInicial,
+      /* para o testador: avalia UMA meta agora (opts.forcado: o estado :hover/:focus foi forçado pelo CDP) */
+      avaliarMeta: function (m, opts) {
+        var ctx = contexto(); ctx.vistos = null; ctx.forcado = !!(opts && opts.forcado);
+        return HS.avaliarMetas(m, ctx)[0];
+      },
       /* para o testador: põe o código ("inicial" ou "solucao"), desenha a página de entrada
          e devolve { metas, console, modo, compat, url } */
       testar: function (qual) {
@@ -998,11 +1090,14 @@
         cumprida = false;
         if (status) { status.className = "sim-status"; status.textContent = "Missão em andamento…"; }
         desenhado = true;
+        largura(largInicial); tema(temaInicial);
         return new Promise(function (ok) {
           aoCarregarFns.push(function (info) {
             quadro.assentar().then(function () {
+              // o testador lê o estado FINAL das animações e transições finitas
+              var nAnim = finalizarAnimacoes(info.doc);
               var ctx = contexto();
-              ok({ metas: meta ? HS.avaliarMetas(meta, ctx) : [], console: quadro.consoleTexto, modo: quadro.modoAtual, compat: info.doc.compatMode, nome: info.nome, temDoc: !!ctx.doc });
+              ok({ metas: meta ? HS.avaliarMetas(meta, ctx) : [], console: quadro.consoleTexto, modo: quadro.modoAtual, compat: info.doc.compatMode, nome: info.nome, temDoc: !!ctx.doc, animacoes: nAnim, largura: info.win.innerWidth });
             });
           });
           painel.limpar();
@@ -1035,6 +1130,7 @@
     var endTxt = caixa.querySelector(".hs-end");
     var esperando = [];
     var q = new Quadro(caixa.querySelector(".hs-frame-host"), {
+      largura: larguraDe(pre), escuro: pre.getAttribute("data-tema") === "escuro",
       arquivos: function () { return [{ nome: nome, codigo: r.codigo }]; },
       altura: { min: 40, max: 640 },
       aoConsole: function (t, txt) { painel.add(t, txt); },
