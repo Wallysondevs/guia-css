@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS :not(), :is() e :where() — excluir, agrupar e zerar a força | Guia CSS</title>
+<meta name="description" content="As pseudo-classes :not(), :is() e :where() para quem está começando: excluir elementos de uma regra (li:not(:last-child)), encurtar listas de seletores com :is(), deixar a especificidade em zero com :where(), a lista que perdoa erros, qual usar em cada caso e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">:not(), :is() e :where()</span></h1>
+
+<p class="intro">Três pseudo-classes que recebem <strong>outros seletores</strong> entre parênteses. A <code>:not()</code> diz "todos, <strong>menos</strong> estes": todos os itens da lista menos o último, todos os campos menos a caixinha de marcar. A <code>:is()</code> e a <code>:where()</code> dizem "<strong>qualquer um</strong> destes" e encurtam listas compridas de seletores; a diferença entre elas é a força na cascata. Juntas, elas deixam o CSS mais curto e mais fácil de manter.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li><code>:not()</code>: excluir elementos de uma regra, com um ou vários seletores.</li>
+  <li><code>:is()</code>: juntar vários seletores num só, sem repetir o resto.</li>
+  <li><code>:where()</code>: o mesmo que <code>:is()</code>, mas com força <strong>zero</strong>.</li>
+  <li>Como cada uma conta na especificidade, e qual usar em cada caso.</li>
+  <li>A "lista que perdoa": por que um erro dentro de <code>:is()</code> não derruba a regra inteira.</li>
+  <li>Os erros reais: o parêntese que falta, o <code>:not()</code> largo demais e o <code>:is()</code> que ficou forte demais.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: o aviso do condomínio</h2>
+<p>Pense nos avisos do quadro de um prédio:</p>
+<ul>
+  <li>"Todos os moradores, <strong>exceto</strong> os do térreo, devem fechar as janelas." Isso é <code>:not()</code>: uma regra para todos, com uma exceção.</li>
+  <li>"Moradores do bloco A, do bloco B <strong>ou</strong> do bloco C: reunião às 19h." Isso é <code>:is()</code>: em vez de escrever três avisos iguais, um aviso com a lista.</li>
+  <li>"<strong>Sugestão</strong> para todos: vaso de planta na varanda." Isso é <code>:where()</code>: vale para todos, mas qualquer regra mais específica passa por cima, sem discussão.</li>
+</ul>
+
+<hr>
+
+<h2>1. Todos, menos estes: <code>:not()</code></h2>
+<p>Um caso que aparece em todo site: uma linha separando os itens de uma lista, mas <strong>sem</strong> linha embaixo do último.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque <code>li:not(:last-child)</code> por <code>li</code> e veja aparecer uma linha sobrando embaixo do último item.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul class="cardapio"&gt;
+  &lt;li&gt;Pão de queijo&lt;/li&gt;
+  &lt;li&gt;Bolo de cenoura&lt;/li&gt;
+  &lt;li&gt;Café coado&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.cardapio {
+  list-style: none;
+  padding: 0;
+  border: 1px solid silver;
+  width: 220px;
+}
+
+.cardapio li {
+  padding: 0.5rem;
+}
+
+.cardapio li:not(:last-child) {
+  border-bottom: 1px solid silver;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>.cardapio li</dt><dd>Os itens da lista do cardápio.</dd>
+  <dt>:not(</dt><dd>"Que <strong>não</strong> seja…" (<em>not</em> = "não"). Colado no seletor, sem espaço.</dd>
+  <dt>:last-child</dt><dd>O seletor que fica de fora: o último filho (aula <a href="nth-child.html">:first-child, :last-child e :nth-child</a>).</dd>
+  <dt>)</dt><dd>Fecha o parêntese. Todo <code>:not(</code> precisa do seu <code>)</code>.</dd>
+</dl>
+
+<p>Repare: os dois primeiros itens têm a linha cinza embaixo; o "Café coado", não. Sem o <code>:not()</code>, seriam duas regras: uma pondo a linha em todos e outra tirando do último (<code>border-bottom: none</code>). Com ele, é uma regra só, que diz o que você quer.</p>
+
+<h3>Vários seletores dentro do <code>:not()</code></h3>
+<p>Separe com vírgula: "nem este, nem aquele".</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> os campos de texto ocupam a largura toda, mas as caixinhas de marcar e as bolinhas de escolha ficam do tamanho normal. Tire o <code>[type="radio"]</code> de dentro do <code>:not()</code> e veja a bolinha esticar (e ficar estranha).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;&lt;label&gt;Nome &lt;input type="text" name="nome"&gt;&lt;/label&gt;&lt;/p&gt;
+&lt;p&gt;&lt;label&gt;E-mail &lt;input type="email" name="email"&gt;&lt;/label&gt;&lt;/p&gt;
+&lt;p&gt;&lt;label&gt;&lt;input type="checkbox" name="novidades"&gt; Quero novidades&lt;/label&gt;&lt;/p&gt;
+&lt;p&gt;&lt;label&gt;&lt;input type="radio" name="entrega" value="retirar"&gt; Vou buscar&lt;/label&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">input:not([type="checkbox"], [type="radio"]) {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.4rem;
+}
+</pre>
+</div>
+
+<p>Os seletores de atributo (<code>[type="checkbox"]</code>) são da aula <a href="seletores-atributo.html">Seletores de Atributo</a>. A lista com vírgula dentro do <code>:not()</code> funciona em todos os navegadores atuais (Chrome e Edge 88, Firefox 84, Safari 9). Em códigos antigos, você vai ver o mesmo escrito com dois <code>:not()</code> seguidos: <code>input:not([type="checkbox"]):not([type="radio"])</code>. Também funciona.</p>
+
+<div class="tryhtml" data-goal="css:.passos li:first-child{border-bottom-style}=dashed,css:.passos li:nth-child(2){border-bottom-style}=dashed,css:.passos li:last-child{border-bottom-style}=none,src::not\(">
+<p class="try-task"><strong>Missão:</strong> na lista de passos da receita, ponha uma linha tracejada embaixo de cada passo (<code>border-bottom: 1px dashed gray;</code>), <strong>menos</strong> no último. Use <code>:not()</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ol class="passos"&gt;
+  &lt;li&gt;Bata as cenouras com os ovos e o óleo.&lt;/li&gt;
+  &lt;li&gt;Misture o açúcar e a farinha.&lt;/li&gt;
+  &lt;li&gt;Asse por 40 minutos.&lt;/li&gt;
+&lt;/ol&gt;
+</pre>
+<pre class="script" data-file="style.css">.passos li {
+  padding: 0.5rem 0;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.passos li {
+  padding: 0.5rem 0;
+}
+
+.passos li:not(:last-child) {
+  border-bottom: 1px dashed gray;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. Qualquer um destes: <code>:is()</code></h2>
+<p>Imagine que os links do cabeçalho, do menu e do rodapé têm o mesmo estilo. Sem <code>:is()</code>, você repete o <code>a</code> três vezes (aula <a href="seletor-grupo.html">Agrupando Seletores</a>):</p>
+
+<pre class="file" data-file="style.css · sem :is()">header a,
+nav a,
+footer a {
+  color: navy;
+}
+</pre>
+
+<p>Com <code>:is()</code>, a parte que muda vai entre parênteses e a parte que repete fica fora, uma vez só:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o link do meio do texto (dentro do <code>main</code>) não está na lista e fica com a cor normal de link. Acrescente <code>main</code> dentro do <code>:is()</code> e veja ele ficar azul-marinho também.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header&gt;&lt;a href="index.html"&gt;Lojinha da Ana&lt;/a&gt;&lt;/header&gt;
+&lt;nav&gt;&lt;a href="bolos.html"&gt;Bolos&lt;/a&gt; · &lt;a href="paes.html"&gt;Pães&lt;/a&gt;&lt;/nav&gt;
+&lt;main&gt;&lt;p&gt;Veja as &lt;a href="novidades.html"&gt;novidades da semana&lt;/a&gt;.&lt;/p&gt;&lt;/main&gt;
+&lt;footer&gt;&lt;a href="contato.html"&gt;Contato&lt;/a&gt;&lt;/footer&gt;
+</pre>
+<pre class="script" data-file="style.css">:is(header, nav, footer) a {
+  color: navy;
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>:is(header, nav, footer)</dt><dd>"Um elemento que <strong>é</strong> <code>header</code>, <code>nav</code> ou <code>footer</code>" (<em>is</em> = "é").</dd>
+  <dt>␣a</dt><dd>Depois do espaço, o resto do seletor: um link dentro de qualquer um deles.</dd>
+</dl>
+
+<p>Fica ainda melhor quando a lista se repete dos dois lados. Títulos dentro de <code>article</code>, <code>section</code> e <code>aside</code>, sem <code>:is()</code>, seriam nove seletores (3 × 3). Com dois <code>:is()</code>, é uma linha:</p>
+
+<pre class="file" data-file="style.css">:is(article, section, aside) :is(h1, h2, h3) {
+  color: darkgreen;
+}
+</pre>
+
+<hr>
+
+<h2>3. O mesmo, com força zero: <code>:where()</code></h2>
+<p>A <code>:where()</code> escolhe <strong>exatamente os mesmos elementos</strong> que a <code>:is()</code>. A única diferença é a <a href="especificidade.html">especificidade</a>:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Pseudo-classe</th><th>Força na cascata</th><th>Exemplo</th><th>Especificidade</th></tr>
+<tr><td><code>:is()</code></td><td>a do seletor <strong>mais forte</strong> da lista</td><td><code>:is(#menu, .lateral) a</code></td><td>1, 0, 1 (vale o <code>#menu</code>)</td></tr>
+<tr><td><code>:where()</code></td><td><strong>zero</strong>, sempre</td><td><code>:where(#menu, .lateral) a</code></td><td>0, 0, 1 (só o <code>a</code> conta)</td></tr>
+<tr><td><code>:not()</code></td><td>a do seletor mais forte da lista (igual à <code>:is()</code>)</td><td><code>li:not(.feito)</code></td><td>0, 1, 1</td></tr>
+</table>
+</div>
+
+<p>Força zero serve para escrever um <strong>estilo base</strong>, que qualquer regra simples consegue mudar depois. Veja o problema que ela resolve:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o parágrafo com a classe <code>alerta</code> deveria ficar vermelho, e não fica: <code>#receita p</code> (1, 0, 1) é mais forte que <code>.alerta</code> (0, 1, 0). Troque <code>#receita p</code> por <code>:where(#receita) p</code> e veja o alerta ficar vermelho.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article id="receita"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Rende 12 fatias.&lt;/p&gt;
+  &lt;p class="alerta"&gt;Contém ovos e trigo.&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">#receita p {
+  color: dimgray;
+}
+
+.alerta {
+  color: firebrick;
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<p>Antes da troca, "Contém ovos e trigo." fica em negrito (o <code>font-weight</code> não tinha concorrente), mas <strong>cinza</strong>: a cor do <code>#receita p</code> ganhou. Depois da troca, <code>:where(#receita) p</code> vale só 0, 0, 1, a <code>.alerta</code> vence e o texto fica vermelho-tijolo. Sem <code>:where()</code>, a tentação seria um <code>!important</code> (aula <a href="important.html">!important</a>), que só empurra o problema para a frente.</p>
+
+<h3>Qual usar</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você quer</th><th>Use</th></tr>
+<tr><td>Uma regra para todos, com exceções</td><td><code>:not()</code></td></tr>
+<tr><td>Encurtar uma lista de seletores, com a força normal</td><td><code>:is()</code></td></tr>
+<tr><td>Um estilo base, fácil de mudar depois (reset, tema, biblioteca de componentes)</td><td><code>:where()</code></td></tr>
+<tr><td>Uma lista curta e simples, como <code>h1, h2</code></td><td>A vírgula de sempre: <code>:is()</code> não acrescenta nada</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>4. A lista que perdoa</h2>
+<p>Numa lista comum com vírgula, <strong>um</strong> seletor errado derruba a <strong>regra inteira</strong>: o navegador não sabe o que fazer com a parte errada e joga tudo fora. Dentro de <code>:is()</code> e <code>:where()</code>, a lista "perdoa" (<em>forgiving</em>): o navegador ignora só o seletor errado e usa os outros.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> os dois títulos têm a mesma regra, com o mesmo erro de digitação (<code>:hoverr</code>). O primeiro, com a lista comum, ficou preto; o segundo, com <code>:is()</code>, ficou cor de tomate. Corrija para <code>:hover</code> e passe o mouse nos parágrafos.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2 class="comum"&gt;Lista comum&lt;/h2&gt;
+&lt;p class="comum"&gt;Parágrafo da lista comum.&lt;/p&gt;
+&lt;h2 class="perdoa"&gt;Lista dentro de :is()&lt;/h2&gt;
+&lt;p class="perdoa"&gt;Parágrafo da lista que perdoa.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h2.comum,
+p.comum:hoverr {
+  color: tomato;
+}
+
+:is(h2.perdoa, p.perdoa:hoverr) {
+  color: tomato;
+}
+</pre>
+</div>
+
+<p>Mesmo assim, o erro continua sendo erro. O validador aponta os dois:</p>
+<pre class="term" data-cwd="~/site">$ vnu --css lista.css
+"file:/home/ana/site/lista.css":2.3-2.8: error: CSS: Unknown pseudo-element or pseudo-class “:hoverr”
+$ vnu --css is.css
+"file:/home/ana/site/is.css":1.11-1.16: error: CSS: Unknown pseudo-element or pseudo-class “:hoverr”</pre>
+<p>"Pseudo-elemento ou pseudo-classe desconhecido: <code>:hoverr</code>". O perdão do <code>:is()</code> evita que um erro pequeno apague um estilo grande, mas o <code>p:hoverr</code> continua sem funcionar. A <code>:not()</code> <strong>não</strong> perdoa: um seletor errado dentro dela derruba a regra.</p>
+
+<div class="note">
+<strong>Suporte</strong>
+<p><code>:is()</code> e <code>:where()</code> funcionam em todos os navegadores atuais desde 2021 (Chrome e Edge 88, Firefox 78, Safari 14; dados do MDN). Em códigos antigos você pode ver <code>:matches()</code> ou <code>:-webkit-any()</code>: são os nomes de teste da <code>:is()</code>, de antes de ela ficar pronta. Não use.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Esqueceu o <code>)</code>: <code>Parse Error</code></strong>
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  li:not(:last-child {
+    color: tomato;
+  }
+&lt;/style&gt;
+&lt;ul&gt;
+  &lt;li&gt;Pão de queijo&lt;/li&gt;
+  &lt;li&gt;Bolo de cenoura&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<p><strong>O que você vê:</strong> os dois itens continuam pretos.</p>
+<p><strong>Por quê:</strong> o parêntese aberto faz o navegador ler as chaves e a declaração como parte do seletor, igual ao colchete esquecido da aula <a href="seletores-atributo.html">Seletores de Atributo</a>. A regra inteira (e as que viessem depois dela) vai embora. O validador:</p>
+<pre class="term" data-cwd="~/site">$ vnu --css parentese.css
+"file:/home/ana/site/parentese.css":1.9-1.18: error: CSS: Parse Error.</pre>
+<p><strong>Como consertar:</strong> <code>li:not(:last-child)</code>. Conte os parênteses: cada <code>(</code> com o seu <code>)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>:not()</code> sozinho pega a página inteira</strong>
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  :not(.destaque) {
+    color: gray;
+  }
+&lt;/style&gt;
+&lt;p&gt;Pão de queijo&lt;/p&gt;
+&lt;p class="destaque"&gt;Bolo do dia: cenoura!&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> os <strong>dois</strong> parágrafos ficam cinza, até o do destaque.</p>
+<p><strong>Por quê:</strong> sem nada na frente, <code>:not(.destaque)</code> escolhe <strong>todo</strong> elemento que não tem a classe, inclusive o <code>&lt;html&gt;</code> e o <code>&lt;body&gt;</code>. O <code>body</code> fica cinza, e o parágrafo <code>.destaque</code>, que ficou de fora da regra, <strong>herda</strong> o cinza do <code>body</code> (aula <a href="heranca.html">Herança</a>). A exceção sumiu. O validador não reclama: o seletor está certo.</p>
+<p><strong>Como consertar:</strong> sempre diga <em>de quem</em> é a exceção: <code>p:not(.destaque)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>:is()</code> com um ID: a regra fica forte demais</strong>
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  :is(#menu, nav) a {
+    color: navy;
+  }
+  .ativo {
+    color: tomato;
+  }
+&lt;/style&gt;
+&lt;nav&gt;
+  &lt;a href="index.html"&gt;Início&lt;/a&gt;
+  &lt;a href="bolos.html" class="ativo"&gt;Bolos&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+<p><strong>O que você vê:</strong> o link "Bolos" fica azul-marinho, e não cor de tomate.</p>
+<p><strong>Por quê:</strong> a <code>:is()</code> vale o que vale o seletor <strong>mais forte</strong> da lista, mesmo que o elemento tenha casado pelo mais fraco. Aqui o link casou pelo <code>nav</code>, mas a regra inteira conta como se tivesse o <code>#menu</code>: 1, 0, 1. A <code>.ativo</code> (0, 1, 0) perde. Nenhum aviso, nem do validador.</p>
+<p><strong>Como consertar:</strong> troque <code>:is()</code> por <code>:where()</code> (0, 0, 1), ou tire o ID da lista e use uma classe.</p>
+</div>
+
+<div class="cenario">
+<strong>Espaço antes do <code>:not</code></strong>
+<p><strong>O que acontece:</strong> <code>li :not(:last-child)</code>, com espaço, quer dizer "qualquer elemento <strong>dentro</strong> de um <code>li</code> que não seja o último filho". Num <code>li</code> só com texto, não há nada dentro, e nada muda. O validador não reclama.</p>
+<p><strong>Como consertar:</strong> cole: <code>li:not(:last-child)</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Escolhe</th><th>Especificidade</th></tr>
+<tr><td><code>li:not(:last-child)</code></td><td>Os <code>li</code> que não são o último</td><td>A do argumento mais forte (aqui, 0, 1, 1)</td></tr>
+<tr><td><code>input:not([type="checkbox"], [type="radio"])</code></td><td>Os <code>input</code> que não são caixinha nem bolinha</td><td>0, 1, 1</td></tr>
+<tr><td><code>:is(header, nav, footer) a</code></td><td>Links dentro de qualquer um dos três</td><td>A do argumento mais forte (aqui, 0, 0, 2)</td></tr>
+<tr><td><code>:where(header, nav, footer) a</code></td><td>Os mesmos links</td><td>Zero para o que está dentro: 0, 0, 1</td></tr>
+<tr><td>Erro dentro de <code>:is()</code>/<code>:where()</code></td><td>Só o seletor errado é ignorado</td><td>—</td></tr>
+<tr><td>Erro numa lista comum ou dentro de <code>:not()</code></td><td>A regra inteira é ignorada</td><td>—</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Menos o último</h3>
+<p>Complete para escolher todos os itens, menos o último:</p>
+<div class="ex-code">li:<input data-answer="not" aria-label="pseudo-classe">(:last-child) { border-bottom: 1px solid silver; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Força zero</h3>
+<p>Complete com a pseudo-classe que não soma nada na especificidade:</p>
+<div class="ex-code">:<input data-answer="where" aria-label="pseudo-classe">(article, section) p { color: dimgray; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Encurtar</h3>
+<p>Complete para escrever <code>header a, footer a</code> de um jeito só:</p>
+<div class="ex-code">:<input data-answer="is|where" aria-label="pseudo-classe">(header, footer) a { color: navy; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Qual é a especificidade de <code>:is(#menu, .lateral) a</code>?</p>
+<label><input type="radio" name="q4"> 0, 1, 1 (vale o <code>.lateral</code>)</label>
+<label><input type="radio" name="q4"> 1, 0, 1 (vale o seletor mais forte, o <code>#menu</code>)</label>
+<label><input type="radio" name="q4"> 0, 0, 1 (o <code>:is()</code> não conta)</label>
+<label><input type="radio" name="q4"> 1, 1, 1 (soma tudo)</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. A regra <code>h2, p:hoverr { color: tomato; }</code> tem um erro de digitação. O que acontece com o <code>h2</code>?</p>
+<label><input type="radio" name="q5"> Fica cor de tomate: só o <code>p:hoverr</code> é ignorado</label>
+<label><input type="radio" name="q5"> Fica cor de tomate só ao passar o mouse</label>
+<label><input type="radio" name="q5"> Não muda: numa lista comum, um seletor errado derruba a regra inteira</label>
+<label><input type="radio" name="q5"> A página para de carregar o CSS</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. A Ana escreveu <code>:not(.destaque) { color: gray; }</code> e até o parágrafo <code>.destaque</code> ficou cinza. Por quê?</p>
+<label><input type="radio" name="q6"> A regra pegou também o <code>body</code>, e o <code>.destaque</code> herdou o cinza dele</label>
+<label><input type="radio" name="q6"> O <code>:not()</code> não funciona com classes</label>
+<label><input type="radio" name="q6"> Faltou o <code>!important</code></label>
+<label><input type="radio" name="q6"> O navegador ignorou a regra</label>
+</div>
+
+<h3>Missão final: o estilo base da receita</h3>
+
+<div class="tryhtml" data-goal="css:#receita h2{color}=rgb(0, 0, 128),css:#receita h3{color}=rgb(0, 0, 128),css:p.alerta{color}=rgb(178, 34, 34),css:#receita p:first-of-type{color}=rgb(105, 105, 105),src::is\(,src::where\(,nsrc:!important">
+<p class="try-task"><strong>Missão:</strong> (1) Troque as duas regras repetidas dos títulos por uma só, com <code>:is(h2, h3)</code>, mantendo a cor <code>navy</code>. (2) O alerta deveria ficar <code>firebrick</code>, mas o <code>#receita p</code> é forte demais: envolva o <code>#receita</code> num <code>:where()</code>. Os parágrafos comuns continuam <code>dimgray</code>. Sem <code>!important</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article id="receita"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Rende 12 fatias.&lt;/p&gt;
+  &lt;h3&gt;Atenção&lt;/h3&gt;
+  &lt;p class="alerta"&gt;Contém ovos e trigo.&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">#receita h2 {
+  color: navy;
+}
+
+#receita h3 {
+  color: navy;
+}
+
+#receita p {
+  color: dimgray;
+}
+
+.alerta {
+  color: firebrick;
+}
+</pre>
+<pre class="solucao" data-file="style.css">#receita :is(h2, h3) {
+  color: navy;
+}
+
+:where(#receita) p {
+  color: dimgray;
+}
+
+.alerta {
+  color: firebrick;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>:not(X)</code>: todos <strong>menos</strong> X. Aceita lista com vírgula (<code>:not(.a, .b)</code>). Sempre diga de quem é a exceção (<code>p:not(.destaque)</code>); sozinho, ele pega até o <code>body</code>.</li>
+  <li><code>:is(A, B, C)</code>: qualquer um da lista, sem repetir o resto do seletor. Vale a força do seletor <strong>mais forte</strong> da lista, e um ID ali dentro deixa a regra difícil de vencer.</li>
+  <li><code>:where(A, B, C)</code>: os mesmos elementos, com força <strong>zero</strong>. Bom para estilos base que outras regras vão mudar.</li>
+  <li>Dentro de <code>:is()</code> e <code>:where()</code>, um seletor errado é ignorado sozinho; numa lista comum ou no <code>:not()</code>, ele derruba a regra inteira. O validador acusa os dois casos (<code>Unknown pseudo-element or pseudo-class</code>).</li>
+  <li>Parêntese esquecido: <code>Parse Error</code>, e a regra some.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
