@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Recortes — clip-path com circle, ellipse, inset e polygon | Guia CSS</title>
+<meta name="description" content="Recortes em CSS para quem está começando: clip-path com circle(), ellipse(), inset() e polygon(), como ler as coordenadas em porcentagem, o espaço que o elemento continua ocupando, a sombra que some, recortes animados com transition e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Recortes</span></h1>
+
+<p class="intro">Toda caixa do CSS é um retângulo. Com <code>border-radius</code> dá para arredondar os cantos, mas e se a Ana quiser a foto do bolo num triângulo, um selo de "Novo!" em forma de estrela, ou o topo do site cortado na diagonal? A propriedade <code>clip-path</code> ("caminho de recorte") recorta o elemento num formato: o que fica dentro do formato aparece; o que fica fora some.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A ideia do recorte: uma tesoura que corta o desenho, mas não muda o espaço que ele ocupa.</li>
+  <li>As quatro formas básicas: <code>circle()</code>, <code>ellipse()</code>, <code>inset()</code> e <code>polygon()</code>, cada uma vista na mesma foto.</li>
+  <li>Como ler as coordenadas de um <code>polygon()</code> (x e y, em porcentagem).</li>
+  <li>Quando usar <code>clip-path</code> e quando <code>border-radius</code> basta.</li>
+  <li>Recortes animados com <code>transition</code>.</li>
+  <li>O que dá errado: a sombra que some, a vírgula esquecida, o número sem unidade e as mensagens reais do validador.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="border-radius.html">Cantos Arredondados</a> e <a href="unidades.html">Unidades</a> (o <code>%</code>). Os exemplos usam as fotos de exemplo do guia, e o seu navegador desenha cada resultado agora. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: uma tesoura com molde</h2>
+<p>Pense na Ana recortando uma foto para colar no caderno de receitas. Ela põe um molde (um círculo, uma estrela) em cima da foto e corta em volta. O que estava fora do molde vai para o lixo.</p>
+
+<p>O <code>clip-path</code> é esse molde, com uma diferença importante: no CSS, o recorte é só no <strong>desenho</strong>. A caixa do elemento continua do mesmo tamanho, ocupando o mesmo lugar na página; os vizinhos não se mexem. É como se o pedaço cortado ficasse invisível, mas continuasse lá, guardando o espaço.</p>
+
+<hr>
+
+<h2>1. O primeiro recorte: um círculo</h2>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .foto {
+    width: 200px;
+  }
+  .redonda {
+    clip-path: circle(50%);
+  }
+&lt;/style&gt;
+&lt;img class="foto" src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo de cenoura"&gt;
+&lt;img class="foto redonda" src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo de cenoura, recortado em círculo"&gt;
+</pre>
+
+<p>A mesma foto quadrada duas vezes. A da direita virou um círculo: os quatro cantos sumiram, e o fundo da página aparece no lugar deles.</p>
+
+<dl class="anatomy">
+  <dt>clip-path</dt><dd>A propriedade: <em>clip</em> = "recortar", <em>path</em> = "caminho". O caminho que a tesoura segue.</dd>
+  <dt>circle(</dt><dd>A <strong>forma</strong>: um círculo.</dd>
+  <dt>50%</dt><dd>O <strong>raio</strong> do círculo (a distância do centro até a borda). Num quadrado, <code>50%</code> é metade do lado: o círculo encosta nas quatro bordas.</dd>
+  <dt>)</dt><dd>Fecha a forma. Sem mais nada, o centro fica no meio do elemento.</dd>
+</dl>
+
+<p>Para mudar o centro, use <code>at</code> ("em") e a posição, primeiro na horizontal e depois na vertical: <code>circle(40% at 50% 60%)</code> é um círculo de raio 40%, com o centro no meio (<code>50%</code>) e um pouco abaixo (<code>60%</code>). Também vale <code>at center</code>, <code>at top</code>, <code>at left bottom</code>.</p>
+
+<div class="tryhtml" data-goal="css:.avatar{clip-path}=circle(50%)">
+<p class="try-task"><strong>Missão:</strong> o avatar do blog da Ana é quadrado. Recorte a foto num círculo, com <code>clip-path: circle(50%)</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;img class="avatar" src="assets/midia/bolo-quadrado-400.jpg" alt="Foto do perfil: bolo de cenoura"&gt;
+&lt;p&gt;Blog da Ana: um bolo por semana.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.avatar {
+  width: 120px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.avatar {
+  width: 120px;
+  clip-path: circle(50%);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. As quatro formas básicas, lado a lado</h2>
+<p>Cada caixa é a mesma foto (quadrada, 150 × 150 pixels) com um recorte diferente, e o código escrito embaixo:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .galeria {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-family: sans-serif;
+  }
+  figure {
+    margin: 0;
+    width: 150px;
+    text-align: center;
+    font-size: 12px;
+  }
+  figure img {
+    width: 150px;
+    display: block;
+  }
+  .circulo img   { clip-path: circle(50%); }
+  .deslocado img { clip-path: circle(40% at 50% 60%); }
+  .elipse img    { clip-path: ellipse(50% 35% at 50% 55%); }
+  .margem img    { clip-path: inset(10%); }
+  .arredondado img { clip-path: inset(10% round 20px); }
+  .triangulo img { clip-path: polygon(50% 0%, 100% 100%, 0% 100%); }
+  .pentagono img { clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); }
+  .estrela img   { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+&lt;/style&gt;
+&lt;div class="galeria"&gt;
+  &lt;figure class="circulo"&gt;&lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo em círculo"&gt;&lt;figcaption&gt;circle(50%)&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="deslocado"&gt;&lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo em círculo menor"&gt;&lt;figcaption&gt;circle(40% at 50% 60%)&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="elipse"&gt;&lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo em elipse"&gt;&lt;figcaption&gt;ellipse(50% 35% at 50% 55%)&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="margem"&gt;&lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo com as bordas cortadas"&gt;&lt;figcaption&gt;inset(10%)&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="arredondado"&gt;&lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo com as bordas cortadas e cantos redondos"&gt;&lt;figcaption&gt;inset(10% round 20px)&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="triangulo"&gt;&lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo em triângulo"&gt;&lt;figcaption&gt;polygon(3 pontos)&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="pentagono"&gt;&lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo em pentágono"&gt;&lt;figcaption&gt;polygon(5 pontos)&lt;/figcaption&gt;&lt;/figure&gt;
+  &lt;figure class="estrela"&gt;&lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo em estrela"&gt;&lt;figcaption&gt;polygon(10 pontos)&lt;/figcaption&gt;&lt;/figure&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Repare que os nomes embaixo ficaram todos alinhados, mesmo com recortes de tamanhos diferentes: cada foto continua ocupando os 150 × 150 pixels dela. Em <code>inset(10%)</code>, sobrou uma moldura vazia em volta; na estrela, as pontas tocam a borda de cima, mas não as dos lados.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Escreva</th><th>O que cada parte quer dizer</th></tr>
+<tr><td><code>circle()</code></td><td><code>circle(RAIO at X Y)</code></td><td>Raio em <code>px</code>, <code>%</code>… O <code>at X Y</code> (centro) é opcional: sem ele, o centro é o meio.</td></tr>
+<tr><td><code>ellipse()</code></td><td><code>ellipse(RAIO-X RAIO-Y at X Y)</code></td><td>Um "círculo achatado": dois raios, o da horizontal e o da vertical.</td></tr>
+<tr><td><code>inset()</code></td><td><code>inset(CIMA DIREITA BAIXO ESQUERDA round CANTOS)</code></td><td><em>Inset</em> = "para dentro": quanto cortar de cada lado, na ordem do <code>margin</code> (um valor = os quatro lados). O <code>round</code> ("arredondado") é opcional e funciona como o <code>border-radius</code>.</td></tr>
+<tr><td><code>polygon()</code></td><td><code>polygon(X1 Y1, X2 Y2, X3 Y3, …)</code></td><td>Um polígono: a lista dos cantos (vértices), cada um com <code>x y</code>, separados por <strong>vírgula</strong>. Três pontos ou mais.</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>3. Lendo as coordenadas do polygon()</h2>
+<p>Cada ponto do <code>polygon()</code> é um par <code>x y</code>, medido a partir do <strong>canto de cima, à esquerda</strong> do elemento:</p>
+<ul>
+  <li><code>x</code> anda para a direita: <code>0%</code> é a borda esquerda, <code>100%</code> é a borda direita;</li>
+  <li><code>y</code> anda para <strong>baixo</strong> (e não para cima, como na escola): <code>0%</code> é a borda de cima, <code>100%</code> é a de baixo.</li>
+</ul>
+
+<p>O triângulo <code>polygon(50% 0%, 100% 100%, 0% 100%)</code>, lido ponto por ponto:</p>
+<ol class="passo">
+  <li><code>50% 0%</code>: no meio da largura, lá em cima. É a ponta do triângulo.</li>
+  <li><code>100% 100%</code>: a borda direita, lá embaixo. Canto de baixo, à direita.</li>
+  <li><code>0% 100%</code>: a borda esquerda, lá embaixo. Canto de baixo, à esquerda.</li>
+  <li>O navegador liga o último ponto ao primeiro e fecha a forma sozinho.</li>
+</ol>
+
+<p>Com porcentagens, o recorte acompanha o tamanho do elemento: a mesma regra serve para uma foto de 100 ou de 1000 pixels. Também dá para usar <code>px</code> (<code>polygon(0 0, 200px 0, 100px 150px)</code>), mas aí o formato fica fixo. O <code>0</code> pode ficar sem unidade.</p>
+
+<p>Um uso muito comum, que não é foto: o topo de um site cortado na diagonal.</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .topo {
+    background-color: tomato;
+    color: white;
+    padding: 20px 20px 60px;
+    font-family: sans-serif;
+    clip-path: polygon(0 0, 100% 0, 100% 75%, 0 100%);
+  }
+&lt;/style&gt;
+&lt;header class="topo"&gt;
+  &lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;/header&gt;
+&lt;p&gt;Bolos, tortas e doces feitos em casa.&lt;/p&gt;
+</pre>
+
+<p>A faixa vermelha termina numa linha inclinada: do lado esquerdo ela desce até o fim da caixa (<code>0 100%</code>); do lado direito, para em três quartos da altura (<code>100% 75%</code>). Embaixo da diagonal, aparece o fundo branco da página. E o parágrafo continua no mesmo lugar, abaixo de onde a caixa <strong>inteira</strong> terminaria.</p>
+
+<div class="tip">
+<p><strong>Desenhando polígonos sem sofrer.</strong> Para formas com muitos pontos, desenhe numa folha quadriculada de 10 × 10 (cada quadradinho = 10%) e anote os cantos. No F12 do Firefox, a regra com <code>clip-path</code> ganha um botãozinho que mostra os pontos em cima do elemento, e dá para arrastá-los. Brinque com os pontos abaixo:</p>
+</div>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;img class="foto" src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo de cenoura recortado"&gt;
+</pre>
+<pre class="script" data-file="style.css">.foto {
+  width: 250px;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+/* experimente:
+   um losango é o de cima; agora tente
+   polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%)   -&gt; uma bandeirola
+   polygon(20% 0, 80% 0, 100% 100%, 0 100%)          -&gt; um trapézio
+   circle(30% at 30% 30%)
+*/
+</pre>
+</div>
+
+<hr>
+
+<h2>4. clip-path × border-radius</h2>
+<p>Para cantos arredondados e círculos, as duas propriedades chegam no mesmo desenho. Veja o avatar com cada uma:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .avatar {
+    width: 120px;
+    margin: 8px;
+  }
+  .com-radius {
+    border-radius: 50%;
+    border: 4px solid tomato;
+    box-shadow: 0 4px 8px gray;
+  }
+  .com-clip {
+    clip-path: circle(50%);
+    border: 4px solid tomato;
+    box-shadow: 0 4px 8px gray;
+  }
+&lt;/style&gt;
+&lt;img class="avatar com-radius" src="assets/midia/bolo-quadrado-400.jpg" alt="Avatar com border-radius"&gt;
+&lt;img class="avatar com-clip" src="assets/midia/bolo-quadrado-400.jpg" alt="Avatar com clip-path"&gt;
+</pre>
+
+<p>À esquerda, com <code>border-radius</code>, o avatar redondo tem a borda <code>tomato</code> inteira e a sombra cinza embaixo. À direita, com <code>clip-path</code>, o círculo cortou a borda e a sombra: elas ficam fora do recorte e somem (sobram só uns pedaços da borda no meio de cada lado, onde o círculo encosta na caixa).</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você quer…</th><th>Use</th><th>Por quê</th></tr>
+<tr><td>Cantos arredondados, avatar redondo, com borda e sombra</td><td><code>border-radius</code></td><td>Arredonda a caixa inteira, e a borda e a sombra acompanham.</td></tr>
+<tr><td>Triângulo, estrela, diagonal, qualquer polígono</td><td><code>clip-path: polygon()</code></td><td>O <code>border-radius</code> só faz curvas.</td></tr>
+<tr><td>Um círculo fora do centro, ou só uma parte da foto</td><td><code>clip-path: circle(… at …)</code> ou <code>inset()</code></td><td>Escolhe qual pedaço aparece, sem editar a foto.</td></tr>
+<tr><td>Um recorte que muda com animação</td><td><code>clip-path</code> + <code>transition</code></td><td>As formas se transformam suavemente (veja a próxima seção).</td></tr>
+<tr><td>Uma forma com sombra</td><td><code>clip-path</code> no elemento + <code>filter: drop-shadow()</code> no <strong>pai</strong></td><td>A sombra do pai fica fora do recorte do filho (veja "Quando dá errado").</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>5. Recorte animado</h2>
+<p>O navegador sabe ir de uma forma para outra aos poucos, com <a href="transition.html"><code>transition</code></a>. Passe o mouse (ou o dedo) na foto:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;img class="foto" src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo de cenoura"&gt;
+&lt;p&gt;Passe o mouse no bolo.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.foto {
+  width: 250px;
+  clip-path: circle(25% at 50% 50%);
+  transition: clip-path 0.5s;
+}
+
+.foto:hover {
+  clip-path: circle(75% at 50% 50%);
+}
+</pre>
+</div>
+
+<p>O círculo pequeno no meio cresce até mostrar a foto inteira (um raio de <code>75%</code> já passa dos cantos). Para animar, as duas formas precisam ser <strong>do mesmo tipo</strong>: círculo com círculo, <code>inset</code> com <code>inset</code>, e polígono com polígono <strong>com o mesmo número de pontos</strong>. O navegador anda com cada ponto até o ponto correspondente; se o número de pontos for diferente, não há como emparelhar, e ele troca de uma forma para a outra de uma vez, sem animação.</p>
+
+<div class="note">
+<p><strong>Suporte:</strong> o <code>clip-path</code> com as formas desta aula (<code>circle</code>, <code>ellipse</code>, <code>inset</code>, <code>polygon</code>) funciona em todos os navegadores atuais desde 2020 (o MDN o marca como <em>Baseline: amplamente disponível</em>). Código antigo pode ter <code>-webkit-clip-path</code>, de quando o Safari só entendia o nome com prefixo; hoje não precisa.</p>
+<p>Existem formas mais novas: <code>path()</code>, que usa os comandos de desenho do SVG (<code>path("M 0 0 L 100 0 L 50 100 Z")</code>, em pixels fixos), e <code>shape()</code>, que faz o mesmo com porcentagens. O <code>shape()</code> chegou no Chrome e no Edge 135, no Safari 18.4 e no Firefox 148: é recente. E o validador W3C (<code>vnu</code> 26.10.12) ainda não conhece nenhuma das duas: ele acusa <code>“path(…)” is not a “clip-path” value</code> e <code>“shape(…)” is not a “clip-path” value</code>, mesmo com o código certo. Neste guia, ficamos com as quatro formas básicas.</p>
+</div>
+
+<hr>
+
+<h2>6. O recorte também vale para o mouse</h2>
+<p>A parte cortada não recebe cliques: o clique "atravessa" e cai no que estiver atrás (no Chromium, clicar no canto cortado de um círculo acerta a página, e não a imagem). Isso é bom num botão em forma de estrela, que só reage em cima da estrela. Mas cuidado com links: se você recorta demais um <code>&lt;a&gt;</code>, sobra pouca área para clicar.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Com um valor inválido, o navegador ignora a declaração inteira: o elemento aparece sem recorte nenhum, retangular. No F12, a declaração aparece riscada, com um ícone de aviso.</p>
+
+<div class="cenario">
+<strong><code>error: CSS: “clip-path”: “ ” is an incorrect operator.</code></strong>
+<p><strong>O que aconteceu:</strong> faltaram as vírgulas entre os pontos do <code>polygon()</code>: <code>polygon(50% 0% 100% 100% 0% 100%)</code>.</p>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  .foto {
+    width: 150px;
+    clip-path: polygon(50% 0% 100% 100% 0% 100%);
+  }
+&lt;/style&gt;
+&lt;img class="foto" src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo de cenoura"&gt;
+</pre>
+<p>A foto aparece quadrada e inteira: nada de triângulo.</p>
+<pre class="term" data-cwd="~/recortes">$ vnu --css sem-virgula.css
+"file:/home/ana/recortes/sem-virgula.css":2.46-2.46: error: CSS: “clip-path”: “ ” is an incorrect operator.</pre>
+<p>"“ ” (espaço) é um operador incorreto." O validador encontrou um espaço onde esperava a vírgula que separa um ponto do outro.</p>
+<p><strong>Como consertar:</strong> espaço <strong>dentro</strong> do ponto (entre o x e o y), vírgula <strong>entre</strong> os pontos: <code>polygon(50% 0%, 100% 100%, 0% 100%)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “clip-path”: “,” is an incorrect operator.</code></strong>
+<p><strong>O que aconteceu:</strong> o contrário, no círculo: <code>circle(50%, 50%)</code>. O <code>circle()</code> e o <code>ellipse()</code> não usam vírgula.</p>
+<pre class="term" data-cwd="~/recortes">$ vnu --css virgula-circulo.css
+"file:/home/ana/recortes/virgula-circulo.css":2.29-2.29: error: CSS: “clip-path”: “,” is an incorrect operator.</pre>
+<p><strong>Como consertar:</strong> <code>circle(50%)</code>, ou <code>ellipse(50% 35%)</code> para dois raios. Vírgula, só entre os pontos do <code>polygon()</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “clip-path”: only “0” can be a “unit”. You must put a unit after your number.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>clip-path: circle(50);</code>, um número sem unidade.</p>
+<pre class="term" data-cwd="~/recortes">$ vnu --css sem-unidade.css
+"file:/home/ana/recortes/sem-unidade.css":2.23-2.23: error: CSS: “clip-path”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<p>"Só o “0” pode ficar sem unidade. Você precisa pôr uma unidade depois do seu número." A foto fica sem recorte.</p>
+<p><strong>Como consertar:</strong> <code>circle(50%)</code> ou <code>circle(50px)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “clip-path”: “triangle(50% 0%)” is not a “clip-path” value.</code></strong>
+<p><strong>O que aconteceu:</strong> uma forma que não existe. Não há <code>triangle()</code>, <code>star()</code> nem <code>square()</code>: triângulo e estrela são <code>polygon()</code>, e retângulo é <code>inset()</code>.</p>
+<pre class="term" data-cwd="~/recortes">$ vnu --css triangle.css
+"file:/home/ana/recortes/triangle.css":2.29-2.29: error: CSS: “clip-path”: “triangle(50% 0%)” is not a “clip-path” value.</pre>
+<p><strong>Como consertar:</strong> <code>polygon(50% 0%, 100% 100%, 0% 100%)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>A sombra sumiu</strong>
+<p><strong>O que aconteceu:</strong> a Ana recortou o cartão da receita na diagonal e pôs um <code>box-shadow</code> nele. A sombra é desenhada <strong>fora</strong> da caixa, e o recorte apaga tudo o que fica fora da forma, inclusive ela. O código é válido; o validador não diz nada.</p>
+<p><strong>Como consertar:</strong> ponha o elemento recortado dentro de um pai, e a sombra no pai, com <code>filter: drop-shadow()</code> (aula <a href="filter.html">Filtros</a>), que segue o desenho dos filhos:</p>
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .sombra {
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+  }
+  .cartao {
+    width: 220px;
+    padding: 16px 16px 40px;
+    background-color: gold;
+    font-family: sans-serif;
+    clip-path: polygon(0 0, 100% 0, 100% 80%, 0 100%);
+  }
+&lt;/style&gt;
+&lt;div class="sombra"&gt;
+  &lt;div class="cartao"&gt;
+    &lt;h3&gt;Torta de limão&lt;/h3&gt;
+    &lt;p&gt;Pronta em 40 minutos.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<p>O cartão amarelo, cortado na diagonal embaixo, ganha uma sombra que acompanha a diagonal.</p>
+</div>
+
+<div class="cenario">
+<strong>O recorte não "puxa" o texto de baixo</strong>
+<p><strong>O que aconteceu:</strong> a Ana recortou a foto com <code>inset(20%)</code> e esperava que o texto subisse para perto do bolo. Mas sobrou um espaço vazio em volta: o <code>clip-path</code> só muda o desenho, não o tamanho da caixa.</p>
+<p><strong>Como consertar:</strong> para mudar o espaço ocupado, mude o tamanho do elemento (<code>width</code>, <code>height</code>, aula <a href="width-height.html">Largura e Altura</a>), ou recorte a foto com <code>object-fit</code> (aula <a href="imagens-responsivas.html">Imagens que se Adaptam</a>).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Código</th><th>O que faz</th></tr>
+<tr><td><code>clip-path: none;</code></td><td>Sem recorte (o padrão)</td></tr>
+<tr><td><code>clip-path: circle(50%);</code></td><td>Círculo no meio, encostando nas bordas</td></tr>
+<tr><td><code>clip-path: circle(40% at 30% 30%);</code></td><td>Círculo com outro centro</td></tr>
+<tr><td><code>clip-path: ellipse(50% 30%);</code></td><td>Elipse (raio horizontal e vertical)</td></tr>
+<tr><td><code>clip-path: inset(10%);</code></td><td>Corta 10% de cada lado</td></tr>
+<tr><td><code>clip-path: inset(0 0 20% 0 round 16px);</code></td><td>Corta 20% de baixo, com cantos arredondados</td></tr>
+<tr><td><code>clip-path: polygon(50% 0%, 100% 100%, 0% 100%);</code></td><td>Triângulo: pontos <code>x y</code>, separados por vírgula</td></tr>
+<tr><td><code>clip-path: polygon(0 0, 100% 0, 100% 75%, 0 100%);</code></td><td>Faixa com diagonal embaixo</td></tr>
+<tr><td><code>transition: clip-path 0.5s;</code></td><td>Anima entre formas do mesmo tipo (polígonos com o mesmo número de pontos)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Qual forma?</h3>
+<p>Complete para recortar um triângulo:</p>
+<div class="ex-code">clip-path: <input data-answer="polygon" aria-label="forma">(50% 0%, 100% 100%, 0% 100%);</div>
+</div>
+
+<div class="exercise">
+<h3>2. O centro do círculo</h3>
+<p>Complete com a palavra que separa o raio da posição do centro:</p>
+<div class="ex-code">clip-path: circle(30% <input data-answer="at" aria-label="palavra"> 20% 50%);</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. No <code>polygon()</code>, o ponto <code>100% 0%</code> fica em qual canto do elemento?</p>
+<label><input type="radio" name="q3"> Embaixo, à direita</label>
+<label><input type="radio" name="q3"> Em cima, à direita</label>
+<label><input type="radio" name="q3"> Em cima, à esquerda</label>
+<label><input type="radio" name="q3"> Embaixo, à esquerda</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Uma foto de 300 × 300 pixels recebe <code>clip-path: circle(25%)</code>. Quanto espaço ela ocupa na página?</p>
+<label><input type="radio" name="q4"> Só o círculo, e o texto ao lado encosta nele</label>
+<label><input type="radio" name="q4"> 150 × 150 pixels</label>
+<label><input type="radio" name="q4"> Os mesmos 300 × 300 pixels: o recorte só muda o desenho</label>
+<label><input type="radio" name="q4"> Nenhum: a foto sai do fluxo da página</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. A Ana quer um avatar redondo com borda e sombra. O que usar?</p>
+<label><input type="radio" name="q5"> <code>border-radius: 50%</code>, porque o <code>clip-path</code> cortaria a borda e a sombra</label>
+<label><input type="radio" name="q5"> <code>clip-path: circle(50%)</code>, porque é mais moderno</label>
+<label><input type="radio" name="q5"> <code>clip-path: polygon()</code> com muitos pontos</label>
+<label><input type="radio" name="q5"> Tanto faz: o resultado é sempre igual</label>
+</div>
+
+<h3>Missão final: o cartão da promoção</h3>
+
+<div class="tryhtml" data-goal="src:\.topo\s*\{[^}]*clip-path:\s*polygon\(,css:.foto{clip-path}=inset(5% round 24px),src:\.selo\s*\{[^}]*clip-path:\s*polygon\(,nsrc:triangle\(|star\(">
+<p class="try-task"><strong>Missão:</strong> (1) corte o <code>.topo</code> com uma diagonal embaixo, usando <code>polygon()</code>; (2) recorte a <code>.foto</code> com <code>inset(5% round 24px)</code>; (3) transforme o <code>.selo</code> numa estrela com <code>polygon()</code> (os pontos da estrela estão na seção 2).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;h1&gt;Promoção da semana&lt;/h1&gt;
+&lt;/header&gt;
+&lt;div class="produto"&gt;
+  &lt;img class="foto" src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo de cenoura com cobertura de chocolate"&gt;
+  &lt;p class="selo"&gt;Novo!&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: sans-serif;
+}
+
+.topo {
+  background-color: tomato;
+  color: white;
+  padding: 16px 16px 48px;
+}
+
+.produto {
+  position: relative;
+  width: 260px;
+}
+
+.foto {
+  width: 260px;
+  display: block;
+}
+
+.selo {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  width: 90px;
+  height: 90px;
+  background-color: gold;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: sans-serif;
+}
+
+.topo {
+  background-color: tomato;
+  color: white;
+  padding: 16px 16px 48px;
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 0 100%);
+}
+
+.produto {
+  position: relative;
+  width: 260px;
+}
+
+.foto {
+  width: 260px;
+  display: block;
+  clip-path: inset(5% round 24px);
+}
+
+.selo {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  width: 90px;
+  height: 90px;
+  background-color: gold;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+</pre>
+</div>
+
+<p>O selo é um <code>&lt;p&gt;</code> quadrado e amarelo; o recorte o transformou numa estrela, com a palavra "Novo!" no meio. Ele continua um texto de verdade: dá para selecionar, e o leitor de tela lê.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>clip-path</code> recorta o desenho do elemento numa forma: o que fica fora some. A caixa continua do mesmo tamanho, e a parte cortada não recebe cliques.</li>
+  <li>Formas: <code>circle(raio at x y)</code>, <code>ellipse(rx ry at x y)</code>, <code>inset(cima direita baixo esquerda round cantos)</code> e <code>polygon(x y, x y, …)</code>.</li>
+  <li>No <code>polygon()</code>, os pontos partem do canto de cima à esquerda; o <code>y</code> cresce para baixo. Espaço entre x e y, vírgula entre os pontos. Porcentagens acompanham o tamanho do elemento.</li>
+  <li>O recorte apaga a borda e a sombra que ficam fora da forma: para círculos com borda e sombra, <code>border-radius</code>; para sombra em polígono, <code>filter: drop-shadow()</code> no pai.</li>
+  <li>Com <code>transition</code>, formas do mesmo tipo (e polígonos com o mesmo número de pontos) se transformam aos poucos.</li>
+  <li>Erro de escrita = declaração ignorada e nenhum recorte. O validador pega vírgula faltando ou sobrando, número sem unidade e formas que não existem; mas ainda acusa, por engano, as formas novas <code>path()</code> e <code>shape()</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
