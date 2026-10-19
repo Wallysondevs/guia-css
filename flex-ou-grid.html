@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Flexbox ou Grid? — quando usar cada um | Guia CSS</title>
+<meta name="description" content="Flexbox ou Grid para quem está começando: uma dimensão × duas dimensões, o conteúdo manda × o layout manda, o mesmo conteúdo feito dos dois jeitos (etiquetas, menu, galeria, página), os dois juntos na mesma página, e os erros de misturar propriedades de um no outro.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Flexbox ou Grid?</span></h1>
+
+<p class="intro">Você já conhece as duas ferramentas de layout do CSS moderno: o <a href="flexbox.html">Flexbox</a> e o <a href="grid.html">Grid</a>. Muita coisa dá para fazer com qualquer uma delas, e é aí que surge a dúvida: qual usar? Nesta aula você vai ver o mesmo conteúdo feito dos dois jeitos, entender a diferença de verdade entre eles e aprender a regra prática que resolve quase todos os casos. Spoiler: numa página de verdade, você usa os dois.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A diferença principal: <strong>uma dimensão</strong> (Flexbox) × <strong>duas dimensões</strong> (Grid).</li>
+  <li>Quem manda no tamanho: o <strong>conteúdo</strong> (Flexbox) ou o <strong>layout</strong> (Grid).</li>
+  <li>Quatro casos comuns, cada um com a ferramenta que combina melhor: etiquetas, menu, galeria e o esqueleto da página.</li>
+  <li>Como usar os dois juntos, um dentro do outro.</li>
+  <li>O que acontece quando você mistura as propriedades de um no outro.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador. Algumas caixas têm uma <strong>largura fixa</strong>, para todo mundo ver as mesmas quebras de linha; os botões <strong>375</strong>, <strong>768</strong> e <strong>cheia</strong>, na barra de cada quadro, mudam a largura.</p>
+
+<hr>
+
+<h2>A ideia: a fila e o tabuleiro</h2>
+<p>Pense numa <strong>fila</strong> de pessoas no banco. Cada pessoa ocupa o espaço que precisa, uma depois da outra. Se a fila não cabe no corredor, ela faz a curva e continua, mas a segunda parte da fila não tem nada a ver com a primeira: ninguém se alinha com quem está "em cima". Isso é o <strong>Flexbox</strong>: uma direção só, e cada item com o seu tamanho.</p>
+<p>Agora pense num <strong>tabuleiro</strong> de xadrez, ou numa planilha. As casas já estão desenhadas antes das peças chegarem: colunas e fileiras alinhadas, nas duas direções. A peça entra na casa. Isso é o <strong>Grid</strong>: duas direções, e o desenho da grade manda no tamanho.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th>Flexbox</th><th>Grid</th></tr>
+<tr><td>Direções</td><td><strong>Uma</strong> por vez: a linha ou a coluna</td><td><strong>Duas</strong> ao mesmo tempo: linhas e colunas</td></tr>
+<tr><td>Quem manda no tamanho</td><td>O <strong>conteúdo</strong>: o item tem o tamanho dele, e o resto se ajusta</td><td>O <strong>layout</strong>: você desenha as colunas, e o item entra na célula</td></tr>
+<tr><td>Quando quebra a linha</td><td>Cada linha é independente: os itens não se alinham com os de cima</td><td>Os itens continuam alinhados nas colunas</td></tr>
+<tr><td>Onde se escreve a maior parte</td><td>Nos itens (<code>flex-grow</code>, <code>flex-basis</code>)</td><td>No pai (<code>grid-template-columns</code>, <code>grid-template-areas</code>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. O mesmo conteúdo, dos dois jeitos</h2>
+<p>Sete etiquetas de receitas, de tamanhos diferentes. Em cima, com Flexbox (<code>flex-wrap: wrap</code>); embaixo, com Grid (<code>repeat(auto-fill, minmax(110px, 1fr))</code>):</p>
+
+<div class="tryhtml" data-largura="480">
+<p class="try-task"><strong>Experimente:</strong> compare as duas caixas. Depois mude o texto de uma etiqueta (por exemplo, "Doce" para "Doce de leite caseiro") e veja quem se ajusta ao texto e quem mantém as colunas.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Flexbox&lt;/p&gt;
+&lt;div class="etiquetas flex"&gt;
+  &lt;span&gt;Doce&lt;/span&gt;&lt;span&gt;Sem glúten&lt;/span&gt;&lt;span&gt;Rápido&lt;/span&gt;
+  &lt;span&gt;Vegano&lt;/span&gt;&lt;span&gt;Para festas&lt;/span&gt;&lt;span&gt;Forno&lt;/span&gt;&lt;span&gt;Barato&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Grid&lt;/p&gt;
+&lt;div class="etiquetas grid"&gt;
+  &lt;span&gt;Doce&lt;/span&gt;&lt;span&gt;Sem glúten&lt;/span&gt;&lt;span&gt;Rápido&lt;/span&gt;
+  &lt;span&gt;Vegano&lt;/span&gt;&lt;span&gt;Para festas&lt;/span&gt;&lt;span&gt;Forno&lt;/span&gt;&lt;span&gt;Barato&lt;/span&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+}
+
+.etiquetas span {
+  background: #ede9fe;
+  border: 2px solid #6d28d9;
+  border-radius: 16px;
+  padding: 4px 12px;
+}
+</pre>
+</div>
+
+<p>No Flexbox, cada etiqueta tem o tamanho do seu texto: "Doce" é curtinha, "Para festas" é comprida. Elas formam uma fila que quebra quando chega na borda, e as linhas não se alinham entre si. No Grid, as etiquetas formam colunas de mesma largura, todas alinhadas, e as curtas ganham espaço sobrando.</p>
+<p>Nenhum dos dois está errado: para etiquetas, o jeito do Flexbox costuma ser o desejado (o tamanho segue o texto). Para cartões de uma galeria, o do Grid.</p>
+
+<hr>
+
+<h2>2. Um menu: Flexbox</h2>
+<p>Um menu é uma <strong>fileira só</strong>, com itens de tamanhos diferentes: o logo de um lado, os links do outro. Uma dimensão, e o conteúdo manda. É o caso típico do Flexbox:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ede9fe;
+    padding: 8px 12px;
+  }
+  .topo nav {
+    display: flex;
+    gap: 16px;
+  }
+  .logo { font-weight: bold; }
+&lt;/style&gt;
+&lt;header class="topo"&gt;
+  &lt;span class="logo"&gt;Receitas da Ana&lt;/span&gt;
+  &lt;nav&gt;
+    &lt;a href="#"&gt;Início&lt;/a&gt;
+    &lt;a href="#"&gt;Receitas&lt;/a&gt;
+    &lt;a href="#"&gt;Sobre&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+</pre>
+
+<p>O logo fica à esquerda, os três links juntos à direita, tudo centralizado na altura da faixa. Com Grid daria para fazer, mas você teria de pensar em colunas que ninguém precisa.</p>
+
+<hr>
+
+<h2>3. Uma galeria de cartões: Grid</h2>
+<p>Cartões de receita em várias fileiras precisam ficar <strong>alinhados nas duas direções</strong>. É o caso típico do Grid. O Flexbox até parece funcionar, até chegar a última fileira:</p>
+
+<div class="tryhtml" data-largura="482" data-goal="css:.galeria{display}=grid,css:.galeria{grid-template-columns}=150px 150px 150px">
+<p class="try-task"><strong>Missão:</strong> a galeria usa Flexbox, e o quarto cartão, sozinho na última fileira, esticou até ocupar a largura toda. Troque o <code>.galeria</code> por uma grade com <code>repeat(auto-fill, minmax(140px, 1fr))</code>: o último cartão fica do tamanho dos outros, alinhado na primeira coluna. Pode apagar a regra do <code>.galeria div</code> que tem o <code>flex</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="galeria"&gt;
+  &lt;div class="cartao"&gt;Bolo&lt;/div&gt;
+  &lt;div class="cartao"&gt;Pudim&lt;/div&gt;
+  &lt;div class="cartao"&gt;Torta&lt;/div&gt;
+  &lt;div class="cartao"&gt;Quindim&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.galeria div {
+  flex: 1 1 120px;
+}
+
+.cartao {
+  background: #ede9fe;
+  border: 2px solid #6d28d9;
+  padding: 24px 12px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.cartao {
+  background: #ede9fe;
+  border: 2px solid #6d28d9;
+  padding: 24px 12px;
+}
+</pre>
+</div>
+
+<p>Por que o Flexbox estica o último: o <code>flex: 1 1 120px</code> diz a cada item "comece com 120px de conteúdo e cresça para ocupar a sobra <strong>da sua linha</strong>". Na última linha, o "Quindim" está sozinho, então a sobra toda é dele. O Flexbox não sabe que existem colunas, porque ele não tem colunas. O Grid tem.</p>
+
+<hr>
+
+<h2>4. O esqueleto da página: Grid</h2>
+<p>Topo, menu lateral, conteúdo e rodapé: duas dimensões, e você quer desenhar o layout antes do conteúdo chegar. É o terreno do Grid com áreas (aula <a href="grid-areas.html">Áreas com Nome</a>). Com Flexbox, você precisaria de uma caixa flex dentro de outra (uma coluna com o topo, uma linha no meio, o rodapé), e mudar o layout no celular seria mexer no HTML.</p>
+
+<hr>
+
+<h2>5. Os dois juntos</h2>
+<p>A pergunta "Flexbox ou Grid?" é sobre <strong>cada caixa</strong>, e não sobre o site. O normal é o Grid organizar o esqueleto e o Flexbox arrumar o que vai dentro de cada parte. Um item de grade pode ser uma caixa flex, e vice-versa:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .galeria {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
+  }
+  .cartao {
+    display: flex;
+    flex-direction: column;
+    background: #ede9fe;
+    border: 2px solid #6d28d9;
+    padding: 12px;
+  }
+  .cartao h3 { margin: 0 0 4px; }
+  .cartao p { margin: 0 0 8px; }
+  .cartao a { margin-top: auto; }
+&lt;/style&gt;
+&lt;div class="galeria"&gt;
+  &lt;div class="cartao"&gt;
+    &lt;h3&gt;Bolo&lt;/h3&gt;
+    &lt;p&gt;Fofinho, de cenoura com cobertura de chocolate.&lt;/p&gt;
+    &lt;a href="#"&gt;Ver receita&lt;/a&gt;
+  &lt;/div&gt;
+  &lt;div class="cartao"&gt;
+    &lt;h3&gt;Pudim&lt;/h3&gt;
+    &lt;p&gt;De leite.&lt;/p&gt;
+    &lt;a href="#"&gt;Ver receita&lt;/a&gt;
+  &lt;/div&gt;
+  &lt;div class="cartao"&gt;
+    &lt;h3&gt;Torta&lt;/h3&gt;
+    &lt;p&gt;De limão.&lt;/p&gt;
+    &lt;a href="#"&gt;Ver receita&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>.galeria { display: grid }</dt><dd>O Grid põe os cartões em colunas alinhadas, todos com a mesma altura na fileira (o <code>stretch</code> da aula <a href="grid-alinhar.html">Alinhando no Grid</a>).</dd>
+  <dt>.cartao { display: flex; flex-direction: column }</dt><dd>Dentro de cada cartão, o Flexbox empilha o título, o texto e o link.</dd>
+  <dt>.cartao a { margin-top: auto }</dt><dd>A margem automática empurra o link para o fundo do cartão. Assim, os três "Ver receita" ficam na mesma altura, mesmo com textos de tamanhos diferentes.</dd>
+</dl>
+
+<p>No resultado, os três cartões têm a mesma altura (a do cartão do bolo, que tem o texto mais longo) e os três links "Ver receita" ficam alinhados lá embaixo.</p>
+
+<hr>
+
+<h2>6. Qual usar: a regra prática</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Use</th><th>Por quê</th></tr>
+<tr><td>Itens numa linha só (menu, barra de botões, ícone + texto)</td><td>Flexbox</td><td>Uma dimensão; cada item do tamanho do conteúdo</td></tr>
+<tr><td>Etiquetas, palavras, botões que quebram a linha</td><td>Flexbox</td><td>Cada linha independente é o desejado</td></tr>
+<tr><td>Empilhar coisas dentro de um cartão e empurrar uma para o fim</td><td>Flexbox</td><td><code>flex-direction: column</code> + <code>margin-top: auto</code></td></tr>
+<tr><td>Cartões, fotos, produtos em fileiras e colunas</td><td>Grid</td><td>Duas dimensões; colunas alinhadas, a última fileira não estica</td></tr>
+<tr><td>O esqueleto da página (topo, lateral, conteúdo, rodapé)</td><td>Grid</td><td>Você desenha o layout; <code>grid-template-areas</code> muda tudo sem mexer no HTML</td></tr>
+<tr><td>Formulário com rótulos à esquerda e campos alinhados à direita</td><td>Grid</td><td>Duas colunas que precisam ficar alinhadas de cima a baixo</td></tr>
+<tr><td>Centralizar uma coisa só</td><td>Qualquer um</td><td><code>place-items: center</code> (Grid) ou <code>justify-content</code> + <code>align-items</code> (Flexbox): aula <a href="centralizar.html">Centralizando</a></td></tr>
+</table>
+</div>
+
+<p>Resumo da regra: <strong>se você pensa em "linha" ou em "fila", Flexbox; se pensa em "tabela" ou em "colunas alinhadas", Grid</strong>. E quando estiver na dúvida, comece com o que você acha mais simples de ler: os dois funcionam em todos os navegadores atuais.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>O erro mais comum é usar uma propriedade de um no outro. Como as declarações são <strong>válidas</strong>, o validador W3C não reclama, e o F12 não as risca: elas só não fazem nada naquele elemento.</p>
+
+<div class="cenario">
+<strong><code>grid-template-columns</code> numa caixa flex</strong>
+<pre class="file" data-file="style.css">.galeria {
+  display: flex;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+</pre>
+<p><strong>O que você vê:</strong> os itens ficam lado a lado, cada um do tamanho do conteúdo, como em qualquer caixa flex. Nada de três colunas iguais.</p>
+<p><strong>Por quê:</strong> <code>grid-template-columns</code> só vale com <code>display: grid</code>. O <code>display</code> é que decide qual das duas ferramentas a caixa usa.</p>
+</div>
+
+<div class="cenario">
+<strong><code>flex-wrap</code> e <code>flex-grow</code> numa grade</strong>
+<p><strong>O que você vê:</strong> com <code>display: grid</code>, um <code>flex-wrap: wrap</code> no pai ou um <code>flex: 1</code> nos itens não mudam nada.</p>
+<p><strong>Por quê:</strong> numa grade, quem quebra a linha é o número de colunas, e quem decide a largura dos itens é a coluna. Para "quantas couberem", use <code>repeat(auto-fill, …)</code> (aula <a href="grid-repeat.html">repeat, minmax e auto-fit</a>).</p>
+</div>
+
+<div class="cenario">
+<strong>O que vale nos dois</strong>
+<p>Algumas propriedades funcionam nas duas ferramentas, com o mesmo sentido: <code>gap</code>, <code>justify-content</code>, <code>align-items</code>, <code>align-self</code>, <code>align-content</code> e <code>order</code>. Já <code>justify-items</code> e <code>justify-self</code> são <strong>só do Grid</strong>: numa caixa flex, são ignoradas.</p>
+</div>
+
+<div class="cenario">
+<strong>Forçar colunas com Flexbox</strong>
+<p><strong>O que você vê:</strong> para ter três colunas com Flexbox, a Ana escreveu <code>width: 33.33%</code> em cada item, com <code>flex-wrap: wrap</code> e <code>gap: 8px</code>. O terceiro item caiu para a linha de baixo.</p>
+<p><strong>Por quê:</strong> três vezes 33,33% já dá a largura toda, e os dois <code>gap</code> de 8px não cabem. Com Flexbox, colunas exigem contas (<code>calc((100% - 16px) / 3)</code>); com Grid, é <code>repeat(3, 1fr)</code>, e o <code>gap</code> é descontado sozinho. Se a conta está ficando difícil, provavelmente o caso é de Grid.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quero</th><th>Flexbox</th><th>Grid</th></tr>
+<tr><td>Ligar</td><td><code>display: flex</code></td><td><code>display: grid</code></td></tr>
+<tr><td>Direção</td><td><code>flex-direction</code></td><td>As duas, sempre</td></tr>
+<tr><td>Quebrar a linha</td><td><code>flex-wrap: wrap</code></td><td>Automático, pelo número de colunas</td></tr>
+<tr><td>Tamanho dos itens</td><td><code>flex-grow</code>, <code>flex-shrink</code>, <code>flex-basis</code> (no item)</td><td><code>grid-template-columns</code>/<code>-rows</code> (no pai)</td></tr>
+<tr><td>Quantos couberem</td><td><code>flex-wrap</code> + <code>flex-basis</code> (a última linha estica)</td><td><code>repeat(auto-fill, minmax(…, 1fr))</code></td></tr>
+<tr><td>Um item maior</td><td><code>flex-grow</code> maior</td><td><code>grid-column: span 2</code></td></tr>
+<tr><td>Espaço entre itens</td><td><code>gap</code></td><td><code>gap</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A barra do topo</h3>
+<p>Complete com a ferramenta mais indicada para uma barra com o logo à esquerda e os links à direita:</p>
+<div class="ex-code">.topo { display: <input data-answer="flex" aria-label="valor">; justify-content: space-between; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. A galeria</h3>
+<p>Complete com a ferramenta mais indicada para uma galeria de fotos em colunas alinhadas:</p>
+<div class="ex-code">.galeria { display: <input data-answer="grid" aria-label="valor">; grid-template-columns: repeat(3, 1fr); }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. Qual é a principal diferença entre Flexbox e Grid?</p>
+<label><input type="radio" name="q3"> O Flexbox é antigo e o Grid é moderno</label>
+<label><input type="radio" name="q3"> O Flexbox organiza numa direção por vez; o Grid, em linhas e colunas ao mesmo tempo</label>
+<label><input type="radio" name="q3"> O Grid só funciona no Chrome</label>
+<label><input type="radio" name="q3"> O Flexbox não tem <code>gap</code></label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Numa galeria com <code>display: flex</code>, <code>flex-wrap: wrap</code> e <code>flex: 1 1 120px</code> nos itens, o último cartão ficou sozinho e enorme. Por quê?</p>
+<label><input type="radio" name="q4"> Faltou o <code>gap</code></label>
+<label><input type="radio" name="q4"> É um erro do navegador</label>
+<label><input type="radio" name="q4"> Cada linha do Flexbox é independente, e o item cresce para ocupar a sobra da sua linha</label>
+<label><input type="radio" name="q4"> O <code>flex-wrap</code> deveria ser <code>nowrap</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. A Ana escreveu <code>grid-template-columns: 1fr 1fr</code> numa caixa com <code>display: flex</code>. O que acontece?</p>
+<label><input type="radio" name="q5"> Duas colunas iguais</label>
+<label><input type="radio" name="q5"> O validador acusa erro</label>
+<label><input type="radio" name="q5"> A caixa vira grid automaticamente</label>
+<label><input type="radio" name="q5"> Nada: a declaração é válida, mas só funciona com <code>display: grid</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Uma página tem o esqueleto em Grid e, dentro do topo, um menu. O que usar no menu?</p>
+<label><input type="radio" name="q6"> Flexbox: um item de grade pode ser uma caixa flex</label>
+<label><input type="radio" name="q6"> Nada: dentro de uma grade, só pode haver grade</label>
+<label><input type="radio" name="q6"> Grid de novo, obrigatoriamente</label>
+<label><input type="radio" name="q6"> Tabela</label>
+</div>
+
+<h3>Missão final: os dois juntos</h3>
+
+<div class="tryhtml" data-largura="480" data-goal="css:.pagina{display}=grid,css:.topo{display}=flex,css:.topo{justify-content}=space-between,css:.receitas{display}=grid,css:.receitas{grid-template-columns}=228px 228px">
+<p class="try-task"><strong>Missão:</strong> monte a página da Ana com a ferramenta certa em cada caixa. (1) <code>.pagina</code>: uma <strong>grade</strong> (uma coluna só, com <code>gap</code>). (2) <code>.topo</code>: uma caixa <strong>flex</strong> com o logo de um lado e os links do outro (<code>space-between</code>). (3) <code>.receitas</code>: uma <strong>grade</strong> com <code>repeat(2, 1fr)</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;header class="topo"&gt;
+    &lt;span&gt;Receitas da Ana&lt;/span&gt;
+    &lt;span&gt;Início · Sobre&lt;/span&gt;
+  &lt;/header&gt;
+  &lt;div class="receitas"&gt;
+    &lt;div&gt;Bolo&lt;/div&gt;
+    &lt;div&gt;Pudim&lt;/div&gt;
+    &lt;div&gt;Torta&lt;/div&gt;
+    &lt;div&gt;Quindim&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+}
+
+.topo {
+  background: #ede9fe;
+  padding: 8px;
+}
+
+.receitas {
+  gap: 8px;
+}
+
+.receitas div {
+  background: #ede9fe;
+  border: 2px solid #6d28d9;
+  padding: 12px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.pagina {
+  display: grid;
+  gap: 12px;
+}
+
+.topo {
+  display: flex;
+  justify-content: space-between;
+  background: #ede9fe;
+  padding: 8px;
+}
+
+.receitas {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.receitas div {
+  background: #ede9fe;
+  border: 2px solid #6d28d9;
+  padding: 12px;
+}
+</pre>
+</div>
+
+<p>A missão confere na largura inicial do quadro (480px). Com a solução, o topo mostra "Receitas da Ana" à esquerda e "Início · Sobre" à direita, e as quatro receitas formam duas colunas iguais, alinhadas.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><strong>Flexbox</strong>: uma direção por vez; o conteúdo manda no tamanho; cada linha quebrada é independente. Bom para menus, barras, etiquetas e para arrumar o que vai dentro de um cartão.</li>
+  <li><strong>Grid</strong>: linhas e colunas ao mesmo tempo; o layout manda; os itens ficam alinhados nas colunas. Bom para galerias, formulários alinhados e o esqueleto da página.</li>
+  <li>A escolha é por caixa: o normal é Grid no esqueleto e Flexbox dentro das partes, um dentro do outro.</li>
+  <li>Propriedade de um no outro (<code>grid-template-columns</code> em flex, <code>flex-wrap</code> em grid, <code>justify-items</code> em flex) não dá erro: só não faz nada. Quem decide é o <code>display</code>.</li>
+  <li><code>gap</code>, <code>justify-content</code>, <code>align-items</code> e <code>align-self</code> valem nos dois.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
