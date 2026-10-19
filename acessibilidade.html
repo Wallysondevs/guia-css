@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS e Acessibilidade — contraste, foco visível, toque, prefers-* e .sr-only | Guia CSS</title>
+<meta name="description" content="CSS e acessibilidade para quem está começando: contraste mínimo do texto (4,5:1) com as contas reais, foco visível com :focus-visible e o perigo do outline: none, tamanho mínimo de toque (24 e 44 px), as consultas prefers-reduced-motion, prefers-color-scheme, prefers-contrast e forced-colors, e a classe .sr-only para texto só para leitores de tela, linha por linha.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS e <span class="hl">Acessibilidade</span></h1>
+
+<p class="intro">Acessibilidade é o site funcionar para <strong>todo mundo</strong>: quem enxerga pouco, quem não enxerga e usa um leitor de tela, quem navega só pelo teclado, quem tem a mão trêmula no celular, quem fica enjoado com animação. O HTML faz metade do trabalho (Guia HTML). A outra metade é do CSS, e o CSS consegue tanto ajudar quanto estragar: uma única linha, <code>outline: none</code>, deixa o site inutilizável para quem usa o teclado. Nesta aula você vai ver as cinco regras de CSS que mais pesam, com os números de verdade.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li><strong>Contraste</strong>: a conta que diz se um texto é legível, e o mínimo de 4,5 para 1.</li>
+  <li><strong>Foco visível</strong>: por que nunca apagar o <code>outline</code>, e como fazer um foco bonito com <code>:focus-visible</code>.</li>
+  <li><strong>Tamanho de toque</strong>: o mínimo de 24 × 24 px, e o recomendado de 44 × 44 px.</li>
+  <li><strong>As preferências do sistema</strong>: <code>prefers-reduced-motion</code>, <code>prefers-color-scheme</code>, <code>prefers-contrast</code> e <code>forced-colors</code>.</li>
+  <li><strong>Texto só para leitores de tela</strong>: a classe <code>.sr-only</code>, linha por linha, e por que <code>display: none</code> não serve.</li>
+</ul>
+</div>
+
+<p>As regras e os números vêm das <strong>WCAG</strong> (<em>Web Content Accessibility Guidelines</em>, "diretrizes de acessibilidade para conteúdo web"), a norma internacional, na versão 2.2. As contas de contraste foram feitas com a fórmula das WCAG; o que o leitor de tela "ouve" foi conferido na árvore de acessibilidade do Chromium (o que o navegador entrega aos leitores de tela).</p>
+
+<hr>
+
+<h2>A ideia: o prédio acessível</h2>
+<p>Um prédio acessível não é um prédio diferente: é o mesmo prédio, com rampa ao lado da escada, corrimão, placas com letra grande e em braile, botão do elevador na altura certa. Quem não precisa nem repara; quem precisa, entra. No CSS é igual: contraste bom, foco visível e botões grandes deixam o site melhor <strong>para todos</strong> (no sol forte, com pressa, com o celular numa mão só).</p>
+
+<hr>
+
+<h2>1. Contraste: o texto precisa se destacar do fundo</h2>
+<p>Contraste é a diferença de luminosidade entre a cor do texto e a do fundo, medida numa escala de <strong>1:1</strong> (nenhuma diferença, como branco no branco) a <strong>21:1</strong> (preto no branco). As WCAG pedem, no nível AA (o nível que as leis costumam exigir):</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>O quê</th><th>Contraste mínimo (AA)</th></tr>
+<tr><td>Texto comum</td><td><strong>4,5 : 1</strong></td></tr>
+<tr><td>Texto grande (a partir de 24 px, ou 18,66 px em negrito)</td><td><strong>3 : 1</strong></td></tr>
+<tr><td>Bordas de campos, ícones e o contorno do foco</td><td><strong>3 : 1</strong> contra o que está em volta</td></tr>
+</table>
+</div>
+
+<p>Lado a lado, com as contas feitas pela fórmula das WCAG:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  p {
+    padding: 8px 12px;
+    font-family: sans-serif;
+  }
+  .c1 { color: #cccccc; }
+  .c2 { color: #999999; }
+  .c3 { color: #767676; }
+  .c4 { color: #595959; }
+  .c5 { background-color: tomato; color: white; }
+  .c6 { background-color: #b33a24; color: white; }
+&lt;/style&gt;
+&lt;p class="c1"&gt;#cccccc no branco: 1,61 : 1 (reprovado)&lt;/p&gt;
+&lt;p class="c2"&gt;#999999 no branco: 2,85 : 1 (reprovado)&lt;/p&gt;
+&lt;p class="c3"&gt;#767676 no branco: 4,54 : 1 (aprovado, por pouco)&lt;/p&gt;
+&lt;p class="c4"&gt;#595959 no branco: 7 : 1 (aprovado com folga)&lt;/p&gt;
+&lt;p class="c5"&gt;Branco no tomato: 2,95 : 1 (reprovado)&lt;/p&gt;
+&lt;p class="c6"&gt;Branco no #b33a24: 5,92 : 1 (aprovado)&lt;/p&gt;
+</pre>
+
+<p>Repare na quinta linha: <strong>branco sobre <code>tomato</code></strong>, uma combinação muito comum em botões, tem só 2,95 : 1. Parece legível numa tela boa, dentro de casa; no celular, no sol, para quem enxerga pouco, não é. Um tom mais escuro do mesmo laranja-avermelhado (<code>#b33a24</code>) passa com 5,92 : 1. O <code>#767676</code> é famoso: é o cinza mais claro que ainda passa no branco.</p>
+
+<h3>Como medir</h3>
+<ul>
+  <li><strong>No F12 do Chrome/Edge:</strong> clique no quadradinho de cor de uma propriedade <code>color</code> no painel de estilos. O seletor de cores mostra a razão de contraste e se ela passa no AA e no AAA.</li>
+  <li><strong>Na web:</strong> verificadores de contraste (procure por "contrast checker"): você digita as duas cores e eles mostram a razão.</li>
+</ul>
+
+<div class="warning">
+<strong>O validador não mede contraste</strong>
+<p>O <code>vnu</code> confere se o CSS está escrito certo, não se ele é legível. <code>color: #ccc</code> num fundo branco é CSS perfeitamente válido. Contraste é responsabilidade sua.</p>
+</div>
+
+<p>Duas regras que andam junto com o contraste:</p>
+<ul>
+  <li><strong>Não use só a cor para dar uma informação.</strong> "Os campos em vermelho são obrigatórios" não funciona para quem não distingue vermelho. Acrescente um texto ou um símbolo (<code>*</code> e "obrigatório").</li>
+  <li><strong>Deixe o texto crescer.</strong> Fontes em <code>rem</code> (aula <a href="unidades.html">Unidades</a>) acompanham o tamanho de letra que a pessoa escolheu no navegador; caixas com altura fixa em <code>px</code> cortam o texto aumentado.</li>
+</ul>
+
+<hr>
+
+<h2>2. Foco visível: quem usa o teclado precisa ver onde está</h2>
+<p>Quem navega pelo teclado aperta <kbd>Tab</kbd> para ir de link em link, de botão em botão. O navegador desenha um <strong>contorno</strong> (o <code>outline</code>, aula <a href="outline.html">Contorno</a>) em volta do item que está com o <strong>foco</strong>. Sem esse contorno, é como usar um mouse com a setinha invisível.</p>
+
+<p>O erro mais comum de toda a web é este:</p>
+
+<pre class="file" data-file="style.css · erro de propósito">/* "tira aquela borda feia" */
+button:focus {
+  outline: none;
+}
+</pre>
+
+<p>Ele aparece em muito código copiado por aí, porque o contorno aparecia também no clique do mouse e "ficava feio". Hoje existe a solução certa: a pseudo-classe <code>:focus-visible</code> ("foco visível"), que o navegador liga <strong>só quando o foco precisa ser mostrado</strong> (no teclado, sim; no clique do mouse num botão, em geral não).</p>
+
+<pre class="file" data-file="style.css">.botao:focus-visible {
+  outline: 3px solid navy;
+  outline-offset: 2px;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>:focus-visible</dt><dd>Vale quando o elemento tem o foco <strong>e</strong> o navegador acha que ele deve aparecer (o foco veio do teclado, ou é um campo de texto). Funciona em todos os navegadores principais desde março de 2022 (Chrome 86, Firefox 85, Safari 15.4, pela tabela do MDN).</dd>
+  <dt>outline: 3px solid navy</dt><dd>Um contorno grosso, de cor com bom contraste com o fundo e com o botão. As WCAG pedem pelo menos 3 : 1 para o indicador de foco.</dd>
+  <dt>outline-offset: 2px</dt><dd>"Deslocamento do contorno": afasta o contorno 2 px do botão, para ele não se misturar com a borda.</dd>
+</dl>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> clique no texto acima dos botões e aperte <kbd>Tab</kbd> várias vezes. No primeiro botão, você vê o foco padrão do navegador; no segundo, nada (o <code>outline: none</code>); no terceiro, o contorno azul-marinho afastado. Agora clique com o mouse no terceiro: o contorno, em geral, não aparece.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Clique aqui e aperte Tab:&lt;/p&gt;
+&lt;button class="botao"&gt;Padrão&lt;/button&gt;
+&lt;button class="botao sem-foco"&gt;outline: none&lt;/button&gt;
+&lt;button class="botao foco-bom"&gt;:focus-visible&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">.botao {
+  padding: 12px 16px;
+  border: none;
+  background-color: #b33a24;
+  color: white;
+  font-size: 1rem;
+}
+
+/* Errado: o foco some */
+.sem-foco:focus {
+  outline: none;
+}
+
+/* Certo: um foco claro, só quando precisa */
+.foco-bom:focus-visible {
+  outline: 3px solid navy;
+  outline-offset: 2px;
+}
+</pre>
+</div>
+
+<p>No Chromium, com o foco de teclado forçado em cada botão, a foto mostra: o primeiro com o contorno padrão do navegador, colado no botão; o segundo <strong>igual a um botão sem foco</strong>, impossível de distinguir dos outros; o terceiro com o contorno azul-marinho grosso, separado do botão por uma faixa branca.</p>
+
+<div class="tryhtml" data-goal="nsrc:outline:\s*(none|0)\b,src:\.menu a:focus-visible\s*\{[^}]*outline:\s*3px solid">
+<p class="try-task"><strong>Missão:</strong> o menu da Ana apagou o foco dos links. Apague a regra com <code>outline: none</code> e crie uma regra <code>.menu a:focus-visible</code> com <code>outline: 3px solid</code> e uma cor que contraste com o fundo (por exemplo, <code>navy</code>), com <code>outline-offset: 2px</code>. Teste com o <kbd>Tab</kbd>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav class="menu"&gt;
+  &lt;a href="index.html"&gt;Início&lt;/a&gt;
+  &lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;
+  &lt;a href="contato.html"&gt;Contato&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu a {
+  display: inline-block;
+  padding: 12px;
+  color: navy;
+}
+
+.menu a:focus {
+  outline: none;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.menu a {
+  display: inline-block;
+  padding: 12px;
+  color: navy;
+}
+
+.menu a:focus-visible {
+  outline: 3px solid navy;
+  outline-offset: 2px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Tamanho de toque: dedos não são setinhas</h2>
+<p>A ponta do dedo é bem maior que a ponta da seta do mouse. Um link minúsculo, colado no vizinho, faz o leitor tocar no errado. As regras:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Fonte</th><th>Tamanho</th></tr>
+<tr><td>WCAG 2.2, critério 2.5.8 (nível AA, o mínimo)</td><td>Pelo menos <strong>24 × 24 px</strong> de área de toque (ou espaço livre suficiente em volta)</td></tr>
+<tr><td>WCAG 2.2, critério 2.5.5 (nível AAA, o recomendado)</td><td><strong>44 × 44 px</strong></td></tr>
+</table>
+</div>
+
+<p>Não é preciso aumentar a letra: basta aumentar a <strong>área clicável</strong> com <code>padding</code> (aula <a href="padding.html">Espaço Interno</a>), ou com <code>min-height</code>/<code>min-width</code>:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  nav a {
+    font-family: sans-serif;
+    color: navy;
+  }
+  .pequeno a {
+    margin-right: 4px;
+  }
+  .grande a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    background-color: #eef;
+  }
+&lt;/style&gt;
+&lt;p&gt;Área de toque só do texto:&lt;/p&gt;
+&lt;nav class="pequeno"&gt;&lt;a href="#a"&gt;1&lt;/a&gt;&lt;a href="#b"&gt;2&lt;/a&gt;&lt;a href="#c"&gt;3&lt;/a&gt;&lt;/nav&gt;
+&lt;p&gt;Com min-width e min-height de 44px (o fundo mostra a área):&lt;/p&gt;
+&lt;nav class="grande"&gt;&lt;a href="#a"&gt;1&lt;/a&gt; &lt;a href="#b"&gt;2&lt;/a&gt; &lt;a href="#c"&gt;3&lt;/a&gt;&lt;/nav&gt;
+</pre>
+
+<p>No Chromium, cada link da primeira linha tem só o tamanho do número: menos de 10 px de largura. Na segunda, cada um tem 44 × 44 px, com o fundo claro mostrando onde o toque vale.</p>
+
+<hr>
+
+<h2>4. As preferências do sistema: <code>prefers-*</code></h2>
+<p>Os sistemas operacionais têm opções de acessibilidade, e o CSS consegue lê-las com <em>media queries</em> (aula <a href="media-queries.html">Media Queries</a>). Cada uma tem a sua aula ou exemplo:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Consulta</th><th>Verdade quando a pessoa…</th><th>O que fazer</th></tr>
+<tr><td><code>(prefers-reduced-motion: reduce)</code></td><td>pediu menos movimento</td><td>Desligar animações grandes e a rolagem suave (aulas <a href="reduced-motion.html">Menos Movimento</a> e <a href="scroll.html">Rolagem Suave</a>)</td></tr>
+<tr><td><code>(prefers-color-scheme: dark)</code></td><td>usa o tema escuro</td><td>Oferecer cores escuras, mantendo o contraste (aula <a href="tema-escuro.html">Tema Escuro</a>)</td></tr>
+<tr><td><code>(prefers-contrast: more)</code></td><td>pediu mais contraste</td><td>Escurecer os cinzas, engrossar bordas, tirar transparências</td></tr>
+<tr><td><code>(forced-colors: active)</code></td><td>usa um modo de cores forçadas (o "alto contraste" do Windows)</td><td>Quase nada: o sistema troca as cores sozinho. Não esconda bordas e contornos, que viram as únicas divisas</td></tr>
+</table>
+</div>
+
+<pre class="file" data-file="style.css">.dica {
+  color: #767676;
+  border: 1px solid #ddd;
+}
+
+@media (prefers-contrast: more) {
+  .dica {
+    color: #333333;
+    border-color: #333333;
+  }
+}
+</pre>
+
+<p>As quatro consultas funcionam nos navegadores principais. Pela tabela do MDN, a mais recente no Safari é a <code>forced-colors</code> (Safari 16), e no Firefox, a <code>prefers-contrast</code> (Firefox 101). Num navegador que não as conhece, o bloco é ignorado e a página fica com as regras normais.</p>
+
+<hr>
+
+<h2>5. Texto só para leitores de tela: <code>.sr-only</code></h2>
+<p>Às vezes um botão tem só um ícone, como um "✕" para fechar. Quem enxerga entende; o leitor de tela anuncia só "botão", sem dizer o quê. A solução é pôr um texto <strong>de verdade</strong> no HTML e escondê-lo <strong>só dos olhos</strong>, deixando-o para o leitor de tela. É para isso que existe esta classe, conhecida como <code>.sr-only</code> (<em>screen reader only</em>, "só para leitor de tela") ou <code>.visually-hidden</code> ("escondido visualmente"):</p>
+
+<pre class="file" data-file="style.css">.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>position: absolute</dt><dd>Tira o texto do fluxo da página: ele não empurra mais nada nem ocupa espaço (aula <a href="position-absolute.html">position: absolute</a>).</dd>
+  <dt>width: 1px; height: 1px</dt><dd>Encolhe a caixa a um pontinho. Não usamos <code>0</code>, porque alguns leitores de tela ignoram elementos de tamanho zero.</dd>
+  <dt>padding: 0; margin: -1px; border: 0</dt><dd>Nada de espaço interno nem borda que aumente a caixa; a margem negativa esconde o pontinho que sobra.</dd>
+  <dt>overflow: hidden</dt><dd>O texto, que não cabe em 1 px, fica cortado (aula <a href="overflow.html">overflow</a>).</dd>
+  <dt>clip-path: inset(50%)</dt><dd>Recorta a caixa de fora para dentro até o meio: não sobra nada visível (aula <a href="clip-path.html">Recortes</a>).</dd>
+  <dt>white-space: nowrap</dt><dd>O texto não quebra em várias linhas dentro da caixa minúscula; alguns leitores de tela juntariam as palavras quebradas.</dd>
+</dl>
+
+<p>O resultado: o texto <strong>existe</strong> para o navegador, mas não aparece. Na árvore de acessibilidade do Chromium, o botão abaixo ficou com o nome "Fechar a janela". Com <code>display: none</code> no lugar do <code>.sr-only</code>, o botão ficou <strong>sem nome</strong>; com <code>visibility: hidden</code>, ficou com um nome feito só de espaços, o que dá no mesmo: essas duas formas escondem dos olhos <strong>e</strong> do leitor de tela (aula <a href="esconder.html">Escondendo</a>).</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o botão mostra só o "✕", mas tem um texto escondido. Tire o <code>class="sr-only"</code> do <code>&lt;span&gt;</code> e veja o texto aparecer ao lado do ✕.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button class="fechar"&gt;
+  &lt;span aria-hidden="true"&gt;✕&lt;/span&gt;
+  &lt;span class="sr-only"&gt;Fechar a janela&lt;/span&gt;
+&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">.fechar {
+  min-width: 44px;
+  min-height: 44px;
+  font-size: 1.25rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+</pre>
+</div>
+
+<p>O <code>aria-hidden="true"</code> no "✕" é HTML: ele tira o símbolo da leitura, para o leitor de tela não anunciar "multiplicação, Fechar a janela". Outros usos comuns do <code>.sr-only</code>: um título para uma seção que visualmente não precisa de título, e o aviso "(abre em nova aba)" dentro de um link.</p>
+
+<div class="tip">
+<strong>E o link "pular para o conteúdo"?</strong>
+<p>Uma variação útil é o texto que fica escondido e <strong>aparece quando recebe o foco</strong>: o link "Pular para o conteúdo", o primeiro do <kbd>Tab</kbd>, que leva direto ao <code>&lt;main&gt;</code>. Com <code>.sr-only</code> e uma regra <code>:focus</code> que desfaz o esconderijo (<code>position: static</code>, <code>width: auto</code>, <code>height: auto</code>, <code>clip-path: none</code>…), quem usa o teclado não precisa passar pelo menu inteiro em toda página.</p>
+</div>
+
+<hr>
+
+<h2>6. Resumo das regras: o que fazer e o que evitar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Faça</th><th>Evite</th></tr>
+<tr><td>Texto com contraste de pelo menos 4,5 : 1 (meça)</td><td>Cinza-claro no branco; branco no <code>tomato</code></td></tr>
+<tr><td><code>:focus-visible</code> com um contorno claro</td><td><code>outline: none</code> sem colocar nada no lugar</td></tr>
+<tr><td>Áreas de toque de 44 × 44 px (pelo menos 24 × 24)</td><td>Links pequenos e colados</td></tr>
+<tr><td>Respeitar <code>prefers-reduced-motion</code> e as outras preferências</td><td>Animações grandes sem como desligar</td></tr>
+<tr><td><code>.sr-only</code> para texto só para leitores de tela</td><td><code>display: none</code> no texto que o leitor de tela precisa ler</td></tr>
+<tr><td>Fontes em <code>rem</code>, alturas flexíveis</td><td>Caixas de altura fixa que cortam o texto aumentado</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong><code>outline: none</code>: o teclado fica cego, e ninguém avisa</strong>
+<pre class="file" data-file="style.css · erro de propósito">*:focus {
+  outline: none;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> com o mouse, nada muda. Com o teclado, o <kbd>Tab</kbd> continua andando de link em link, mas não há nenhum sinal de onde está o foco: um <kbd>Enter</kbd> pode abrir qualquer coisa. Experimente o segundo botão da seção 2.</p>
+<p><strong>Por quê:</strong> é CSS válido, então o validador fica em silêncio e o F12 não risca nada. Mas fere o critério 2.4.7 das WCAG ("Foco visível").</p>
+<p><strong>Como consertar:</strong> apague a regra. Se o contorno padrão não combina com o site, troque por um seu, em <code>:focus-visible</code>, nunca por nada.</p>
+</div>
+
+<div class="cenario">
+<strong><code>display: none</code> no texto do botão: o leitor de tela anuncia só "botão"</strong>
+<pre class="file" data-file="index.html · erro de propósito">&lt;button&gt;
+  &lt;span aria-hidden="true"&gt;✕&lt;/span&gt;
+  &lt;span style="display: none"&gt;Fechar a janela&lt;/span&gt;
+&lt;/button&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> na tela, o mesmo botão com o ✕. <strong>O que o leitor de tela anuncia:</strong> só "botão". Na árvore de acessibilidade do Chromium, o botão ficou sem nome.</p>
+<p><strong>Por quê:</strong> <code>display: none</code> (e <code>visibility: hidden</code>) tiram o elemento da página para todos, inclusive para o leitor de tela. Nenhum validador acusa.</p>
+<p><strong>Como consertar:</strong> a classe <code>.sr-only</code> no lugar do <code>display: none</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Um espaço no valor: <code>outline-offset: 2 px</code></strong>
+<pre class="file" data-file="estilo.css · erro de propósito">.botao:focus-visible {
+  outline: 3px solid navy;
+  outline-offset: 2 px;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css estilo.css
+"file:/home/ana/site/estilo.css":3.21-3.22: error: CSS: “outline-offset”: Too many values or values are not recognized.</pre>
+<p><strong>O que significa:</strong> "<code>outline-offset</code>: valores demais, ou valores não reconhecidos". Com o espaço, <code>2 px</code> vira duas coisas: o número <code>2</code> sem unidade e uma palavra <code>px</code> solta (a coluna 21 a 22 da linha 3).</p>
+<p><strong>O que o leitor vê:</strong> o contorno aparece, mas colado no botão: o navegador ignorou só a declaração do <code>outline-offset</code>. O número e a unidade andam sempre juntos: <code>2px</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Para quê</th></tr>
+<tr><td>Contraste ≥ 4,5 : 1 (texto), ≥ 3 : 1 (texto grande, bordas, foco)</td><td>Legibilidade (WCAG 1.4.3 e 1.4.11)</td></tr>
+<tr><td><code>:focus-visible { outline: 3px solid …; outline-offset: 2px; }</code></td><td>Foco claro no teclado (WCAG 2.4.7)</td></tr>
+<tr><td><code>min-height: 44px</code>, <code>padding</code></td><td>Área de toque (WCAG 2.5.8: mínimo 24 px; 2.5.5: 44 px)</td></tr>
+<tr><td><code>@media (prefers-reduced-motion: reduce)</code></td><td>Menos movimento</td></tr>
+<tr><td><code>@media (prefers-color-scheme: dark)</code></td><td>Tema escuro</td></tr>
+<tr><td><code>@media (prefers-contrast: more)</code></td><td>Mais contraste</td></tr>
+<tr><td><code>@media (forced-colors: active)</code></td><td>Cores forçadas (alto contraste do Windows)</td></tr>
+<tr><td><code>.sr-only { position: absolute; width: 1px; height: 1px; … }</code></td><td>Texto só para leitores de tela</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O contraste mínimo</h3>
+<p>Para texto comum, o contraste mínimo do nível AA é de quanto para 1?</p>
+<div class="ex-code"><input data-answer="4,5|4.5" aria-label="contraste"> : 1</div>
+</div>
+
+<div class="exercise">
+<h3>2. O foco certo</h3>
+<p>Complete a pseudo-classe que mostra o foco quando ele precisa aparecer:</p>
+<div class="ex-code">.botao:<input data-answer="focus-visible" aria-label="pseudo-classe"> {
+  outline: 3px solid navy;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>3. Menos movimento</h3>
+<p>Complete a consulta:</p>
+<div class="ex-code">@media (<input data-answer="prefers-reduced-motion" aria-label="consulta">: reduce) {
+  * { animation: none; }
+}</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Branco sobre <code>tomato</code> tem contraste de 2,95 : 1. Para um botão com texto de 16 px, isso…</p>
+<label><input type="radio" name="q4"> Passa, porque é maior que 1</label>
+<label><input type="radio" name="q4"> Passa, porque o validador aceita</label>
+<label><input type="radio" name="q4"> Não passa: texto comum precisa de pelo menos 4,5 : 1</label>
+<label><input type="radio" name="q4"> Depende do navegador</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Para esconder um texto só dos olhos, deixando-o para o leitor de tela, use…</p>
+<label><input type="radio" name="q5"> <code>display: none</code></label>
+<label><input type="radio" name="q5"> A classe <code>.sr-only</code> (posição absoluta, 1 px, recortado)</label>
+<label><input type="radio" name="q5"> <code>visibility: hidden</code></label>
+<label><input type="radio" name="q5"> <code>color: white</code> no fundo branco</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Qual o tamanho mínimo de área de toque pedido pelas WCAG 2.2 no nível AA?</p>
+<label><input type="radio" name="q6"> 24 × 24 px</label>
+<label><input type="radio" name="q6"> 8 × 8 px</label>
+<label><input type="radio" name="q6"> 100 × 100 px</label>
+<label><input type="radio" name="q6"> Não existe mínimo</label>
+</div>
+
+<h3>Missão final: o botão do carrinho</h3>
+
+<div class="tryhtml" data-goal="css:.sr-only{position}=absolute,css:.sr-only{width}=1px,css:.sr-only{overflow-x}=hidden,nsrc:display:\s*none,css:.carrinho{min-height}=44px">
+<p class="try-task"><strong>Missão:</strong> o botão do carrinho mostra só o ícone e o texto "Ver o carrinho" foi escondido com <code>display: none</code>, sumindo também para o leitor de tela. Troque a regra <code>.sr-only</code> pelas declarações da seção 5 (sem <code>display: none</code>), e dê ao <code>.carrinho</code> <code>min-width</code> e <code>min-height</code> de <code>44px</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button class="carrinho"&gt;
+  &lt;span aria-hidden="true"&gt;🛒&lt;/span&gt;
+  &lt;span class="sr-only"&gt;Ver o carrinho&lt;/span&gt;
+&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">.carrinho {
+  font-size: 1.25rem;
+}
+
+.sr-only {
+  display: none;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.carrinho {
+  min-width: 44px;
+  min-height: 44px;
+  font-size: 1.25rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><strong>Contraste:</strong> pelo menos 4,5 : 1 para texto comum, 3 : 1 para texto grande, bordas e foco. Meça (o F12 mostra); o validador não mede. Branco no <code>tomato</code> não passa.</li>
+  <li><strong>Foco:</strong> nunca <code>outline: none</code> sem substituto. Use <code>:focus-visible</code> com um contorno grosso e <code>outline-offset</code>.</li>
+  <li><strong>Toque:</strong> áreas de 44 × 44 px (mínimo de 24 × 24), com <code>padding</code> ou <code>min-height</code>.</li>
+  <li><strong>Preferências:</strong> <code>prefers-reduced-motion</code>, <code>prefers-color-scheme</code>, <code>prefers-contrast</code> e <code>forced-colors</code> deixam o site seguir o que a pessoa escolheu no sistema.</li>
+  <li><strong>Texto escondido:</strong> <code>.sr-only</code> esconde dos olhos e mantém para o leitor de tela; <code>display: none</code> e <code>visibility: hidden</code> escondem de todos.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
