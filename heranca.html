@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Herança — o que passa de pai para filho | Guia CSS</title>
+<meta name="description" content="Herança no CSS para quem nunca escreveu CSS: por que a cor e a fonte do body chegam em todos os parágrafos, quais propriedades são herdadas (texto) e quais não (caixa: borda, margem, fundo), por que uma regra do próprio elemento sempre vence a herança, as palavras inherit, initial, unset e revert, e o que acontece quando dá errado (links e botões que não herdam, fundo que parece herdado, inherited inválido).">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Herança</span></h1>
+
+<p class="intro">Você escreve <code>body { color: darkslateblue; }</code> e <strong>todo</strong> o texto da página muda de cor: títulos, parágrafos, itens de lista. Mas nenhuma regra falou de <code>h1</code>, <code>p</code> ou <code>li</code>. Quem levou a cor até eles foi a <strong>herança</strong>: algumas propriedades passam do elemento pai para os filhos, e dos filhos para os netos, sozinhas. Nesta aula você vai ver quais passam, quais não passam, e como controlar isso.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que é herdar, e por que isso economiza muito CSS.</li>
+  <li>Quais propriedades são herdadas (as de <strong>texto</strong>) e quais não são (as de <strong>caixa</strong>).</li>
+  <li>Por que uma regra que fala do próprio elemento sempre vence o valor herdado.</li>
+  <li>As palavras <code>inherit</code>, <code>initial</code>, <code>unset</code> e <code>revert</code>.</li>
+  <li>Os sustos comuns: o link que não herda a cor, o botão que não herda a fonte, o fundo que "parece" herdado.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: o sotaque e a roupa</h2>
+<p>Uma criança herda dos pais o <strong>sotaque</strong>: ninguém precisa ensinar, ela fala do jeito da casa. Mas não herda a <strong>roupa</strong>: se o pai usa casaco, o filho não sai de casaco por isso. E se a escola ensina outro jeito de falar, vale o que a escola ensinou.</p>
+<p>No CSS:</p>
+<ul>
+  <li>As propriedades de <strong>texto</strong> (cor, fonte, tamanho da letra, alinhamento) são como o sotaque: <strong>passam</strong> para os filhos.</li>
+  <li>As propriedades de <strong>caixa</strong> (borda, margem, preenchimento, fundo, largura) são como a roupa: <strong>não passam</strong>.</li>
+  <li>Uma regra que fala diretamente do filho é a escola: ela <strong>sempre</strong> vence o que veio de casa.</li>
+</ul>
+
+<hr>
+
+<h2>1. A herança em ação</h2>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> a regra fala só do <code>&lt;body&gt;</code>. A cor e o itálico chegaram ao título, ao parágrafo, à lista e ao <code>&lt;strong&gt;</code>. A borda, não: ela ficou só em volta do <code>&lt;body&gt;</code>. Troque a cor por <code>darkgreen</code> e veja tudo mudar junto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura com &lt;strong&gt;cobertura de chocolate&lt;/strong&gt;.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Farinha&lt;/li&gt;
+  &lt;li&gt;Cenoura&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  color: darkslateblue;
+  font-style: italic;
+  border: 2px solid crimson;
+}
+</pre>
+</div>
+
+<p>Se a borda fosse herdada, cada título, parágrafo, item e até o <code>&lt;strong&gt;</code> no meio da frase ganhariam uma borda própria: um desastre. Por isso as propriedades de caixa não são herdadas. Já a cor e a fonte, você quase sempre quer iguais no texto todo: por isso elas são.</p>
+
+<p>Repare também no <code>&lt;strong&gt;</code>: ele é <strong>neto</strong> do <code>&lt;body&gt;</code> (filho do <code>&lt;p&gt;</code>), e recebeu a cor mesmo assim. A herança desce de geração em geração: o <code>&lt;p&gt;</code> herdou do <code>&lt;body&gt;</code>, e o <code>&lt;strong&gt;</code> herdou do <code>&lt;p&gt;</code>.</p>
+
+<div class="tryhtml" data-goal="css:h1{color}=rgb(139, 69, 19),css:li{color}=rgb(139, 69, 19),css:p{color}=rgb(139, 69, 19),src:body\s*\{[^}]*color,nsrc:(^|[\s,}])(h1|p|li|ul)\s*\{">
+<p class="try-task"><strong>Missão:</strong> a Ana quer todo o texto do cardápio em marrom (<code>saddlebrown</code>). Escreva <strong>uma</strong> regra, para o <code>body</code>, e deixe a herança levar a cor ao título, ao parágrafo e aos itens. Nada de regras para <code>h1</code>, <code>p</code> ou <code>li</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Cardápio da Padaria&lt;/h1&gt;
+&lt;p&gt;Tudo feito hoje cedo.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Pão de queijo&lt;/li&gt;
+  &lt;li&gt;Bolo de fubá&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">/* escreva a regra aqui */
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  color: saddlebrown;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. Quem herda e quem não herda</h2>
+<p>Cada propriedade do CSS já nasce definida como "herdada" ou "não herdada" (a página de cada propriedade no MDN diz, na tabela de resumo, em "Herdada: sim/não"). Não precisa decorar: quase sempre a regra do sotaque e da roupa acerta.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Herdadas (texto)</th><th>Não herdadas (caixa e posição)</th></tr>
+<tr><td><code>color</code></td><td><code>background-color</code>, <code>background-image</code></td></tr>
+<tr><td><code>font-family</code>, <code>font-size</code>, <code>font-weight</code>, <code>font-style</code></td><td><code>border</code>, <code>outline</code></td></tr>
+<tr><td><code>line-height</code>, <code>letter-spacing</code></td><td><code>margin</code>, <code>padding</code></td></tr>
+<tr><td><code>text-align</code>, <code>text-transform</code>, <code>text-shadow</code></td><td><code>width</code>, <code>height</code></td></tr>
+<tr><td><code>list-style</code> (o tipo de marcador)</td><td><code>display</code>, <code>position</code></td></tr>
+<tr><td><code>visibility</code>, <code>cursor</code></td><td><code>opacity</code>, <code>box-shadow</code></td></tr>
+</table>
+</div>
+
+<p>Algumas pegadinhas da tabela: <code>text-decoration</code> (o sublinhado) <strong>não</strong> é herdada, mas o risco do pai é desenhado por cima do texto dos filhos, e parece herança; e <code>opacity</code> não é herdada, mas o filho fica transparente junto com o pai, porque está desenhado dentro dele.</p>
+
+<hr>
+
+<h2 id="vence">3. A regra do próprio elemento sempre vence</h2>
+<p>O valor herdado é o mais fraco de todos. Qualquer regra que fale <strong>diretamente</strong> do elemento ganha dele, não importa a especificidade da regra do pai: até um seletor de ID no pai perde para um simples seletor de elemento no filho.</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  #receita {
+    color: darkslateblue;
+  }
+  p {
+    color: darkgreen;
+  }
+&lt;/style&gt;
+&lt;div id="receita"&gt;
+  &lt;h2&gt;Bolo de fubá&lt;/h2&gt;
+  &lt;p&gt;Fofinho, com erva-doce.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<p>O título ficou azul-ardósia (herdado do <code>#receita</code>), mas o parágrafo ficou verde: a regra <code>p</code>, com pontuação (0, 0, 1), fala dele diretamente, e isso basta. A <a href="especificidade.html">especificidade</a> só compara regras que pegam o <strong>mesmo</strong> elemento; o <code>#receita</code> pega o <code>&lt;div&gt;</code>, e não o <code>&lt;p&gt;</code>.</p>
+
+<h3>As regras do navegador também contam</h3>
+<p>Isso explica dois sustos clássicos. A <a href="cascata.html">folha padrão do navegador</a> tem regras que falam diretamente de alguns elementos, e elas vencem a sua herança:</p>
+<ul>
+  <li>os <strong>links</strong> têm uma regra de cor (azul, roxo depois de visitados): não herdam a cor do pai;</li>
+  <li>os <strong>botões e campos de formulário</strong> têm regras de fonte: não herdam a fonte nem o tamanho de letra do pai.</li>
+</ul>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  body {
+    color: darkslateblue;
+    font-family: Georgia, serif;
+    font-size: 18px;
+  }
+&lt;/style&gt;
+&lt;p&gt;Veja o &lt;a href="bolo.html"&gt;bolo de fubá&lt;/a&gt;.&lt;/p&gt;
+&lt;button type="button"&gt;Encomendar&lt;/button&gt;
+</pre>
+
+<p>O parágrafo herdou tudo, mas o link continuou azul, e o botão ficou com a letra menor e com outra fonte: a regra do navegador fala dele diretamente. (O tamanho exato varia; no Chrome, a letra do botão é de 13,33 px.)</p>
+
+<hr>
+
+<h2>4. Pedindo a herança: <code>inherit</code></h2>
+<p>A palavra <code>inherit</code> ("herdar") pode ser usada como valor de <strong>qualquer</strong> propriedade. Ela diz: "use o valor do pai", mesmo que a propriedade não seja herdada, e mesmo que exista outra regra do navegador.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> com <code>color: inherit</code>, o link ficou da cor do texto, e com <code>font: inherit</code> o botão ficou com a mesma fonte e o mesmo tamanho do resto da página. Apague uma das regras e veja o navegador voltar ao padrão dele.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Veja o &lt;a href="bolo.html"&gt;bolo de fubá&lt;/a&gt;.&lt;/p&gt;
+&lt;button type="button"&gt;Encomendar&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  color: darkslateblue;
+  font-family: Georgia, serif;
+  font-size: 18px;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>color: inherit</dt><dd>"A cor do meu pai." O link fica da cor do parágrafo em volta. Ele continua sublinhado (o sublinhado é outra propriedade), então ainda dá para ver que é link.</dd>
+  <dt>font: inherit</dt><dd><code>font</code> é um atalho que junta <code>font-family</code>, <code>font-size</code>, <code>font-weight</code> e outras. <code>font: inherit</code> manda herdar todas de uma vez. Essa regra aparece em quase todo <a href="reset.html">reset</a> moderno, para os botões e campos acompanharem o texto.</dd>
+</dl>
+
+<h3>As outras palavras: <code>initial</code>, <code>unset</code> e <code>revert</code></h3>
+<p>Existem outras três palavras que funcionam em qualquer propriedade. Você vai usá-las bem menos:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>Quer dizer</th><th>Exemplo</th></tr>
+<tr><td><code>inherit</code></td><td>O valor do pai</td><td><code>a { color: inherit; }</code>: o link com a cor do texto</td></tr>
+<tr><td><code>initial</code></td><td>O valor <strong>inicial</strong> da propriedade, o da especificação do CSS (não o do navegador)</td><td><code>color: initial</code> dá preto (o inicial de <code>color</code>), e não a cor do pai</td></tr>
+<tr><td><code>unset</code></td><td>Como se nenhuma regra sua existisse: herda se a propriedade é herdada; senão, usa o inicial</td><td><code>color: unset</code> herda; <code>border: unset</code> tira a borda</td></tr>
+<tr><td><code>revert</code></td><td>Volta ao estilo do <strong>navegador</strong> para aquele elemento</td><td><code>h1 { font-weight: revert; }</code> devolve o negrito do título</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>"O fundo foi herdado", mas não foi</strong>
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .cartao {
+    background-color: lightyellow;
+    border: 2px solid gray;
+    padding: 8px;
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;
+  &lt;p&gt;Bolo de fubá&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> o parágrafo aparece sobre o fundo amarelo, como se tivesse herdado a cor de fundo.</p>
+<p><strong>Por quê:</strong> o fundo do <code>&lt;p&gt;</code> é <strong>transparente</strong> (o valor inicial de <code>background-color</code>). Você está vendo, através dele, o fundo do cartão que está atrás. Se o fundo fosse herdado, cada filho pintaria o seu próprio amarelo; no F12, o <code>background-color</code> calculado do <code>&lt;p&gt;</code> aparece como <code>rgba(0, 0, 0, 0)</code>, ou seja, transparente.</p>
+</div>
+
+<div class="cenario">
+<strong>O link não fica da cor do texto</strong>
+<p><strong>O que você vê:</strong> com <code>.rodape { color: white; }</code> num rodapé escuro, os links do rodapé continuam azuis, quase invisíveis no fundo escuro.</p>
+<p><strong>Por quê:</strong> o navegador tem uma regra própria para a cor dos links, e uma regra que fala do elemento sempre vence a herança (<a href="#vence">seção 3</a>).</p>
+<p><strong>Como consertar:</strong> <code>.rodape a { color: inherit; }</code>, ou uma cor própria para os links (aula <a href="links.html">Estilizando Links</a>).</p>
+</div>
+
+<div class="cenario">
+<strong><code>inherited</code> no lugar de <code>inherit</code></strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  p {
+    color: darkslateblue;
+  }
+  a {
+    color: inherited;
+  }
+&lt;/style&gt;
+&lt;p&gt;Veja o &lt;a href="bolo.html"&gt;bolo de fubá&lt;/a&gt;.&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> o link continua azul.</p>
+<p><strong>Por quê:</strong> a palavra é <code>inherit</code> (o verbo, "herdar"), e não <code>inherited</code> ("herdado"). Com um valor que ele não conhece, o navegador ignora a declaração. O validador avisa:</p>
+<pre class="term" data-cwd="~/site">$ vnu --css herda.css
+"file:/home/ana/site/herda.css":2.10-2.18: error: CSS: “color”: “inherited” is not a “color” value.</pre>
+<p><strong>O que significa:</strong> "<code>inherited</code> não é um valor de <code>color</code>". No F12, a declaração aparece riscada, com um ícone de aviso.</p>
+</div>
+
+<div class="cenario">
+<strong>Mudou a fonte do <code>body</code> e o formulário não acompanhou</strong>
+<p><strong>O que você vê:</strong> o site inteiro em Georgia, tamanho 18 px, e os campos e botões com a letra pequena e outra fonte.</p>
+<p><strong>Por quê:</strong> <code>&lt;button&gt;</code>, <code>&lt;input&gt;</code>, <code>&lt;select&gt;</code> e <code>&lt;textarea&gt;</code> recebem do navegador uma regra de fonte própria.</p>
+<p><strong>Como consertar:</strong> <code>button, input, select, textarea { font: inherit; }</code> no começo do CSS.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>O que acontece</th></tr>
+<tr><td>Propriedade de texto no pai (<code>color</code>, <code>font-*</code>, <code>line-height</code>, <code>text-align</code>)</td><td>Os descendentes herdam</td></tr>
+<tr><td>Propriedade de caixa no pai (<code>border</code>, <code>margin</code>, <code>padding</code>, <code>background</code>, <code>width</code>)</td><td>Não passa para os filhos</td></tr>
+<tr><td>Uma regra que fala do próprio filho</td><td>Sempre vence o valor herdado</td></tr>
+<tr><td>Links, botões, campos</td><td>Têm regras do navegador: não herdam cor (links) nem fonte (formulários)</td></tr>
+<tr><td><code>inherit</code></td><td>Usa o valor do pai</td></tr>
+<tr><td><code>initial</code></td><td>Usa o valor inicial da propriedade</td></tr>
+<tr><td><code>unset</code></td><td>Herda, se a propriedade é herdada; senão, inicial</td></tr>
+<tr><td><code>revert</code></td><td>Volta ao estilo do navegador</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A palavra</h3>
+<p>Complete para o link usar a cor do texto em volta:</p>
+<div class="ex-code">a {
+  color: <input data-answer="inherit" aria-label="valor">;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. O atalho da fonte</h3>
+<p>Complete para os botões herdarem a fonte e o tamanho de letra, de uma vez:</p>
+<div class="ex-code">button {
+  <input data-answer="font" aria-label="propriedade">: inherit;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>3. Onde pôr</h3>
+<p>Em qual elemento você põe a cor do texto para ela valer na página inteira, por herança?</p>
+<div class="ex-code"><input data-answer="body|html|body {|body{" aria-label="elemento"> { color: darkslateblue; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Qual destas propriedades <strong>não</strong> é herdada?</p>
+<label><input type="radio" name="q4"> <code>color</code></label>
+<label><input type="radio" name="q4"> <code>border</code></label>
+<label><input type="radio" name="q4"> <code>font-family</code></label>
+<label><input type="radio" name="q4"> <code>text-align</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. Com <code>#receita { color: navy; }</code> e <code>p { color: darkgreen; }</code>, de que cor fica um <code>&lt;p&gt;</code> dentro do <code>#receita</code>?</p>
+<label><input type="radio" name="q5"> Azul-marinho, porque o ID é mais específico</label>
+<label><input type="radio" name="q5"> Uma mistura das duas</label>
+<label><input type="radio" name="q5"> Preto</label>
+<label><input type="radio" name="q5"> Verde: a regra que fala do próprio <code>p</code> vence o valor herdado</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Um parágrafo dentro de um cartão amarelo aparece com fundo amarelo. O que aconteceu?</p>
+<label><input type="radio" name="q6"> O fundo do parágrafo é transparente, e o amarelo do cartão aparece por trás</label>
+<label><input type="radio" name="q6"> O parágrafo herdou o <code>background-color</code></label>
+<label><input type="radio" name="q6"> O navegador copiou o fundo para todos os filhos</label>
+<label><input type="radio" name="q6"> O <code>&lt;p&gt;</code> sempre tem fundo amarelo</label>
+</div>
+
+<h3>Missão final: o rodapé escuro</h3>
+
+<div class="tryhtml" data-goal="css:footer a{color}=rgb(255, 255, 255),css:footer button{font-size}=18px,css:footer p{color}=rgb(255, 255, 255),nsrc:inherited,src:color:\s*inherit,src:font:\s*inherit">
+<p class="try-task"><strong>Missão:</strong> o rodapé da Ana tem fundo escuro e texto branco, mas o link continua azul (quase invisível) e o botão está com a letra pequena. Sem repetir a cor <code>white</code> nem o tamanho <code>18px</code>, use <code>inherit</code>: (1) o link do rodapé com a cor do texto; (2) o botão com a fonte do rodapé (<code>font: inherit;</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;footer class="rodape"&gt;
+  &lt;p&gt;Padaria da Ana · &lt;a href="contato.html"&gt;Fale conosco&lt;/a&gt;&lt;/p&gt;
+  &lt;button type="button"&gt;Voltar ao topo&lt;/button&gt;
+&lt;/footer&gt;
+</pre>
+<pre class="script" data-file="style.css">.rodape {
+  background-color: darkslategray;
+  color: white;
+  font-size: 18px;
+  padding: 16px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.rodape {
+  background-color: darkslategray;
+  color: white;
+  font-size: 18px;
+  padding: 16px;
+}
+
+.rodape a {
+  color: inherit;
+}
+
+.rodape button {
+  font: inherit;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Herança: algumas propriedades passam do pai para os filhos e netos, sem regra para eles.</li>
+  <li>Herdam as de <strong>texto</strong> (cor, fonte, tamanho, alinhamento, espaçamento). Não herdam as de <strong>caixa</strong> (borda, margem, preenchimento, fundo, largura).</li>
+  <li>O valor herdado é o mais fraco: qualquer regra que fale do próprio elemento vence, inclusive as do navegador. Por isso links não herdam a cor, e botões não herdam a fonte.</li>
+  <li><code>inherit</code> pede o valor do pai; <code>initial</code>, o inicial; <code>unset</code>, "como se não houvesse regra"; <code>revert</code>, o do navegador.</li>
+  <li>Fundo "herdado" quase sempre é fundo transparente deixando ver o do pai.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
