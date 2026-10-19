@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS grid-template-columns e fr — as colunas da grade | Guia CSS</title>
+<meta name="description" content="grid-template-columns em detalhe: colunas fixas em px, em %, a unidade fr (fração do espaço livre), misturando px e fr numa lateral com conteúdo, proporções 2fr 1fr, colunas auto, por que % com gap vaza e fr não, a coluna que não encolhe e as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Colunas</span> (grid-template-columns e fr)</h1>
+
+<p class="intro">Na aula <a href="grid.html">Introdução ao Grid</a>, a Ana fez a primeira grade com <code>grid-template-columns: 1fr 1fr 1fr</code>. Agora ela quer mais: uma lateral de 200 pixels e o conteúdo ocupando o resto; uma coluna de destaque com o dobro da largura das outras; uma coluna que tenha só o tamanho do texto. Tudo isso se escreve no mesmo lugar, o <code>grid-template-columns</code>, com unidades diferentes. A estrela da aula é a unidade <code>fr</code>, que só existe no Grid.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Como o <code>grid-template-columns</code> funciona: um tamanho para cada coluna.</li>
+  <li>Colunas fixas (<code>px</code>, <code>rem</code>) e em porcentagem (<code>%</code>), e o problema do <code>%</code> com <code>gap</code>.</li>
+  <li>A unidade <code>fr</code>: uma parte do espaço que sobra, e as proporções <code>2fr 1fr</code>.</li>
+  <li>Como misturar: <code>200px 1fr</code>, <code>auto 1fr auto</code>.</li>
+  <li>Por que uma coluna <code>1fr</code> às vezes fica mais larga que as outras.</li>
+  <li>As mensagens reais do validador W3C para os erros mais comuns.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="grid.html">Introdução ao Grid</a> e <a href="unidades.html">Unidades</a>. Os exemplos com resultado são desenhados agora pelo <strong>seu</strong> navegador; os números em pixels do texto foram medidos no Chromium. As mensagens do validador saíram do validador W3C (<code>vnu</code>), na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: dividir o terreno</h2>
+<p>A Ana tem um terreno de 500 metros de frente para dividir em lotes. Ela pode fazer de três jeitos:</p>
+<ul>
+  <li><strong>Lotes de tamanho fixo:</strong> "o primeiro tem 100 metros, o segundo também…". Se sobrar terreno, sobra; se faltar, o último lote invade o vizinho. São os <code>px</code>.</li>
+  <li><strong>Lotes em porcentagem do terreno:</strong> "cada um tem 25%". Mas se ela precisar de ruas entre os lotes (o <code>gap</code>), 4 × 25% mais as ruas passa de 100%.</li>
+  <li><strong>Lotes em partes do que sobra:</strong> "primeiro separo as ruas e os lotes fixos; o resto eu divido em partes". Ninguém invade ninguém. É o <code>fr</code>.</li>
+</ul>
+
+<hr>
+
+<h2>1. Um tamanho para cada coluna</h2>
+<p>O <code>grid-template-columns</code> recebe uma lista de tamanhos, separados por espaço. <strong>Cada tamanho é uma coluna.</strong> Três tamanhos, três colunas:</p>
+
+<pre class="file" data-file="style.css">.grade {
+  display: grid;
+  grid-template-columns: 100px 100px 100px;
+}</pre>
+
+<dl class="anatomy">
+  <dt>grid-template-columns</dt><dd>"Modelo das colunas": desenha as colunas da grade. Vai no <strong>pai</strong> (o elemento com <code>display: grid</code>).</dd>
+  <dt>100px</dt><dd>A largura da primeira coluna.</dd>
+  <dt>100px 100px</dt><dd>A segunda e a terceira. A quantidade de valores é a quantidade de colunas.</dd>
+</dl>
+
+<p>As unidades que você já conhece funcionam: <code>px</code>, <code>rem</code>, <code>em</code>, <code>%</code>. E o Grid traz algumas próprias, que você vai ver nesta aula (<code>fr</code>, <code>auto</code>) e na aula <a href="grid-repeat.html">repeat, minmax e auto-fit</a>.</p>
+
+<hr>
+
+<h2>2. Fixas, em porcentagem e em <code>fr</code>, lado a lado</h2>
+<p>Três grades numa caixa de 500 pixels, todas com <code>gap: 16px</code>. Em cima, colunas fixas; no meio, quatro de 25%; embaixo, quatro de <code>1fr</code>:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;100px 100px 100px&lt;/p&gt;
+&lt;div class="grade fixas"&gt;
+  &lt;div class="item"&gt;A&lt;/div&gt;&lt;div class="item"&gt;B&lt;/div&gt;&lt;div class="item"&gt;C&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;25% 25% 25% 25%&lt;/p&gt;
+&lt;div class="grade porcento"&gt;
+  &lt;div class="item"&gt;A&lt;/div&gt;&lt;div class="item"&gt;B&lt;/div&gt;&lt;div class="item"&gt;C&lt;/div&gt;&lt;div class="item"&gt;D&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;1fr 1fr 1fr 1fr&lt;/p&gt;
+&lt;div class="grade fracao"&gt;
+  &lt;div class="item"&gt;A&lt;/div&gt;&lt;div class="item"&gt;B&lt;/div&gt;&lt;div class="item"&gt;C&lt;/div&gt;&lt;div class="item"&gt;D&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">p {
+  font-family: monospace;
+}
+
+.grade {
+  display: grid;
+  gap: 16px;
+  width: 500px;
+  border: 2px dashed gray;
+}
+
+.fixas {
+  grid-template-columns: 100px 100px 100px;
+}
+
+.porcento {
+  grid-template-columns: 25% 25% 25% 25%;
+}
+
+.fracao {
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.item {
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Grade</th><th>O que acontece (medido)</th></tr>
+<tr><td><code>100px 100px 100px</code></td><td>Cada coluna tem exatamente 100 pixels. Sobra espaço vazio à direita: a grade não se adapta à caixa.</td></tr>
+<tr><td><code>25% 25% 25% 25%</code></td><td>Cada coluna tem 125 pixels (25% de 500). Mas os três <code>gap</code> de 16 pixels vêm <strong>por cima</strong>: 500 + 48 = 548. A coluna D <strong>vaza</strong> da borda tracejada.</td></tr>
+<tr><td><code>1fr 1fr 1fr 1fr</code></td><td>O navegador primeiro separa os 48 pixels dos <code>gap</code> e divide os 452 que sobram em quatro: 113 para cada. Cabe certinho.</td></tr>
+</table>
+</div>
+
+<p>Essa é a grande vantagem do <code>fr</code>: ele já desconta o <code>gap</code> e as colunas fixas, e divide só o que <strong>sobra</strong>. Com <code>%</code>, você teria de fazer a conta à mão (<code>calc(25% - 12px)</code>, aula <a href="calc.html">calc()</a>).</p>
+
+<hr>
+
+<h2>3. A unidade <code>fr</code></h2>
+<p><code>fr</code> vem de <em>fraction</em>, "fração". <code>1fr</code> é <strong>uma parte</strong> do espaço livre da grade. O navegador faz a conta assim:</p>
+<ol class="passo">
+  <li>Pega a largura da grade.</li>
+  <li>Tira os <code>gap</code> e as colunas que não são <code>fr</code> (as de <code>px</code>, <code>rem</code>, <code>auto</code>…).</li>
+  <li>Soma os <code>fr</code> e divide o que sobrou por esse total. Cada coluna leva quantas partes pediu.</li>
+</ol>
+
+<p>Por isso <code>2fr 1fr</code> quer dizer "três partes: duas para a primeira coluna, uma para a segunda". A primeira fica com o dobro da largura da segunda:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;2fr 1fr&lt;/p&gt;
+&lt;div class="grade dois-um"&gt;
+  &lt;div class="item"&gt;Receita (2fr)&lt;/div&gt;&lt;div class="item"&gt;Dicas (1fr)&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;1fr 2fr 1fr&lt;/p&gt;
+&lt;div class="grade um-dois-um"&gt;
+  &lt;div class="item"&gt;1fr&lt;/div&gt;&lt;div class="item"&gt;Destaque (2fr)&lt;/div&gt;&lt;div class="item"&gt;1fr&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">p {
+  font-family: monospace;
+}
+
+.grade {
+  display: grid;
+  gap: 16px;
+  width: 500px;
+  border: 2px dashed gray;
+}
+
+.dois-um {
+  grid-template-columns: 2fr 1fr;
+}
+
+.um-dois-um {
+  grid-template-columns: 1fr 2fr 1fr;
+}
+
+.item {
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<p>Na primeira grade, os 500 pixels menos 16 do <code>gap</code> são 484, divididos em 3 partes: a Receita ficou com cerca de 323 pixels, as Dicas com 161. Na segunda, o Destaque tem o dobro de cada vizinha. Os números do <code>fr</code> são <strong>proporções</strong>: <code>2fr 1fr</code> e <code>4fr 2fr</code> dão o mesmo resultado.</p>
+
+<div class="note">
+<strong>Lembra do <code>flex: 2</code>?</strong>
+<p>O <code>fr</code> é parecido com o <code>flex-grow</code> do Flexbox (aula <a href="flex-grow.html">Crescer e Encolher</a>): partes de um espaço. A diferença é que o <code>fr</code> é decidido no <strong>pai</strong>, para a coluna inteira, e vale para todas as linhas da grade; o <code>flex-grow</code> é decidido em cada item.</p>
+</div>
+
+<hr>
+
+<h2>4. Misturando: fixo + <code>fr</code>, <code>auto</code></h2>
+<p>O jeito mais comum de usar o <code>fr</code> é junto com colunas fixas: as fixas ficam com o seu tamanho, e o <code>fr</code> pega o resto. Também existe o valor <code>auto</code>: a coluna fica com a largura do <strong>conteúdo</strong> dela.</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;150px 1fr&lt;/p&gt;
+&lt;div class="grade lateral"&gt;
+  &lt;div class="item"&gt;Lateral&lt;/div&gt;&lt;div class="item"&gt;Conteúdo&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;auto 1fr auto&lt;/p&gt;
+&lt;div class="grade cabecalho"&gt;
+  &lt;div class="item"&gt;Logo&lt;/div&gt;&lt;div class="item"&gt;Busca&lt;/div&gt;&lt;div class="item"&gt;Entrar&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">p {
+  font-family: monospace;
+}
+
+.grade {
+  display: grid;
+  gap: 16px;
+  width: 500px;
+  border: 2px dashed gray;
+}
+
+.lateral {
+  grid-template-columns: 150px 1fr;
+}
+
+.cabecalho {
+  grid-template-columns: auto 1fr auto;
+}
+
+.item {
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<p>Na primeira grade, a Lateral tem 150 pixels e o Conteúdo ficou com o resto (334 pixels: 500 − 150 − 16). Mude o <code>width</code> da grade e só o Conteúdo muda. Na segunda, "Logo" e "Entrar" têm a largura do seu texto, e a Busca, no meio, pega tudo o que sobra: é o cabeçalho da aula <a href="flex-grow.html">Crescer e Encolher</a>, agora com Grid.</p>
+
+<h3>Experimente: lateral e conteúdo</h3>
+<div class="tryhtml" data-goal="css:.pagina{display}=grid,src:grid-template-columns:\s*200px\s+1fr\s*;">
+<p class="try-task"><strong>Missão:</strong> faça a página do blog ter duas colunas: a lateral com <code>200px</code> e o conteúdo com todo o resto (<code>1fr</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;nav class="lateral"&gt;Bolos · Tortas · Pães&lt;/nav&gt;
+  &lt;main class="conteudo"&gt;
+    &lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+    &lt;p&gt;A receita que a Ana faz todo domingo.&lt;/p&gt;
+  &lt;/main&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+  gap: 16px;
+  font-family: sans-serif;
+}
+
+.lateral {
+  padding: 8px;
+  background-color: lavender;
+}
+
+.conteudo {
+  padding: 8px;
+  background-color: lightyellow;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.pagina {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 16px;
+  font-family: sans-serif;
+}
+
+.lateral {
+  padding: 8px;
+  background-color: lavender;
+}
+
+.conteudo {
+  padding: 8px;
+  background-color: lightyellow;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>5. Formas de fazer colunas</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>A coluna fica com…</th><th>Quando usar</th></tr>
+<tr><td><code>200px</code>, <code>12rem</code></td><td>Exatamente esse tamanho</td><td>Laterais, ícones, colunas que não devem mudar</td></tr>
+<tr><td><code>1fr</code>, <code>2fr</code></td><td>Partes do espaço que sobra</td><td><strong>O mais comum</strong>: colunas que se adaptam à largura</td></tr>
+<tr><td><code>auto</code></td><td>A largura do conteúdo (e pode crescer se sobrar espaço e não houver <code>fr</code>)</td><td>Rótulos, botões, o logo: "o que o texto precisar"</td></tr>
+<tr><td><code>25%</code></td><td>Uma porcentagem da largura da grade, <strong>sem</strong> descontar o <code>gap</code></td><td>Raramente: prefira <code>fr</code>, que desconta</td></tr>
+<tr><td><code>repeat(3, 1fr)</code></td><td>O mesmo que <code>1fr 1fr 1fr</code>, sem repetir</td><td>Muitas colunas iguais (aula <a href="grid-repeat.html">repeat, minmax e auto-fit</a>)</td></tr>
+<tr><td><code>minmax(0, 1fr)</code></td><td>Uma parte do espaço, mas que pode encolher abaixo do conteúdo</td><td>Colunas iguais de verdade, mesmo com palavras compridas (veja <a href="#errado">Quando dá errado</a>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>CSS quase nunca mostra mensagem: o navegador ignora em silêncio o que não entende.</p>
+
+<div class="cenario">
+<strong>A grade vazou da caixa: <code>%</code> com <code>gap</code></strong>
+<p><strong>O que aconteceu:</strong> <code>grid-template-columns: 25% 25% 25% 25%;</code> e <code>gap: 16px</code>, como na seção 2.</p>
+<p><strong>O que você vê:</strong> a última coluna passa da borda da caixa. As porcentagens somam 100%, e o <code>gap</code> vem a mais. O validador não reclama: está tudo escrito certo, só a conta não fecha. Numa tela estreita, isso vira uma barra de rolagem para o lado na página inteira.</p>
+<p><strong>Como consertar:</strong> troque por <code>1fr 1fr 1fr 1fr</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Uma coluna <code>1fr</code> ficou mais larga que as outras</strong>
+<p><strong>O que aconteceu:</strong> três colunas <code>1fr 1fr 1fr</code>, e a do meio tem um endereço comprido, sem espaços:</p>
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="grade"&gt;
+  &lt;div class="item"&gt;Bolo&lt;/div&gt;
+  &lt;div class="item"&gt;https://receitasdaana.exemplo.com/bolodecenouracomchocolate&lt;/div&gt;
+  &lt;div class="item"&gt;Pão&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.grade {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  width: 500px;
+  border: 2px dashed gray;
+}
+
+.item {
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+<p><strong>O que você vê:</strong> a coluna do meio ficou enorme, e a terceira passa da borda tracejada. O <code>1fr</code> tem uma regra escondida: a coluna <strong>nunca fica menor que o conteúdo que não se quebra</strong>. O endereço não tem onde quebrar, então a coluna cresce, e as outras ficam com o que sobra.</p>
+<p><strong>Como consertar:</strong> troque cada <code>1fr</code> por <code>minmax(0, 1fr)</code> ("no mínimo zero, no máximo uma parte") e deixe o texto quebrar com <code>overflow-wrap: anywhere</code> no <code>.item</code> (aula <a href="texto-longo.html">Texto que Não Cabe</a>). Faça isso na caixa acima: as três colunas ficam com 156 pixels cada.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “grid-template-columns”: only “0” can be a “unit”. You must put a unit after your number.</code></strong>
+<p><strong>O que aconteceu:</strong> um número sem unidade. Acontece de três jeitos: o número de colunas (<code>3</code>), a largura sem <code>px</code> (<code>200 200</code>) e o <code>fr</code> separado do número (<code>1 fr 1 fr</code>):</p>
+<pre class="term" data-cwd="~/grade">$ vnu --css tres.css
+"file:/home/ana/grade/tres.css":3.26-3.26: error: CSS: “grid-template-columns”: only “0” can be a “unit”. You must put a unit after your number.
+$ vnu --css semunid.css
+"file:/home/ana/grade/semunid.css":3.30-3.32: error: CSS: “grid-template-columns”: only “0” can be a “unit”. You must put a unit after your number.
+$ vnu --css espaco.css
+"file:/home/ana/grade/espaco.css":3.33-3.34: error: CSS: “grid-template-columns”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<p>"Só o <code>0</code> pode ficar sem unidade; ponha uma unidade depois do número." No caso do <code>1 fr</code>, o espaço separa o número da unidade, e o validador vê um <code>1</code> sozinho. O navegador ignora a declaração inteira: a grade fica com uma coluna só.</p>
+<p><strong>Como consertar:</strong> <code>200px 200px</code>, <code>1fr 1fr</code> (número e unidade grudados).</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “grid-template-columns”: “-1fr” negative values are not allowed.</code></strong>
+<pre class="term" data-cwd="~/grade">$ vnu --css negfr.css
+"file:/home/ana/grade/negfr.css":3.31-3.33: error: CSS: “grid-template-columns”: “-1fr” negative values are not allowed.</pre>
+<p>"Valores negativos não são permitidos." Uma coluna não tem largura negativa. A declaração é ignorada.</p>
+<p><strong>Como consertar:</strong> use só valores positivos. Para uma coluna mais estreita, diminua o número dela em relação às outras (<code>1fr 3fr</code>).</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “grid-template-columns”: “,” is an incorrect operator.</code></strong>
+<pre class="term" data-cwd="~/grade">$ vnu --css virgula.css
+"file:/home/ana/grade/virgula.css":3.36-3.38: error: CSS: “grid-template-columns”: “,” is an incorrect operator.</pre>
+<p>As colunas são separadas por <strong>espaço</strong>, não por vírgula. (A vírgula aparece, sim, mas <strong>dentro</strong> de funções: <code>repeat(3, 1fr)</code>, <code>minmax(0, 1fr)</code>.)</p>
+<p><strong>Como consertar:</strong> <code>grid-template-columns: 1fr 1fr 1fr;</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Colunas</th></tr>
+<tr><td><code>grid-template-columns: 100px 100px 100px;</code></td><td>Três colunas fixas de 100 pixels</td></tr>
+<tr><td><code>grid-template-columns: 1fr 1fr 1fr;</code></td><td>Três colunas iguais, que dividem o espaço livre</td></tr>
+<tr><td><code>grid-template-columns: 2fr 1fr;</code></td><td>A primeira com o dobro da segunda</td></tr>
+<tr><td><code>grid-template-columns: 200px 1fr;</code></td><td>Lateral fixa + conteúdo com o resto</td></tr>
+<tr><td><code>grid-template-columns: auto 1fr auto;</code></td><td>As das pontas com a largura do conteúdo; a do meio com o resto</td></tr>
+<tr><td><code>grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);</code></td><td>Duas colunas iguais mesmo com conteúdo comprido</td></tr>
+<tr><td>O valor no F12 (Computed)</td><td>Sempre em pixels, já calculados: <code>2fr 1fr</code> numa grade de 500 px com <code>gap: 16px</code> aparece como <code>322.656px 161.328px</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A unidade da fração</h3>
+<p>Complete com a unidade que divide o espaço que sobra:</p>
+<div class="ex-code">.grade { display: grid; grid-template-columns: 1<input data-answer="fr" aria-label="unidade"> 1fr; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. O dobro</h3>
+<p>Complete para a primeira coluna ter o dobro da largura da segunda:</p>
+<div class="ex-code">.grade { display: grid; grid-template-columns: <input data-answer="2fr" aria-label="largura"> 1fr; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. Uma grade de 500 px tem <code>grid-template-columns: 100px 1fr</code> e nenhum <code>gap</code>. Qual a largura da segunda coluna?</p>
+<label><input type="radio" name="q3"> 100 px</label>
+<label><input type="radio" name="q3"> 250 px</label>
+<label><input type="radio" name="q3"> 400 px</label>
+<label><input type="radio" name="q3"> 500 px</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">4. Por que <code>25% 25% 25% 25%</code> com <code>gap: 16px</code> vaza da caixa, e <code>1fr 1fr 1fr 1fr</code> não?</p>
+<label><input type="radio" name="q4"> Porque o <code>fr</code> desconta o <code>gap</code> antes de dividir, e o <code>%</code> não</label>
+<label><input type="radio" name="q4"> Porque o <code>%</code> não funciona no Grid</label>
+<label><input type="radio" name="q4"> Porque o <code>gap</code> não funciona com <code>fr</code></label>
+<label><input type="radio" name="q4"> Porque 25% é mais que 1fr</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. <code>grid-template-columns: auto 1fr auto</code>. Qual coluna fica com o espaço que sobra?</p>
+<label><input type="radio" name="q5"> A primeira</label>
+<label><input type="radio" name="q5"> A do meio</label>
+<label><input type="radio" name="q5"> A última</label>
+<label><input type="radio" name="q5"> As três, por igual</label>
+</div>
+
+<h3>Missão final: a vitrine com destaque</h3>
+
+<div class="tryhtml" data-goal="css:.vitrine{display}=grid,src:grid-template-columns:\s*1fr\s+2fr\s+1fr\s*;,css:.vitrine{column-gap}=16px">
+<p class="try-task"><strong>Missão:</strong> a vitrine tem três produtos, e o do meio é o destaque da semana. Faça uma grade de três colunas em que a do meio tenha o <strong>dobro</strong> da largura das outras duas (<code>1fr 2fr 1fr</code>), com <code>gap: 1rem</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;div class="produto"&gt;Brigadeiro&lt;/div&gt;
+  &lt;div class="produto destaque"&gt;Bolo de cenoura: destaque da semana!&lt;/div&gt;
+  &lt;div class="produto"&gt;Pão de mel&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.vitrine {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  font-family: sans-serif;
+}
+
+.produto {
+  padding: 16px;
+  background-color: lightyellow;
+  border: 2px solid orange;
+}
+
+.destaque {
+  background-color: orange;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.vitrine {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 1rem;
+  font-family: sans-serif;
+}
+
+.produto {
+  padding: 16px;
+  background-color: lightyellow;
+  border: 2px solid orange;
+}
+
+.destaque {
+  background-color: orange;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>grid-template-columns</code>, no pai, recebe <strong>um tamanho por coluna</strong>, separados por espaço.</li>
+  <li><code>px</code>/<code>rem</code>: colunas fixas. <code>%</code>: porcentagem da grade, sem descontar o <code>gap</code> (pode vazar).</li>
+  <li><code>fr</code>: partes do espaço que <strong>sobra</strong> depois do <code>gap</code> e das colunas fixas. <code>2fr 1fr</code> = a primeira com o dobro da segunda.</li>
+  <li>Misture: <code>200px 1fr</code> (lateral + conteúdo), <code>auto 1fr auto</code> (o meio pega o resto).</li>
+  <li>Uma coluna <code>1fr</code> não encolhe abaixo do conteúdo que não quebra: <code>minmax(0, 1fr)</code> resolve.</li>
+  <li>Número sem unidade, <code>1 fr</code> separado, vírgula ou valor negativo: o validador reclama, e o navegador ignora a linha.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
