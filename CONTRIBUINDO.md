@@ -81,7 +81,9 @@ As metas olham a **página já desenhada pelo navegador** (o DOM), e não o text
 | `nsel:SELETOR=N` | existem exatamente N elementos (`nsel:li=3`) |
 | `texto:SELETOR=TEXTO` | o texto do **primeiro** elemento que casa (espaços juntados, sem as pontas) **contém** TEXTO, diferenciando maiúsculas de minúsculas |
 | `attr:SELETOR[ATRIBUTO]=VALOR` | o atributo do primeiro elemento é **igual** a VALOR; sem `=VALOR`, basta o atributo existir. **O último `[…]` é sempre o atributo** e o resto é o seletor: `attr:nav a[aria-current]=page` lê o `aria-current` do **primeiro** `nav a`. Para escolher o link que tem o atributo, filtre no seletor: `attr:nav a[aria-current][aria-current]=page` |
-| `css:SELETOR{propriedade}=VALOR` | o estilo **calculado** (`getComputedStyle`) do primeiro elemento é igual a VALOR (`css:h1{color}=rgb(255, 0, 0)`) |
+| `css:SELETOR{propriedade}=VALOR` | o estilo **calculado** (`getComputedStyle`) do primeiro elemento é igual a VALOR (`css:h1{color}=rgb(255, 0, 0)`). Pseudo-elemento no fim do seletor: `css:li::before{content}="★ "`, `css:li::marker{color}=…` |
+| `hover:SELETOR{propriedade}=VALOR` | igual ao `css:`, mas **com o mouse em cima** do primeiro elemento (e, como no navegador, em cima dos pais dele): `hover:.botao{background-color}=rgb(0, 0, 128)` |
+| `foco:SELETOR{propriedade}=VALOR` | igual ao `css:`, mas **com o foco** no primeiro elemento (`:focus` e `:focus-visible`; os pais ficam com `:focus-within`): `foco:input{outline-color}=rgb(255, 99, 71)` |
 | `console:TEXTO` | a saída do console (log e erros) contém TEXTO |
 | `src:REGEX` | o código de todas as abas casa com a regex (flags `m` e `i`) |
 | `nsrc:REGEX` | o código **não** casa com a regex (para proibir algo, como `nsrc:<font`) |
@@ -98,10 +100,11 @@ As metas olham a **página já desenhada pelo navegador** (o DOM), e não o text
 
 
 **Para o CSS, as metas mais úteis:**
-- `css:SELETOR{propriedade}=VALOR` confere o estilo **calculado** — o valor como o navegador o guarda depois de resolver tudo: cores viram `rgb(…)` (`tomato` → `rgb(255, 99, 71)`; com transparência, `rgba(…)`), tamanhos viram `px` (`2em` com fonte de 16px → `32px`), `bold` vira `700`, e os atalhos (`margin`, `border`, `background`) **não** aparecem: confira a propriedade longa (`margin-top`, `border-top-width`, `background-color`). **Antes de escrever a meta, confira o valor calculado de verdade** com `tools/foto.js --estilo` (§4) — nunca de memória.
+- `css:SELETOR{propriedade}=VALOR` confere o estilo **calculado** — o valor como o navegador o guarda depois de resolver tudo: cores viram `rgb(…)` (`tomato` → `rgb(255, 99, 71)`; com transparência, `rgba(…)`), tamanhos viram `px` (`2em` com fonte de 16px → `32px`), `bold` vira `700`. Os atalhos às vezes aparecem (`margin: 4px 8px`, `flex: 1 1 0%`) e às vezes não (`border` com lados diferentes fica vazio): confira **sempre a propriedade longa** (`margin-top`, `border-top-width`, `background-color`). **Antes de escrever a meta, confira o valor calculado de verdade** com `tools/foto.js --estilo` (§4) — nunca de memória.
 - `src:REGEX` exige um recurso no código (`src:display:\s*flex`, `src:@media`); `nsrc:` proíbe (`nsrc:!important`).
 - Não use meta que dependa da fonte instalada, da largura da tela (a não ser com a largura fixa do quadro, §4) ou do navegador (larguras de texto em px, quebra de linha, `font-family` calculada).
-- `:hover`, `:focus`, animações e transições não têm estado fixo para conferir: use `src:` (por exemplo, `src::hover\s*\{[^}]*background`) ou a meta que o agente do simulador acrescentar (§4).
+- `:hover` e `:focus`: use as metas `hover:` e `foco:` (§4, "Estados"). Animações e transições: o testador lê o **estado final** (§4, "Animações").
+- Para a largura do quadro (aulas de `@media`), o tema escuro (`prefers-color-scheme`) e o resto do que é só do Guia CSS, veja a §4, "Recursos de CSS".
 
 ### Terminal (`pre.term`)
 Igual aos outros guias: `$ ` = `ana@notebook:~$`. No Guia CSS ele aparece pouco: o validador (`vnu --css estilo.css`, `vnu --also-check-css index.html`) e, nas aulas de organização, `tree`.
@@ -112,34 +115,102 @@ Igual aos outros guias: `$ ` = `ana@notebook:~$`. No Guia CSS ele aparece pouco:
 No `.exercise`, `data-answer="a|b"` aceita respostas alternativas (`\|` é uma barra literal).
 
 ## 4. O editor do guia (`assets/htmlsim.js`)
-> **Herdada do Guia HTML (o mesmo editor); o agente do simulador do Guia CSS está revisando e completando.** **Esta seção é mantida pelo agente do simulador.** Antes de escrever uma frase do tipo "no editor…" que não esteja aqui, confira com as ferramentas dele.
+> **Esta seção é mantida pelo agente do simulador.** É o mesmo editor do Guia HTML, com os recursos de CSS abaixo. Antes de escrever uma frase do tipo "no editor…" que não esteja aqui, confira com o `tools/foto.js`.
 
-**Testador pronto (17/10, 15:55).** Mídia de exemplo pronta (lista abaixo). A aula do editor para o leitor é `simulador.html`; a página de teste é `tools/demo.html`.
+**Pronto em 19/10/2026:** o testador, o `tools/foto.js`, as metas `hover:`/`foco:`, pseudo-elementos, `data-largura`, `data-tema` e o estado final das animações. A aula do editor para o leitor é `simulador.html`; a página de teste com um exemplo de cada recurso é `tools/demo.html`.
+
+### A foto do resultado (`tools/foto.js`) — use em TODA aula
+Antes de descrever um resultado ("os cartões ficam lado a lado", "o botão fica azul"), **tire a foto e abra com Read**. No notebook:
+```bash
+~/guia-css-lab/foto pagina.html --listar                    # numera as caixas e os Resultados da página
+~/guia-css-lab/foto pagina.html --caixa 2                   # a 2ª caixa .tryhtml, código inicial
+~/guia-css-lab/foto pagina.html --caixa 2 --solucao         # a mesma caixa, com a solução
+~/guia-css-lab/foto pagina.html --resultado 1               # o 1º pre.file[data-resultado]
+~/guia-css-lab/foto pagina.html --caixa 3 --largura 375     # o quadro com 375 px (celular)
+~/guia-css-lab/foto pagina.html --caixa 4 --solucao --estado hover:.botao --estilo ".botao{background-color,color}"
+~/guia-css-lab/foto --html RASCUNHO/a.html --css RASCUNHO/a.css --estilo "h1{color,font-size}"   # rascunho solto
+```
+- Imprime `foto: ~/rascunho/css/fotos/NOME.png` (na VPS) e `baixada: /tmp/claude-1000/guia-css-fotos/NOME.png` (no notebook): **abra esse caminho com Read**.
+- `--estilo "SELETOR{prop1,prop2}"` imprime os valores **calculados** (`getComputedStyle`) do primeiro elemento, como a aba Computed do F12. Pode repetir. Vale pseudo-elemento: `--estilo "li::before{content}"`. **É assim que se escreve uma meta `css:`** — nunca de memória.
+- `--estado hover:SELETOR` / `--estado foco:SELETOR`: força o estado, como o testador faz (pode repetir).
+- `--escuro`: tema escuro no quadro (`prefers-color-scheme: dark`); `--menos-movimento`: `prefers-reduced-motion: reduce`; `--simples`: o editor no modo simples (sem service worker).
+- Sem `--largura`, a foto usa o `data-largura` da caixa ou, sem ele, **728 px** (a largura do quadro numa janela de 1100 px, a mesma do testador).
+- A altura é a do conteúdo (até 4000 px); `--altura PX` fixa. As animações e transições finitas são esperadas até o fim (até 6 s); `--sem-fim` tira a foto no instante em que a página carregou.
+- Com `--caixa`, também mostra as metas (✓/✗) e o console daquele código.
+- `--html`/`--css`: os arquivos podem estar no notebook (o `foto` manda para a VPS). O HTML precisa do `<link rel="stylesheet" href="…css">` para usar o CSS (a aba ganha o nome do `href`); um `<style>` também serve. `assets/midia/…` funciona.
+- Na VPS: `node tools/foto.js …` (as mesmas opções; `node tools/foto.js -h` mostra a ajuda).
+
+### Recursos de CSS no editor
+**Largura do quadro (aulas de `@media`, `vw`, responsivo):**
+- `data-largura="375"` na caixa (ou num `pre.file[data-resultado]`) faz o quadro ter **375 px de largura**, de 200 a 2000. A página lá dentro vê uma janela de 375 px: as `@media`, `vw` e `@container` mudam. Sem o atributo, o quadro tem a largura da coluna do guia, que muda com a tela do leitor (728 px numa janela de 1100 px).
+- Na barra do Resultado de toda caixa há os botões **375 · 768 · cheia** e a largura atual em px (`375 px`). O leitor clica e vê a `@media` mudar **ao vivo**, sem desenhar de novo. Mais largo que a caixa, o quadro ganha rolagem lateral.
+- **As metas são conferidas na largura que o quadro tem.** O testador usa o `data-largura` (sem ele, 728 px). Se o leitor trocar a largura, a missão continua conferindo, e o "Ainda falta" avisa: "(a missão é conferida com o quadro em 375 px)".
+- Regra: missão cuja meta depende da largura (`flex-direction` dentro de uma `@media`, por exemplo) **tem de ter `data-largura`**. Escreva na missão: "com o quadro em 375 px (botão 375)".
+
+**Tema claro/escuro (`prefers-color-scheme`):**
+- O botão **◐** da barra liga o tema escuro **só no quadro**: o `@media (prefers-color-scheme: dark)` da página do leitor passa a valer. Funciona porque o editor põe `color-scheme: dark` no `<iframe>`, e o navegador passa isso para a página de dentro (conferido no Chromium 155).
+- `light-dark(red, blue)` e as cores do sistema (`Canvas`, `CanvasText`) seguem o botão **só** se a página declarar `color-scheme: light dark` (por exemplo, em `:root`); sem isso, ficam no claro (conferido: `light-dark(red, blue)` deu `rgb(0, 0, 255)` com a declaração e `rgb(255, 0, 0)` com `color-scheme: light`).
+- `data-tema="escuro"` na caixa (ou no Resultado) começa no escuro, e as metas da missão são conferidas no escuro.
+- Sem tema escuro, a página do quadro tem fundo branco, mesmo com o guia no tema escuro.
+
+**`prefers-reduced-motion`:** o editor **não** tem botão (não há como a página ligar isso no quadro). Ensine pelo F12: **⋮ → More tools → Rendering → "Emulate CSS media feature prefers-reduced-motion"** (no Chrome/Edge; os nomes dos menus são em inglês e podem mudar — descreva como ilustrativo) ou pelas configurações de acessibilidade do sistema (a opção de reduzir/desligar animações). A foto: `--menos-movimento`. Numa missão, use `src:prefers-reduced-motion`.
+
+**Estados (`:hover`, `:focus`):**
+- Metas `hover:SELETOR{prop}=VALOR` e `foco:SELETOR{prop}=VALOR` (§3).
+- **No testador**, o estado é forçado pelo protocolo do DevTools (`CSS.forcePseudoState`), como a caixinha `:hov` do F12: `:hover` no elemento e nos pais; `:focus` + `:focus-visible` no elemento e `:focus-within` nos pais. As outras metas são conferidas sem estado nenhum (dá para pedir, na mesma missão, `css:.botao{…}=tomato` e `hover:.botao{…}=navy`).
+- **No editor do leitor**, a meta é conferida quando ele **passa o mouse** (ou clica/usa <kbd>Tab</kbd>) no elemento. Até lá, o "Ainda falta" diz "(passe o mouse sobre .botao para conferir)". Conferida uma vez, fica cumprida até o quadro ser desenhado de novo. Escreva isso na missão: "…e passe o mouse no botão".
+- `:active`, `:visited`, `:checked` e outros: use `src:` (ex.: `src::active\s*\{`). `:checked`, `:valid`, `:invalid` dependem do HTML: dá para conferir com `css:` se a caixa já começa com o campo marcado/inválido.
+
+**Pseudo-elementos:** `css:p::before{content}`, `::after`, `::marker`, `::placeholder`, `::first-line`, `::first-letter`, `::selection`, `::backdrop`, `::file-selector-button`. O `content` calculado vem **com aspas**: `content: "★ "` → meta `css:li::before{content}="★ "`. Sem `content`, um `::before` tem `content: none`.
+
+**Animações e transições:**
+- **No testador**, antes de conferir as metas, as animações e transições **finitas** são levadas ao fim (`finish()`): `css:` lê o **estado final**. Atenção: uma animação sem `animation-fill-mode: forwards` volta ao estilo de antes quando acaba; a meta lê esse estilo, como o leitor veria depois de a animação terminar.
+- **No editor do leitor**, as metas são conferidas de novo quando uma animação ou transição termina (`animationend`/`transitionend`).
+- Animação **infinita** (`infinite`) não tem estado final: a meta `css:` leria um valor do meio. Use `src:` (`src:animation:[^;]*infinite`, `src:@keyframes\s+girar`).
+- Transição só acontece quando algo muda (o `:hover`, por exemplo): confira com `hover:` (o testador espera o fim) ou com `src:transition`.
+
+**Valores calculados (o que esperar do `getComputedStyle`, conferido no Chromium 155):** nomes de cor e hex viram `rgb(…)`/`rgba(…)`, mas `oklch(70% 0.15 30)` fica `oklch(0.7 0.15 30)` (não vira `rgb`); tamanhos em `px`; `font-weight: bold` vira `700`; `line-height: normal` fica `normal`; `flex: 1` vira `flex: 1 1 0%`. Os atalhos às vezes aparecem (`margin: 4px 8px`, `border-radius: 8px`) e às vezes ficam vazios: **use sempre a propriedade longa** e confira com `--estilo`.
 
 ### O testador (na VPS)
 ```bash
 ~/guia-css-lab/testar pagina.html            # no notebook (roda na VPS, com timeout)
 ~/guia-css-lab/testar -v pagina.html         # mostra cada meta, o que o código inicial ainda não cumpre e o console
-~/guia-css-lab/testar --nativo pagina.html   # + validador W3C do laboratório (vnu 26.10.12)
+~/guia-css-lab/testar --nativo pagina.html   # + validador W3C do laboratório (vnu 26.10.12), HTML e CSS
 ```
-- Abre a página num **Chromium de verdade** (sem janela), com o **mesmo** `assets/htmlsim.js` do leitor: as metas são avaliadas pelo mesmo código, no mesmo quadro.
-- Em cada missão: põe o código inicial e confere que **alguma meta falha**; põe a solução e confere que **todas passam**. Mostra o motivo, por exemplo: `texto:h1=Receitas da Ana (hoje o texto é “Meu site”)`.
+- Abre a página num **Chromium de verdade** (sem janela, numa janela de 1100 × 900), com o **mesmo** `assets/htmlsim.js` do leitor: as metas são avaliadas pelo mesmo código, no mesmo quadro.
+- Em cada missão: põe o código inicial e confere que **alguma meta falha**; põe a solução e confere que **todas passam**. Mostra o motivo, por exemplo: `css:.cartoes{flex-direction}=column (hoje flex-direction é row)` ou `hover:.botao{background-color}=rgb(0, 0, 128) (com o mouse em cima, background-color é rgb(255, 99, 71))`.
 - Confere o **escape** de todo `<pre>`:
-  - `<` ou `&` cru dentro de `pre.file`, `pre.script` ou `pre.solucao` é **falha**;
+  - `<` ou `&` cru dentro de `pre.file`, `pre.script` ou `pre.solucao` é **falha** (inclusive o `&` do aninhamento: `&amp;:hover`; o `>` do combinador fica legível, mas escreva `&gt;`);
   - uma entidade como `&copy;` crua é **aviso**: o leitor veria `©` no código; para mostrar `&copy;`, escreva `&amp;copy;`.
-- Confere o contrato: meta desconhecida, seletor ou regex inválidos, missão sem `pre.solucao`, abas com o mesmo nome, caixa sem aba `.html`.
+- Confere o contrato: meta desconhecida, seletor ou regex inválidos, missão sem `pre.solucao`, abas com o mesmo nome, caixa sem aba `.html`, `data-largura` fora de 200–2000, `data-tema` diferente de `escuro`/`claro`.
 - **Avisos** (`!`, não são falha):
   - erro no console da solução, de uma caixa livre ou de um Resultado (por exemplo, `Não foi possível carregar "bolo.jpg" (<img>)`);
-  - solução desenhada em modo quirks.
-  - **recurso que falha** na solução de uma missão, numa caixa livre ou num Resultado: um 404, uma imagem, um script ou CSS que não carregou, um `<iframe>` que caiu na 404 do editor ou do servidor. Exemplo: `a solução carrega algo que falha: 404 jogo.html`. Uma meta como `attr:iframe[sandbox]` não olha o conteúdo do iframe; este aviso, sim. Num Resultado com "erro de propósito" no rótulo, o aviso diz isso.
-- Guarda o que passou em `tools/.cache-missoes.json`. Só testa de novo a caixa que mudou (ou tudo, se o `htmlsim.js` mudar). Use `--sem-cache` para forçar.
-- `--nativo`: valida no `vnu` do lab **a solução de cada missão** (abas `.html` e `.css`) e **cada `pre.file[data-resultado]`**.
-  - Solução com erro do W3C = **falha**.
-  - Resultado com erro = só mostra (é normal num "quando dá errado").
-  - As mensagens saem no formato da linha de comando, com as linhas do **seu** código: `"index.html":3.29-3.35: error: …`.
-  - Num fragmento, as linhas e colunas já descontam o esqueleto. Um erro que o validador só percebe no fim do arquivo (`End of file seen…`, por exemplo de um `<textarea>` sem fechar) aparece sem posição, com a nota "depois do fim do seu código".
-  - O `vnu --also-check-css` 26.10.12 conta as linhas do HTML uma a menos. Por isso o testador valida o HTML e o CSS em rodadas separadas: as posições que ele mostra são as mesmas de `vnu arquivo.html`.
-- As metas são conferidas logo depois que a página carrega, **sem cliques**. Uma missão do tipo "clique no botão" não dá para testar: use `src:` (por exemplo, `src:addEventListener\("click"`) e deixe o leitor clicar.
+  - solução desenhada em modo quirks;
+  - **recurso que falha** na solução de uma missão, numa caixa livre ou num Resultado: um 404, uma imagem, um CSS que não carregou (`404 estilo.css`: o `<link href>` aponta para uma aba que não existe);
+  - **erro falso do validador** (abaixo).
+- Guarda o que passou em `tools/.cache-missoes.json`. Só testa de novo a caixa que mudou (ou tudo, se o `htmlsim.js` ou o testador mudarem). Use `--sem-cache` para forçar.
+- `--nativo`: valida no `vnu` do lab **a solução de cada missão** (abas `.html` **e `.css`**) e **cada `pre.file[data-resultado]`** (o CSS do `<style>` e do `style="…"` dentro do HTML também é conferido).
+  - Solução com erro do W3C = **falha**. Resultado com erro = só mostra (é normal num "quando dá errado").
+  - As mensagens saem no formato da linha de comando, com as linhas do **seu** código: `"style.css":5.3-5.6: error: CSS: “colr”: Property “colr” doesn't exist.`
+  - Num fragmento HTML, as linhas e colunas já descontam o esqueleto. Um erro que o validador só percebe no fim do arquivo (`End of file seen…`) aparece sem posição, com a nota "depois do fim do seu código".
+  - O `vnu --also-check-css` 26.10.12 conta as linhas do HTML uma a menos. Por isso o testador valida o HTML e o CSS em rodadas separadas: as posições que ele mostra são as mesmas de `vnu arquivo.html` e `vnu --css estilo.css`.
+- **CSS moderno no validador (conferido em 19/10/2026 com o vnu 26.10.12):**
+  - **aceita** (sem erro): aninhamento (`&`), `@layer`, `@scope`, `:has()`, `:is()`, `:where()`, `oklch()`, `oklab()`, `lch()`, `color-mix()`, `rgb(from …)`, `light-dark()`, `clamp()`, `round()`, `dvh`/`svh`, `subgrid`, `text-wrap`, `aspect-ratio`, `translate`/`rotate`/`scale`, `@media (400px <= width <= 700px)`, `::marker`, `::backdrop`, `:user-invalid`, `@counter-style`;
+  - **acusa erro FALSO** em: `@container` e `container`/`container-type`/`container-name`, as unidades `cqi`/`cqw`/`cqh`…, `@property`, `@starting-style`, `@view-transition` e `view-transition-name`, posicionamento por âncora (`anchor-name`, `position-anchor`, `anchor()`, `anchor-center`), animações ligadas à rolagem (`animation-timeline`, `animation-range`), `transition-behavior`, `interpolate-size`, `field-sizing`, `text-box`, `color(display-p3 …)`.
+  - O testador mostra esses erros como **aviso** ("erro FALSO do vnu 26.10.12…"), não como falha. Na aula, quando o leitor puder usar o validador do W3C nesse CSS, diga numa `div.note` que o validador ainda acusa erro, embora os navegadores entendam (confira o suporte no MDN). Achou outro erro falso? Anote no relatório; o agente do simulador põe na lista (`VNU_FALSOS` no testador).
+- As metas são conferidas logo depois que a página carrega, **sem cliques** (o `:hover`/`:focus` é forçado, não clicado). Uma missão do tipo "clique no botão" não dá para testar: use `src:` e deixe o leitor clicar.
+
+### A página inteira, como o leitor vê (`tools/testar-navegador.js`)
+```bash
+~/guia-c-lab/vps '. ~/.profile; cd ~/guia-css && timeout 600 node tools/testar-navegador.js pagina.html'
+```
+- Abre a página **inteira** (menu, `site.js`, Anterior/Próximo), rola até o fim para o editor desenhar cada caixa e cada Resultado, e confere:
+  - erro de JavaScript ou `console.error` **da página do guia** (o código do leitor, dentro dos quadros, é do `testar-missoes.js`);
+  - HTTP ≥ 400 fora dos quadros (uma imagem ou um CSS do guia que falta);
+  - caixa ou Resultado que não montou ou não desenhou;
+  - link no texto da aula para uma página que **não está na `NIVEIS`** (FALHA); para uma aula da `NIVEIS` ainda não escrita, só informa;
+  - **rolagem lateral no celular**: a página aberta com 375 px de largura não pode ser mais larga que a tela. A mensagem aponta o elemento mais largo (ex.: `a página tem 379 px (span.t-o)`): uma tabela larga vai num `div.table-wrap`, um código comprido num `pre`.
+- `--celular` testa tudo com 375 px; `--fotos DIR` salva um print da página inteira; `-q` mostra só as páginas com problema; `--todas` testa todas.
 
 ### O que o quadro faz
 - **Resultado ao vivo:** cada caixa desenha o código num `<iframe>` próprio, meio segundo depois que o leitor para de digitar (Ctrl+Enter desenha na hora). O CSS e o JS do leitor não vazam para a página do guia.
@@ -186,7 +257,7 @@ No `.exercise`, `data-answer="a|b"` aceita respostas alternativas (`\|` é uma b
   - Enquanto o leitor digita, o editor não tira o foco do código.
   - O botão ↻ (da caixa e do Resultado) aplica o `autofocus` da página, como o navegador faria numa aba nova.
   - O ↗ abre numa aba nova, onde quem aplica o `autofocus` é o próprio navegador.
-- **Validar no W3C (decisão: tem, opcional):** o botão manda o código da aba `.html` aberta para `validator.w3.org/nu`, só **depois de o leitor confirmar** (o código vai para a internet). As mensagens aparecem em inglês, com a linha e a coluna. As metas **não** dependem disso.
+- **Validar no W3C (decisão: tem, opcional):** o botão manda o código da aba aberta para `validator.w3.org/nu`, só **depois de o leitor confirmar** (o código vai para a internet). Numa aba `.css`, valida **o CSS** (enviado como `text/css`; conferido em 19/10 com o validador on-line, versão 26.10.18); numa aba `.html` (ou outra), valida a primeira aba `.html`, que inclui o CSS do `<style>` e do `style="…"`. As mensagens aparecem em inglês, com a linha e a coluna: `Error (linha 2, coluna 9): “colr”: Property “colr” doesn't exist.` (para `  colr: tomato;`, conferido no Chromium: a coluna é a do **valor**) Os erros falsos de CSS moderno (lista do `--nativo`) aparecem como **Error (falso)**, com uma explicação para o leitor. As metas **não** dependem disso.
 - **Restaurar** volta ao código original. **Ver solução** pede confirmação e troca as abas que a solução muda.
 - **Missão:** "Missão em andamento… Ainda falta: h1 com o texto “Receitas da Ana” (hoje o texto é “Meu site”)" → "✔ Missão cumprida!".
   - As metas olham a **primeira aba `.html`**. São conferidas quando ela carrega, a cada mensagem no console e a cada mudança no DOM (o leitor clicou, digitou num campo).
@@ -215,7 +286,7 @@ No `.exercise`, `data-answer="a|b"` aceita respostas alternativas (`\|` é uma b
   - **service worker** (o modo completo, descrito acima): quando o navegador tem `navigator.serviceWorker` e `caches`, a página está num contexto seguro (`https://`, ou `http://localhost`/`127.0.0.1`) e o `assets/htmlsim-sw.js` fica ativo em até 6 segundos. É o caso do guia publicado no GitHub Pages e do testador.
   - **`srcdoc`** (modo simples): em qualquer outro caso (arquivo aberto do disco com `file://`, `http://` sem ser localhost, janela anônima do Firefox, service worker bloqueado) ou com `?htmlsim=simples` no endereço (para conferir). O console do F12 mostra `htmlsim: sem service worker (…); usando o modo simples` quando a tentativa falha.
 - **Modo simples**, conferido no Chromium:
-  - o CSS e o JS das abas entram embutidos: o `href` do `<link>` muda, e as metas `attr:` em `link`/`script` podem falhar;
+  - o CSS e o JS das abas entram embutidos: o `href` do `<link>` muda, e as metas `attr:` em `link`/`script` falham (conferido: `attr:link[href]=style.css` dá `hoje href="data:text/css;…"`). O `url(assets/midia/…)` dentro do CSS continua funcionando (conferido no Chromium, `foto.js --simples`);
   - os links entre as abas e os formulários continuam funcionando, inclusive `bolo.html#modo-de-preparo` (abre a aba, rola e liga o `:target`) e o link para uma aba que não é página (`receita.txt`), que mostra ou baixa o conteúdo da aba;
   - um `href="#x"` navega de verdade para o fragmento do próprio quadro, como no modo completo: rola, liga o `:target` e move o ponto de partida do foco (o próximo <kbd>Tab</kbd> parte dali);
   - `href="#"` e `href="#top"` (sem elemento com esse id) voltam ao topo, como no navegador; o foco fica no link clicado;

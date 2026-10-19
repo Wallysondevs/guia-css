@@ -300,6 +300,23 @@
   function naoDesenha(rotulo) { return /\.(css|m?js|json|txt|vtt|csv|md)\s*$/i.test(String(rotulo || "").trim()); }
   HS.naoDesenha = naoDesenha;
 
+  /* Erros FALSOS do vnu 26.10.12 com CSS moderno (o validador de CSS dele é antigo): o CSS
+     funciona nos navegadores de 2025–2026, mas o vnu acusa erro. O testador mostra como AVISO. */
+  var VNU_FALSOS = [
+    // conferido em 19/10/2026: o vnu 26.10.12 aceita aninhamento (&), @layer, @scope, :has(), :is(),
+    // oklch()/oklab()/lch(), color-mix(), rgb(from …), light-dark(), round(), dvh/svh, subgrid, text-wrap…
+    [/Property “(container|container-type|container-name|field-sizing|interpolate-size|anchor-name|anchor-scope|position-anchor|position-area|position-try|position-try-fallbacks|position-try-order|position-visibility|view-transition-name|view-transition-class|animation-timeline|animation-range|animation-range-start|animation-range-end|scroll-timeline|scroll-timeline-name|scroll-timeline-axis|view-timeline|view-timeline-name|view-timeline-axis|view-timeline-inset|timeline-scope|transition-behavior|text-box|text-box-trim|text-box-edge|reading-flow|reading-order)” doesn't exist/, "propriedade moderna"],
+    [/Unrecognized at-rule “@(container|property|starting-style|view-transition|position-try|font-palette-values|function)”/, "at-rule moderna"],
+    [/“(color\()?(display-p3|srgb|srgb-linear|a98-rgb|prophoto-rgb|rec2020|xyz|xyz-d50|xyz-d65)\b[^”]*” is not a “[\w-]+” value/, "color() com espaço de cor"],
+    [/“(anchor|anchor-size)\(|“anchor-center”/, "posicionamento por âncora"],
+  ];
+  // "Unknown dimension" é falso quando o valor usa as unidades de contêiner (cqi, cqw…)
+  function vnuFalsoUnidade(m) { return /Unknown dimension/.test(m.message || "") && /\d(cqi|cqb|cqw|cqh|cqmin|cqmax)\b/.test(m.extract || "") ? "unidade de contêiner (cq…)" : null; }
+  // mensagem do validador → nome do recurso moderno (erro falso) ou null
+  function vnuFalso(m) { for (var i = 0; i < VNU_FALSOS.length; i++) if (VNU_FALSOS[i][0].test(m.message || "")) return VNU_FALSOS[i][1]; return vnuFalsoUnidade(m); }
+  HS.vnuFalso = vnuFalso;
+  HS.VNU_FALSOS = VNU_FALSOS;
+
   if (typeof module === "object" && module.exports) { module.exports = HS; }
   if (typeof document === "undefined") return;
   window.HtmlSim = HS;
@@ -838,30 +855,34 @@
   };
 
   /* ---------- validar no W3C ---------- */
-  function validarW3C(codigo) {
-    var doc = HS.paraValidar(codigo);
-    return fetch("https://validator.w3.org/nu/?out=json", { method: "POST", headers: { "Content-Type": "text/html; charset=utf-8" }, body: doc.texto })
+  function validarW3C(codigo, ehCss) {
+    var doc = ehCss ? { texto: String(codigo), deslocamento: 0 } : HS.paraValidar(codigo);
+    return fetch("https://validator.w3.org/nu/?out=json", { method: "POST", headers: { "Content-Type": (ehCss ? "text/css" : "text/html") + "; charset=utf-8" }, body: doc.texto })
       .then(function (r) { if (!r.ok) throw new Error("o validador respondeu " + r.status); return r.json(); })
-      .then(function (j) { return { msgs: (j.messages || []), doc: doc, fragmento: doc.deslocamento > 0 }; });
+      .then(function (j) { return { msgs: (j.messages || []), doc: doc, fragmento: doc.deslocamento > 0, css: !!ehCss }; });
   }
   HS.validarW3C = validarW3C;
   function mostrarW3C(caixa, res, nomeAba) {
-    var erros = res.msgs.filter(function (m) { return m.type === "error" || m.type === "non-document-error"; });
+    var falsos = res.msgs.filter(function (m) { return vnuFalso(m); });
+    var erros = res.msgs.filter(function (m) { return (m.type === "error" || m.type === "non-document-error") && !vnuFalso(m); });
     // num fragmento, "nenhum h1" vem do esqueleto que o editor pôs em volta, e não do código do leitor
     var avisos = res.msgs.filter(function (m) { return m.type === "info" && m.subType === "warning" && !(res.fragmento && /computed heading level of 1/.test(m.message)); });
     var h = "<strong>Validador do W3C</strong> (" + escHtml(nomeAba) + "): ";
     h += erros.length ? '<span class="hs-e">' + erros.length + (erros.length === 1 ? " erro" : " erros") + "</span>" : '<span style="color:var(--ok);font-weight:700">✔ nenhum erro</span>';
     if (avisos.length) h += ", " + '<span class="hs-a">' + avisos.length + (avisos.length === 1 ? " aviso" : " avisos") + "</span>";
-    var lista = erros.concat(avisos);
+    if (falsos.length) h += ", " + '<span class="hs-a">' + falsos.length + (falsos.length === 1 ? " erro falso" : " erros falsos") + "</span>";
+    var lista = erros.concat(avisos, falsos);
     if (lista.length) {
       h += "<ol>" + lista.map(function (m) {
         var l = m.firstLine || m.lastLine, p = HS.posicaoNoCodigo(res.doc, l, m.firstColumn);
         if (!m.firstColumn && p) p = HS.posicaoNoCodigo(res.doc, m.lastLine, m.lastColumn);
         var onde = p ? "linha " + p.linha + (p.coluna ? ", coluna " + p.coluna : "") : (l ? "no esqueleto que o editor pôs em volta" : "");
-        return "<li><span class=\"" + (m.type === "error" ? "hs-e\">Error" : "hs-a\">Warning") + "</span>" + (onde ? " (" + onde + ")" : "") + ": " + escHtml(m.message) + (m.extract ? "<br><code>" + escHtml(m.extract.replace(/\n/g, "↵")) + "</code>" : "") + "</li>";
+        var falso = vnuFalso(m);
+        return "<li><span class=\"" + (falso ? "hs-a\">Error (falso)" : m.type === "error" ? "hs-e\">Error" : "hs-a\">Warning") + "</span>" + (onde ? " (" + onde + ")" : "") + ": " + escHtml(m.message) + (m.extract ? "<br><code>" + escHtml(m.extract.replace(/\n/g, "↵")) + "</code>" : "") +
+          (falso ? "<br><small>O validador ainda não conhece este CSS moderno (" + escHtml(falso) + "). Os navegadores atuais entendem: não é erro seu.</small>" : "") + "</li>";
       }).join("") + "</ol>";
     }
-    h += '<p class="hs-nota">As mensagens do validador são em inglês.' + (res.fragmento ? " O código é um pedaço de página, então o editor o pôs dentro de um esqueleto mínimo (<code>&lt;!DOCTYPE html&gt;</code>, <code>&lt;html lang&gt;</code>, <code>&lt;head&gt;</code> com <code>&lt;title&gt;</code>) antes de mandar; as linhas já estão contadas como no seu código." : "") + "</p>";
+    h += '<p class="hs-nota">As mensagens do validador são em inglês.' + (res.css ? " O validador confere o CSS sozinho: ele não sabe se os seletores casam com o seu HTML." : "") + (res.fragmento ? " O código é um pedaço de página, então o editor o pôs dentro de um esqueleto mínimo (<code>&lt;!DOCTYPE html&gt;</code>, <code>&lt;html lang&gt;</code>, <code>&lt;head&gt;</code> com <code>&lt;title&gt;</code>) antes de mandar; as linhas já estão contadas como no seu código." : "") + "</p>";
     caixa.innerHTML = h; caixa.hidden = false;
   }
 
@@ -883,7 +904,7 @@
     var w = el("div", { "class": "ts tc hs" });
     w.innerHTML =
       '<div class="ts-bar"><span class="tc-tabs" role="tablist" aria-label="Arquivos"></span><span class="ts-sp"></span>' +
-      '<button type="button" class="sim-btn hs-validar" title="Manda o código desta aba para o validador do W3C, na internet">Validar no W3C</button>' +
+      '<button type="button" class="sim-btn hs-validar" title="Manda o código desta aba (.html ou .css) para o validador do W3C, na internet">Validar no W3C</button>' +
       (solucao ? '<button type="button" class="sim-btn ts-sol">Ver solução</button>' : "") +
       '<button type="button" class="sim-btn ts-rest" title="Volta ao código original">Restaurar</button></div>' +
       '<div class="ts-confirma hs-conf-sol" hidden><span>Trocar o seu código pela solução?</span> <button type="button" class="sim-btn2 ts-sim">Sim, mostrar</button> <button type="button" class="sim-btn2 secundario ts-nao">Cancelar</button></div>' +
@@ -1039,8 +1060,9 @@
     var confW = w.querySelector(".hs-conf-w3c");
     w.querySelector(".hs-validar").addEventListener("click", function () {
       salvarAba();
-      var aba = ehHtml(abas[ativa].nome) ? abas[ativa] : abas.filter(function (a) { return ehHtml(a.nome); })[0];
-      if (!aba) { w3c.hidden = false; w3c.textContent = "O validador de HTML confere arquivos .html; esta caixa não tem nenhum."; return; }
+      var ehCssAba = function (a) { return /\.css$/i.test(a.nome); };
+      var aba = ehHtml(abas[ativa].nome) || ehCssAba(abas[ativa]) ? abas[ativa] : abas.filter(function (a) { return ehHtml(a.nome); })[0];
+      if (!aba) { w3c.hidden = false; w3c.textContent = "O validador confere arquivos .html e .css; esta caixa não tem nenhum."; return; }
       w.querySelector(".hs-aba-w3c").textContent = aba.nome;
       confW.hidden = false; conf.hidden = true;
       confW._aba = aba;
@@ -1049,7 +1071,7 @@
     w.querySelector(".hs-w3c-sim").addEventListener("click", function () {
       var aba = confW._aba; confW.hidden = true;
       w3c.hidden = false; w3c.textContent = "Enviando " + aba.nome + " para o validador do W3C…";
-      validarW3C(aba.atual).then(function (r) { mostrarW3C(w3c, r, aba.nome); }, function (e) {
+      validarW3C(aba.atual, /\.css$/i.test(aba.nome)).then(function (r) { mostrarW3C(w3c, r, aba.nome); }, function (e) {
         w3c.innerHTML = "Não consegui falar com o validador do W3C (" + escHtml(e.message || String(e)) + "). Confira a internet, ou cole o código em <a href=\"https://validator.w3.org/nu/#textarea\" target=\"_blank\" rel=\"noopener\">validator.w3.org/nu</a>.";
       });
     });

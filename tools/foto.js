@@ -21,6 +21,7 @@
      --escuro / --claro  tema do quadro (prefers-color-scheme), como o botão ◐ do editor
      --menos-movimento   emula prefers-reduced-motion: reduce
      --sem-fim           NÃO leva as animações/transições ao fim (foto no instante em que carregou)
+     --simples           o editor no modo simples (sem service worker, §4), para comparar
      --listar            só lista as caixas e os Resultados da página, com os números
      --nome NOME         nome do arquivo (padrão: montado a partir das opções)
    A foto vai para ~/rascunho/css/fotos/NOME.png (o caminho é impresso no fim).
@@ -55,6 +56,7 @@ function args() {
     else if (x === "--menos-movimento") o.menosMov = true;
     else if (x === "--sem-fim") o.semFim = true;
     else if (x === "--listar") o.listar = true;
+    else if (x === "--simples") o.simples = true;
     else if (x === "--nome") o.nome = v().replace(/[^\w.-]+/g, "-").replace(/\.png$/i, "");
     else if (x === "--html") o.html = v();
     else if (x === "--css") o.css = v();
@@ -94,6 +96,7 @@ async function main() {
     rel = "__foto__.html";
     virtuais = { "/__foto__.html": { tipo: "text/html; charset=utf-8", dados: paginaRascunho(o) } };
     o.caixa = 1; o.resultado = undefined;
+    if (!o.largura) o.largura = 728; // a largura do quadro no guia (janela de 1100 px)
   } else {
     const arq = path.isAbsolute(o.pagina) ? o.pagina : fs.existsSync(o.pagina) ? path.resolve(o.pagina) : path.join(T.RAIZ, o.pagina);
     if (!fs.existsSync(arq)) uso("página não encontrada: " + o.pagina);
@@ -125,10 +128,10 @@ async function main() {
     const pg = await nav.newPage();
     await pg.setViewport({ width: 1100, height: 900 });
     if (o.menosMov) await pg.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
-    await pg.goto(base + rel.split(path.sep).map(encodeURIComponent).join("/") + "?htmlsim-teste", { waitUntil: "load", timeout: 30000 });
+    await pg.goto(base + rel.split(path.sep).map(encodeURIComponent).join("/") + "?htmlsim-teste" + (o.simples ? "&htmlsim=simples" : ""), { waitUntil: "load", timeout: 30000 });
     await pg.waitForFunction(() => window.HtmlSim && window.HtmlSim.montado, { timeout: 15000 });
     const md = await pg.evaluate(() => window.HtmlSim.modo());
-    if (md !== "sw") console.log("! o editor caiu no modo simples (sem service worker)");
+    if (md !== "sw" && !o.simples) console.log("! o editor caiu no modo simples (sem service worker)");
 
     // desenha (inicial ou solução)
     const r = await T.comTempo(pg.evaluate((ehRes, i, sol) => ehRes ? window.HtmlSim.resultados[i].desenhar() : window.HtmlSim.caixas[i].testar(sol ? "solucao" : "inicial"), ehRes, idx, !!o.solucao), 20000, "o quadro não terminou de carregar");
@@ -198,7 +201,7 @@ async function main() {
     const destino = path.join(PASTA, nome + ".png");
     await pg.screenshot({ path: destino, clip: { x: 0, y: 0, width: larg, height: Math.max(40, alt) } });
 
-    console.log("quadro: " + est.largura + " × " + alt + " px" + (est.escuro ? ", tema escuro (prefers-color-scheme: dark)" : "") + (o.menosMov ? ", prefers-reduced-motion: reduce" : "") + (o.estados.length ? ", estado forçado: " + o.estados.map((e) => e.tipo + " em " + e.sel).join(", ") : "") + (nAnim ? ", " + nAnim + " animação(ões)/transição(ões) levada(s) ao fim" : ""));
+    console.log("quadro: " + est.largura + " × " + alt + " px" + (md !== "sw" ? " (modo simples)" : "") + (est.escuro ? ", tema escuro (prefers-color-scheme: dark)" : "") + (o.menosMov ? ", prefers-reduced-motion: reduce" : "") + (o.estados.length ? ", estado forçado: " + o.estados.map((e) => e.tipo + " em " + e.sel).join(", ") : "") + (nAnim ? ", " + nAnim + " animação(ões)/transição(ões) levada(s) ao fim" : ""));
     if (r.metas && r.metas.length) {
       await T.metasComEstado(pg, idx, r).catch(() => {});
       console.log("metas (" + (o.solucao ? "solução" : "código inicial") + "):\n" + r.metas.map((m) => "  " + (m.ok ? "✓ " : "✗ ") + m.meta + (m.ok || !m.motivo ? "" : "  (" + m.motivo + ")")).join("\n"));

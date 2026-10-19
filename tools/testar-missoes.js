@@ -35,19 +35,8 @@ const CACHE = path.join(__dirname, ".cache-missoes.json");
 const CHROMIUM = process.env.CHROMIUM || "/usr/bin/chromium";
 const LAB = path.join(process.env.HOME, "guia-html-lab"); // o vnu fica no lab do Guia HTML
 const NOME_LAB = "css-nativo";
-/* Erros FALSOS do vnu 26.10.12 com CSS moderno (o validador de CSS dele é antigo): o CSS
-   funciona nos navegadores de 2025–2026, mas o vnu acusa erro. O testador mostra como AVISO. */
-const VNU_FALSOS = [
-  // conferido em 19/10/2026: o vnu 26.10.12 aceita aninhamento (&), @layer, @scope, :has(), :is(),
-  // oklch()/oklab()/lch(), color-mix(), rgb(from …), light-dark(), round(), dvh/svh, subgrid, text-wrap…
-  [/Property “(container|container-type|container-name|field-sizing|interpolate-size|anchor-name|anchor-scope|position-anchor|position-area|position-try|position-try-fallbacks|position-try-order|position-visibility|view-transition-name|view-transition-class|animation-timeline|animation-range|animation-range-start|animation-range-end|scroll-timeline|scroll-timeline-name|scroll-timeline-axis|view-timeline|view-timeline-name|view-timeline-axis|view-timeline-inset|timeline-scope|transition-behavior|text-box|text-box-trim|text-box-edge|reading-flow|reading-order)” doesn't exist/, "propriedade moderna"],
-  [/Unrecognized at-rule “@(container|property|starting-style|view-transition|position-try|font-palette-values|function)”/, "at-rule moderna"],
-  [/“(color\()?(display-p3|srgb|srgb-linear|a98-rgb|prophoto-rgb|rec2020|xyz|xyz-d50|xyz-d65)\b[^”]*” is not a “[\w-]+” value/, "color() com espaço de cor"],
-  [/“(anchor|anchor-size)\(|“anchor-center”/, "posicionamento por âncora"],
-];
-// "Unknown dimension" é falso quando o valor usa as unidades de contêiner (cqi, cqw…)
-function vnuFalsoUnidade(m) { return /Unknown dimension/.test(m.message || "") && /\d(cqi|cqb|cqw|cqh|cqmin|cqmax)\b/.test(m.extract || "") ? "unidade de contêiner (cq…)" : null; }
-function vnuFalso(m) { for (const [re, o] of VNU_FALSOS) if (re.test(m.message || "")) return o; return vnuFalsoUnidade(m); }
+// erros FALSOS do vnu com CSS moderno: a lista fica no htmlsim.js (o botão "Validar no W3C" usa a mesma)
+const vnuFalso = HS.vnuFalso;
 
 function puppeteer() {
   for (const p of [path.join(__dirname, "node_modules/puppeteer-core"), path.join(process.env.HOME, "rascunho/coord/cdp/node_modules/puppeteer-core")]) {

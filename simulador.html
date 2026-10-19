@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS O Editor do Guia — como usar as caixas Experimente | Guia CSS</title>
+<meta name="description" content="Como usar o editor Experimente do Guia CSS: o HTML e o CSS em abas, o resultado ao vivo desenhado pelo seu navegador, a largura do quadro (celular, tablet e cheia), o tema escuro, missões que conferem o :hover, o botão Validar no W3C para HTML e CSS, Restaurar e Ver solução, e o que muda entre o editor e um site publicado.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">O Editor do Guia</span></h1>
+
+<p class="intro">Em quase toda aula deste guia aparecem caixas <strong>Experimente</strong>: você escreve o HTML numa aba, o CSS em outra, e vê a página pronta logo embaixo, desenhada pelo <strong>seu próprio navegador</strong>. Não precisa instalar nada, criar arquivo nem abrir outra janela. Nesta página você conhece cada parte do editor, aprende a mudar a largura do quadro (para ver a página como num celular), a ligar o tema escuro, a cumprir missões e a mandar o seu CSS para o validador. Ainda não sabe CSS? Sem problema: aqui você só mexe em cores. O resto vem nas próximas aulas.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>As partes de uma caixa Experimente: as abas <code>index.html</code> e <code>style.css</code>, o código, o <strong>Resultado</strong> e a missão.</li>
+  <li>Por que a aba <code>style.css</code> só vale com o <code>&lt;link&gt;</code> no HTML.</li>
+  <li>Como ver a página com a largura de um celular (375 px), de um tablet (768 px) ou cheia.</li>
+  <li>Como ligar o tema escuro só no quadro.</li>
+  <li>Missões que pedem para você passar o mouse em cima de algo.</li>
+  <li>Como mandar o seu HTML ou o seu CSS para o validador do W3C.</li>
+  <li>O que o editor <strong>não</strong> faz e o que muda num site publicado.</li>
+</ul>
+</div>
+
+<hr>
+
+<h2>A ideia: um caderno de rascunho que desenha a página</h2>
+<p>Pense numa parede e numa lata de tinta. Você pinta um pedaço, olha, não gostou, pinta de novo. Com CSS é igual: você muda uma cor, olha o resultado, muda de novo. O editor do guia deixa esse "olhar" instantâneo: você digita, e meio segundo depois o navegador desenha a página outra vez no quadro <strong>Resultado</strong>.</p>
+<p>O resultado é <strong>de verdade</strong>: é o mesmo navegador que você usa para ver qualquer site. Se você errar o nome de uma propriedade, o quadro mostra exatamente o que o navegador faz: ele <strong>ignora</strong> a linha errada, sem aviso nenhum, e segue com o resto.</p>
+
+<hr>
+
+<h2>As partes da caixa</h2>
+<p>Esta é uma caixa livre, sem missão. Clique na aba <code>style.css</code>, troque <code>tomato</code> por <code>navy</code> e veja o título mudar de cor:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura com cobertura de chocolate.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: tomato;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Parte</th><th>O que faz</th></tr></thead>
+<tbody>
+<tr><td><code>index.html</code> e <code>style.css</code></td><td>As <strong>abas</strong>: um arquivo em cada uma. Clique para trocar de arquivo.</td></tr>
+<tr><td><strong>Validar no W3C</strong></td><td>Manda o código da aba aberta (HTML ou CSS) para o validador oficial (veja <a href="#w3c">mais abaixo</a>).</td></tr>
+<tr><td><strong>Restaurar</strong></td><td>Volta ao código original da caixa. Use quando se perder.</td></tr>
+<tr><td>O código</td><td>A área em que você digita, com os números das linhas do lado.</td></tr>
+<tr><td><strong>Resultado</strong></td><td>A página desenhada pelo navegador, com a <strong>barra de endereço</strong> (o arquivo que está aberto).</td></tr>
+<tr><td><strong>375 · 768 · cheia</strong></td><td>A <strong>largura</strong> do quadro: celular, tablet ou a largura toda da caixa (veja <a href="#largura">mais abaixo</a>). Do lado, a largura atual em px.</td></tr>
+<tr><td><strong>◐</strong></td><td>Liga e desliga o <strong>tema escuro</strong> só no quadro (veja <a href="#tema">mais abaixo</a>).</td></tr>
+<tr><td><strong>↻</strong> e <strong>↗</strong></td><td>↻ desenha de novo a partir da primeira página; ↗ abre o resultado numa aba nova do navegador.</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Repare no <code>index.html</code>: não há <code>&lt;!DOCTYPE html&gt;</code>, <code>&lt;html&gt;</code>, <code>&lt;head&gt;</code> nem <code>&lt;body&gt;</code>. É só um <strong>pedaço</strong> de página, para o exemplo ficar curto. O editor desenha esse pedaço como se ele estivesse dentro de uma página completa. O <code>&lt;link&gt;</code> da primeira linha vai para o <code>&lt;head&gt;</code>, como o navegador faria. Quando o código tem a página inteira, o editor desenha exatamente o que você escreveu.</p>
+
+<h3>Atalhos do editor</h3>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Tecla</th><th>O que faz</th></tr></thead>
+<tbody>
+<tr><td><kbd>Tab</kbd></td><td>Recua a linha em 2 espaços (com várias linhas selecionadas, recua todas).</td></tr>
+<tr><td><kbd>Shift</kbd>+<kbd>Tab</kbd></td><td>Desfaz o recuo.</td></tr>
+<tr><td><kbd>Enter</kbd></td><td>Nova linha com o mesmo recuo; depois de uma <code>{</code>, recua um pouco mais (o lugar das declarações).</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd></td><td>Desenha o resultado na hora, sem esperar.</td></tr>
+<tr><td><kbd>Esc</kbd></td><td>Sai do editor (o <kbd>Tab</kbd> volta a andar pela página).</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<h2 id="abas">A aba style.css só vale com o &lt;link&gt;</h2>
+<p>No editor, cada aba é um arquivo de uma pasta, como no seu computador. Um arquivo <code>style.css</code> parado na pasta não faz nada: é o <code>&lt;link rel="stylesheet" href="style.css"&gt;</code> do HTML que manda o navegador buscá-lo. Sem o <code>&lt;link&gt;</code>, a aba <code>style.css</code> é ignorada, igual num site de verdade (aula <a href="onde-colocar.html">Três Jeitos de Usar CSS</a>).</p>
+
+<div class="tryhtml" data-goal="attr:link[href]=style.css,css:h1{color}=rgb(0, 0, 128)">
+<p class="try-task"><strong>Missão:</strong> o <code>style.css</code> já deixa o título azul-marinho (<code>navy</code>), mas o <code>index.html</code> ainda não o carrega. Na primeira linha do <code>index.html</code>, acrescente <code>&lt;link rel="stylesheet" href="style.css"&gt;</code>.</p>
+<pre class="script" data-file="index.html">&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura com cobertura de chocolate.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: navy;
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura com cobertura de chocolate.&lt;/p&gt;
+</pre>
+</div>
+
+<p>Mudou o CSS? O quadro desenha de novo a página que está aberta. Também funcionam outros nomes e pastas, como num site: uma aba <code>css/estilo.css</code> com <code>href="css/estilo.css"</code>.</p>
+
+<hr>
+
+<h2>O quadro "Resultado" embaixo do código</h2>
+<p>Nas aulas, muitos exemplos são só para ler, e não para editar. Mesmo assim, o navegador desenha cada um logo embaixo, num quadro <strong>Resultado</strong> do tamanho do conteúdo. Nesses exemplos curtos, o CSS vem num <code>&lt;style&gt;</code> dentro do próprio HTML:</p>
+
+<pre class="file" data-file="exemplo.html" data-resultado>&lt;style&gt;
+  h2 { color: seagreen; }
+  li { color: gray; }
+&lt;/style&gt;
+&lt;h2&gt;Ingredientes&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;3 cenouras&lt;/li&gt;
+  &lt;li&gt;3 ovos&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+<p>Quer mexer no exemplo? Clique em <strong>copiar</strong> e cole numa caixa Experimente.</p>
+
+<hr>
+
+<h2 id="largura">A largura do quadro: celular, tablet e cheia</h2>
+<p>Uma página bem feita se ajeita na tela de um celular e na de um computador. Para ver isso sem trocar de aparelho, use os botões da barra do Resultado:</p>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Botão</th><th>Largura do quadro</th><th>Parece com</th></tr></thead>
+<tbody>
+<tr><td><strong>375</strong></td><td>375 px</td><td>a tela de um celular, em pé</td></tr>
+<tr><td><strong>768</strong></td><td>768 px</td><td>a tela de um tablet, em pé</td></tr>
+<tr><td><strong>cheia</strong></td><td>a largura toda da caixa</td><td>a janela do navegador (depende da sua tela)</td></tr>
+</tbody>
+</table>
+</div>
+<p>A página dentro do quadro "acha" que a janela tem essa largura. Do lado dos botões aparece a largura atual, por exemplo <code>375 px</code>. Quando o quadro fica mais largo que a caixa, aparece uma barra de rolagem embaixo dele.</p>
+<p>Experimente na caixa abaixo. Você ainda não precisa entender o <code>@media</code> do CSS (ele vem na aula <a href="media-queries.html">Media Queries</a>): só clique em <strong>375</strong>, <strong>768</strong> e <strong>cheia</strong> e veja os cartões trocarem de lugar e de cor.</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartoes"&gt;
+  &lt;p class="cartao"&gt;Bolo de cenoura&lt;/p&gt;
+  &lt;p class="cartao"&gt;Pão de queijo&lt;/p&gt;
+  &lt;p class="cartao"&gt;Brigadeiro&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartoes {
+  display: flex;
+  gap: 1rem;
+}
+.cartao {
+  flex: 1;
+  margin: 0;
+  padding: 1rem;
+  background-color: wheat;
+}
+/* telas estreitas (até 600 px): um cartão embaixo do outro */
+@media (max-width: 600px) {
+  .cartoes {
+    flex-direction: column;
+  }
+  .cartao {
+    background-color: lightblue;
+  }
+}
+</pre>
+</div>
+
+<p>Algumas caixas já começam com uma largura certa, quando a aula é sobre celular. Numa missão assim, o texto avisa ("com o quadro em 375 px"), e é nessa largura que a missão confere. Se você trocar a largura, a missão diz embaixo em qual ela confere.</p>
+
+<hr>
+
+<h2 id="tema">O tema escuro (◐)</h2>
+<p>Muita gente usa o celular e o computador no <strong>modo escuro</strong>. Um site pode ter cores próprias para quem escolheu esse modo (aula <a href="tema-escuro.html">Tema Escuro</a>). O botão <strong>◐</strong> da barra liga o modo escuro <strong>só no quadro</strong>, sem mexer no seu computador nem no tema do guia. Clique nele na caixa abaixo:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Clique no ◐ da barra do Resultado.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  background-color: white;
+  color: black;
+}
+/* para quem escolheu o modo escuro */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #222;
+    color: white;
+  }
+}
+</pre>
+</div>
+
+<div class="note">
+<strong>E o "menos movimento"?</strong>
+<p>Existe outra preferência parecida: a de quem pede <strong>menos animação</strong> na tela (aula <a href="reduced-motion.html">Respeitando Quem Prefere Menos Movimento</a>). Essa o editor não consegue ligar no quadro. Para testar, use as ferramentas do navegador (F12), que sabem fingir essa preferência (aula <a href="devtools.html">Inspecionando com o F12</a>), ou a opção de reduzir as animações nas configurações de acessibilidade do seu sistema.</p>
+</div>
+
+<hr>
+
+<h2 id="midia">Imagens de exemplo</h2>
+<p>O guia traz imagens prontas para os exemplos, na pasta <code>assets/midia/</code>. Elas funcionam no <code>&lt;img&gt;</code> do HTML e no <code>url()</code> do CSS:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="capa"&gt;Bolo de cenoura&lt;/div&gt;
+&lt;img src="assets/midia/avatar-ana-96.png" alt="Foto da Ana" width="96" height="96"&gt;
+</pre>
+<pre class="script" data-file="style.css">.capa {
+  height: 150px;
+  padding: 1rem;
+  background-image: url(assets/midia/bolo-800.jpg);
+  background-size: cover;
+  background-position: center;
+  color: maroon;
+  font-size: 2rem;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Arquivo</th><th>Tamanho</th><th>O que é</th></tr></thead>
+<tbody>
+<tr><td><code>bolo-400.jpg</code>, <code>bolo-800.jpg</code>, <code>bolo-1200.jpg</code></td><td>400×300, 800×600, 1200×900</td><td>bolo de cenoura com cobertura de chocolate (também em <code>.webp</code> e <code>.avif</code>)</td></tr>
+<tr><td><code>bolo-quadrado-400.jpg</code>, <code>bolo-quadrado-800.jpg</code></td><td>400×400, 800×800</td><td>o mesmo bolo, recorte quadrado</td></tr>
+<tr><td><code>logo-lojinha-200.png</code>, <code>logo-lojinha-400.png</code>, <code>logo-lojinha.svg</code></td><td>200×80, 400×160</td><td>logo da Lojinha da Ana (fundo transparente)</td></tr>
+<tr><td><code>avatar-ana-96.png</code>, <code>avatar-ana-192.png</code>, <code>avatar-ana.svg</code></td><td>96×96, 192×192</td><td>avatar redondo da Ana</td></tr>
+<tr><td><code>mapa-400.png</code>, <code>mapa-800.png</code>, <code>mapa.svg</code></td><td>400×250, 800×500</td><td>mapa do bairro (de mentira)</td></tr>
+</tbody>
+</table>
+</div>
+<p>Escreva o caminho sem <code>/</code> no começo e sem <code>../</code>: <code>assets/midia/bolo-800.jpg</code>.</p>
+
+<hr>
+
+<h2 id="hover">Missões com o mouse</h2>
+<p>A missão olha a <strong>página desenhada</strong>, e não o texto do código: ela pergunta ao navegador qual é a cor, o tamanho, a margem de cada elemento. Algumas regras de CSS só valem quando o mouse está em cima de algo (aula <a href="hover-focus.html">Estados: :hover, :focus e :active</a>). Nessas missões, depois de mudar o código, <strong>passe o mouse</strong> em cima do elemento: é aí que a missão confere.</p>
+
+<div class="tryhtml" data-goal="hover:.botao{background-color}=rgb(0, 0, 128)">
+<p class="try-task"><strong>Missão:</strong> com o mouse em cima, o botão fica vermelho-escuro (<code>darkred</code>). Troque essa cor por <code>navy</code> (azul-marinho) e depois <strong>passe o mouse</strong> no botão.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button class="botao"&gt;Comprar bolo&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">.botao {
+  background-color: tomato;
+  color: white;
+  border: 0;
+  padding: 0.5rem 1rem;
+}
+/* com o mouse em cima */
+.botao:hover {
+  background-color: darkred;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.botao {
+  background-color: tomato;
+  color: white;
+  border: 0;
+  padding: 0.5rem 1rem;
+}
+/* com o mouse em cima */
+.botao:hover {
+  background-color: navy;
+}
+</pre>
+</div>
+
+<p>Enquanto você não passa o mouse, a missão diz <em>Ainda falta: .botao com background-color: rgb(0, 0, 128) quando o mouse está em cima (passe o mouse sobre .botao para conferir)</em>. Repare no <code>rgb(0, 0, 128)</code>: é o nome <code>navy</code> do jeito que o navegador guarda as cores por dentro (aula <a href="cores-rgb.html">rgb()</a>). Num celular, sem mouse, toque no botão.</p>
+
+<hr>
+
+<h2 id="w3c">Validar no W3C</h2>
+<p>Quando o CSS tem um erro, o navegador não reclama: ele pula a declaração errada e pronto. Para achar o erro, existe o <strong>validador do W3C</strong>, o mesmo que os profissionais usam. Abra a aba <code>style.css</code> da caixa abaixo e clique em <strong>Validar no W3C</strong>:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  colr: tomato;
+}
+</pre>
+</div>
+
+<ul>
+  <li>O editor <strong>pergunta antes</strong>, porque o código vai para a internet (para o site <code>validator.w3.org</code>).</li>
+  <li>Ele valida a aba que está aberta: <code>index.html</code> confere o HTML (e o CSS de um <code>&lt;style&gt;</code> dentro dele), <code>style.css</code> confere o CSS.</li>
+  <li>As mensagens vêm em inglês, com a linha e a coluna. Neste exemplo: <code>Error (linha 2, coluna 9): “colr”: Property “colr” doesn't exist.</code> Quer dizer: a propriedade <code>colr</code> não existe (o certo é <code>color</code>). Repare que a coluna 9 é a do valor (<code>tomato</code>), e não a do nome: o erro está na mesma linha.</li>
+  <li>O validador confere o CSS sozinho: ele não sabe se os seletores casam com o seu HTML. Um <code>.cartao</code> que não existe na página não é erro para ele.</li>
+  <li>Alguns recursos muito novos do CSS (como o <code>@container</code>) o validador ainda não conhece e marca como erro, embora os navegadores atuais entendam. O editor mostra esses como <strong>Error (falso)</strong>, com uma explicação.</li>
+</ul>
+
+<hr>
+
+<h2>Missões, Restaurar e Ver solução</h2>
+<p>Algumas caixas têm uma <strong>missão</strong>. Embaixo da caixa aparece o andamento:</p>
+<ul>
+  <li><strong>Missão em andamento…</strong> e, logo abaixo, o que ainda falta, por exemplo <em>Ainda falta: h1 com color: rgb(0, 0, 128) (hoje color é rgb(0, 0, 0))</em>.</li>
+  <li><strong>✔ Missão cumprida!</strong> quando tudo confere.</li>
+</ul>
+<p>A missão confere de novo a cada mudança: no código, na largura do quadro, no mouse e no fim de uma animação.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Botão</th><th>O que faz</th></tr></thead>
+<tbody>
+<tr><td><strong>Restaurar</strong></td><td>Volta todas as abas ao código original da caixa.</td></tr>
+<tr><td><strong>Ver solução</strong></td><td>Pergunta antes ("Trocar o seu código pela solução?") e troca as abas que a solução muda. Tente sozinho primeiro!</td></tr>
+<tr><td><strong>Validar no W3C</strong></td><td>Pergunta antes e manda a aba aberta (<code>.html</code> ou <code>.css</code>) para o validador do W3C.</td></tr>
+<tr><td><strong>375 · 768 · cheia</strong></td><td>Muda a largura do quadro, sem desenhar de novo.</td></tr>
+<tr><td><strong>◐</strong></td><td>Liga e desliga o tema escuro no quadro.</td></tr>
+<tr><td><strong>↻</strong></td><td>Desenha de novo a partir da primeira página <code>.html</code>.</td></tr>
+<tr><td><strong>↗</strong></td><td>Abre o resultado numa aba nova do navegador (lá você pode usar o F12 à vontade).</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<h2>O editor × um site publicado</h2>
+
+<h3>O que funciona igual</h3>
+<ul>
+  <li>Tudo o que o navegador faz sozinho: todo o CSS (cores, fontes, Flexbox, Grid, animações, <code>@media</code>), o HTML, as imagens.</li>
+  <li>Os caminhos relativos entre as abas (<code>style.css</code>, <code>css/estilo.css</code>) e as imagens de <code>assets/midia/</code>, no HTML e no <code>url()</code> do CSS.</li>
+  <li>A cascata: o seu CSS é o único da página do quadro. O estilo do guia não vaza para o quadro, e o seu não vaza para o guia.</li>
+</ul>
+
+<h3>O que é diferente</h3>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Situação</th><th>No editor</th><th>Num site publicado</th></tr></thead>
+<tbody>
+<tr><td>Ver a página como num celular</td><td>Botão <strong>375</strong></td><td>Abra no celular, ou use o modo de aparelho do F12</td></tr>
+<tr><td>Tema escuro</td><td>Botão <strong>◐</strong>, só no quadro</td><td>Segue a escolha do sistema de quem visita</td></tr>
+<tr><td>Fonte da internet (Google Fonts)</td><td>Funciona se você estiver conectado</td><td>Funciona</td></tr>
+<tr><td>Caminho que começa com <code>/</code></td><td>Não use: aponta para fora do editor</td><td>Depende do servidor</td></tr>
+<tr><td>Guardar o que você escreveu</td><td>Ao sair da página, o código volta ao original</td><td>Fica no arquivo</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Modo completo e modo simples</h3>
+<p>Para que as abas funcionem como arquivos de uma pasta, o editor liga no seu navegador um pequeno "servidor de mentirinha", o <em>service worker</em>. É o <strong>modo completo</strong>, o que você vê no guia publicado na internet (endereço com <code>https://</code>).</p>
+<p>Às vezes o navegador não deixa ligar esse servidor: com o guia aberto direto do disco (<code>file://</code>), numa janela anônima do Firefox ou com o recurso bloqueado. Aí o editor usa o <strong>modo simples</strong>, e o CSS continua igual. A diferença: o <code>style.css</code> entra embutido na página, e o <code>&lt;link&gt;</code> passa a apontar para o código embutido. Uma missão que confere o <code>href="style.css"</code> do <code>&lt;link&gt;</code> não é cumprida nesse modo. Para ver tudo funcionando, abra o guia pela internet.</p>
+
+<hr>
+
+<h2>Quando dá errado</h2>
+
+<div class="cenario">
+<strong>O CSS não pega: o título continua preto</strong>
+<p>Três causas, da mais comum para a menos comum. 1) Falta o <code>&lt;link rel="stylesheet" href="style.css"&gt;</code> no <code>index.html</code>: o navegador nem busca o CSS. 2) O <code>href</code> tem outro nome: com <code>href="estilos.css"</code> e a aba <code>style.css</code>, o console embaixo do quadro diz <code>Não foi possível carregar "estilos.css" (&lt;link&gt;). Confira o nome e o caminho do arquivo.</code> 3) Falta o <code>rel="stylesheet"</code>: nada carrega, e o console não avisa nada.</p>
+</div>
+
+<div class="cenario">
+<strong>Uma linha do CSS não faz nada, e não aparece erro</strong>
+<p>O navegador pulou a declaração: o nome da propriedade está errado (<code>colr</code>), o valor não existe (<code>color: azul</code>), ou faltou o <code>;</code> da linha de cima (aí as duas linhas viram uma só, e as duas são puladas). O console do editor <strong>não</strong> mostra erros de CSS, porque o navegador não avisa. Use <strong>Validar no W3C</strong> na aba <code>style.css</code>, ou o F12 (aula <a href="devtools.html">Inspecionando com o F12</a>).</p>
+</div>
+
+<div class="cenario">
+<strong>A missão diz "passe o mouse sobre .botao para conferir"</strong>
+<p>A missão é de <code>:hover</code>: ela só confere com o mouse em cima do elemento. Passe o mouse no botão (no celular, toque nele).</p>
+</div>
+
+<div class="cenario">
+<strong>A missão diz "a missão é conferida com o quadro em 375 px"</strong>
+<p>Você trocou a largura do quadro, e a missão é sobre a tela de celular. Clique em <strong>375</strong>.</p>
+</div>
+
+<div class="cenario">
+<strong>A imagem de fundo não aparece</strong>
+<p>Confira o nome na <a href="#midia">tabela das imagens</a> (<code>bolo.jpg</code> não existe: os nomes têm o tamanho, como <code>bolo-800.jpg</code>) e se o elemento tem altura: uma <code>div</code> vazia tem 0 px de altura, e o fundo some junto. </p>
+</div>
+
+<hr>
+
+<h2>Referência</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Parte</th><th>Para que serve</th></tr></thead>
+<tbody>
+<tr><td>Abas</td><td>Um arquivo por aba; o <code>&lt;link href="style.css"&gt;</code> liga o CSS ao HTML, como numa pasta.</td></tr>
+<tr><td>Resultado</td><td>A página desenhada pelo seu navegador, com a barra de endereço.</td></tr>
+<tr><td>375 · 768 · cheia</td><td>A largura do quadro (celular, tablet, a caixa toda).</td></tr>
+<tr><td>◐</td><td>O tema escuro no quadro (<code>prefers-color-scheme: dark</code>).</td></tr>
+<tr><td>Console</td><td>Arquivos que não carregaram (um CSS com o nome errado, uma imagem). Erros de CSS não aparecem.</td></tr>
+<tr><td>Missão</td><td>Confere a página desenhada (as cores e os tamanhos calculados); mostra o que ainda falta.</td></tr>
+<tr><td><code>assets/midia/…</code></td><td>Imagens de exemplo, no <code>&lt;img&gt;</code> e no <code>url()</code>.</td></tr>
+<tr><td>Validar no W3C</td><td>Manda a aba aberta (HTML ou CSS) para o validador on-line, depois de perguntar.</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">1. Quem desenha a página no quadro Resultado?</p>
+<label><input type="radio" name="q1"> Um servidor do guia, que manda uma imagem pronta.</label>
+<label><input type="radio" name="q1"> O seu próprio navegador.</label>
+<label><input type="radio" name="q1"> O validador do W3C.</label>
+<label><input type="radio" name="q1"> Ninguém: é uma foto tirada antes.</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">2. Você escreveu o CSS na aba <code>style.css</code>, mas nada mudou no quadro, e o console está vazio. O que conferir primeiro?</p>
+<label><input type="radio" name="q2"> Se o navegador é novo o bastante para CSS.</label>
+<label><input type="radio" name="q2"> Se a aba se chama <code>style.css</code> com letra maiúscula.</label>
+<label><input type="radio" name="q2"> Se o <code>index.html</code> tem o <code>&lt;link rel="stylesheet" href="style.css"&gt;</code>.</label>
+<label><input type="radio" name="q2"> Se o quadro está no tema escuro.</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">3. Qual botão mostra a página com a largura de um celular?</p>
+<label><input type="radio" name="q3"> 375</label>
+<label><input type="radio" name="q3"> ◐</label>
+<label><input type="radio" name="q3"> ↗</label>
+<label><input type="radio" name="q3"> Restaurar</label>
+</div>
+
+<div class="exercise">
+<h3>4. Ligando o CSS</h3>
+<p>Complete a linha que liga o arquivo <code>style.css</code> à página:</p>
+<div class="ex-code">&lt;link rel="<input data-answer="stylesheet">" href="style.css"&gt;</div>
+</div>
+
+<h3>Missão final: as cores da Lojinha</h3>
+<div class="tryhtml" data-goal="attr:link[href]=style.css,css:h1{color}=rgb(255, 99, 71),css:body{background-color}=rgb(245, 222, 179)">
+<p class="try-task"><strong>Missão:</strong> ligue o <code>style.css</code> à página e, nele, deixe o título <code>tomato</code> e o fundo da página <code>wheat</code> (cor de trigo). Dica: o fundo da página é o <code>background-color</code> do <code>body</code>.</p>
+<pre class="script" data-file="index.html">&lt;img src="assets/midia/logo-lojinha-400.png" alt="Logo da Lojinha da Ana" width="200" height="80"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;p&gt;Bolos, doces e salgados feitos em casa.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: black;
+}
+body {
+  background-color: white;
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;img src="assets/midia/logo-lojinha-400.png" alt="Logo da Lojinha da Ana" width="200" height="80"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;p&gt;Bolos, doces e salgados feitos em casa.&lt;/p&gt;
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: tomato;
+}
+body {
+  background-color: wheat;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>As caixas Experimente desenham o seu HTML e o seu CSS com o <strong>seu navegador</strong>, ao vivo, num quadro separado da página do guia.</li>
+  <li>Cada arquivo é uma <strong>aba</strong>; a aba <code>style.css</code> só vale com o <code>&lt;link rel="stylesheet" href="style.css"&gt;</code> no HTML.</li>
+  <li>Os botões <strong>375 · 768 · cheia</strong> mudam a largura do quadro (celular, tablet, caixa toda); o <strong>◐</strong> liga o tema escuro só no quadro.</li>
+  <li>A missão confere a página desenhada: as cores e os tamanhos que o navegador calculou. Nas missões de <code>:hover</code>, passe o mouse no elemento.</li>
+  <li>Erros de CSS não aparecem no console: o navegador pula a linha errada. Use <strong>Validar no W3C</strong> na aba <code>style.css</code>.</li>
+  <li>As imagens de exemplo ficam em <code>assets/midia/</code>: <code>bolo-800.jpg</code>, <code>logo-lojinha-400.png</code>, <code>avatar-ana-96.png</code> e outras.</li>
+  <li>Restaurar volta ao original; Ver solução mostra uma solução.</li>
+  <li>Próximo passo: escrever o seu primeiro CSS do zero, em <a href="primeiro-estilo.html">Seu Primeiro Estilo</a>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
