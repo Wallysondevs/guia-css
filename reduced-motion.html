@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Menos Movimento — prefers-reduced-motion | Guia CSS</title>
+<meta name="description" content="Como respeitar quem prefere menos movimento em CSS: a media query prefers-reduced-motion, o que reduzir e o que pode ficar, trocar movimento por um surgir suave, o jeito no-preference, a rolagem suave, o reset de animações e como testar, com os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Menos Movimento</span></h1>
+
+<p class="intro">Nas últimas aulas, o site da Ana ganhou cartões que levantam, selos que pulsam e avisos que tremem. Para a maioria das pessoas, é só um enfeite. Mas, para algumas, movimento na tela causa <strong>tontura, enjoo e dor de cabeça</strong> de verdade, às vezes por horas. Essas pessoas costumam ligar no sistema uma opção de "reduzir movimento", e o navegador conta isso ao CSS. Nesta aula você vai aprender a ouvir esse pedido.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Quem pede menos movimento, e onde fica essa opção no sistema.</li>
+  <li>A media query <code>@media (prefers-reduced-motion: reduce)</code>.</li>
+  <li>O que reduzir, o que pode ficar e como <strong>trocar</strong> um movimento por um efeito calmo.</li>
+  <li>O jeito "movimento só para quem não pediu menos" (<code>no-preference</code>).</li>
+  <li>A rolagem suave e o "reset" de animações que você vai encontrar por aí.</li>
+  <li>Como testar, e os erros que o validador pega (e os que não pega).</li>
+</ul>
+</div>
+
+<p>Antes, veja <a href="transition.html">Transições</a>, <a href="animation.html">Animações</a> e <a href="media-queries.html">Media Queries</a>. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana. Os valores calculados foram conferidos no Chromium, com a preferência ligada e desligada.</p>
+
+<hr>
+
+<h2>A ideia: o motorista que vê alguém enjoado</h2>
+<p>A Ana dá carona para a tia, que enjoa em estrada de curva. Ela não deixa de levar a tia: só dirige mais devagar, sem frear de repente, e abre a janela. A viagem é a mesma, o destino é o mesmo; muda o <strong>jeito</strong>.</p>
+<p>Com o site é igual. Quem pede menos movimento <strong>não</strong> quer um site sem graça nem sem informação. Quer o mesmo conteúdo, sem coisas que deslizam, giram, dão zoom ou pulam. O texto, as cores, os botões e o layout continuam iguais.</p>
+
+<h3>Quem pede, e onde</h3>
+<p>Pessoas com distúrbios do equilíbrio (labirintite, problemas do ouvido interno), enxaqueca, algumas pessoas autistas ou com TDAH, que se distraem com o que se mexe, e qualquer um que simplesmente acha animação demais cansativa. A opção fica nas configurações de acessibilidade do sistema. Os nomes mudam de versão para versão; procure algo como:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Sistema</th><th>Onde (ilustrativo)</th></tr>
+<tr><td>iPhone e iPad</td><td>Ajustes → Acessibilidade → Movimento → <strong>Reduzir Movimento</strong></td></tr>
+<tr><td>Android</td><td>Configurações → Acessibilidade → <strong>Remover animações</strong></td></tr>
+<tr><td>Windows 11</td><td>Configurações → Acessibilidade → Efeitos visuais → <strong>Efeitos de animação</strong> (desligar)</td></tr>
+<tr><td>macOS</td><td>Ajustes do Sistema → Acessibilidade → Tela → <strong>Reduzir movimento</strong></td></tr>
+<tr><td>Linux (GNOME)</td><td>Configurações → Acessibilidade → <strong>Animações</strong> (desligar)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. A pergunta: <code>prefers-reduced-motion</code></h2>
+
+<pre class="file" data-file="style.css">.selo {
+  animation: pulsar 1.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selo {
+    animation: none;
+  }
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>.selo { animation: … }</dt><dd>A animação de sempre, da aula <a href="animation.html">Animações</a>.</dd>
+  <dt>@media (prefers-reduced-motion: reduce)</dt><dd>"Se a pessoa prefere movimento reduzido". <code>prefers-reduced-motion</code> = "prefere movimento reduzido"; <code>reduce</code> = "reduzir". Como no <a href="tema-escuro.html">tema escuro</a>, a pergunta vai entre parênteses.</dd>
+  <dt>animation: none;</dt><dd>Desliga a animação. Esta regra tem o mesmo seletor e vem <strong>depois</strong>: pela cascata, vence quando o <code>@media</code> é verdadeiro.</dd>
+</dl>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>Quando a resposta é sim</th></tr>
+<tr><td><code>reduce</code></td><td>a pessoa ligou "reduzir movimento" no sistema</td></tr>
+<tr><td><code>no-preference</code></td><td>a pessoa não pediu nada (a maioria)</td></tr>
+</table>
+</div>
+
+<p>Conferido no Chromium: sem a preferência, o <code>.selo</code> fica com <code>animation-name: pulsar</code>; com <code>reduce</code>, <code>animation-name: none</code>.</p>
+
+<div class="note">
+<strong>Suporte</strong>
+<p>Funciona no Chrome e no Edge desde a versão 74, no Firefox desde a 63 e no Safari desde a 10.1 (segundo o MDN): todos os navegadores atuais. Não há motivo para não usar.</p>
+</div>
+
+<h3>Como testar</h3>
+<ul>
+  <li><strong>No sistema:</strong> ligue a opção da tabela acima e recarregue a página.</li>
+  <li><strong>No F12 (ilustrativo):</strong> no Chrome e no Edge, menu ⋮ do F12 → More tools → <strong>Rendering</strong> → "Emulate CSS media feature prefers-reduced-motion" → <code>reduce</code>. Também dá para apertar <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> no F12 e digitar <code>reduced-motion</code>. Os nomes dos menus são em inglês e mudam com a versão.</li>
+  <li><strong>No editor do guia:</strong> diferente do tema escuro, o quadro <strong>não</strong> tem um botão para isso. Os quadros seguem a configuração do seu sistema (ou o que o F12 estiver fingindo para a página toda). Se você ligar "reduzir movimento", as caixas abaixo passam a mostrar a versão calma.</li>
+</ul>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> com o seu sistema normal, o selo pulsa. Ligue "reduzir movimento" no sistema (ou finja no F12) e veja: ele para. Depois, troque o <code>animation: none;</code> por <code>animation-duration: 4s;</code> e repare que, em vez de parar, ele passa a pulsar bem devagar.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Pão de queijo recheado &lt;span class="selo"&gt;Novo&lt;/span&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">@keyframes pulsar {
+  50% {
+    scale: 1.15;
+  }
+}
+
+.selo {
+  display: inline-block;
+  background-color: #c2410c;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  animation: pulsar 1.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selo {
+    animation: none;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. O que reduzir, e o que pode ficar</h2>
+<p>"Reduzir" não quer dizer "tirar tudo". O que incomoda é o movimento que dá a sensação de que a tela (ou você) está se mexendo:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Reduza ou tire</th><th>Pode ficar</th></tr>
+<tr><td>coisas que <strong>deslizam</strong> de longe (um painel que entra voando pela lateral)</td><td>mudança de <strong>cor</strong> no hover</td></tr>
+<tr><td><strong>zoom</strong> e rotação (<code>scale</code> grande, <code>rotate</code>, o cartão que vira)</td><td>um <strong>surgir</strong> curto com <code>opacity</code> (aparecer e sumir sem se mexer)</td></tr>
+<tr><td>animações <strong>infinitas</strong> decorativas (o selo que pulsa)</td><td>a mudança de sombra ou de borda</td></tr>
+<tr><td><strong>parallax</strong> (o fundo andando em velocidade diferente do texto) e a rolagem suave</td><td>um "carregando" mais lento ou mais discreto, porque ele <strong>informa</strong> algo</td></tr>
+</table>
+</div>
+
+<p>O "carregando" é o caso especial: se você simplesmente o desligar, a pessoa vê um círculo parado e pensa que a página travou. Melhor deixá-lo mais lento (<code>animation-duration: 3s</code>) ou trocá-lo por um texto "Carregando…".</p>
+
+<h3>Trocar, em vez de tirar</h3>
+<p>Um aviso que entra deslizando de baixo pode, para quem pede menos movimento, só <strong>surgir</strong> no lugar. A informação ("chegou um aviso") continua; some o deslocamento:</p>
+
+<pre class="file" data-file="style.css">@keyframes entrar {
+  from {
+    opacity: 0;
+    translate: 0 40px;
+  }
+}
+
+@keyframes surgir {
+  from {
+    opacity: 0;
+  }
+}
+
+.aviso {
+  animation: entrar 0.5s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aviso {
+    animation-name: surgir;
+  }
+}
+</pre>
+
+<p>Repare que o bloco do <code>@media</code> troca <strong>só o nome</strong> da animação (<code>animation-name</code>): a duração e o ritmo continuam os da regra principal. E os dois <code>@keyframes</code> só têm o <code>from</code>: o fim é o estilo normal do aviso.</p>
+
+<div class="tryhtml" data-goal="src:@media\s*\(\s*prefers-reduced-motion\s*:\s*reduce\s*\)\s*\{[^@]*\.cartao\s*\{[^}]*transition\s*:\s*none,css:.cartao{transition-property}=transform,hover:.cartao{transform}=matrix(1.08\, 0\, 0\, 1.08\, 0\, 0)">
+<p class="try-task"><strong>Missão:</strong> o cartão do bolo dá um zoom no hover. Acrescente, no fim do CSS, um bloco <code>@media (prefers-reduced-motion: reduce)</code> que tire a transição do <code>.cartao</code> (<code>transition: none;</code>). Quem não pediu nada continua vendo o zoom suave: passe o mouse para conferir.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="200" height="150"&gt;
+  &lt;p&gt;Bolo de cenoura&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  display: inline-block;
+  margin: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: transform 0.4s ease-out;
+}
+
+.cartao:hover {
+  transform: scale(1.08);
+}
+
+.cartao img {
+  display: block;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  display: inline-block;
+  margin: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: transform 0.4s ease-out;
+}
+
+.cartao:hover {
+  transform: scale(1.08);
+}
+
+.cartao img {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cartao {
+    transition: none;
+  }
+}
+</pre>
+</div>
+
+<p>Com <code>transition: none</code>, o zoom ainda acontece, mas de uma vez, sem a parte "em movimento". Para quem pede menos movimento, o mais gentil seria tirar o zoom também, e marcar o hover com uma borda: experimente pôr, no mesmo bloco, <code>.cartao:hover { transform: none; border-color: #c2410c; }</code>.</p>
+
+<hr>
+
+<h2>3. O outro jeito: movimento só para quem não pediu menos</h2>
+<p>Até aqui, a animação é a regra, e o <code>@media</code> tira. Dá para fazer o contrário: o site começa <strong>calmo</strong>, e o movimento só é ligado dentro de <code>@media (prefers-reduced-motion: no-preference)</code>:</p>
+
+<pre class="file" data-file="style.css">.selo {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .selo {
+    animation: pulsar 1.2s ease-in-out infinite;
+  }
+}
+</pre>
+
+<p>A vantagem: se você esquecer de pensar no "reduzir" numa animação nova, o erro fica do lado seguro (a animação simplesmente não aparece para quem pediu menos). Com a preferência ligada, o Chromium mostrou <code>animation-name: none</code> no <code>.selo</code>; sem ela, <code>pulsar</code>.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Jeito</th><th>Como é</th><th>Quando usar</th></tr>
+<tr><td><code>@media (… : reduce)</code> tirando ou trocando</td><td>a animação é a regra; o bloco desliga ou acalma</td><td>quando você quer <strong>trocar</strong> o movimento por outro efeito (seção 2), e em sites que já existem</td></tr>
+<tr><td><code>@media (… : no-preference)</code> ligando</td><td>o site é calmo; o bloco liga o movimento</td><td>em sites novos, para efeitos que são só decoração</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>4. A rolagem suave</h2>
+<p>A propriedade <code>scroll-behavior: smooth</code> (aula <a href="scroll.html">Rolagem Suave</a>) faz a página deslizar até o destino quando a pessoa clica num link interno, em vez de pular. É exatamente o tipo de movimento que incomoda. O jeito certo de usá-la é já dentro do <code>no-preference</code>:</p>
+
+<pre class="file" data-file="style.css">@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+</pre>
+
+<hr>
+
+<h2>5. O "reset" de animações</h2>
+<p>Você vai encontrar em muitos sites (e em resets de CSS, aula <a href="reset.html">Reset e Normalize</a>) um bloco como este:</p>
+
+<pre class="file" data-file="style.css">@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>*, *::before, *::after</dt><dd>Todos os elementos e os pseudo-elementos (aula <a href="seletor-universal.html">Seletor Universal</a>).</dd>
+  <dt>animation-duration: 0.01ms</dt><dd>Toda animação dura um centésimo de milésimo de segundo: acontece "de uma vez". Por que não <code>0s</code>? Com uma duração quase zero, a animação ainda <strong>termina</strong>, e o estado final (o <code>forwards</code> da aula anterior) e os avisos de fim que o JavaScript espera continuam acontecendo.</dd>
+  <dt>animation-iteration-count: 1</dt><dd>As infinitas rodam uma vez só.</dd>
+  <dt>!important</dt><dd>Aqui está uma das poucas vezes em que o <code>!important</code> (aula <a href="important.html">!important</a>) é aceito: o bloco precisa vencer qualquer animação do site, por mais específico que seja o seletor dela.</dd>
+</dl>
+
+<p>Funciona como uma rede de segurança, mas é bruto: tira também os efeitos inofensivos (os surgir suaves) e o "carregando". Prefira cuidar de cada animação, como nas seções 2 e 3, e use o reset, se quiser, só como garantia.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong><code>error: CSS: “reduced” is not a “prefers-reduced-motion” value</code></strong>
+<p><strong>O que aconteceu:</strong> <code>@media (prefers-reduced-motion: reduced)</code>, com <code>d</code> no fim. Com <code>true</code>, acontece o mesmo:</p>
+<pre class="term" data-cwd="~/mov">$ vnu --css reduced.css true.css
+"file:/home/ana/mov/reduced.css":1.40-1.40: error: CSS: “reduced” is not a “prefers-reduced-motion” value
+"file:/home/ana/mov/true.css":1.37-1.37: error: CSS: “true” is not a “prefers-reduced-motion” value</pre>
+<p>O navegador não reclama: a pergunta nunca tem resposta "sim", e o movimento nunca é reduzido. Quem pediu continua passando mal, e você não percebe, porque o seu sistema não tem a opção ligada.</p>
+<p><strong>Como consertar:</strong> os valores são <code>reduce</code> e <code>no-preference</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O bloco não funciona (e o validador não reclama)</strong>
+<p><strong>O que aconteceu:</strong> o nome da característica foi encurtado: <code>@media (reduced-motion: reduce)</code>.</p>
+<pre class="term" data-cwd="~/mov">$ vnu --css nome.css
+$ </pre>
+<p>O validador do laboratório (<code>vnu</code> 26.10.12) não avisa, mas o navegador não conhece <code>reduced-motion</code>: uma pergunta desconhecida é sempre "não", e o bloco nunca vale. Por isso, teste de verdade (F12 ou sistema): não confie só no validador.</p>
+<p><strong>Como consertar:</strong> o nome completo, <code>prefers-reduced-motion</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>A animação continua mesmo com "reduzir movimento" ligado</strong>
+<p><strong>O que aconteceu:</strong> o bloco <code>@media</code> veio <strong>antes</strong> da regra da animação, com o mesmo seletor:</p>
+<pre class="file" data-file="style.css · erro de propósito">@media (prefers-reduced-motion: reduce) {
+  .selo {
+    animation: none;
+  }
+}
+
+.selo {
+  animation: pulsar 1.2s infinite;
+}
+</pre>
+<p>A mesma armadilha do tema escuro: o <code>@media</code> não dá prioridade nenhuma. As duas regras têm a mesma especificidade, e a que vem depois vence: a animação.</p>
+<p><strong>Como consertar:</strong> o bloco <code>@media</code> sempre <strong>depois</strong> das regras que ele muda. Ou use o jeito <code>no-preference</code> (seção 3), em que essa ordem não importa.</p>
+</div>
+
+<div class="cenario">
+<strong>Tirou a animação, mas o movimento continua</strong>
+<p><strong>O que aconteceu:</strong> o bloco tem <code>animation: none</code>, mas o movimento vinha de uma <strong>transição</strong> (um <code>transition: transform 0.4s</code> no hover). <code>animation</code> e <code>transition</code> são coisas diferentes: desligar uma não desliga a outra.</p>
+<p><strong>Como consertar:</strong> no bloco de "reduzir", cuide das duas: <code>animation: none;</code> e <code>transition: none;</code> (ou só nas propriedades de movimento).</p>
+</div>
+
+<div class="cenario">
+<strong>O "carregando" parou e a página parece travada</strong>
+<p><strong>O que aconteceu:</strong> o reset da seção 5 (ou um <code>animation: none</code>) parou também o ícone de carregando. Para a pessoa, um círculo parado parece um erro.</p>
+<p><strong>Como consertar:</strong> para o carregando, prefira deixar mais lento (<code>animation-duration: 3s</code>) ou mostrar um texto ("Carregando…").</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>@media (prefers-reduced-motion: reduce) { … }</code></td><td>Regras para quem pediu menos movimento</td></tr>
+<tr><td><code>@media (prefers-reduced-motion: no-preference) { … }</code></td><td>Regras para quem não pediu nada (ligar o movimento)</td></tr>
+<tr><td><code>animation: none;</code></td><td>Desliga a animação</td></tr>
+<tr><td><code>animation-name: surgir;</code></td><td>Troca por uma animação mais calma, mantendo duração e ritmo</td></tr>
+<tr><td><code>transition: none;</code></td><td>Desliga a transição (a mudança acontece de uma vez)</td></tr>
+<tr><td><code>scroll-behavior: smooth;</code> dentro de <code>no-preference</code></td><td>Rolagem suave só para quem não pediu menos</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A pergunta</h3>
+<p>Complete a media query para quem pediu menos movimento:</p>
+<div class="ex-code">@media (prefers-reduced-motion: <input data-answer="reduce" aria-label="valor">) { … }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Ligar só para quem não pediu</h3>
+<p>Complete com o outro valor:</p>
+<div class="ex-code">@media (prefers-reduced-motion: <input data-answer="no-preference" aria-label="valor">) { html { scroll-behavior: smooth; } }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. Para quem pediu menos movimento, o que é melhor fazer com um aviso que entra deslizando?</p>
+<label><input type="radio" name="q3"> Tirar o aviso da página</label>
+<label><input type="radio" name="q3"> Deixar como está: é só meio segundo</label>
+<label><input type="radio" name="q3"> Trocar o deslizar por um surgir com <code>opacity</code>, no lugar</label>
+<label><input type="radio" name="q3"> Fazer ele deslizar mais rápido</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. O bloco <code>@media (prefers-reduced-motion: reduce)</code> tem <code>animation: none</code>, mas o cartão continua dando zoom suave no hover. Por quê?</p>
+<label><input type="radio" name="q4"> O <code>@media</code> só vale no celular</label>
+<label><input type="radio" name="q4"> O zoom vem de uma <code>transition</code>, que o <code>animation: none</code> não desliga</label>
+<label><input type="radio" name="q4"> Faltou <code>!important</code></label>
+<label><input type="radio" name="q4"> O cartão não tem <code>display: block</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. <code>@media (reduced-motion: reduce)</code> passou no validador. Ele funciona?</p>
+<label><input type="radio" name="q5"> Não: o nome é <code>prefers-reduced-motion</code>, e uma pergunta desconhecida nunca é verdadeira</label>
+<label><input type="radio" name="q5"> Sim: o validador aprovou</label>
+<label><input type="radio" name="q5"> Só no Firefox</label>
+<label><input type="radio" name="q5"> Só com <code>!important</code></label>
+</div>
+
+<h3>Missão final: o aviso calmo</h3>
+
+<div class="tryhtml" data-goal="src:@media\s*\(\s*prefers-reduced-motion\s*:\s*reduce\s*\)\s*\{[^@]*\.aviso\s*\{[^}]*animation-name\s*:\s*surgir,src:@keyframes\s+surgir\s*\{[^}]*\{[^}]*opacity\s*:\s*0,css:.aviso{animation-name}=entrar,css:.aviso{animation-duration}=0.5s,nsrc:!important">
+<p class="try-task"><strong>Missão:</strong> o aviso de "pedido recebido" entra subindo. (1) Crie um <code>@keyframes surgir</code> só com <code>from { opacity: 0; }</code>. (2) No fim do CSS, num bloco <code>@media (prefers-reduced-motion: reduce)</code>, troque só o <code>animation-name</code> do <code>.aviso</code> para <code>surgir</code>. Quem não pediu nada continua vendo o <code>entrar</code>. Sem <code>!important</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="aviso"&gt;Pedido recebido! O bolo fica pronto às 16h.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">@keyframes entrar {
+  from {
+    opacity: 0;
+    translate: 0 40px;
+  }
+}
+
+.aviso {
+  background-color: #f0fdf4;
+  border-left: 4px solid #2f7d32;
+  padding: 12px;
+  animation: entrar 0.5s ease-out;
+}
+</pre>
+<pre class="solucao" data-file="style.css">@keyframes entrar {
+  from {
+    opacity: 0;
+    translate: 0 40px;
+  }
+}
+
+@keyframes surgir {
+  from {
+    opacity: 0;
+  }
+}
+
+.aviso {
+  background-color: #f0fdf4;
+  border-left: 4px solid #2f7d32;
+  padding: 12px;
+  animation: entrar 0.5s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aviso {
+    animation-name: surgir;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Movimento na tela causa tontura e enjoo em algumas pessoas. Elas ligam "reduzir movimento" no sistema, e o CSS fica sabendo por <code>prefers-reduced-motion</code>.</li>
+  <li><code>@media (prefers-reduced-motion: reduce) { … }</code> depois das regras de animação: desligue (<code>animation: none</code>, <code>transition: none</code>) ou troque por algo calmo (<code>animation-name: surgir</code>).</li>
+  <li>Reduza deslizes, zooms, giros, parallax e animações infinitas decorativas. Cores, surgir com <code>opacity</code> e um carregando mais lento podem ficar.</li>
+  <li>O jeito seguro para efeitos novos: ligar o movimento só dentro de <code>@media (prefers-reduced-motion: no-preference)</code>, inclusive a rolagem suave.</li>
+  <li>Teste no sistema ou no F12: o editor do guia não tem botão para isso, e o validador não percebe nome errado (<code>reduced-motion</code>).</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
