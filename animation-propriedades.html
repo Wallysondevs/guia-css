@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Controlando Animações — delay, direction, fill-mode e play-state | Guia CSS</title>
+<meta name="description" content="As propriedades de animação em CSS para quem está começando: animation-delay (inclusive negativo), animation-iteration-count, animation-direction com alternate, animation-fill-mode para manter o último quadro, animation-play-state para pausar, a ordem no atalho animation e os erros mais comuns, com posições medidas de verdade.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Controlando Animações</span></h1>
+
+<p class="intro">Na aula <a href="animation.html">Animações</a>, você criou um <code>@keyframes</code> e o ligou com <code>animation: nome duração</code>. Agora vem o <strong>controle remoto</strong>: esperar antes de começar, repetir um certo número de vezes, ir e voltar, parar no último quadro em vez de voltar ao começo, e pausar quando o mouse passa. Cada um desses botões é uma propriedade.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>As oito propriedades longas por trás do atalho <code>animation</code>, e a ordem dos valores no atalho.</li>
+  <li><code>animation-delay</code>: esperar (e o truque do atraso <strong>negativo</strong>).</li>
+  <li><code>animation-iteration-count</code>: quantas vezes.</li>
+  <li><code>animation-direction</code>: para a frente, ao contrário, indo e voltando.</li>
+  <li><code>animation-fill-mode</code>: o que fica na tela antes de começar e depois de acabar.</li>
+  <li><code>animation-play-state</code>: pausar.</li>
+</ul>
+</div>
+
+<p>Os números desta aula (onde cada caixa estava num certo momento) foram medidos no Chromium, parando a animação naquele instante. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana.</p>
+
+<hr>
+
+<h2>A ideia: o controle remoto</h2>
+<p>O <code>@keyframes</code> é o filme. A <code>animation</code> é o aparelho que passa o filme, e as propriedades desta aula são os botões do controle remoto: "começar daqui a pouco", "repetir", "passar de trás para a frente", "congelar na última cena", "pausar". O filme não muda; muda <strong>como</strong> ele é passado. Por isso o mesmo <code>@keyframes</code> pode servir para elementos diferentes, cada um com o seu jeito de passar.</p>
+
+<hr>
+
+<h2>1. O atalho e as oito propriedades</h2>
+
+<pre class="file" data-file="style.css">.barra {
+  animation: encher 2s ease-out 0.5s 1 normal forwards running;
+}
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>No atalho</th><th>Propriedade longa</th><th>O que controla</th><th>Padrão</th></tr>
+<tr><td><code>encher</code></td><td><code>animation-name</code></td><td>qual <code>@keyframes</code></td><td><code>none</code></td></tr>
+<tr><td><code>2s</code></td><td><code>animation-duration</code></td><td>quanto dura uma vez</td><td><code>0s</code></td></tr>
+<tr><td><code>ease-out</code></td><td><code>animation-timing-function</code></td><td>o ritmo (aula <a href="transition.html">Transições</a>)</td><td><code>ease</code></td></tr>
+<tr><td><code>0.5s</code></td><td><code>animation-delay</code></td><td>quanto esperar antes</td><td><code>0s</code></td></tr>
+<tr><td><code>1</code></td><td><code>animation-iteration-count</code></td><td>quantas vezes</td><td><code>1</code></td></tr>
+<tr><td><code>normal</code></td><td><code>animation-direction</code></td><td>para que lado</td><td><code>normal</code></td></tr>
+<tr><td><code>forwards</code></td><td><code>animation-fill-mode</code></td><td>o que fica antes e depois</td><td><code>none</code></td></tr>
+<tr><td><code>running</code></td><td><code>animation-play-state</code></td><td>rodando ou pausada</td><td><code>running</code></td></tr>
+</table>
+</div>
+
+<p>No atalho, a ordem quase não importa, com uma regra: o <strong>primeiro</strong> tempo é a duração e o <strong>segundo</strong>, o atraso (igual à <code>transition</code>). Na prática, ninguém escreve os oito: você põe só o que muda do padrão (<code>animation: encher 2s ease-out forwards;</code>). E as longas servem para mudar só uma peça, por exemplo um atraso diferente em cada item, sem repetir o resto.</p>
+
+<hr>
+
+<h2>2. <code>animation-delay</code>: esperar</h2>
+<p>Com <code>animation-delay: 1s</code>, a animação espera um segundo depois que a página abre e só então começa. É o que faz os itens de uma lista entrarem um depois do outro:</p>
+
+<pre class="file" data-file="style.css">.item {
+  animation: surgir 0.5s;
+}
+
+.item:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.item:nth-child(3) {
+  animation-delay: 0.3s;
+}
+</pre>
+
+<h3>O atraso negativo</h3>
+<p>Um atraso <strong>negativo</strong> (<code>animation-delay: -0.5s</code>) não espera: começa na hora, mas como se já tivesse passado meio segundo. Com uma animação de 2 s, ela começa no quadro de 25%. É o truque dos "carregando" com vários pontinhos: todos têm a mesma animação, mas cada um está num momento diferente dela desde o primeiro instante, sem aquela espera no começo.</p>
+
+<hr>
+
+<h2>3. <code>animation-iteration-count</code>: quantas vezes</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que faz</th></tr>
+<tr><td><code>1</code> (o padrão)</td><td>uma vez</td></tr>
+<tr><td><code>3</code></td><td>três vezes seguidas, e para</td></tr>
+<tr><td><code>2.5</code></td><td>duas vezes e meia: para no meio da terceira</td></tr>
+<tr><td><code>infinite</code></td><td>para sempre</td></tr>
+<tr><td><code>0</code></td><td>nenhuma vez (a animação não acontece)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>4. <code>animation-direction</code>: para que lado</h2>
+<p>Quatro caixas com a mesma animação: andar de 0 a 200 px, em 2 s, ritmo <code>linear</code>, <strong>duas vezes</strong>. Muda só a direção. Onde cada uma estava (medido no Chromium):</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Direção</th><th>Aos 0,5 s (1ª vez)</th><th>Aos 2,5 s (2ª vez)</th><th>Como é</th></tr>
+<tr><td><code>normal</code></td><td>50 px</td><td>50 px</td><td>sempre do começo para o fim; a cada vez, "pula" de volta ao começo</td></tr>
+<tr><td><code>reverse</code></td><td>150 px</td><td>150 px</td><td>sempre do fim para o começo (o filme ao contrário)</td></tr>
+<tr><td><code>alternate</code></td><td>50 px</td><td>150 px</td><td>vai na 1ª vez, <strong>volta</strong> na 2ª: um vai-e-vem sem pulos</td></tr>
+<tr><td><code>alternate-reverse</code></td><td>150 px</td><td>50 px</td><td>começa voltando, depois vai</td></tr>
+</table>
+</div>
+
+<p>O <code>alternate</code> é o mais útil: um <code>@keyframes</code> só com o começo e o fim vira um movimento de ida e volta, macio, sem você escrever a volta. Veja:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> as quatro caixas andam para sempre (<code>infinite</code>). Repare no pulo da <code>normal</code> e da <code>reverse</code> a cada volta, e na ida e volta das outras duas. Depois troque o <code>linear</code> por <code>ease-in-out</code>: o vai-e-vem do <code>alternate</code> fica parecendo um pêndulo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa" style="animation-direction: normal"&gt;normal&lt;/div&gt;
+&lt;div class="caixa" style="animation-direction: reverse"&gt;reverse&lt;/div&gt;
+&lt;div class="caixa" style="animation-direction: alternate"&gt;alternate&lt;/div&gt;
+&lt;div class="caixa" style="animation-direction: alternate-reverse"&gt;alternate-reverse&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">@keyframes andar {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 200px 0;
+  }
+}
+
+.caixa {
+  width: 150px;
+  margin: 6px 0;
+  padding: 4px;
+  background-color: #c2410c;
+  color: white;
+  font-family: monospace;
+  animation: andar 2s linear infinite;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>5. <code>animation-fill-mode</code>: antes de começar e depois de acabar</h2>
+<p>Lembra da aula anterior? No fim, a animação some e o elemento volta ao estilo normal <strong>de uma vez</strong>. Para uma barra de progresso que enche, isso é um problema: ela enche e... volta a ficar vazia. O <code>animation-fill-mode</code> ("modo de preenchimento") resolve:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>Durante o atraso (antes)</th><th>Depois do fim</th></tr>
+<tr><td><code>none</code> (o padrão)</td><td>estilo normal</td><td>volta ao estilo normal</td></tr>
+<tr><td><code>forwards</code> ("para a frente")</td><td>estilo normal</td><td><strong>fica no último quadro</strong></td></tr>
+<tr><td><code>backwards</code> ("para trás")</td><td><strong>já mostra o primeiro quadro</strong></td><td>volta ao estilo normal</td></tr>
+<tr><td><code>both</code> ("os dois")</td><td>primeiro quadro</td><td>último quadro</td></tr>
+</table>
+</div>
+
+<p>Medido no Chromium, com uma barra de estilo normal <code>width: 20%</code> e uma animação de <code>0%</code> a <code>100%</code>, num trilho de 584 px: depois do fim, a barra com <code>none</code> voltou a 116,8 px (os 20%), e a com <code>forwards</code> ficou com 584 px (os 100%). E, com um atraso de 1 s e um primeiro quadro vermelho, a caixa com <code>backwards</code> já estava vermelha durante a espera; as outras continuavam com a cor normal (cinza).</p>
+
+<p>Quando usar: <code>forwards</code> para algo que deve <strong>terminar diferente</strong> (barra cheia, aviso que surgiu e fica). <code>backwards</code> quando há atraso e o primeiro quadro é diferente do normal (um item que entra surgindo do invisível não deve aparecer, sumir e surgir de novo). Na dúvida, <code>both</code>.</p>
+
+<div class="tryhtml" data-goal="css:.barra{animation-fill-mode}=forwards,css:.barra{width}=300px,css:.barra{animation-duration}=2s">
+<p class="try-task"><strong>Missão:</strong> a barra de upload enche e, no fim, volta a ficar vazia. Faça-a ficar cheia no fim, com o <code>animation-fill-mode</code> certo. (Clique em ↻ para ver de novo.)</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Enviando foto do bolo…&lt;/p&gt;
+&lt;div class="trilho"&gt;&lt;div class="barra"&gt;&lt;/div&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">@keyframes encher {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.trilho {
+  width: 300px;
+  height: 12px;
+  background-color: #eee;
+  border-radius: 6px;
+}
+
+.barra {
+  width: 0;
+  height: 100%;
+  background-color: #2f7d32;
+  border-radius: 6px;
+  animation: encher 2s ease-out;
+}
+</pre>
+<pre class="solucao" data-file="style.css">@keyframes encher {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.trilho {
+  width: 300px;
+  height: 12px;
+  background-color: #eee;
+  border-radius: 6px;
+}
+
+.barra {
+  width: 0;
+  height: 100%;
+  background-color: #2f7d32;
+  border-radius: 6px;
+  animation: encher 2s ease-out forwards;
+}
+</pre>
+</div>
+
+<p>Outra saída seria pôr <code>width: 100%</code> no estilo normal da barra: o fim da animação já seria igual ao normal, e não haveria salto. É uma boa regra: quando der, faça o <strong>último quadro igual ao estilo normal</strong>, e o <code>fill-mode</code> nem faz falta.</p>
+
+<hr>
+
+<h2>6. <code>animation-play-state</code>: pausar</h2>
+<p>Dois valores: <code>running</code> ("rodando", o padrão) e <code>paused</code> ("pausada"). Pausada, a animação congela onde estava; ao voltar para <code>running</code>, continua dali. O uso mais comum é pausar no hover, para a pessoa conseguir ler ou clicar em algo que se mexe:</p>
+
+<pre class="file" data-file="style.css">.letreiro:hover {
+  animation-play-state: paused;
+}
+</pre>
+
+<hr>
+
+<h2>Formas de fazer, e qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Quando usar</th></tr>
+<tr><td>o atalho, só com o que muda: <code>animation: encher 2s ease-out forwards;</code></td><td>o normal, na regra principal do elemento</td></tr>
+<tr><td>uma longa sozinha: <code>animation-delay: 0.3s;</code></td><td>para mudar uma peça em casos especiais (o 2º item, o hover) sem repetir o resto</td></tr>
+<tr><td>o atalho completo, com os oito valores</td><td>raramente; fica difícil de ler</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>A animação espera em vez de durar (tempos trocados)</strong>
+<p><strong>O que aconteceu:</strong> <code>animation: encher 0.5s 2s;</code>, querendo 2 s de duração e meio segundo de espera. O primeiro tempo é a duração: a barra espera <strong>2 s</strong> parada e depois enche em <strong>0,5 s</strong>. Na aba Computed, <code>animation-duration: 0.5s</code> e <code>animation-delay: 2s</code> mostram a troca.</p>
+<p><strong>Como consertar:</strong> duração primeiro: <code>animation: encher 2s 0.5s;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “animation-fill-mode”: “forward” is not a “animation-fill-mode” value.</code></strong>
+<p><strong>O que aconteceu:</strong> faltou o <code>s</code> do fim: <code>animation-fill-mode: forward;</code>.</p>
+<pre class="term" data-cwd="~/anim2">$ vnu --css forward.css
+"file:/home/ana/anim2/forward.css":2.24-2.30: error: CSS: “animation-fill-mode”: “forward” is not a “animation-fill-mode” value.</pre>
+<p>O navegador ignora a declaração, e a barra volta a ficar vazia no fim. No atalho é pior: <code>animation: encher 2s forward;</code> dá <code>“animation”: “forward” is not a “animation” value.</code>, e o navegador ignora o atalho <strong>inteiro</strong>. Na aba Computed, <code>animation-name: none</code>: a barra nem enche.</p>
+<p><strong>Como consertar:</strong> <code>forwards</code> e <code>backwards</code>, com <code>s</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “animation-direction”: “alternado” is not a “animation-direction” value.</code></strong>
+<p><strong>O que aconteceu:</strong> o valor em português.</p>
+<pre class="term" data-cwd="~/anim2">$ vnu --css alt.css
+"file:/home/ana/anim2/alt.css":2.24-2.32: error: CSS: “animation-direction”: “alternado” is not a “animation-direction” value.</pre>
+<p><strong>Como consertar:</strong> <code>normal</code>, <code>reverse</code>, <code>alternate</code> ou <code>alternate-reverse</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: … “-1” negative values are not allowed.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>animation-iteration-count: -1;</code>, tentando dizer "para sempre" (como em algumas linguagens de programação). Com a duração negativa (<code>animation-duration: -2s;</code>), a mensagem é a mesma.</p>
+<pre class="term" data-cwd="~/anim2">$ vnu --css neg.css durneg.css
+"file:/home/ana/anim2/neg.css":2.31-2.31: error: CSS: “animation-iteration-count”: “-1” negative values are not allowed.
+"file:/home/ana/anim2/durneg.css":2.24-2.25: error: CSS: “animation-duration”: “-2s” negative values are not allowed.</pre>
+<p>"Valores negativos não são permitidos." Só o <code>animation-delay</code> aceita negativo.</p>
+<p><strong>Como consertar:</strong> "para sempre" é <code>infinite</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>alternate</code> não faz diferença</strong>
+<p><strong>O que aconteceu:</strong> <code>animation: andar 2s alternate;</code>, sem repetição. Com uma vez só, não há "volta": o <code>alternate</code> só aparece da 2ª vez em diante. O validador não reclama, porque está tudo certo.</p>
+<p><strong>Como consertar:</strong> junte com <code>infinite</code> ou um número: <code>animation: andar 2s alternate infinite;</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>Valores</th></tr>
+<tr><td><code>animation-name</code></td><td>o nome do <code>@keyframes</code>, ou <code>none</code></td></tr>
+<tr><td><code>animation-duration</code></td><td><code>2s</code>, <code>300ms</code> (não aceita negativo)</td></tr>
+<tr><td><code>animation-timing-function</code></td><td><code>ease</code>, <code>linear</code>, <code>ease-in</code>, <code>ease-out</code>, <code>ease-in-out</code>, <code>steps(n)</code>, <code>cubic-bezier(…)</code></td></tr>
+<tr><td><code>animation-delay</code></td><td><code>0.5s</code>; negativo começa "no meio"</td></tr>
+<tr><td><code>animation-iteration-count</code></td><td><code>1</code>, <code>3</code>, <code>2.5</code>, <code>infinite</code></td></tr>
+<tr><td><code>animation-direction</code></td><td><code>normal</code>, <code>reverse</code>, <code>alternate</code>, <code>alternate-reverse</code></td></tr>
+<tr><td><code>animation-fill-mode</code></td><td><code>none</code>, <code>forwards</code>, <code>backwards</code>, <code>both</code></td></tr>
+<tr><td><code>animation-play-state</code></td><td><code>running</code>, <code>paused</code></td></tr>
+<tr><td><code>animation</code></td><td>o atalho: nome, duração, ritmo, atraso, vezes, direção, preenchimento, estado</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Ficar no fim</h3>
+<p>Complete para o elemento ficar no último quadro quando a animação acabar:</p>
+<div class="ex-code">animation-fill-mode: <input data-answer="forwards|both" aria-label="valor">;</div>
+</div>
+
+<div class="exercise">
+<h3>2. Ir e voltar</h3>
+<p>Complete para a animação ir e voltar sem pulos:</p>
+<div class="ex-code">animation-direction: <input data-answer="alternate" aria-label="valor">;</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. Em <code>animation: girar 1s 3s;</code>, quanto tempo a animação espera antes de começar?</p>
+<label><input type="radio" name="q3"> 1 segundo</label>
+<label><input type="radio" name="q3"> nada</label>
+<label><input type="radio" name="q3"> 3 segundos</label>
+<label><input type="radio" name="q3"> 4 segundos</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Uma animação de 2 s tem <code>animation-delay: -1s</code>. O que acontece?</p>
+<label><input type="radio" name="q4"> Nada: o validador recusa o negativo</label>
+<label><input type="radio" name="q4"> Começa na hora, já na metade (no quadro de 50%)</label>
+<label><input type="radio" name="q4"> Espera 1 segundo</label>
+<label><input type="radio" name="q4"> Roda ao contrário</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Para o letreiro parar enquanto o mouse está em cima, qual declaração vai no <code>:hover</code>?</p>
+<label><input type="radio" name="q5"> <code>animation-play-state: paused;</code></label>
+<label><input type="radio" name="q5"> <code>animation: none;</code></label>
+<label><input type="radio" name="q5"> <code>animation-delay: infinite;</code></label>
+<label><input type="radio" name="q5"> <code>animation-fill-mode: stop;</code></label>
+</div>
+
+<h3>Missão final: os três pontinhos</h3>
+
+<div class="tryhtml" data-goal="css:.ponto{animation-direction}=alternate,css:.ponto{animation-iteration-count}=infinite,css:.ponto:nth-child(2){animation-delay}=0.2s,css:.ponto:nth-child(3){animation-delay}=0.4s,hover:.ponto{animation-play-state}=paused">
+<p class="try-task"><strong>Missão:</strong> o "digitando…" do chat da lojinha tem três pontinhos que sobem e descem. (1) Faça a animação do <code>.ponto</code> repetir para sempre, <strong>indo e voltando</strong>. (2) Dê <code>animation-delay</code> de <code>0.2s</code> ao 2º ponto e <code>0.4s</code> ao 3º (use <code>.ponto:nth-child(2)</code> e <code>.ponto:nth-child(3)</code>). (3) Quando o mouse passar em <code>.pontos</code>, os pontinhos devem <strong>pausar</strong> (<code>.pontos:hover .ponto</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;A Ana está digitando&lt;/p&gt;
+&lt;div class="pontos"&gt;
+  &lt;span class="ponto"&gt;&lt;/span&gt;
+  &lt;span class="ponto"&gt;&lt;/span&gt;
+  &lt;span class="ponto"&gt;&lt;/span&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">@keyframes subir {
+  to {
+    translate: 0 -8px;
+  }
+}
+
+.pontos {
+  display: flex;
+  gap: 6px;
+  padding: 14px;
+}
+
+.ponto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #c2410c;
+  animation: subir 0.4s ease-in-out;
+}
+</pre>
+<pre class="solucao" data-file="style.css">@keyframes subir {
+  to {
+    translate: 0 -8px;
+  }
+}
+
+.pontos {
+  display: flex;
+  gap: 6px;
+  padding: 14px;
+}
+
+.ponto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #c2410c;
+  animation: subir 0.4s ease-in-out infinite alternate;
+}
+
+.ponto:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.ponto:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.pontos:hover .ponto {
+  animation-play-state: paused;
+}
+</pre>
+</div>
+
+<p>Repare que os <code>.ponto:nth-child(…)</code> vêm <strong>depois</strong> do <code>.ponto</code>: o atalho <code>animation</code> do <code>.ponto</code> também define o atraso (como <code>0s</code>), e, se viesse depois, apagaria os atrasos. Experimente trocar <code>0.2s</code> e <code>0.4s</code> por <code>-0.2s</code> e <code>-0.4s</code>: os pontinhos já começam desencontrados, sem a espera inicial.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O atalho <code>animation</code> junta oito propriedades. No atalho, o 1º tempo é a duração e o 2º, o atraso.</li>
+  <li><code>animation-delay</code> espera; negativo começa "no meio".</li>
+  <li><code>animation-iteration-count</code>: um número ou <code>infinite</code>.</li>
+  <li><code>animation-direction: alternate</code> vai e volta sem pulos (precisa de mais de uma vez).</li>
+  <li><code>animation-fill-mode: forwards</code> fica no último quadro; <code>backwards</code> mostra o primeiro durante o atraso; <code>both</code> faz os dois.</li>
+  <li><code>animation-play-state: paused</code> congela; ótimo no <code>:hover</code>.</li>
+  <li>Erros comuns: tempos trocados, <code>forward</code> sem <code>s</code>, <code>-1</code> para "sempre", <code>alternate</code> sem repetição.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
