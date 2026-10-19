@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Primeiro Estilo — do arquivo vazio à página com cor | Guia CSS</title>
+<meta name="description" content="Seu primeiro CSS, passo a passo: a pasta do site, o index.html com o link, o arquivo style.css, a primeira regra, salvar e recarregar, e mais regras uma de cada vez. Com os tropeços reais de quem está começando: o style.css.txt, o CSS solto no HTML e o navegador que mostra a versão antiga.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Primeiro Estilo</span></h1>
+
+<p class="intro">Chega de olhar: agora você vai escrever o seu primeiro CSS, do zero, como num site de verdade. Uma pasta, dois arquivos, uma regra. Depois, uma novidade de cada vez, até a página da Ana ganhar cor de fundo, letra nova e título centralizado. No fim, os tropeços que quase todo mundo tem na primeira vez, e como sair deles.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A montar a pasta do site com o <code>index.html</code> e o <code>style.css</code>.</li>
+  <li>A ligar os dois arquivos com o <code>&lt;link&gt;</code>.</li>
+  <li>A escrever a primeira regra e ver o resultado (salvar e recarregar).</li>
+  <li>A acrescentar instruções e regras, uma de cada vez, conferindo cada passo.</li>
+  <li>Os tropeços da primeira vez: o arquivo <code>style.css.txt</code>, o CSS escrito solto no HTML e o navegador que mostra a versão antiga.</li>
+</ul>
+</div>
+
+<p>Os comandos de terminal desta aula rodaram na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>). Se você prefere criar pastas e arquivos clicando, no gerenciador de arquivos, o resultado é o mesmo.</p>
+
+<hr>
+
+<h2>A ideia: pintar uma parede de cada vez</h2>
+<p>Quem reforma uma casa pela primeira vez não pinta tudo de uma vez: pinta uma parede, dá um passo para trás, olha, e só então vai para a próxima. Se ficou feio, é fácil saber qual lata de tinta foi.</p>
+<p>Com o CSS é igual. Escreva <strong>uma</strong> instrução, salve, recarregue a página e olhe. Funcionou? Próxima. Não funcionou? O problema está na última coisa que você escreveu. Esse ritmo, "escreve, salva, olha", evita a pior situação de quem começa: vinte linhas novas, nada funciona e nenhuma pista de onde está o erro.</p>
+
+<hr>
+
+<h2>1. A pasta e os dois arquivos</h2>
+<p>Todo site começa numa pasta. A da Ana se chama <code>site</code> e tem dois arquivos: a página e a folha de estilo.</p>
+
+<pre class="term" data-cwd="~">$ mkdir site
+$ cd site
+$ touch index.html style.css
+$ tree
+.
+├── index.html
+└── style.css
+
+1 directory, 2 files</pre>
+
+<dl class="anatomy">
+  <dt>mkdir site</dt><dd>Cria a pasta <code>site</code> (<em>make directory</em>, "criar pasta").</dd>
+  <dt>touch index.html style.css</dt><dd>Cria os dois arquivos, vazios.</dd>
+  <dt>tree</dt><dd>Mostra a pasta em forma de árvore: os dois arquivos lado a lado, na mesma pasta.</dd>
+</dl>
+
+<p>O nome <code>style.css</code> é o mais comum, mas qualquer nome serve (<code>estilo.css</code>, <code>principal.css</code>), desde que termine em <code>.css</code> e seja o mesmo no <code>&lt;link&gt;</code>. Siga a regra de sempre para nomes de arquivo: minúsculas, sem acento e sem espaço.</p>
+
+<hr>
+
+<h2>2. O HTML com o <code>&lt;link&gt;</code></h2>
+<p>Abra o <code>index.html</code> no seu editor de texto e escreva uma página completa. A linha nova é a do <code>&lt;link&gt;</code>, dentro do <code>&lt;head&gt;</code>:</p>
+
+<pre class="file" data-file="index.html">&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+&lt;meta charset="utf-8"&gt;
+&lt;title&gt;Receitas da Ana&lt;/title&gt;
+&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+&lt;p&gt;Toda semana, uma receita nova.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p>Salve e abra o <code>index.html</code> no navegador (dois cliques no arquivo, ou arraste-o para uma janela do navegador). A página aparece com o visual padrão: letra com serifa, fundo branco, título preto. O <code>style.css</code> ainda está vazio, então não muda nada. Por que o <code>&lt;link&gt;</code> fica no <code>&lt;head&gt;</code> e o que o <code>rel</code> faz: aula <a href="onde-colocar.html">Três Jeitos de Usar CSS</a>.</p>
+
+<hr>
+
+<h2>3. A primeira regra</h2>
+<p>Agora abra o <code>style.css</code> e escreva:</p>
+
+<pre class="file" data-file="style.css">h1 {
+  color: teal;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>h1</dt><dd>O seletor: todos os <code>&lt;h1&gt;</code> da página.</dd>
+  <dt>{</dt><dd>Abre a lista de instruções para o <code>h1</code>.</dd>
+  <dt>color: teal;</dt><dd>A instrução: cor do texto (<code>color</code>) = <code>teal</code>, um verde-azulado. Recuada com 2 espaços, para ficar claro que está dentro da regra.</dd>
+  <dt>}</dt><dd>Fecha a regra.</dd>
+</dl>
+
+<p>Agora o passo que todo mundo esquece:</p>
+<ol class="passo">
+  <li><strong>Salve</strong> o <code>style.css</code> (<kbd>Ctrl</kbd>+<kbd>S</kbd>).</li>
+  <li>Volte ao navegador e <strong>recarregue</strong> a página (<kbd>F5</kbd> ou <kbd>Ctrl</kbd>+<kbd>R</kbd>).</li>
+</ol>
+<p>O navegador não fica vigiando os seus arquivos: ele lê o CSS quando carrega a página. Sem recarregar, você continua vendo a versão de antes.</p>
+<p>Aqui no guia, a caixa faz isso por você: ela redesenha o resultado meio segundo depois que você para de digitar.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> esta é a página da Ana com a primeira regra. Troque <code>teal</code> por outras cores: <code>purple</code>, <code>darkorange</code>, <code>crimson</code>. Depois apague a regra inteira e veja o título voltar ao preto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+&lt;p&gt;Toda semana, uma receita nova.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: teal;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>4. Mais uma instrução na mesma regra</h2>
+<p>A Ana quer o título no meio da página. A instrução nova vai <strong>dentro da mesma regra</strong> do <code>h1</code>, numa linha própria, com o seu <code>;</code>:</p>
+
+<pre class="file" data-file="style.css">h1 {
+  color: teal;
+  text-align: center;
+}
+</pre>
+
+<p><code>text-align</code> = "alinhamento do texto"; <code>center</code> = "centro". Salve, recarregue: o título fica verde-azulado <strong>e</strong> centralizado. Cada instrução cuida de uma coisa, e elas se somam. Uma regra pode ter quantas instruções você quiser, uma por linha.</p>
+
+<hr>
+
+<h2>5. Uma regra nova para outro elemento</h2>
+<p>Agora o fundo e a letra da página inteira. Isso não é do <code>h1</code>, é do <code>&lt;body&gt;</code>, o corpo da página. Uma regra nova, separada da primeira por uma linha em branco:</p>
+
+<pre class="file" data-file="style.css">body {
+  background-color: honeydew;
+  font-family: sans-serif;
+}
+
+h1 {
+  color: teal;
+  text-align: center;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>body</dt><dd>O seletor da nova regra: o elemento <code>&lt;body&gt;</code>, que envolve tudo o que aparece na página.</dd>
+  <dt>background-color: honeydew;</dt><dd>Cor de fundo (<em>background</em> = "fundo"): <code>honeydew</code>, um verde quase branco.</dd>
+  <dt>font-family: sans-serif;</dt><dd>A família da letra: <code>sans-serif</code>, "sem serifa", sem os pezinhos nas pontas. Cada computador usa a sua letra sem serifa padrão.</dd>
+</dl>
+
+<p>Salve e recarregue. O fundo da janela inteira fica verde-clarinho, e a letra muda <strong>em todos os textos</strong>, inclusive no título e nos parágrafos, mesmo que a regra seja só do <code>body</code>. É a <strong>herança</strong>: certas propriedades, como a fonte e a cor do texto, passam do pai para os filhos (aula <a href="heranca.html">Herança</a>).</p>
+<p>A ordem das regras no arquivo, aqui, não importa: o <code>body</code> em cima, o <code>h1</code> embaixo, ou o contrário, dá o mesmo resultado, porque cada regra fala de um elemento diferente.</p>
+
+<hr>
+
+<h2>6. A terceira regra: os parágrafos</h2>
+
+<pre class="file" data-file="style.css">body {
+  background-color: honeydew;
+  font-family: sans-serif;
+}
+
+h1 {
+  color: teal;
+  text-align: center;
+}
+
+p {
+  color: dimgray;
+  font-size: 18px;
+}
+</pre>
+
+<p>O seletor <code>p</code> pega <strong>os dois</strong> parágrafos de uma vez: os dois ficam cinza-escuros (<code>dimgray</code>) e com a letra um pouco maior (<code>font-size</code> = "tamanho da letra", 18 pixels em vez dos 16 do padrão). Uma regra, todos os parágrafos. Se a Ana escrever um terceiro parágrafo amanhã, ele já nasce com esse visual.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> esta é a página completa, com as três regras. Brinque com uma coisa de cada vez: troque <code>honeydew</code> por <code>lavender</code>, <code>center</code> por <code>right</code>, <code>18px</code> por <code>22px</code>. Repare como cada mudança aparece sozinha, sem mexer no resto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+&lt;p&gt;Toda semana, uma receita nova.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  background-color: honeydew;
+  font-family: sans-serif;
+}
+
+h1 {
+  color: teal;
+  text-align: center;
+}
+
+p {
+  color: dimgray;
+  font-size: 18px;
+}
+</pre>
+</div>
+
+<h3>O jeito de escrever deste guia</h3>
+<p>O navegador aceitaria tudo numa linha só (<code>h1{color:teal;text-align:center}</code>), mas as pessoas leem melhor assim, e é o padrão em todo o guia:</p>
+<ul>
+  <li>uma instrução por linha, recuada com <strong>2 espaços</strong>;</li>
+  <li>um espaço depois dos dois-pontos (<code>color: teal</code>);</li>
+  <li>o <code>;</code> sempre, até na última instrução (assim, quando você acrescenta uma linha embaixo, não esquece de pôr);</li>
+  <li>uma linha em branco entre uma regra e outra.</li>
+</ul>
+<p>Por que cada sinal está ali, e o que acontece quando falta um: <a href="sintaxe.html">Regras, Seletores e Declarações</a>.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Nada mudou: esqueceu de salvar ou de recarregar</strong>
+<p><strong>O que você vê:</strong> a página igualzinha a antes, embora o CSS pareça certo no editor.</p>
+<p><strong>Por quê:</strong> o navegador mostra o arquivo <strong>salvo</strong>, na hora em que a página foi carregada. Muitos editores de texto marcam o arquivo não salvo com uma bolinha ou um asterisco no nome da aba.</p>
+<p><strong>Como consertar:</strong> <kbd>Ctrl</kbd>+<kbd>S</kbd> no editor, <kbd>F5</kbd> no navegador. Vire um hábito: salvou, recarregou.</p>
+</div>
+
+<div class="cenario">
+<strong>O navegador mostra a versão antiga do CSS</strong>
+<p><strong>O que você vê:</strong> salvou, recarregou, e ainda assim nada mudou (acontece mais num site publicado do que num arquivo aberto do seu computador).</p>
+<p><strong>Por quê:</strong> para ser rápido, o navegador guarda uma cópia do <code>style.css</code> (o <strong>cache</strong>) e às vezes a reaproveita em vez de buscar a nova.</p>
+<p><strong>Como consertar:</strong> uma recarga "forçada", que ignora a cópia guardada: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> (ou <kbd>Ctrl</kbd>+<kbd>F5</kbd>) no Chrome, no Edge e no Firefox; no Mac, <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> no Chrome e no Firefox.</p>
+</div>
+
+<div class="cenario">
+<strong>O arquivo virou <code>style.css.txt</code></strong>
+<p>Alguns editores (e o Windows, que esconde as extensões dos arquivos) salvam o arquivo com um <code>.txt</code> escondido no fim. Na tela parece <code>style.css</code>, mas o nome de verdade é outro:</p>
+<pre class="term" data-cwd="~/site">$ tree
+.
+├── index.html
+└── style.css.txt
+
+1 directory, 2 files</pre>
+<p><strong>O que você vê:</strong> a página sem estilo nenhum. O <code>&lt;link&gt;</code> pede <code>style.css</code>, e esse arquivo não existe. O validador não avisa (ele não confere se o arquivo existe); o console do F12 mostra que o arquivo não carregou (aula <a href="devtools.html">Inspecionando com o F12</a>).</p>
+<p><strong>Como consertar:</strong> renomeie o arquivo para <code>style.css</code> (no terminal, <code>mv style.css.txt style.css</code>). No Windows, ligue a opção do Explorador de Arquivos que mostra as extensões, para ver o nome completo. Ao salvar pela primeira vez, escolha "Todos os arquivos" no tipo, se o editor oferecer.</p>
+</div>
+
+<div class="cenario">
+<strong>CSS escrito solto no HTML: ele aparece na página, como texto</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>h1 {
+  color: teal;
+}
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+</pre>
+<p><strong>O que você vê:</strong> o texto <code>h1 { color: teal; }</code> escrito no topo da página, numa linha só, e o título preto logo abaixo.</p>
+<p><strong>Por quê:</strong> dentro do HTML, fora de um <code>&lt;style&gt;</code>, o CSS é só texto, como qualquer frase. O navegador mostra o texto e não aplica nada. As quebras de linha somem porque, no HTML, várias linhas e espaços viram um espaço só.</p>
+<p><strong>Como consertar:</strong> o CSS vai no <code>style.css</code> (o melhor) ou, numa página de teste, entre <code>&lt;style&gt;</code> e <code>&lt;/style&gt;</code> no <code>&lt;head&gt;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Escreveu tudo de uma vez e nada funciona</strong>
+<p><strong>O que você vê:</strong> parte do CSS funciona, parte não, e você não sabe qual linha é a culpada.</p>
+<p><strong>Como consertar:</strong> volte ao ritmo da parede: apague (ou "desligue" com um comentário, aula <a href="comentarios.html">Comentários</a>) o que acabou de escrever e ponha de volta uma instrução por vez, olhando o resultado a cada uma. O F12 também mostra as instruções que o navegador ignorou (aula <a href="devtools.html">Inspecionando com o F12</a>).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Passo</th><th>O que fazer</th></tr>
+<tr><td>1. Pasta</td><td><code>site/</code> com <code>index.html</code> e <code>style.css</code> lado a lado</td></tr>
+<tr><td>2. Ligar</td><td><code>&lt;link rel="stylesheet" href="style.css"&gt;</code> no <code>&lt;head&gt;</code></td></tr>
+<tr><td>3. Regra</td><td><code>seletor {</code>, uma instrução por linha com <code>;</code>, <code>}</code></td></tr>
+<tr><td>4. Ver</td><td>Salvar (<kbd>Ctrl</kbd>+<kbd>S</kbd>) e recarregar (<kbd>F5</kbd>); recarga forçada: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd></td></tr>
+<tr><td>5. Crescer</td><td>Uma instrução de cada vez, conferindo o resultado</td></tr>
+</table>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Instrução desta aula</th><th>O que faz</th><th>Aula própria</th></tr>
+<tr><td><code>color: teal;</code></td><td>Cor do texto</td><td><a href="cores.html">Cores por Nome</a></td></tr>
+<tr><td><code>text-align: center;</code></td><td>Centraliza o texto</td><td><a href="text-align.html">Alinhamento</a></td></tr>
+<tr><td><code>background-color: honeydew;</code></td><td>Cor de fundo</td><td><a href="background-color.html">Cor de Fundo</a></td></tr>
+<tr><td><code>font-family: sans-serif;</code></td><td>Letra sem serifa</td><td><a href="font-family.html">Fontes</a></td></tr>
+<tr><td><code>font-size: 18px;</code></td><td>Tamanho da letra</td><td><a href="font-size.html">Tamanho da Letra</a></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Abrir a regra</h3>
+<p>Complete o sinal que abre a lista de instruções:</p>
+<div class="ex-code">h1 <input data-answer="{" aria-label="sinal">
+  color: teal;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. Centralizar</h3>
+<p>Complete o valor que centraliza o título:</p>
+<div class="ex-code">h1 {
+  text-align: <input data-answer="center" aria-label="valor">;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>3. O fundo</h3>
+<p>Complete a propriedade da cor de fundo:</p>
+<div class="ex-code">body {
+  <input data-answer="background-color" aria-label="propriedade">: honeydew;
+}</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. A Ana mudou o <code>style.css</code>, mas o navegador continua mostrando a página antiga. O que ela deve tentar primeiro?</p>
+<label><input type="radio" name="q4"> Apagar o <code>index.html</code></label>
+<label><input type="radio" name="q4"> Salvar o arquivo e recarregar a página</label>
+<label><input type="radio" name="q4"> Trocar de navegador</label>
+<label><input type="radio" name="q4"> Escrever o CSS de novo</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. A regra <code>body { font-family: sans-serif; }</code> muda a letra de quais textos?</p>
+<label><input type="radio" name="q5"> Só do texto solto no <code>body</code>, fora dos parágrafos</label>
+<label><input type="radio" name="q5"> Só dos títulos</label>
+<label><input type="radio" name="q5"> De todos os textos da página, porque a fonte passa do pai para os filhos</label>
+<label><input type="radio" name="q5"> De nenhum: precisa de uma regra para cada elemento</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. O <code>tree</code> mostra <code>style.css.txt</code>. O que acontece com a página que tem <code>&lt;link rel="stylesheet" href="style.css"&gt;</code>?</p>
+<label><input type="radio" name="q6"> Fica sem estilo, porque o arquivo <code>style.css</code> não existe</label>
+<label><input type="radio" name="q6"> Funciona normalmente</label>
+<label><input type="radio" name="q6"> Mostra o CSS como texto na página</label>
+<label><input type="radio" name="q6"> O navegador renomeia o arquivo sozinho</label>
+</div>
+
+<h3>Missão final: o seu primeiro <code>style.css</code></h3>
+
+<div class="tryhtml" data-goal="css:h1{color}=rgb(0, 128, 128),css:h1{text-align}=center,css:body{background-color}=rgb(240, 255, 240),css:p{font-size}=18px">
+<p class="try-task"><strong>Missão:</strong> a aba <code>style.css</code> está vazia. Escreva, do zero, uma instrução de cada vez: (1) o <code>h1</code> com a cor <code>teal</code> e centralizado; (2) o <code>body</code> com o fundo <code>honeydew</code>; (3) os parágrafos (<code>p</code>) com a letra de <code>18px</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+&lt;p&gt;Toda semana, uma receita nova.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  background-color: honeydew;
+}
+
+h1 {
+  color: teal;
+  text-align: center;
+}
+
+p {
+  font-size: 18px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O site é uma pasta com o <code>index.html</code> e o <code>style.css</code>; o <code>&lt;link rel="stylesheet" href="style.css"&gt;</code> no <code>&lt;head&gt;</code> liga os dois.</li>
+  <li>Uma regra: seletor, <code>{</code>, uma instrução por linha terminada em <code>;</code>, <code>}</code>. Instruções na mesma regra se somam; cada elemento diferente ganha a sua regra.</li>
+  <li>O navegador lê o CSS quando a página carrega: <strong>salve e recarregue</strong>. Versão antiga teimosa: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>.</li>
+  <li>A fonte e a cor do texto do <code>body</code> passam para os elementos de dentro (herança).</li>
+  <li>Os tropeços da primeira vez: o arquivo salvo como <code>style.css.txt</code>, o CSS solto no HTML (aparece como texto) e muita coisa escrita de uma vez. Uma instrução por vez, olhando o resultado.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
