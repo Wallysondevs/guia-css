@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS position: fixed — preso à janela, mesmo rolando | Guia CSS</title>
+<meta name="description" content="position: fixed em CSS para quem está começando: o elemento preso à janela que não rola com a página, top, right, bottom e left medidos a partir da janela, o botão flutuante e a barra de topo fixa, o espaço que some do fluxo, a largura que encolhe, o pai com transform que estraga o fixed e as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">position: fixed</span></h1>
+
+<p class="intro">Sabe aquele botão "Fale conosco" que fica no canto da tela enquanto você rola a página inteira? Ou a barra de menu que nunca sai do topo? Os dois são feitos com <code>position: fixed</code> ("posição fixa"): o elemento fica <strong>preso à janela do navegador</strong>, e a página passa por baixo dele. Nesta aula você vai pôr um botão de ajuda e uma barra de topo fixos no site de receitas da Ana, e aprender os três tropeços clássicos: o conteúdo que fica escondido embaixo, a barra que encolhe e o <code>fixed</code> que para de funcionar.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que <code>position: fixed</code> faz e a diferença para a posição normal.</li>
+  <li>Como <code>top</code>, <code>right</code>, <code>bottom</code> e <code>left</code> medem a distância a partir das <strong>bordas da janela</strong>.</li>
+  <li>A receita do botão flutuante e a da barra de topo fixa.</li>
+  <li>Por que o elemento fixo "sai do fluxo" e como evitar que ele esconda o conteúdo.</li>
+  <li>Por que a barra fixa encolhe, e como esticá-la de uma borda à outra.</li>
+  <li>Quando o <code>fixed</code> deixa de ser fixo (um pai com <code>transform</code>) e as mensagens reais do validador.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador, dentro de cada quadro. Para ver o <code>fixed</code> funcionando, <strong>role o quadro</strong> com a rodinha do mouse (ou com o dedo, no celular): a página sobe e desce, e o elemento fixo fica parado. A base da posição está na aula <a href="position.html">position: Como Funciona</a>; aqui o assunto é só o <code>fixed</code>.</p>
+
+<hr>
+
+<h2>A ideia: o adesivo no vidro do ônibus</h2>
+<p>Imagine que você está num ônibus, olhando pela janela. A paisagem passa: casas, árvores, placas. Mas o adesivo "Saída de emergência", colado no <strong>vidro</strong>, fica sempre no mesmo lugar, não importa quanto o ônibus ande.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>No ônibus</th><th>Na página</th></tr>
+<tr><td>A paisagem que passa</td><td>O conteúdo da página, que sobe quando você rola</td></tr>
+<tr><td>O vidro da janela</td><td>A <strong>janela do navegador</strong> (a área visível, chamada de <em>viewport</em>)</td></tr>
+<tr><td>O adesivo colado no vidro</td><td>O elemento com <code>position: fixed</code></td></tr>
+<tr><td>"10 cm acima da borda de baixo do vidro"</td><td><code>bottom: 16px</code>: a distância até a borda de baixo da janela</td></tr>
+</table>
+</div>
+
+<p>Um elemento normal é como uma casa da paisagem: ele está <strong>na página</strong> e sobe junto quando você rola. Um elemento <code>fixed</code> está <strong>na janela</strong>.</p>
+
+<hr>
+
+<h2>1. O primeiro elemento fixo: o botão de ajuda</h2>
+<p>A Ana quer um botão "Dúvidas? Fale com a Ana" sempre visível no canto de baixo, à direita. Role o quadro do resultado e observe o botão verde:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> role o resultado até o fim. O botão não sai do canto. Depois troque <code>bottom</code> por <code>top</code> e veja o botão pular para o canto de cima.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;a class="ajuda" href="contato.html"&gt;Dúvidas? Fale com a Ana&lt;/a&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p&gt;Bata no liquidificador 3 cenouras, 3 ovos e 1 xícara de óleo. Misture com 2 xícaras de açúcar e 2 de farinha.&lt;/p&gt;
+&lt;h2&gt;Pão de queijo&lt;/h2&gt;
+&lt;p&gt;Escalde o polvilho com leite e óleo quentes. Junte os ovos e o queijo, faça bolinhas e asse.&lt;/p&gt;
+&lt;h2&gt;Brigadeiro&lt;/h2&gt;
+&lt;p&gt;Leve ao fogo o leite condensado, o chocolate e a manteiga, mexendo até desgrudar da panela.&lt;/p&gt;
+&lt;h2&gt;Bolo de fubá&lt;/h2&gt;
+&lt;p&gt;Bata os ovos, o leite, o óleo, o açúcar e o fubá. Por último, o fermento. Asse por 40 minutos.&lt;/p&gt;
+&lt;h2&gt;Cuscuz&lt;/h2&gt;
+&lt;p&gt;Hidrate a flocão com água e sal, coloque na cuscuzeira e cozinhe no vapor por 10 minutos.&lt;/p&gt;
+&lt;h2&gt;Pudim&lt;/h2&gt;
+&lt;p&gt;Faça a calda com açúcar, bata o leite condensado, o leite e os ovos e asse em banho-maria.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.ajuda {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  background-color: seagreen;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 20px;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>position: fixed;</dt><dd>Prende o elemento à <strong>janela</strong>. Ele deixa de ocupar o seu lugar na página e passa a flutuar por cima dela, sempre no mesmo ponto da tela.</dd>
+  <dt>bottom: 16px;</dt><dd>A distância entre a borda de baixo do botão e a borda de baixo da <strong>janela</strong>. Em português, <code>bottom</code> = "embaixo".</dd>
+  <dt>right: 16px;</dt><dd>A distância entre a borda direita do botão e a borda direita da janela. <code>right</code> = "direita".</dd>
+  <dt>o resto</dt><dd>Só aparência: fundo verde (<code>seagreen</code>), letra branca, espaço interno e cantos arredondados (aulas <a href="padding.html">padding</a> e <a href="border-radius.html">border-radius</a>).</dd>
+</dl>
+
+<p>Repare no resultado:</p>
+<ul>
+  <li>No código, o link está logo depois do <code>&lt;h1&gt;</code>, mas no resultado ele aparece <strong>no canto de baixo</strong>: com <code>fixed</code>, quem decide o lugar são o <code>bottom</code> e o <code>right</code>, e não a ordem do HTML.</li>
+  <li>Ao rolar, as linhas de texto passam <strong>por baixo</strong> do botão: ele é desenhado por cima da página.</li>
+  <li>O botão continua sendo um link: clique nele.</li>
+</ul>
+
+<div class="note">
+<strong>No editor do guia, a "janela" é o quadro</strong>
+<p>Cada resultado é desenhado num quadro separado, que funciona como uma janela de navegador pequena. Por isso o elemento fixo fica preso às bordas <strong>do quadro</strong>, e não às da página do guia. O quadro cresce com o conteúdo até um limite; passando disso, ele ganha a própria barra de rolagem. Os exemplos desta aula têm texto suficiente para rolar.</p>
+</div>
+
+<h3>Os quatro lados</h3>
+<p>As quatro propriedades de deslocamento medem a distância até a borda correspondente da janela. Normalmente você usa <strong>uma vertical</strong> (<code>top</code> ou <code>bottom</code>) e <strong>uma horizontal</strong> (<code>left</code> ou <code>right</code>):</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Combinação</th><th>Onde o elemento fica</th><th>Uso comum</th></tr>
+<tr><td><code>top: 0; left: 0;</code></td><td>Canto de cima, à esquerda</td><td>Logo, botão de menu</td></tr>
+<tr><td><code>top: 0; right: 0;</code></td><td>Canto de cima, à direita</td><td>Carrinho de compras</td></tr>
+<tr><td><code>bottom: 16px; right: 16px;</code></td><td>Canto de baixo, à direita</td><td>Botão de ajuda, de conversa, "voltar ao topo"</td></tr>
+<tr><td><code>bottom: 0; left: 0; right: 0;</code></td><td>Faixa colada embaixo, de lado a lado</td><td>Aviso de cookies, barra de navegação de app</td></tr>
+<tr><td><code>top: 0; left: 0; right: 0;</code></td><td>Faixa colada em cima, de lado a lado</td><td>Barra de topo (seção 3)</td></tr>
+</table>
+</div>
+
+<div class="tryhtml" data-goal="css:.ajuda{position}=fixed,css:.ajuda{bottom}=16px,css:.ajuda{left}=16px">
+<p class="try-task"><strong>Missão:</strong> o botão "Voltar ao topo" está perdido no meio do texto. Prenda-o à janela, no canto de <strong>baixo, à esquerda</strong>, a <code>16px</code> de cada borda. Depois role o resultado e clique nele.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1 id="topo"&gt;Receitas da Ana&lt;/h1&gt;
+&lt;a class="ajuda" href="#topo"&gt;Voltar ao topo&lt;/a&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p&gt;Bata no liquidificador 3 cenouras, 3 ovos e 1 xícara de óleo. Misture com 2 xícaras de açúcar e 2 de farinha.&lt;/p&gt;
+&lt;h2&gt;Pão de queijo&lt;/h2&gt;
+&lt;p&gt;Escalde o polvilho com leite e óleo quentes. Junte os ovos e o queijo, faça bolinhas e asse.&lt;/p&gt;
+&lt;h2&gt;Brigadeiro&lt;/h2&gt;
+&lt;p&gt;Leve ao fogo o leite condensado, o chocolate e a manteiga, mexendo até desgrudar da panela.&lt;/p&gt;
+&lt;h2&gt;Bolo de fubá&lt;/h2&gt;
+&lt;p&gt;Bata os ovos, o leite, o óleo, o açúcar e o fubá. Por último, o fermento. Asse por 40 minutos.&lt;/p&gt;
+&lt;h2&gt;Cuscuz&lt;/h2&gt;
+&lt;p&gt;Hidrate a flocão com água e sal, coloque na cuscuzeira e cozinhe no vapor por 10 minutos.&lt;/p&gt;
+&lt;h2&gt;Pudim&lt;/h2&gt;
+&lt;p&gt;Faça a calda com açúcar, bata o leite condensado, o leite e os ovos e asse em banho-maria.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.ajuda {
+  background-color: navy;
+  color: white;
+  padding: 10px 16px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.ajuda {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  background-color: navy;
+  color: white;
+  padding: 10px 16px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. O elemento fixo sai do fluxo</h2>
+<p>Na página normal, cada bloco ocupa o seu espaço e empurra o próximo para baixo: é o <strong>fluxo</strong> da página (aula <a href="position.html">position: Como Funciona</a>). Um elemento <code>fixed</code> <strong>sai do fluxo</strong>: o espaço dele some, e o que vinha depois sobe para ocupar o lugar. Ele passa a flutuar <strong>por cima</strong> da página, como o adesivo por cima da paisagem.</p>
+
+<p>Veja um aviso fixo, sem nenhum <code>top</code> ou <code>bottom</code>:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o aviso amarelo cobre o começo do "Bolo de cenoura", porque o espaço dele sumiu e a receita subiu. Role o resultado: o aviso fica parado. Apague a linha do <code>position</code> e compare: o aviso volta a ocupar espaço e rola junto com a página.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p class="aviso"&gt;Frete grátis hoje!&lt;/p&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p&gt;Bata no liquidificador 3 cenouras, 3 ovos e 1 xícara de óleo. Misture com 2 xícaras de açúcar e 2 de farinha.&lt;/p&gt;
+&lt;h2&gt;Pão de queijo&lt;/h2&gt;
+&lt;p&gt;Escalde o polvilho com leite e óleo quentes. Junte os ovos e o queijo, faça bolinhas e asse.&lt;/p&gt;
+&lt;h2&gt;Brigadeiro&lt;/h2&gt;
+&lt;p&gt;Leve ao fogo o leite condensado, o chocolate e a manteiga, mexendo até desgrudar da panela.&lt;/p&gt;
+&lt;h2&gt;Bolo de fubá&lt;/h2&gt;
+&lt;p&gt;Bata os ovos, o leite, o óleo, o açúcar e o fubá. Por último, o fermento. Asse por 40 minutos.&lt;/p&gt;
+&lt;h2&gt;Cuscuz&lt;/h2&gt;
+&lt;p&gt;Hidrate a flocão com água e sal, coloque na cuscuzeira e cozinhe no vapor por 10 minutos.&lt;/p&gt;
+&lt;h2&gt;Pudim&lt;/h2&gt;
+&lt;p&gt;Faça a calda com açúcar, bata o leite condensado, o leite e os ovos e asse em banho-maria.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.aviso {
+  position: fixed;
+  background-color: gold;
+  padding: 8px;
+}
+</pre>
+</div>
+
+<p>Duas lições deste exemplo:</p>
+<ul>
+  <li><strong>Sem <code>top</code>, <code>right</code>, <code>bottom</code> nem <code>left</code></strong>, o elemento fixo fica no ponto da tela onde ele <strong>estaria</strong> no fluxo (logo abaixo do título) e congela ali. Funciona, mas é frágil: o lugar muda se o título mudar. Diga sempre onde ele deve ficar.</li>
+  <li><strong>O conteúdo não "sabe" que o elemento fixo existe.</strong> Nada desvia dele. Quem tem de abrir espaço é você, e é o assunto da próxima seção.</li>
+</ul>
+
+<hr>
+
+<h2>3. A barra de topo fixa</h2>
+<p>A Ana quer o nome do site numa barra azul, sempre no topo. O primeiro rascunho:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> repare em dois problemas. A barra é <strong>curta</strong>, só do tamanho do texto. E ela <strong>cobre o título</strong> "Bolos e doces". Role um pouco: a barra fica, e as receitas passam por baixo dela.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;Receitas da Ana&lt;/header&gt;
+&lt;h1&gt;Bolos e doces&lt;/h1&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p&gt;Bata no liquidificador 3 cenouras, 3 ovos e 1 xícara de óleo. Misture com 2 xícaras de açúcar e 2 de farinha.&lt;/p&gt;
+&lt;h2&gt;Pão de queijo&lt;/h2&gt;
+&lt;p&gt;Escalde o polvilho com leite e óleo quentes. Junte os ovos e o queijo, faça bolinhas e asse.&lt;/p&gt;
+&lt;h2&gt;Brigadeiro&lt;/h2&gt;
+&lt;p&gt;Leve ao fogo o leite condensado, o chocolate e a manteiga, mexendo até desgrudar da panela.&lt;/p&gt;
+&lt;h2&gt;Bolo de fubá&lt;/h2&gt;
+&lt;p&gt;Bata os ovos, o leite, o óleo, o açúcar e o fubá. Por último, o fermento. Asse por 40 minutos.&lt;/p&gt;
+&lt;h2&gt;Cuscuz&lt;/h2&gt;
+&lt;p&gt;Hidrate a flocão com água e sal, coloque na cuscuzeira e cozinhe no vapor por 10 minutos.&lt;/p&gt;
+&lt;h2&gt;Pudim&lt;/h2&gt;
+&lt;p&gt;Faça a calda com açúcar, bata o leite condensado, o leite e os ovos e asse em banho-maria.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.topo {
+  position: fixed;
+  top: 0;
+  background-color: navy;
+  color: white;
+  padding: 12px;
+}
+</pre>
+</div>
+
+<h3>Problema 1: a barra encolhe</h3>
+<p>Um <code>&lt;header&gt;</code> normal é um bloco e ocupa a largura toda. Com <code>fixed</code>, ele fica só <strong>do tamanho do conteúdo</strong>: no Chromium, a barra mediu 127&nbsp;px de largura, contra 744&nbsp;px do título logo abaixo. Para esticá-la de uma borda da janela à outra, há duas formas:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Como</th><th>Observação</th></tr>
+<tr><td><code>left: 0;</code> + <code>right: 0;</code></td><td>"Encoste na borda esquerda <strong>e</strong> na direita": o navegador calcula a largura</td><td>A mais segura: o <code>padding</code> fica dentro e nada transborda</td></tr>
+<tr><td><code>left: 0;</code> + <code>width: 100%;</code></td><td>"Comece na borda esquerda e tenha a largura da janela"</td><td>Com <code>padding</code>, a barra fica <strong>mais larga</strong> que a janela, a não ser com <code>box-sizing: border-box</code> (aula <a href="box-sizing.html">box-sizing</a>)</td></tr>
+</table>
+</div>
+
+<h3>Problema 2: a barra cobre o começo da página</h3>
+<p>A barra saiu do fluxo, então o título subiu para debaixo dela. A solução é empurrar o conteúdo para baixo com um espaço do tamanho da barra: um <code>padding-top</code> ("espaço interno em cima") no <code>body</code>. A barra mede 42&nbsp;px de altura (18&nbsp;px da linha de texto + 12&nbsp;px de <code>padding</code> em cima e embaixo); um <code>padding-top: 48px</code> dá conta, com uma folga.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> agora a barra vai de lado a lado e o título aparece inteiro. Role: a barra continua no topo. Mude o <code>padding-top</code> para <code>0</code> e veja o título sumir embaixo da barra de novo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;Receitas da Ana&lt;/header&gt;
+&lt;h1&gt;Bolos e doces&lt;/h1&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p&gt;Bata no liquidificador 3 cenouras, 3 ovos e 1 xícara de óleo. Misture com 2 xícaras de açúcar e 2 de farinha.&lt;/p&gt;
+&lt;h2&gt;Pão de queijo&lt;/h2&gt;
+&lt;p&gt;Escalde o polvilho com leite e óleo quentes. Junte os ovos e o queijo, faça bolinhas e asse.&lt;/p&gt;
+&lt;h2&gt;Brigadeiro&lt;/h2&gt;
+&lt;p&gt;Leve ao fogo o leite condensado, o chocolate e a manteiga, mexendo até desgrudar da panela.&lt;/p&gt;
+&lt;h2&gt;Bolo de fubá&lt;/h2&gt;
+&lt;p&gt;Bata os ovos, o leite, o óleo, o açúcar e o fubá. Por último, o fermento. Asse por 40 minutos.&lt;/p&gt;
+&lt;h2&gt;Cuscuz&lt;/h2&gt;
+&lt;p&gt;Hidrate a flocão com água e sal, coloque na cuscuzeira e cozinhe no vapor por 10 minutos.&lt;/p&gt;
+&lt;h2&gt;Pudim&lt;/h2&gt;
+&lt;p&gt;Faça a calda com açúcar, bata o leite condensado, o leite e os ovos e asse em banho-maria.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  padding-top: 48px;
+}
+
+.topo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: navy;
+  color: white;
+  padding: 12px;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>top: 0;</dt><dd>Cola a barra na borda de cima da janela. Zero não precisa de unidade: <code>0</code>, <code>0px</code> e <code>0rem</code> são a mesma coisa.</dd>
+  <dt>left: 0; right: 0;</dt><dd>Encosta a barra nas duas bordas laterais. A largura vira "tudo o que sobra entre elas". Repare que a barra encosta mesmo na borda da janela, sem os 8&nbsp;px de margem que o <code>body</code> tem por padrão: ela mede a partir da janela, não do <code>body</code>.</dd>
+  <dt>body { padding-top: 48px; }</dt><dd>Abre, no começo da página, um espaço onde a barra "senta". Se a barra crescer (uma fonte maior, um texto em duas linhas), aumente esse valor.</dd>
+</dl>
+
+<div class="tip">
+<strong>Barra fixa ou barra "grudenta"?</strong>
+<p>Existe um primo do <code>fixed</code> que resolve o problema 2 sozinho: o <code>position: sticky</code>. Ele ocupa o seu espaço no fluxo como um elemento normal e só "gruda" no topo quando a rolagem chega nele. Para barras de topo, ele costuma ser a escolha mais simples (próxima aula, <a href="position-sticky.html">position: sticky</a>).</p>
+</div>
+
+<hr>
+
+<h2>4. Fixo por cima de quê? As camadas</h2>
+<p>O elemento fixo é desenhado <strong>por cima</strong> do conteúdo normal, como você viu nos exemplos. Mas, se a página tiver outros elementos posicionados (com <code>relative</code>, <code>absolute</code> ou outro <code>fixed</code>), quem fica por cima pode mudar: um elemento que vem depois no HTML pode passar por cima da sua barra. Quem decide é a propriedade <code>z-index</code>, assunto da aula <a href="z-index.html">Camadas (z-index)</a>. Por enquanto, a regra prática: barras e botões fixos costumam ganhar um <code>z-index</code> (por exemplo, <code>z-index: 10;</code>) para ficarem sempre na frente.</p>
+
+<hr>
+
+<h2>5. Cuidados com elementos fixos</h2>
+<ul>
+  <li><strong>Telas pequenas.</strong> Num celular, a janela é pequena. Uma barra de topo fixa de 60&nbsp;px mais um aviso de cookies fixo embaixo podem roubar um bom pedaço da tela. Mantenha os elementos fixos baixos e poucos.</li>
+  <li><strong>Zoom.</strong> Quem aumenta o zoom do navegador para ler melhor vê a barra crescer junto, e a área livre para o texto encolher. Teste com <kbd>Ctrl</kbd>+<kbd>+</kbd>.</li>
+  <li><strong>O que fica embaixo.</strong> O botão no canto cobre um pedaço do texto em algum momento da rolagem. Deixe um espaço no fim da página (um <code>padding-bottom</code> no <code>body</code>) para o último parágrafo não ficar escondido para sempre.</li>
+  <li><strong>Ordem do teclado.</strong> A posição na tela não muda a ordem do <kbd>Tab</kbd>: ele segue a ordem do HTML. Um botão "Voltar ao topo" deve vir no fim do código, perto de onde o leitor termina; um menu, no começo.</li>
+</ul>
+
+<hr>
+
+<h2>Qual posição usar?</h2>
+<p>O <code>fixed</code> é um dos valores de <code>position</code>. Compare com os vizinhos:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>Ocupa espaço no fluxo?</th><th>Medido a partir de</th><th>Rola com a página?</th><th>Use para</th></tr>
+<tr><td><code>static</code> (o padrão)</td><td>Sim</td><td>(não usa <code>top</code>/<code>left</code>)</td><td>Sim</td><td>Quase tudo</td></tr>
+<tr><td><code>relative</code></td><td>Sim (o lugar original fica reservado)</td><td>A própria posição original</td><td>Sim</td><td>Ajustes pequenos; servir de referência para um <code>absolute</code></td></tr>
+<tr><td><code>absolute</code></td><td>Não</td><td>O ancestral posicionado mais próximo</td><td>Sim</td><td>Selo num cartão, ícone num canto</td></tr>
+<tr><td><code>fixed</code></td><td>Não</td><td>A <strong>janela</strong></td><td><strong>Não</strong></td><td>Botão flutuante, barra que nunca sai da tela, aviso de cookies</td></tr>
+<tr><td><code>sticky</code></td><td>Sim</td><td>A janela (ou a caixa que rola), só depois de chegar no ponto</td><td>Até grudar; depois, não</td><td>Barra de topo, título de seção que acompanha a leitura</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>O <code>fixed</code> rola junto com a página: um ancestral tem <code>transform</code></strong>
+<p>A Ana pôs um <code>transform</code> (aula <a href="transform.html">transform</a>) na caixa que envolve a página toda, e o botão de ajuda sumiu:</p>
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o botão "Dúvidas?" não aparece no canto. Role o resultado até o fim: ele está lá embaixo, no fim da <code>div.pagina</code>, e rolou junto com o texto. Apague a regra <code>.pagina</code> inteira e role de novo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+  &lt;a class="ajuda" href="contato.html"&gt;Dúvidas?&lt;/a&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Bata no liquidificador 3 cenouras, 3 ovos e 1 xícara de óleo. Misture com 2 xícaras de açúcar e 2 de farinha.&lt;/p&gt;
+  &lt;h2&gt;Pão de queijo&lt;/h2&gt;
+  &lt;p&gt;Escalde o polvilho com leite e óleo quentes. Junte os ovos e o queijo, faça bolinhas e asse.&lt;/p&gt;
+  &lt;h2&gt;Brigadeiro&lt;/h2&gt;
+  &lt;p&gt;Leve ao fogo o leite condensado, o chocolate e a manteiga, mexendo até desgrudar da panela.&lt;/p&gt;
+  &lt;h2&gt;Bolo de fubá&lt;/h2&gt;
+  &lt;p&gt;Bata os ovos, o leite, o óleo, o açúcar e o fubá. Por último, o fermento. Asse por 40 minutos.&lt;/p&gt;
+  &lt;h2&gt;Cuscuz&lt;/h2&gt;
+  &lt;p&gt;Hidrate a flocão com água e sal, coloque na cuscuzeira e cozinhe no vapor por 10 minutos.&lt;/p&gt;
+  &lt;h2&gt;Pudim&lt;/h2&gt;
+  &lt;p&gt;Faça a calda com açúcar, bata o leite condensado, o leite e os ovos e asse em banho-maria.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+  transform: translateX(0);
+}
+
+.ajuda {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  background-color: seagreen;
+  color: white;
+  padding: 10px 16px;
+}
+</pre>
+</div>
+<p><strong>O que acontece:</strong> quando um ancestral (o pai, o avô…) tem <code>transform</code>, <code>filter</code> ou <code>perspective</code> com um valor diferente de <code>none</code>, ele vira a "janela" do elemento fixo. O <code>bottom: 16px</code> passa a ser medido a partir do fim da <code>div.pagina</code>, e não da janela; e, como a <code>div</code> rola com a página, o botão rola junto. No Chromium, antes de rolar, o botão ficou a 515&nbsp;px do topo do quadro, abaixo da parte visível; só aparece rolando até o fim. Nenhuma mensagem avisa: o <code>translateX(0)</code> nem move nada na tela.</p>
+<p><strong>Como achar:</strong> no F12, selecione o elemento fixo e suba pelos pais no painel de elementos, olhando os estilos de cada um em busca de <code>transform</code>, <code>filter</code> ou <code>perspective</code>.</p>
+<p><strong>Como consertar:</strong> tire o <code>transform</code> do ancestral, ou mova o elemento fixo para fora dele no HTML (por exemplo, para o fim do <code>&lt;body&gt;</code>).</p>
+</div>
+
+<div class="cenario">
+<strong>Erro de digitação no valor: <code>“fixd” is not a “position” value</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.ajuda {
+  position: fixd;
+  bottom: 16px;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> o botão no meio do texto, rolando junto com a página, como se não houvesse <code>position</code>. O navegador ignorou a declaração inteira, e o <code>bottom: 16px</code> sozinho não faz nada num elemento <code>static</code>. No F12, a declaração aparece riscada, com um ícone de aviso.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":2.13-2.16: error: CSS: “position”: “fixd” is not a “position” value.</pre>
+<p><strong>O que significa:</strong> "<code>fixd</code> não é um valor de <code>position</code>". Linha 2, colunas 13 a 16: o validador aponta a palavra errada.</p>
+<p><strong>Como consertar:</strong> <code>position: fixed;</code>, com o <code>e</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Número sem unidade: <code>only “0” can be a “unit”</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.ajuda {
+  position: fixed;
+  bottom: 16;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> o botão continua encostado à direita (o <code>right</code> vale), mas não fica embaixo: ele congela na altura onde estaria no fluxo, logo abaixo do título, como o aviso amarelo da seção 2, e fica ali parado enquanto o texto rola. O <code>bottom: 16</code> foi ignorado.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.11-3.12: error: CSS: “bottom”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<p><strong>O que significa:</strong> "só o <code>0</code> pode ficar sem unidade. Você precisa pôr uma unidade depois do número". Dezesseis o quê? Pixels, <code>rem</code>, porcentagem?</p>
+<p><strong>Como consertar:</strong> <code>bottom: 16px;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>A barra fixa com <code>width: 100%</code> passa da janela</strong>
+<p><strong>O que acontece:</strong> com <code>left: 0; width: 100%; padding: 12px;</code>, a barra tem a largura da janela <strong>mais</strong> 24&nbsp;px de <code>padding</code> (12 de cada lado). No Chromium, numa janela de 760&nbsp;px, a barra mediu 784&nbsp;px: os 24&nbsp;px a mais ficam para fora da borda direita, cortados, e um texto alinhado à direita aparece pela metade. O validador não reclama: o código é válido, só a conta não fecha.</p>
+<p><strong>Como consertar:</strong> troque o <code>width: 100%</code> por <code>right: 0</code>, ou use <code>box-sizing: border-box</code> (aula <a href="box-sizing.html">box-sizing</a>).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>position: fixed;</code></td><td>Prende o elemento à janela; ele sai do fluxo e não rola com a página</td></tr>
+<tr><td><code>top</code> / <code>bottom</code></td><td>Distância até a borda de cima / de baixo da janela</td></tr>
+<tr><td><code>left</code> / <code>right</code></td><td>Distância até a borda esquerda / direita da janela</td></tr>
+<tr><td><code>bottom: 16px; right: 16px;</code></td><td>Botão flutuante no canto de baixo, à direita</td></tr>
+<tr><td><code>top: 0; left: 0; right: 0;</code></td><td>Barra de topo de lado a lado</td></tr>
+<tr><td><code>body { padding-top: … }</code></td><td>Abre espaço para a barra de topo não cobrir o conteúdo</td></tr>
+<tr><td>Sem <code>top</code>/<code>bottom</code>/<code>left</code>/<code>right</code></td><td>Congela onde estaria no fluxo (evite)</td></tr>
+<tr><td>Ancestral com <code>transform</code>, <code>filter</code> ou <code>perspective</code></td><td>Vira a referência do elemento fixo, que passa a rolar junto</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O valor</h3>
+<p>Complete para o elemento ficar preso à janela:</p>
+<div class="ex-code">.ajuda { position: <input data-answer="fixed" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. O canto</h3>
+<p>Complete para o botão ficar no canto de <strong>cima</strong>, à direita:</p>
+<div class="ex-code">.carrinho { position: fixed; <input data-answer="top" aria-label="propriedade vertical">: 0; right: 0; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. De lado a lado</h3>
+<p>Complete para a barra encostar nas duas bordas laterais da janela:</p>
+<div class="ex-code">.topo { position: fixed; top: 0; left: 0; <input data-answer="right" aria-label="propriedade">: 0; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. A Ana pôs uma barra de topo com <code>position: fixed; top: 0;</code> e o título da página sumiu. Por quê?</p>
+<label><input type="radio" name="q4"> O <code>fixed</code> apaga o elemento seguinte</label>
+<label><input type="radio" name="q4"> A barra saiu do fluxo, o título subiu e ficou embaixo dela</label>
+<label><input type="radio" name="q4"> Faltou fechar o <code>&lt;header&gt;</code></label>
+<label><input type="radio" name="q4"> O <code>top: 0</code> precisa de unidade</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Um botão com <code>position: fixed; bottom: 16px;</code> rola junto com a página. O que provavelmente está acontecendo?</p>
+<label><input type="radio" name="q5"> O botão precisa de <code>z-index</code></label>
+<label><input type="radio" name="q5"> O navegador não suporta <code>fixed</code></label>
+<label><input type="radio" name="q5"> Um ancestral tem <code>transform</code> (ou <code>filter</code>), e virou a referência do botão</label>
+<label><input type="radio" name="q5"> O botão está antes do <code>&lt;h1&gt;</code> no HTML</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Qual destas é a diferença entre <code>fixed</code> e <code>absolute</code>?</p>
+<label><input type="radio" name="q6"> O <code>fixed</code> é medido a partir da janela e não rola; o <code>absolute</code> é medido a partir de um ancestral e rola com a página</label>
+<label><input type="radio" name="q6"> O <code>absolute</code> ocupa espaço no fluxo; o <code>fixed</code>, não</label>
+<label><input type="radio" name="q6"> Nenhuma: são nomes diferentes para a mesma coisa</label>
+<label><input type="radio" name="q6"> O <code>fixed</code> só funciona no topo da página</label>
+</div>
+
+<h3>Missão final: a barra de topo da Ana</h3>
+
+<div class="tryhtml" data-goal="css:.topo{position}=fixed,css:.topo{top}=0px,css:.topo{left}=0px,css:.topo{right}=0px,css:body{padding-top}=56px">
+<p class="try-task"><strong>Missão:</strong> transforme o <code>&lt;header class="topo"&gt;</code> numa barra fixa colada no topo da janela, de lado a lado (<code>top</code>, <code>left</code> e <code>right</code> iguais a <code>0</code>). Depois, ponha <code>padding-top: 56px</code> no <code>body</code> para o título "Bolos e doces" aparecer inteiro. Role o resultado para conferir.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;Receitas da Ana · Bolos · Doces · Salgados&lt;/header&gt;
+&lt;h1&gt;Bolos e doces&lt;/h1&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p&gt;Bata no liquidificador 3 cenouras, 3 ovos e 1 xícara de óleo. Misture com 2 xícaras de açúcar e 2 de farinha.&lt;/p&gt;
+&lt;h2&gt;Pão de queijo&lt;/h2&gt;
+&lt;p&gt;Escalde o polvilho com leite e óleo quentes. Junte os ovos e o queijo, faça bolinhas e asse.&lt;/p&gt;
+&lt;h2&gt;Brigadeiro&lt;/h2&gt;
+&lt;p&gt;Leve ao fogo o leite condensado, o chocolate e a manteiga, mexendo até desgrudar da panela.&lt;/p&gt;
+&lt;h2&gt;Bolo de fubá&lt;/h2&gt;
+&lt;p&gt;Bata os ovos, o leite, o óleo, o açúcar e o fubá. Por último, o fermento. Asse por 40 minutos.&lt;/p&gt;
+&lt;h2&gt;Cuscuz&lt;/h2&gt;
+&lt;p&gt;Hidrate a flocão com água e sal, coloque na cuscuzeira e cozinhe no vapor por 10 minutos.&lt;/p&gt;
+&lt;h2&gt;Pudim&lt;/h2&gt;
+&lt;p&gt;Faça a calda com açúcar, bata o leite condensado, o leite e os ovos e asse em banho-maria.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.topo {
+  background-color: darkslateblue;
+  color: white;
+  padding: 16px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  padding-top: 56px;
+}
+
+.topo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: darkslateblue;
+  color: white;
+  padding: 16px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>position: fixed</code> prende o elemento à <strong>janela</strong> (no editor, ao quadro): a página rola por baixo e ele fica parado.</li>
+  <li><code>top</code>, <code>right</code>, <code>bottom</code> e <code>left</code> medem a distância até as bordas da janela. Use uma vertical e uma horizontal; sem nenhuma, o elemento congela onde estaria no fluxo.</li>
+  <li>O elemento fixo <strong>sai do fluxo</strong>: o espaço dele some e o conteúdo passa por baixo. Abra espaço com <code>padding-top</code> (ou <code>padding-bottom</code>) no <code>body</code>.</li>
+  <li>Ele encolhe para o tamanho do conteúdo. Barra de lado a lado: <code>left: 0; right: 0;</code>.</li>
+  <li>Um ancestral com <code>transform</code>, <code>filter</code> ou <code>perspective</code> estraga o <code>fixed</code>: o elemento passa a rolar com esse ancestral.</li>
+  <li>Validador: <code>“fixd” is not a “position” value</code> (valor errado) e <code>only “0” can be a “unit”</code> (número sem unidade). Para barras de topo, conheça também o <a href="position-sticky.html">position: sticky</a>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
