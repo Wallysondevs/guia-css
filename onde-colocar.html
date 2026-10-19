@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Onde Colocar — atributo style, elemento style e arquivo com link | Guia CSS</title>
+<meta name="description" content="Os três jeitos de pôr CSS numa página: o atributo style, o elemento style no head e o arquivo separado chamado pelo link rel=stylesheet. Quando usar cada um, por que o arquivo separado é o melhor, e os erros reais: href errado, link sem rel, style no body e tags HTML dentro do arquivo .css.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Onde Colocar</span></h1>
+
+<p class="intro">Você já sabe o que é CSS. Falta saber <strong>onde</strong> escrevê-lo para o navegador encontrar. São três lugares possíveis: dentro da própria tag, num bloco <code>&lt;style&gt;</code> no começo da página ou num arquivo separado, chamado com <code>&lt;link&gt;</code>. Nesta aula você vai usar os três, ver o alcance de cada um e entender por que o arquivo separado é o jeito que você vai usar quase sempre.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O atributo <code>style</code>: CSS dentro de uma tag, para um elemento só.</li>
+  <li>O elemento <code>&lt;style&gt;</code>: CSS no <code>&lt;head&gt;</code>, para a página inteira.</li>
+  <li>O arquivo <code>.css</code> com <code>&lt;link rel="stylesheet"&gt;</code>: um CSS para o site inteiro.</li>
+  <li>Qual dos três usar, e por quê.</li>
+  <li>Os erros reais: o nome do arquivo errado, o <code>&lt;link&gt;</code> sem <code>rel</code>, o <code>&lt;style&gt;</code> fora do lugar e as tags HTML dentro do arquivo de CSS.</li>
+</ul>
+</div>
+
+<hr>
+
+<h2>A ideia: o bilhete, o quadro de avisos e o manual</h2>
+<p>Imagine que a Ana tem uma padaria e quer passar instruções para a equipe:</p>
+<ul>
+  <li>um <strong>bilhete colado num bolo</strong>: "este aqui vai com cobertura extra". Vale só para aquele bolo;</li>
+  <li>um <strong>aviso no quadro da cozinha</strong>: "hoje, todos os bolos com cobertura de chocolate". Vale para aquela cozinha;</li>
+  <li>o <strong>manual da padaria</strong>, uma cópia em cada loja: "nossos bolos sempre levam cobertura". Vale para todas as lojas, e mudar o manual muda todas de uma vez.</li>
+</ul>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Na padaria</th><th>No CSS</th><th>Vale para</th></tr>
+<tr><td>Bilhete no bolo</td><td>Atributo <code>style="…"</code></td><td>Um elemento</td></tr>
+<tr><td>Aviso no quadro da cozinha</td><td>Elemento <code>&lt;style&gt;</code></td><td>Uma página</td></tr>
+<tr><td>Manual em todas as lojas</td><td>Arquivo <code>style.css</code> + <code>&lt;link&gt;</code></td><td>Todas as páginas que o chamam</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. No atributo <code>style</code> (dentro da tag)</h2>
+<p>Todo elemento HTML aceita o atributo <code>style</code>. Dentro das aspas vão as instruções de CSS, só para aquele elemento:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;h1 style="color: firebrick;"&gt;Receitas da Ana&lt;/h1&gt;
+&lt;h1&gt;Receitas do Beto&lt;/h1&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>style="…"</dt><dd>O atributo de estilo. É um atributo como <code>href</code> ou <code>alt</code>: vai dentro da tag de abertura, com o valor entre aspas.</dd>
+  <dt>color: firebrick;</dt><dd>Uma instrução de CSS: a propriedade <code>color</code> ("cor"), os dois-pontos, o valor <code>firebrick</code> e o ponto e vírgula. Repare que <strong>não tem seletor nem chaves</strong>: o "quem" já é o próprio elemento.</dd>
+</dl>
+
+<p>No resultado, só o primeiro título ficou vermelho-escuro. O segundo, sem o atributo, continua preto. Para mais de uma instrução, separe com <code>;</code> dentro das mesmas aspas:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;p style="color: navy; font-size: 24px; text-align: center;"&gt;Promoção de bolo de cenoura!&lt;/p&gt;
+</pre>
+
+<p>Fica azul-marinho, maior e centralizado. E já dá para sentir o problema: a linha cresce, o HTML fica difícil de ler, e se houver dez promoções no site, são dez cópias dessa linha.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> mude a cor no <code>style</code> do primeiro parágrafo. Depois tente deixar o segundo parágrafo igual ao primeiro: você vai ter de copiar o atributo inteiro.</p>
+<pre class="script" data-file="index.html">&lt;p style="color: darkgreen; font-size: 20px;"&gt;Bolo de cenoura: R$ 30&lt;/p&gt;
+&lt;p&gt;Pão de queijo: R$ 2&lt;/p&gt;
+</pre>
+</div>
+
+<hr>
+
+<h2>2. No elemento <code>&lt;style&gt;</code> (no <code>&lt;head&gt;</code>)</h2>
+<p>O elemento <code>&lt;style&gt;</code> guarda regras de CSS completas, com seletor e chaves, e vale para a <strong>página inteira</strong>. O lugar dele é o <code>&lt;head&gt;</code>:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+&lt;meta charset="utf-8"&gt;
+&lt;title&gt;Receitas da Ana&lt;/title&gt;
+&lt;style&gt;
+  h1 {
+    color: firebrick;
+  }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;h1&gt;Receitas do Beto&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>&lt;style&gt;</dt><dd>Abre o bloco de CSS. Tudo até o <code>&lt;/style&gt;</code> é lido como CSS, e não como HTML.</dd>
+  <dt>h1 { color: firebrick; }</dt><dd>Uma regra completa: o seletor <code>h1</code> diz "todos os <code>&lt;h1&gt;</code> desta página".</dd>
+  <dt>&lt;/style&gt;</dt><dd>Fecha o bloco.</dd>
+</dl>
+
+<p>Agora os <strong>dois</strong> títulos ficaram vermelho-escuros, com uma regra só. Bem melhor que o atributo. Mas a regra mora <strong>dentro desta página</strong>: a página <code>sobre.html</code> não sabe que ela existe, e teria de ter a sua própria cópia.</p>
+
+<hr>
+
+<h2>3. Num arquivo separado, com <code>&lt;link&gt;</code></h2>
+<p>O jeito recomendado: as regras vão para um arquivo só de CSS, com a extensão <code>.css</code>, e cada página o chama com um <code>&lt;link&gt;</code> no <code>&lt;head&gt;</code>. Na pasta do site da Ana:</p>
+
+<pre class="term" data-cwd="~/site">$ ls
+index.html  sobre.html  style.css</pre>
+
+<pre class="file" data-file="index.html">&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+&lt;meta charset="utf-8"&gt;
+&lt;title&gt;Receitas da Ana&lt;/title&gt;
+&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<pre class="file" data-file="style.css">h1 {
+  color: firebrick;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>&lt;link</dt><dd>O elemento que liga a página a outro arquivo. Não tem tag de fechamento.</dd>
+  <dt>rel="stylesheet"</dt><dd>A <strong>relação</strong> com o arquivo: <em>stylesheet</em> = "folha de estilo". É o <code>rel</code> que diz ao navegador "aplique este arquivo como CSS". Sem ele, o arquivo é ignorado.</dd>
+  <dt>href="style.css"</dt><dd>O <strong>endereço</strong> do arquivo, como no <code>&lt;a href&gt;</code>. Aqui, o arquivo <code>style.css</code> na mesma pasta.</dd>
+  <dt>style.css</dt><dd>Só regras de CSS. <strong>Sem</strong> <code>&lt;style&gt;</code>, sem <code>&lt;html&gt;</code>: é texto puro com CSS.</dd>
+</dl>
+
+<p>O <code>sobre.html</code> leva o mesmo <code>&lt;link&gt;</code> no <code>&lt;head&gt;</code>. As duas páginas usam o mesmo arquivo. Mudou o <code>style.css</code>, mudaram as duas. Com 50 páginas, é a mesma coisa: um arquivo, um lugar para mexer.</p>
+<p>Nas caixas "Experimente" deste guia, cada aba é um arquivo da mesma pasta. A caixa abaixo tem duas páginas e um CSS:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> na aba <code>style.css</code>, troque <code>firebrick</code> por <code>darkgreen</code>. Depois clique no link "Sobre a Ana" no resultado: a outra página também mudou, porque as duas chamam o mesmo arquivo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;&lt;a href="sobre.html"&gt;Sobre a Ana&lt;/a&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="sobre.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Sobre a Ana&lt;/h1&gt;
+&lt;p&gt;&lt;a href="index.html"&gt;Voltar ao início&lt;/a&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: firebrick;
+}
+</pre>
+</div>
+
+<div class="note">
+<strong>Nas abas, sem <code>&lt;head&gt;</code>?</strong>
+<p>As abas <code>index.html</code> das caixas começam direto no <code>&lt;link&gt;</code>, sem <code>&lt;!DOCTYPE&gt;</code>, <code>&lt;html&gt;</code> e <code>&lt;head&gt;</code>, para o código ficar curto. O navegador põe o <code>&lt;link&gt;</code> no <code>&lt;head&gt;</code> sozinho. No seu site de verdade, escreva a página completa, como no <code>index.html</code> acima.</p>
+</div>
+
+<h3>Por que o arquivo separado é o melhor</h3>
+<ul>
+  <li><strong>Um lugar só:</strong> o visual do site inteiro fica num arquivo. Trocar a cor da marca é editar uma linha.</li>
+  <li><strong>HTML limpo:</strong> o HTML fica só com a estrutura (aula <a href="html-e-css.html">HTML e CSS</a>), mais fácil de ler.</li>
+  <li><strong>Mais rápido:</strong> o navegador baixa o <code>style.css</code> uma vez e guarda uma cópia (o <strong>cache</strong>). Nas outras páginas do site, ele reaproveita a cópia em vez de baixar de novo. O CSS no <code>&lt;style&gt;</code>, ao contrário, vem repetido dentro de cada página.</li>
+  <li><strong>Trabalho em equipe:</strong> uma pessoa mexe no HTML, outra no CSS, sem pisar uma no arquivo da outra.</li>
+</ul>
+
+<hr>
+
+<h2>4. Quem vence quando os três falam do mesmo elemento</h2>
+<p>Você pode usar mais de um jeito na mesma página. Quando eles discordam, o atributo <code>style</code> ganha das regras do <code>&lt;style&gt;</code> e do arquivo:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  h1 {
+    color: navy;
+  }
+&lt;/style&gt;
+&lt;h1 style="color: firebrick;"&gt;Receitas da Ana&lt;/h1&gt;
+&lt;h1&gt;Receitas do Beto&lt;/h1&gt;
+</pre>
+
+<p>O primeiro título fica vermelho-escuro (venceu o atributo); o segundo, sem atributo, fica azul-marinho (vale a regra do <code>&lt;style&gt;</code>). Entre o <code>&lt;style&gt;</code> e o arquivo, quem vem <strong>depois</strong> no código vence. Por que é assim, e todas as regras desse "desempate", é o assunto de <a href="cascata.html">A Cascata</a> e <a href="especificidade.html">Especificidade</a>.</p>
+<p>Esse poder do atributo <code>style</code> é justamente um problema: uma cor escondida numa tag ganha do seu arquivo de CSS, e você passa minutos procurando por que a mudança no <code>style.css</code> "não funciona".</p>
+
+<hr>
+
+<h2>5. Qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Jeito</th><th>Alcance</th><th>Use quando</th><th>Evite porque</th></tr>
+<tr><td><strong>Arquivo <code>.css</code> + <code>&lt;link&gt;</code></strong></td><td>Todas as páginas que o chamam</td><td><strong>Quase sempre.</strong> É o padrão deste guia e de qualquer site de verdade.</td><td>(nada: é o jeito certo)</td></tr>
+<tr><td><code>&lt;style&gt;</code> no <code>&lt;head&gt;</code></td><td>Uma página</td><td>Uma página única e pequena (um teste, um e-mail de aviso); um estilo que só aquela página tem</td><td>Cada página precisa da sua cópia; o navegador não reaproveita</td></tr>
+<tr><td>Atributo <code>style</code></td><td>Um elemento</td><td>Testes rápidos; valores que um programa escreve no HTML (como a largura de uma barra de progresso)</td><td>Repete em cada tag, mistura HTML com CSS e vence o seu arquivo de CSS sem você perceber</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>O nome do arquivo no <code>href</code> está errado: nada muda</strong>
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente (erro de propósito):</strong> o arquivo se chama <code>style.css</code>, mas o <code>href</code> pede <code>estilo.css</code>. Repare no console embaixo do resultado e conserte o <code>href</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="estilo.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: firebrick;
+}
+</pre>
+</div>
+<p><strong>O que você vê:</strong> o título preto, como se o CSS não existisse. O navegador procurou <code>estilo.css</code>, não achou e seguiu em frente sem CSS. Não aparece nada na página; o editor do guia avisa no console: <code>Não foi possível carregar "estilo.css" (&lt;link&gt;). Confira o nome e o caminho do arquivo.</code> Num site de verdade, o aviso aparece no console do F12 (aula <a href="devtools.html">Inspecionando com o F12</a>).</p>
+<p><strong>O que o validador diz:</strong> nada. Ele confere se o HTML está bem escrito, e não se o arquivo existe.</p>
+<p><strong>Como consertar:</strong> o <code>href</code> tem de ter o nome <strong>exato</strong> do arquivo, com as mesmas maiúsculas e minúsculas (<code>Style.css</code> é outro arquivo num servidor de verdade) e o caminho certo, se ele estiver em outra pasta (<code>css/style.css</code>). Organizar o CSS em pastas: aula <a href="organizar-arquivos.html">Organizando os Arquivos de CSS</a>.</p>
+</div>
+
+<div class="cenario">
+<strong>Esqueceu o <code>rel</code>: <code>Element “link” is missing one or more of the following attributes</code></strong>
+<pre class="file" data-file="semrel.html">&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+&lt;meta charset="utf-8"&gt;
+&lt;title&gt;Receitas&lt;/title&gt;
+&lt;link href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+<p><strong>O que você vê:</strong> o título preto. O arquivo existe e o <code>href</code> está certo, mas sem <code>rel="stylesheet"</code> o navegador não sabe que aquilo é uma folha de estilo e não a aplica.</p>
+<pre class="term" data-cwd="~/site">$ vnu semrel.html
+"file:/home/ana/site/semrel.html":6.1-6.23: error: Element “link” is missing one or more of the following attributes: “itemprop”, “property”, “rel”.</pre>
+<p><strong>O que significa:</strong> "falta ao elemento <code>link</code> um destes atributos: <code>itemprop</code>, <code>property</code>, <code>rel</code>". Os dois primeiros são de outros usos do <code>&lt;link&gt;</code>; para CSS, o que falta é o <code>rel</code>.</p>
+<p><strong>Como consertar:</strong> <code>&lt;link rel="stylesheet" href="style.css"&gt;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Tags HTML dentro do arquivo <code>.css</code>: <code>Style sheets should not include HTML syntax</code></strong>
+<p>A Ana copiou o bloco do <code>&lt;style&gt;</code> para o arquivo, com as tags junto:</p>
+<pre class="term" data-cwd="~/site">$ cat style.css
+&lt;style&gt;
+h1 {
+  color: firebrick;
+}
+
+p {
+  color: navy;
+}
+&lt;/style&gt;
+$ vnu --css style.css
+"file:/home/ana/site/style.css":1.1-1.7: error: CSS: Parse Error. Style sheets should not include HTML syntax.
+"file:/home/ana/site/style.css":11.1-11.8: error: Stray end tag “style”.</pre>
+<p><strong>O que o navegador faz</strong> (conferido no Chromium): o <code>&lt;style&gt;</code> da primeira linha "gruda" no seletor da regra seguinte, que vira <code>&lt;style&gt; h1</code>, um seletor que não existe. A regra inteira do <code>h1</code> é jogada fora, e o título fica preto. A regra do <code>p</code>, depois dela, funciona: o parágrafo fica azul-marinho. O resultado é o pior possível: <strong>metade</strong> do CSS funciona, e parece que o problema está no <code>h1</code>.</p>
+<p><strong>O que significa:</strong> "erro de leitura: folhas de estilo não devem ter sintaxe de HTML" (na linha 1) e "tag de fechamento <code>style</code> perdida". A segunda mensagem aponta a linha 11, que nem existe no arquivo: depois do primeiro erro, o validador se perde. Conserte o primeiro erro e rode de novo.</p>
+<p><strong>Como consertar:</strong> apague o <code>&lt;style&gt;</code> e o <code>&lt;/style&gt;</code>. O arquivo <code>.css</code> só tem CSS.</p>
+</div>
+
+<div class="cenario">
+<strong><code>&lt;style&gt;</code> no <code>&lt;body&gt;</code>: <code>not allowed outside an “@scope” rule</code></strong>
+<pre class="file" data-file="stylebody.html">&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+&lt;meta charset="utf-8"&gt;
+&lt;title&gt;Receitas&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;style&gt;
+  h1 { color: tomato; }
+&lt;/style&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+<p><strong>O que o navegador faz:</strong> aplica o estilo mesmo assim (o título fica vermelho). Por isso o erro passa despercebido.</p>
+<pre class="term" data-cwd="~/site">$ vnu stylebody.html
+"file:/home/ana/site/stylebody.html":9.3-9.4: error: Style rule “h1” not allowed outside an “@scope” rule in a “style” element in “body”.</pre>
+<p><strong>O que significa:</strong> "a regra <code>h1</code> não é permitida fora de uma regra <code>@scope</code> num <code>style</code> dentro do <code>body</code>". Em português: um <code>&lt;style&gt;</code> no <code>&lt;body&gt;</code> só é válido com um recurso avançado, o <code>@scope</code> (aula <a href="scope.html">Escopo</a>). Para o CSS comum, o lugar é o <code>&lt;head&gt;</code>.</p>
+<p><strong>Como consertar:</strong> mova o <code>&lt;style&gt;</code> para dentro do <code>&lt;head&gt;</code>, ou, melhor ainda, passe as regras para o <code>style.css</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Onde</th><th>Alcance</th></tr>
+<tr><td><code>&lt;h1 style="color: navy;"&gt;</code></td><td>Na tag de abertura de qualquer elemento</td><td>Só aquele elemento</td></tr>
+<tr><td><code>&lt;style&gt; h1 { color: navy; } &lt;/style&gt;</code></td><td>No <code>&lt;head&gt;</code></td><td>A página</td></tr>
+<tr><td><code>&lt;link rel="stylesheet" href="style.css"&gt;</code></td><td>No <code>&lt;head&gt;</code> de cada página</td><td>Todas as páginas que o têm</td></tr>
+<tr><td><code>style.css</code></td><td>Um arquivo na pasta do site</td><td>Só CSS, sem tags HTML</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A relação do link</h3>
+<p>Complete o <code>&lt;link&gt;</code> para o navegador aplicar o arquivo como CSS:</p>
+<div class="ex-code">&lt;link rel="<input data-answer="stylesheet" aria-label="valor do rel">" href="style.css"&gt;</div>
+</div>
+
+<div class="exercise">
+<h3>2. O atributo de estilo</h3>
+<p>Complete o atributo que deixa só este parágrafo azul-marinho:</p>
+<div class="ex-code">&lt;p <input data-answer="style" aria-label="atributo">="color: navy;"&gt;Promoção!&lt;/p&gt;</div>
+</div>
+
+<div class="exercise">
+<h3>3. A extensão</h3>
+<p>Complete o nome do arquivo de CSS:</p>
+<div class="ex-code">style.<input data-answer="css" aria-label="extensão"></div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. A Ana tem um site com 20 páginas e quer o mesmo visual em todas. Onde ela deve escrever o CSS?</p>
+<label><input type="radio" name="q4"> No atributo <code>style</code> de cada elemento</label>
+<label><input type="radio" name="q4"> Num <code>&lt;style&gt;</code> em cada página</label>
+<label><input type="radio" name="q4"> Num arquivo <code>style.css</code>, chamado com <code>&lt;link&gt;</code> em cada página</label>
+<label><input type="radio" name="q4"> No validador</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. O <code>style.css</code> diz <code>h1 { color: navy; }</code>, mas um título tem <code>style="color: firebrick;"</code>. De que cor ele fica?</p>
+<label><input type="radio" name="q5"> Azul-marinho, porque o arquivo vale para o site todo</label>
+<label><input type="radio" name="q5"> Vermelho-escuro, porque o atributo <code>style</code> vence</label>
+<label><input type="radio" name="q5"> Preto, porque as duas regras se anulam</label>
+<label><input type="radio" name="q5"> Roxo, a mistura das duas</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. O CSS do arquivo não funciona, e o <code>&lt;link&gt;</code> é <code>&lt;link href="style.css"&gt;</code>. O que falta?</p>
+<label><input type="radio" name="q6"> <code>rel="stylesheet"</code></label>
+<label><input type="radio" name="q6"> <code>type="css"</code></label>
+<label><input type="radio" name="q6"> Um <code>&lt;/link&gt;</code></label>
+<label><input type="radio" name="q6"> O <code>&lt;style&gt;</code> dentro do arquivo</label>
+</div>
+
+<h3>Missão final: tirar o CSS das tags</h3>
+
+<div class="tryhtml" data-goal="nsel:[style]=0,css:h1{color}=rgb(178, 34, 34),css:p{color}=rgb(105, 105, 105),attr:link[rel]=stylesheet">
+<p class="try-task"><strong>Missão:</strong> a Ana escreveu o CSS nos atributos <code>style</code>. Passe as duas instruções para a aba <code>style.css</code> (uma regra para o <code>h1</code>, outra para o <code>p</code>) e apague os atributos <code>style</code> do HTML. O resultado tem de continuar igual: título <code>firebrick</code> e parágrafo <code>dimgray</code> ("cinza-escuro").</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1 style="color: firebrick;"&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p style="color: dimgray;"&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: firebrick;
+}
+
+p {
+  color: dimgray;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Três lugares para o CSS: o atributo <code>style</code> (um elemento), o elemento <code>&lt;style&gt;</code> no <code>&lt;head&gt;</code> (uma página) e o arquivo <code>.css</code> com <code>&lt;link rel="stylesheet" href="…"&gt;</code> (o site inteiro).</li>
+  <li>Use o <strong>arquivo separado</strong>: um lugar só para mexer, HTML limpo e o navegador reaproveita a cópia em todas as páginas.</li>
+  <li>No atributo <code>style</code> não há seletor nem chaves. Ele vence as regras do <code>&lt;style&gt;</code> e do arquivo, e é por isso que atrapalha.</li>
+  <li>Nome errado no <code>href</code>: nada muda e o validador não avisa; o console mostra o arquivo que não carregou.</li>
+  <li>Sem <code>rel="stylesheet"</code>, o arquivo é ignorado. Tags HTML dentro do <code>.css</code> derrubam a primeira regra. <code>&lt;style&gt;</code> no <code>&lt;body&gt;</code> funciona, mas é inválido.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
