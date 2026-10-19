@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS overflow-wrap e text-overflow — texto que não cabe na caixa | Guia CSS</title>
+<meta name="description" content="Texto que não cabe, para quem nunca escreveu CSS: palavras e endereços compridos que vazam da caixa, overflow-wrap (break-word e anywhere), word-break, hyphens, white-space: nowrap, as reticências do text-overflow: ellipsis (e as três regras que ele exige), cortar em duas linhas com -webkit-line-clamp e os erros comuns.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Texto que Não Cabe</span></h1>
+
+<p class="intro">O navegador quebra as linhas nos espaços, e quase sempre isso basta. Mas um endereço de site comprido, um e-mail ou uma palavra enorme não têm espaço no meio, e saem pela borda da caixa, atropelando o resto da página. No outro extremo, às vezes você <strong>quer</strong> uma linha só, cortada com "…" quando não couber. Nesta aula você vai resolver os dois casos: quebrar o que é comprido demais (<code>overflow-wrap</code>) e cortar com reticências (<code>text-overflow</code>).</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Por que uma palavra sem espaços vaza da caixa.</li>
+  <li><code>overflow-wrap: break-word</code> e <code>anywhere</code>: quebrar só quando precisa.</li>
+  <li><code>word-break: break-all</code> e <code>hyphens: auto</code>, e quando usar cada um.</li>
+  <li><code>white-space: nowrap</code>: proibir a quebra de linha.</li>
+  <li>As reticências do <code>text-overflow: ellipsis</code>, e as <strong>três</strong> regras que ele precisa.</li>
+  <li>Cortar um resumo em duas linhas com <code>-webkit-line-clamp</code>.</li>
+  <li>Os erros comuns: <code>overflow-wrap: break-all</code>, <code>text-overflow</code> sozinho (com as mensagens do validador W3C).</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. Os valores calculados foram conferidos no Chromium; as mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a fita métrica na gaveta</h2>
+<p>Você guarda objetos numa gaveta estreita. Os pequenos cabem, um ao lado do outro, e quando a fileira enche você começa outra fileira. Mas uma fita métrica esticada, mais comprida que a gaveta, não cabe de jeito nenhum: ou ela fica para fora, ou você a <strong>dobra</strong>. Outra opção é <strong>cortar</strong> o que sobra e deixar um aviso de que tem mais.</p>
+<p>No CSS, a gaveta é a caixa, as fileiras são as linhas e a fita é uma palavra sem espaços. <code>overflow-wrap</code> dobra a fita; <code>text-overflow</code> corta e põe o aviso "…".</p>
+
+<hr>
+
+<h2>1. O problema: a palavra que vaza</h2>
+
+<pre class="file" data-file="exemplo · o problema" data-resultado>&lt;style&gt;
+  .cartao {
+    width: 160px;
+    border: 2px solid navy;
+    padding: 4px;
+    background-color: aliceblue;
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;Site: https://receitasdaana.example/bolo-de-cenoura-com-cobertura&lt;/div&gt;
+</pre>
+
+<p>O endereço saiu pela borda direita do cartão. O navegador só quebra a linha em lugares "permitidos": espaços e alguns sinais, como o hífen. No Chromium, ele quebrou depois de "bolo-" e de "com-", mas o pedaço <code>https://receitasdaana.example/bolo-</code> não tem nenhum lugar permitido e é mais largo que o cartão. Por padrão, o navegador prefere deixar vazar a cortar uma palavra.</p>
+
+<hr>
+
+<h2>2. <code>overflow-wrap</code>: quebre só quando precisar</h2>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .cartao {
+    width: 160px;
+    border: 2px solid navy;
+    padding: 4px;
+    background-color: aliceblue;
+    overflow-wrap: break-word;
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;Site: https://receitasdaana.example/bolo-de-cenoura-com-cobertura&lt;/div&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>overflow-wrap</dt><dd>A propriedade: "quebra quando transborda". Ela diz o que fazer com uma palavra que não cabe sozinha numa linha.</dd>
+  <dt>break-word</dt><dd>O valor: "quebre a palavra". O navegador primeiro tenta os lugares normais; só quando um pedaço ainda não cabe, ele o corta onde for preciso, no fim da linha.</dd>
+</dl>
+
+<p>Agora o endereço ficou dentro do cartão, cortado em "receitasdaana.exa" / "mple/…". As palavras normais da frase continuam inteiras: só o que não cabia foi quebrado. O valor inicial é <code>normal</code> (deixa vazar).</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor de <code>overflow-wrap</code></th><th>O que faz</th></tr>
+<tr><td><code>normal</code></td><td>Nunca corta uma palavra; ela vaza (o valor inicial)</td></tr>
+<tr><td><code>break-word</code></td><td>Corta só a palavra que não cabe numa linha inteira</td></tr>
+<tr><td><code>anywhere</code></td><td>Igual na caixa comum. A diferença aparece quando a caixa pode <strong>encolher</strong> até o tamanho do conteúdo (células de tabela, itens do Flexbox): com <code>anywhere</code>, ela pode encolher cortando as palavras; com <code>break-word</code>, a palavra mais longa decide a largura mínima</td></tr>
+</table>
+</div>
+
+<div class="tip">
+<strong>Uma regra para o site todo</strong>
+<p>Muita gente põe <code>body { overflow-wrap: break-word; }</code> no começo do CSS. Como a propriedade é <strong>herdada</strong>, todo texto do site fica protegido contra endereços e e-mails compridos, e as palavras normais não mudam.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:.contato{overflow-wrap}=break-word">
+<p class="try-task"><strong>Missão:</strong> o e-mail da lojinha vaza do cartão. Faça a <code>.contato</code> quebrar só o que não cabe, com <code>overflow-wrap</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="contato"&gt;
+  &lt;h2&gt;Fale com a Ana&lt;/h2&gt;
+  &lt;p&gt;encomendas.bolos.da.ana@lojinha-da-ana.example&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.contato {
+  width: 180px;
+  border: 2px solid tomato;
+  padding: 8px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.contato {
+  width: 180px;
+  border: 2px solid tomato;
+  padding: 8px;
+  overflow-wrap: break-word;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Outros jeitos de quebrar: <code>word-break</code> e <code>hyphens</code></h2>
+
+<h3><code>word-break: break-all</code>: corta em qualquer letra</h3>
+<p>O <code>word-break</code> ("quebra de palavra") com <code>break-all</code> não espera a palavra não caber: ele corta <strong>qualquer</strong> palavra onde a linha acabar, para encher cada linha até o fim.</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .cartao {
+    width: 160px;
+    border: 2px solid navy;
+    padding: 4px;
+    background-color: aliceblue;
+    word-break: break-all;
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;Bolo de cenoura com cobertura de chocolate&lt;/div&gt;
+</pre>
+
+<p>Repare: "cobertura" virou "co" / "bertura", embora coubesse inteira na linha de baixo. Para texto em português, isso atrapalha a leitura. O <code>break-all</code> serve para trechos que não são palavras, como um código ou um número de pedido muito longo.</p>
+
+<h3><code>hyphens: auto</code>: quebra com hífen, nas sílabas</h3>
+<p>O <code>hyphens: auto</code> pede ao navegador para dividir palavras longas nas sílabas, com hífen, como num livro. Ele precisa saber a <strong>língua</strong> do texto: o <code>lang="pt-BR"</code> da página (ou do elemento) é obrigatório.</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .cartao {
+    width: 160px;
+    border: 2px solid navy;
+    padding: 4px;
+    background-color: aliceblue;
+    hyphens: auto;
+  }
+&lt;/style&gt;
+&lt;div class="cartao" lang="pt-BR"&gt;Pneumoultramicroscopicossilicovulcanoconiótico é uma palavra extraordinariamente comprida&lt;/div&gt;
+</pre>
+
+<div class="note">
+<strong>O hífen depende do navegador</strong>
+<p>Pelos dados do MDN, Chrome (desde a versão 87), Firefox e Safari sabem hifenizar português. Mas a divisão usa um <strong>dicionário de sílabas</strong> do navegador, e nem toda instalação o tem: no Chromium do laboratório do guia, sem esse dicionário, o exemplo acima não ganhou hífen nenhum, e a palavra gigante vazou do cartão. Se o seu navegador tiver o dicionário, você vê a palavra dividida com hífens. Por isso, não conte só com o <code>hyphens</code>: junte-o com <code>overflow-wrap: break-word</code>, que funciona sempre.</p>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Qual usar</th></tr>
+<tr><td>Endereços, e-mails, palavras gigantes no meio do texto</td><td><code>overflow-wrap: break-word</code> (de preferência no <code>body</code>)</td></tr>
+<tr><td>Células de tabela ou itens de Flexbox que não encolhem</td><td><code>overflow-wrap: anywhere</code></td></tr>
+<tr><td>Código, número de pedido, sequência sem sentido</td><td><code>word-break: break-all</code></td></tr>
+<tr><td>Colunas estreitas de texto corrido, com cara de livro</td><td><code>hyphens: auto</code> + <code>lang</code>, com <code>overflow-wrap</code> de reserva</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>4. O contrário: uma linha só, com reticências</h2>
+<p>Num cartão de produto, a Ana quer o nome numa linha só, cortado com "…" se for comprido. São <strong>quatro</strong> ingredientes, e todos são necessários:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .nome {
+    width: 160px;
+    border: 2px solid navy;
+    padding: 4px;
+    background-color: aliceblue;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+&lt;/style&gt;
+&lt;div class="nome"&gt;Bolo de cenoura com cobertura de chocolate&lt;/div&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>width: 160px</dt><dd>Uma largura limitada. Num elemento de bloco, a largura já vem do pai; o que não pode é uma caixa que cresce junto com o texto.</dd>
+  <dt>white-space: nowrap</dt><dd>"Espaço em branco: sem quebra". O texto fica numa linha só, mesmo que não caiba.</dd>
+  <dt>overflow: hidden</dt><dd>"Transbordamento: escondido". O que sai da caixa não aparece (aula <a href="overflow.html">O que Transborda</a>).</dd>
+  <dt>text-overflow: ellipsis</dt><dd>"Transbordamento do texto: reticências". No lugar do corte seco, o navegador mostra "…".</dd>
+</dl>
+
+<p>O resultado: "Bolo de cenoura com …". Tire qualquer um dos ingredientes e as reticências somem (veja <a href="#errado">Quando dá errado</a>).</p>
+
+<div class="warning">
+<strong>O que fica escondido</strong>
+<p>O texto cortado continua no HTML (leitores de tela e buscadores leem tudo), mas quem enxerga não tem como ver o resto. Não corte informação importante, como o preço. Se o nome completo for útil, mostre-o na página do produto, ou no atributo <code>title</code> (a dica que aparece ao parar o mouse).</p>
+</div>
+
+<h3>Cortar em duas ou três linhas: <code>-webkit-line-clamp</code></h3>
+<p>Para um resumo de receita com no máximo duas linhas, e "…" no fim da segunda, existe o <code>line-clamp</code> ("grampo de linhas"). Hoje ele funciona em todos os navegadores atuais, mas só com o prefixo <code>-webkit-</code> e mais duas declarações antigas que vêm junto:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .resumo {
+    width: 200px;
+    border: 2px solid navy;
+    background-color: aliceblue;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+&lt;/style&gt;
+&lt;p class="resumo"&gt;Bata no liquidificador as cenouras, os ovos e o óleo. Despeje numa tigela e junte o açúcar.&lt;/p&gt;
+</pre>
+
+<div class="note">
+<strong>Por que com <code>-webkit-</code>?</strong>
+<p>Este é um dos raros casos em que o prefixo é o jeito certo hoje. A versão sem prefixo, <code>line-clamp: 2</code>, ainda está em teste nos navegadores (dados do MDN); no Chromium 155 do laboratório, ela não funciona. As quatro linhas acima, juntas, funcionam no Chrome, Edge, Firefox e Safari. Evite pôr <code>padding</code> em cima e embaixo nesta caixa: ele deixa aparecer um pedaço da terceira linha.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Valores trocados: <code>overflow-wrap: break-all</code>, <code>text-overflow: dots</code></strong>
+<pre class="term" data-cwd="~/site">$ cat style.css
+.link {
+  overflow-wrap: break-all;
+}
+.titulo {
+  text-overflow: dots;
+}
+.resumo {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+$ vnu --css style.css
+"file:/home/ana/site/style.css":2.18-2.26: error: CSS: “overflow-wrap”: “break-all” is not a “overflow-wrap” value.
+"file:/home/ana/site/style.css":5.18-5.21: error: CSS: “text-overflow”: “dots” is not a “text-overflow” value.</pre>
+<p><strong>O que o leitor vê:</strong> o endereço continua vazando e o título continua sem reticências: as duas declarações foram ignoradas. No F12, no painel <strong>Styles</strong> (Estilos), elas aparecem riscadas, com um ícone de aviso.</p>
+<p><strong>Por quê:</strong> <code>break-all</code> existe, mas é valor de <strong>outra</strong> propriedade, a <code>word-break</code>; e as reticências se chamam <code>ellipsis</code>, não <code>dots</code> ("pontos"). O validador diz "<code>break-all</code> não é um valor de <code>overflow-wrap</code>" e "<code>dots</code> não é um valor de <code>text-overflow</code>". O bloco <code>.resumo</code>, com o prefixo <code>-webkit-</code>, passou sem erro.</p>
+<p><strong>Como consertar:</strong> <code>overflow-wrap: break-word;</code> (ou <code>word-break: break-all;</code>, se for mesmo para cortar em qualquer letra) e <code>text-overflow: ellipsis;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>text-overflow</code> sem os outros ingredientes</strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  div {
+    width: 160px;
+    border: 2px solid navy;
+    padding: 4px;
+    margin-bottom: 6px;
+  }
+  .sem-nowrap {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sem-hidden {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+&lt;/style&gt;
+&lt;div class="sem-nowrap"&gt;Bolo de cenoura com cobertura de chocolate&lt;/div&gt;
+&lt;div class="sem-hidden"&gt;Bolo de cenoura com cobertura de chocolate&lt;/div&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> nenhuma reticência. Na primeira caixa, o nome quebrou em duas linhas, normalmente. Na segunda, ficou numa linha só e <strong>vazou</strong> pela borda.</p>
+<p><strong>Por quê:</strong> o <code>text-overflow</code> só desenha o "…" quando o texto <strong>transborda</strong> (precisa do <code>nowrap</code>, senão ele simplesmente quebra a linha) e o transbordamento está <strong>escondido</strong> (precisa do <code>overflow: hidden</code>). O validador não reclama: cada declaração, sozinha, é válida. Na aba <strong>Computed</strong>, o <code>text-overflow</code> mostra <code>ellipsis</code> nas duas caixas, e mesmo assim nada aparece.</p>
+<p><strong>Como consertar:</strong> os quatro juntos: largura limitada, <code>white-space: nowrap</code>, <code>overflow: hidden</code> e <code>text-overflow: ellipsis</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>break-all</code> que estragou os parágrafos</strong>
+<p>A Ana pôs <code>body { word-break: break-all; }</code> para resolver um endereço comprido. O endereço coube, mas agora todo parágrafo do site tem palavras cortadas no meio ("co" / "bertura"). O validador não reclama, porque o código é válido.</p>
+<p><strong>Como consertar:</strong> no <code>body</code>, use <code>overflow-wrap: break-word</code>, que só corta o que não cabe. Guarde o <code>break-all</code> para o elemento que mostra códigos.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>overflow-wrap: break-word;</code></td><td>Corta só a palavra que não cabe (herdado; bom no <code>body</code>)</td></tr>
+<tr><td><code>overflow-wrap: anywhere;</code></td><td>Igual, e deixa a caixa encolher (tabelas, Flexbox)</td></tr>
+<tr><td><code>word-break: break-all;</code></td><td>Corta qualquer palavra onde a linha acabar</td></tr>
+<tr><td><code>hyphens: auto;</code></td><td>Divide nas sílabas, com hífen; precisa do <code>lang</code> e do dicionário do navegador</td></tr>
+<tr><td><code>white-space: nowrap;</code></td><td>Proíbe quebrar a linha</td></tr>
+<tr><td><code>text-overflow: ellipsis;</code></td><td>"…" no corte; exige <code>nowrap</code>, <code>overflow: hidden</code> e largura limitada</td></tr>
+<tr><td><code>display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;</code></td><td>Corta em 2 linhas, com "…"</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O endereço comprido</h3>
+<p>Complete para quebrar só o que não cabe:</p>
+<div class="ex-code">body { overflow-wrap: <input data-answer="break-word|anywhere" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. As reticências</h3>
+<p>Complete o valor:</p>
+<div class="ex-code">.nome { text-overflow: <input data-answer="ellipsis" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Uma linha só</h3>
+<p>Complete para proibir a quebra de linha:</p>
+<div class="ex-code">.nome { white-space: <input data-answer="nowrap" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. A Ana escreveu <code>overflow: hidden; text-overflow: ellipsis;</code> e as reticências não aparecem; o nome quebra em duas linhas. O que falta?</p>
+<label><input type="radio" name="q4"> <code>overflow-wrap: break-word</code></label>
+<label><input type="radio" name="q4"> <code>hyphens: auto</code></label>
+<label><input type="radio" name="q4"> <code>white-space: nowrap</code></label>
+<label><input type="radio" name="q4"> <code>word-break: break-all</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Qual a diferença entre <code>overflow-wrap: break-word</code> e <code>word-break: break-all</code> num parágrafo comum?</p>
+<label><input type="radio" name="q5"> O primeiro corta só a palavra que não cabe; o segundo corta qualquer palavra no fim da linha</label>
+<label><input type="radio" name="q5"> Nenhuma: são dois nomes para a mesma coisa</label>
+<label><input type="radio" name="q5"> O primeiro põe hífen; o segundo não</label>
+<label><input type="radio" name="q5"> O segundo só funciona em tabelas</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">6. O que o <code>hyphens: auto</code> precisa para funcionar?</p>
+<label><input type="radio" name="q6"> O prefixo <code>-webkit-</code></label>
+<label><input type="radio" name="q6"> A língua do texto no <code>lang</code>, e um navegador com o dicionário dessa língua</label>
+<label><input type="radio" name="q6"> <code>white-space: nowrap</code></label>
+<label><input type="radio" name="q6"> Nada: funciona sempre</label>
+</div>
+
+<h3>Missão final: o cartão da lojinha</h3>
+
+<div class="tryhtml" data-goal="css:.nome{white-space}=nowrap,css:.nome{overflow-x}=hidden,css:.nome{text-overflow}=ellipsis,css:.resumo{-webkit-line-clamp}=2,css:.site{overflow-wrap}=break-word,nsrc:break-all">
+<p class="try-task"><strong>Missão:</strong> arrume o cartão. (1) O nome do produto fica numa linha só, com "…" no fim. (2) O resumo mostra no máximo duas linhas, com <code>-webkit-line-clamp</code>. (3) O endereço do site quebra só onde precisa, com <code>overflow-wrap</code>; tire o <code>word-break: break-all</code>, que está cortando todas as palavras.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="cartao"&gt;
+  &lt;h2 class="nome"&gt;Bolo de cenoura com cobertura de chocolate&lt;/h2&gt;
+  &lt;p class="resumo"&gt;Fofinho, com cenouras da feira e cobertura de chocolate meio amargo que endurece por cima. Serve 12 fatias.&lt;/p&gt;
+  &lt;p class="site"&gt;https://lojinhadaana.example/produtos/bolo-de-cenoura&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  width: 220px;
+  border: 2px solid navy;
+  padding: 8px;
+  word-break: break-all;
+}
+
+.nome {
+  font-size: 20px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  width: 220px;
+  border: 2px solid navy;
+  padding: 8px;
+}
+
+.nome {
+  font-size: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.resumo {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.site {
+  overflow-wrap: break-word;
+}
+</pre>
+</div>
+
+<p>A meta confere o <code>overflow-x</code> do nome: o atalho <code>overflow: hidden</code> vale para os dois sentidos, e a aba Computed o mostra desdobrado em <code>overflow-x</code> e <code>overflow-y</code>.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O navegador quebra linhas em espaços e hífens; uma palavra sem esses lugares, mais larga que a caixa, <strong>vaza</strong>.</li>
+  <li><code>overflow-wrap: break-word</code> corta só o que não cabe: ótimo no <code>body</code>, contra endereços e e-mails. <code>anywhere</code> também deixa a caixa encolher.</li>
+  <li><code>word-break: break-all</code> corta qualquer palavra: só para códigos. <code>hyphens: auto</code> divide nas sílabas, mas depende do <code>lang</code> e do dicionário do navegador.</li>
+  <li>Reticências numa linha: largura limitada + <code>white-space: nowrap</code> + <code>overflow: hidden</code> + <code>text-overflow: ellipsis</code>. Faltou um, não aparece.</li>
+  <li>Em várias linhas: <code>display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: N; overflow: hidden;</code>.</li>
+  <li>Texto cortado continua no HTML, mas some da tela: não corte o que é importante.</li>
+  <li>Valores trocados são ignorados: <code>“break-all” is not a “overflow-wrap” value</code>, <code>“dots” is not a “text-overflow” value</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
