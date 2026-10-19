@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS hsl() — matiz, saturação e luminosidade | Guia CSS</title>
+<meta name="description" content="A função hsl() do CSS para quem nunca escreveu CSS: a roda de cores (matiz de 0 a 360), a saturação e a luminosidade lado a lado, como criar tons mais claros e mais escuros da mesma cor, cinzas, transparência com a barra, a forma antiga com vírgulas e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">hsl()</span></h1>
+
+<p class="intro">Com <code>rgb()</code> e hexadecimal você escolhe a força de três luzes. Funciona, mas responda rápido: qual é a versão <strong>mais clara</strong> de <code>rgb(199 64 31)</code>? Difícil, porque os três números mudam juntos. A função <code>hsl()</code> descreve a cor do jeito que as pessoas pensam: <strong>qual cor</strong>, <strong>quão viva</strong> e <strong>quão clara</strong>. Para clarear, basta subir um número.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>As três partes de <code>hsl(9 100% 64%)</code>: matiz, saturação e luminosidade.</li>
+  <li>A roda de cores: o vermelho no 0, o verde no 120, o azul no 240.</li>
+  <li>A saturação e a luminosidade lado a lado, do cinza ao vivo e do preto ao branco.</li>
+  <li>O grande truque do <code>hsl()</code>: tons mais claros e mais escuros da mesma cor, mudando um número só.</li>
+  <li>Transparência com a barra, a forma antiga com vírgulas e o <code>hsla()</code>.</li>
+  <li>Uma limitação: o "50%" do amarelo parece mais claro que o "50%" do azul.</li>
+  <li>Os erros reais do validador (como o <code>%</code> esquecido).</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter feito <a href="cores-rgb.html">rgb()</a>. Os quadros "Resultado" e as caixas "Experimente" são desenhados agora pelo <strong>seu</strong> navegador. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: o mostruário da loja de tintas</h2>
+<p>Numa loja de tintas, o mostruário é organizado assim: primeiro você escolhe a <strong>cor</strong> (um laranja); depois, numa cartela, escolhe entre o laranja <strong>vivo</strong> e o laranja <strong>acinzentado</strong>; e, descendo a cartela, do laranja <strong>escuro</strong> ao <strong>clarinho</strong>, quase branco. São três perguntas, e cada uma é um número do <code>hsl()</code>:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Letra</th><th>Em inglês</th><th>Em português</th><th>A pergunta</th><th>Valores</th></tr>
+<tr><td><strong>H</strong></td><td><em>hue</em></td><td>matiz</td><td>Qual cor?</td><td>0 a 360 (graus na roda de cores)</td></tr>
+<tr><td><strong>S</strong></td><td><em>saturation</em></td><td>saturação</td><td>Quão viva?</td><td><code>0%</code> (cinza) a <code>100%</code> (a cor mais viva)</td></tr>
+<tr><td><strong>L</strong></td><td><em>lightness</em></td><td>luminosidade</td><td>Quão clara?</td><td><code>0%</code> (preto) a <code>100%</code> (branco); <code>50%</code> é a cor "pura"</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. A anatomia de <code>hsl(9 100% 64%)</code></h2>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura com cobertura de chocolate.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: hsl(9 100% 64%);
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>hsl</dt><dd>O nome da função, colado no parêntese.</dd>
+  <dt>9</dt><dd>A <strong>matiz</strong>: a posição na roda de cores, em graus. O 0 é o vermelho; o 9 é um vermelho que já puxa um pouquinho para o laranja. Sem <code>%</code>.</dd>
+  <dt>100%</dt><dd>A <strong>saturação</strong>: 100% é a cor mais viva possível, sem nada de cinza.</dd>
+  <dt>64%</dt><dd>A <strong>luminosidade</strong>: um pouco acima do meio (50%), então um pouco mais clara que a cor pura.</dd>
+</dl>
+
+<p>É, de novo, o tomate: o navegador guarda <code>hsl(9 100% 64%)</code> como <code>rgb(255, 99, 71)</code>, igual a <code>tomato</code> e <code>#ff6347</code>. Na caixa acima, mude <strong>só</strong> o primeiro número (tente <code>120</code>, <code>200</code>, <code>280</code>) e veja a cor dar a volta na roda, com a mesma "força".</p>
+
+<hr>
+
+<h2>2. A matiz: a roda de cores</h2>
+<p>Imagine as cores do arco-íris dispostas num círculo. A matiz é o ângulo: o vermelho fica no 0, o verde um terço da volta depois (120) e o azul a dois terços (240). No 360, a volta se fecha e estamos no vermelho de novo. As faixas abaixo têm saturação 100% e luminosidade 50%; só a matiz muda:</p>
+
+<pre class="file" data-file="matiz.html" data-resultado>&lt;style&gt;
+  p {
+    margin: 4px 0;
+    padding: 6px 10px; /* espaço em volta do texto (aula Espaço Interno) */
+    font-family: monospace;
+  }
+  .h0 { background-color: hsl(0 100% 50%); }
+  .h30 { background-color: hsl(30 100% 50%); }
+  .h60 { background-color: hsl(60 100% 50%); }
+  .h120 { background-color: hsl(120 100% 50%); }
+  .h180 { background-color: hsl(180 100% 50%); }
+  .h240 { background-color: hsl(240 100% 50%); color: white; }
+  .h300 { background-color: hsl(300 100% 50%); }
+  .h360 { background-color: hsl(360 100% 50%); }
+&lt;/style&gt;
+&lt;p class="h0"&gt;hsl(0 100% 50%) vermelho&lt;/p&gt;
+&lt;p class="h30"&gt;hsl(30 100% 50%) laranja&lt;/p&gt;
+&lt;p class="h60"&gt;hsl(60 100% 50%) amarelo&lt;/p&gt;
+&lt;p class="h120"&gt;hsl(120 100% 50%) verde&lt;/p&gt;
+&lt;p class="h180"&gt;hsl(180 100% 50%) ciano&lt;/p&gt;
+&lt;p class="h240"&gt;hsl(240 100% 50%) azul&lt;/p&gt;
+&lt;p class="h300"&gt;hsl(300 100% 50%) magenta&lt;/p&gt;
+&lt;p class="h360"&gt;hsl(360 100% 50%) vermelho de novo&lt;/p&gt;
+</pre>
+
+<p>Vale guardar três marcos: <strong>0 vermelho, 120 verde, 240 azul</strong>. O resto fica entre eles: o amarelo no meio do vermelho e do verde (60), o ciano no meio do verde e do azul (180).</p>
+
+<hr>
+
+<h2>3. A saturação: do cinza ao vivo</h2>
+<p>Mesma matiz (0, vermelho), mesma luminosidade (50%); só a saturação muda:</p>
+
+<pre class="file" data-file="saturacao.html" data-resultado>&lt;style&gt;
+  p {
+    margin: 4px 0;
+    padding: 6px 10px;
+    font-family: monospace;
+    color: white;
+  }
+  .s0 { background-color: hsl(0 0% 50%); }
+  .s25 { background-color: hsl(0 25% 50%); }
+  .s50 { background-color: hsl(0 50% 50%); }
+  .s75 { background-color: hsl(0 75% 50%); }
+  .s100 { background-color: hsl(0 100% 50%); }
+&lt;/style&gt;
+&lt;p class="s0"&gt;hsl(0 0% 50%)&lt;/p&gt;
+&lt;p class="s25"&gt;hsl(0 25% 50%)&lt;/p&gt;
+&lt;p class="s50"&gt;hsl(0 50% 50%)&lt;/p&gt;
+&lt;p class="s75"&gt;hsl(0 75% 50%)&lt;/p&gt;
+&lt;p class="s100"&gt;hsl(0 100% 50%)&lt;/p&gt;
+</pre>
+
+<p>Com <code>0%</code>, sobra um cinza médio: não tem cor nenhuma. Subindo, o vermelho vai "acordando": primeiro um vermelho apagado, meio acinzentado, até o vermelho puro em <code>100%</code>. Saturação baixa dá cores mais sóbrias, boas para fundos; saturação alta chama atenção, boa para um botão ou um aviso.</p>
+
+<hr>
+
+<h2>4. A luminosidade: do preto ao branco</h2>
+<p>Mesma matiz e saturação; só a luminosidade muda:</p>
+
+<pre class="file" data-file="luminosidade.html" data-resultado>&lt;style&gt;
+  p {
+    margin: 4px 0;
+    padding: 6px 10px;
+    font-family: monospace;
+  }
+  .l0 { background-color: hsl(0 100% 0%); color: white; }
+  .l25 { background-color: hsl(0 100% 25%); color: white; }
+  .l50 { background-color: hsl(0 100% 50%); color: white; }
+  .l75 { background-color: hsl(0 100% 75%); }
+  .l100 { background-color: hsl(0 100% 100%); }
+&lt;/style&gt;
+&lt;p class="l0"&gt;hsl(0 100% 0%) preto&lt;/p&gt;
+&lt;p class="l25"&gt;hsl(0 100% 25%) vermelho escuro&lt;/p&gt;
+&lt;p class="l50"&gt;hsl(0 100% 50%) o vermelho puro&lt;/p&gt;
+&lt;p class="l75"&gt;hsl(0 100% 75%) vermelho claro (rosa)&lt;/p&gt;
+&lt;p class="l100"&gt;hsl(0 100% 100%) branco&lt;/p&gt;
+</pre>
+
+<p>Nas pontas, a matiz deixa de importar: <code>0%</code> é sempre preto e <code>100%</code> é sempre branco (a última faixa está aí, branca sobre o fundo branco). A cor "de verdade" fica no meio, em <code>50%</code>.</p>
+
+<hr>
+
+<h2>5. O grande truque: tons da mesma cor</h2>
+<p>O laranja-tijolo do logo da Ana, <code>#c7401f</code>, em <code>hsl()</code> é <code>hsl(12 73% 45%)</code>. Agora, para criar uma versão mais escura (para uma borda) e versões bem claras (para fundos), basta mudar o <strong>último número</strong>; a matiz e a saturação ficam iguais, e todas combinam:</p>
+
+<pre class="file" data-file="tons.html" data-resultado>&lt;style&gt;
+  p {
+    margin: 4px 0;
+    padding: 6px 10px;
+    font-family: monospace;
+  }
+  .t30 { background-color: hsl(12 73% 30%); color: white; }
+  .t45 { background-color: hsl(12 73% 45%); color: white; }
+  .t60 { background-color: hsl(12 73% 60%); color: black; }
+  .t90 { background-color: hsl(12 73% 90%); color: black; }
+  .t95 { background-color: hsl(12 73% 95%); color: black; }
+&lt;/style&gt;
+&lt;p class="t30"&gt;hsl(12 73% 30%) mais escuro&lt;/p&gt;
+&lt;p class="t45"&gt;hsl(12 73% 45%) a cor do logo&lt;/p&gt;
+&lt;p class="t60"&gt;hsl(12 73% 60%) mais clara&lt;/p&gt;
+&lt;p class="t90"&gt;hsl(12 73% 90%) bem clara&lt;/p&gt;
+&lt;p class="t95"&gt;hsl(12 73% 95%) quase branca&lt;/p&gt;
+</pre>
+
+<p>Os cinco são claramente "da mesma família". Em <code>rgb()</code>, os mesmos tons seriam <code>rgb(132 43 21)</code>, <code>rgb(199 64 31)</code>, <code>rgb(227 108 79)</code>, <code>rgb(248 218 211)</code> e <code>rgb(252 237 233)</code>: números que não deixam ver parentesco nenhum. É por isso que tanta gente monta a paleta de um site com <code>hsl()</code>. (Na aula <a href="variaveis.html">Variáveis</a>, você vai guardar a matiz numa variável e trocar a cor do site inteiro de uma vez.)</p>
+
+<div class="tryhtml" data-goal="css:.aviso{background-color}=rgb(252, 237, 233),css:.aviso{color}=rgb(132, 43, 21)">
+<p class="try-task"><strong>Missão:</strong> o aviso da lojinha está preto no branco. Use a família do logo, <code>hsl(12 73% …)</code>: o fundo do <code>.aviso</code> com luminosidade <code>95%</code> e o texto com luminosidade <code>30%</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;p class="aviso"&gt;Encomendas de bolo até quinta-feira.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: hsl(12 73% 45%);
+}
+
+.aviso {
+  padding: 10px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: hsl(12 73% 45%);
+}
+
+.aviso {
+  padding: 10px;
+  background-color: hsl(12 73% 95%);
+  color: hsl(12 73% 30%);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>6. Cinzas: saturação zero</h2>
+<p>Com saturação <code>0%</code>, a matiz não muda nada: <code>hsl(200 0% 20%)</code> e <code>hsl(30 0% 20%)</code> dão o mesmo <code>rgb(51, 51, 51)</code>, o <code>#333</code> da aula de hexadecimal. Um cinza em <code>hsl()</code> é só a luminosidade: <code>hsl(0 0% 20%)</code> é escuro, <code>hsl(0 0% 90%)</code> é bem claro.</p>
+<p>Um truque de designer: em vez de cinza puro, use uma saturação <strong>baixinha</strong> (5% a 15%) com a matiz da cor principal. Fica um cinza "quente" ou "frio", que combina com o resto do site.</p>
+
+<hr>
+
+<h2>7. Uma limitação: o "50%" não é igual para todas as cores</h2>
+<p>A luminosidade do <code>hsl()</code> é uma conta com as três luzes, e não a claridade que o olho percebe. Veja o amarelo e o azul, os dois com <code>100% 50%</code>:</p>
+
+<pre class="file" data-file="limite.html" data-resultado>&lt;style&gt;
+  p {
+    margin: 4px 0;
+    padding: 6px 10px;
+    font-family: monospace;
+    color: white;
+  }
+  .amarelo { background-color: hsl(60 100% 50%); }
+  .azul { background-color: hsl(240 100% 50%); }
+&lt;/style&gt;
+&lt;p class="amarelo"&gt;hsl(60 100% 50%) texto branco&lt;/p&gt;
+&lt;p class="azul"&gt;hsl(240 100% 50%) texto branco&lt;/p&gt;
+</pre>
+
+<p>Mesmo "50%", e o amarelo parece muito mais claro: o texto branco quase some nele, e no azul se lê bem. Então, ao trocar a matiz de uma paleta, confira o contraste de novo. A função <code>oklch()</code>, da aula <a href="cores-modernas.html">Cores Modernas</a>, foi criada justamente para resolver isso: nela, a mesma luminosidade parece igual em todas as matizes.</p>
+
+<hr>
+
+<h2>8. Outras formas de escrever</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Exemplo</th><th>Valor calculado</th></tr>
+<tr><td>Moderna (espaços)</td><td><code>hsl(9 100% 64%)</code></td><td><code>rgb(255, 99, 71)</code></td></tr>
+<tr><td>Com transparência (barra)</td><td><code>hsl(9 100% 64% / 50%)</code></td><td><code>rgba(255, 99, 71, 0.5)</code></td></tr>
+<tr><td>Antiga (vírgulas)</td><td><code>hsl(9, 100%, 64%)</code></td><td><code>rgb(255, 99, 71)</code></td></tr>
+<tr><td>Antiga com transparência</td><td><code>hsla(9, 100%, 64%, 0.5)</code></td><td><code>rgba(255, 99, 71, 0.5)</code></td></tr>
+<tr><td>Matiz com unidade de ângulo</td><td><code>hsl(9deg 100% 64%)</code></td><td><code>rgb(255, 99, 71)</code> (<code>deg</code> = graus)</td></tr>
+<tr><td>Matiz em voltas</td><td><code>hsl(0.5turn 100% 50%)</code></td><td><code>rgb(0, 255, 255)</code> (meia volta = 180)</td></tr>
+</table>
+</div>
+<p>Como no <code>rgb()</code>: não misture vírgulas e espaços, e o <code>hsla()</code> hoje é só outro nome do <code>hsl()</code>. O navegador sempre mostra o valor calculado em <code>rgb()</code>/<code>rgba()</code>, nunca em <code>hsl()</code>.</p>
+
+<h3>Números fora do intervalo</h3>
+<p>A matiz é um ângulo, então ela <strong>dá a volta</strong>: <code>hsl(400 100% 50%)</code> é o mesmo que 40 (400 − 360), um laranja, <code>rgb(255, 170, 0)</code>; e <code>hsl(-30 100% 50%)</code> é o mesmo que 330, um rosa, <code>rgb(255, 0, 128)</code>. Já a saturação acima de 100% é cortada em 100%.</p>
+
+<hr>
+
+<h2>9. Qual forma de cor usar?</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Melhor para</th></tr>
+<tr><td>Nome (<code>tomato</code>)</td><td>Exemplos, testes, <code>white</code>, <code>black</code>, <code>transparent</code></td></tr>
+<tr><td>Hexadecimal (<code>#c7401f</code>)</td><td>Copiar a cor exata de um logo ou desenho</td></tr>
+<tr><td><code>rgb()</code></td><td>Transparência legível (<code>rgb(0 0 0 / 60%)</code>), entender a mistura</td></tr>
+<tr><td><code>hsl()</code></td><td>Montar uma paleta: tons mais claros e mais escuros da mesma cor, cores "irmãs" mudando só a matiz</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Uma cor inválida é ignorada em silêncio, e o texto fica com a cor de antes. Os quatro títulos abaixo queriam ser tomate:</p>
+
+<pre class="file" data-file="erros.html · erro de propósito" data-resultado>&lt;style&gt;
+  .a { color: hsl(9, 100, 64); }
+  .b { color: hsl(9, 100% 64%); }
+  .c { color: hsl(9 100%); }
+  .d { color: hsl(9 100% 64% 0.5); }
+&lt;/style&gt;
+&lt;h2 class="a"&gt;hsl(9, 100, 64)&lt;/h2&gt;
+&lt;h2 class="b"&gt;hsl(9, 100% 64%)&lt;/h2&gt;
+&lt;h2 class="c"&gt;hsl(9 100%)&lt;/h2&gt;
+&lt;h2 class="d"&gt;hsl(9 100% 64% 0.5)&lt;/h2&gt;
+</pre>
+
+<p>Os quatro ficaram pretos. O validador:</p>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: “100” is not a valid HSL color.</code></strong>
+<p><strong>O que aconteceu:</strong> faltou o <code>%</code> na saturação e na luminosidade, na forma com vírgulas: <code>hsl(9, 100, 64)</code>.</p>
+<pre class="term" data-cwd="~/hsl">$ vnu --css sem-porcento.css
+"file:/home/ana/hsl/sem-porcento.css":2.24-2.24: error: CSS: “color”: “100” is not a valid HSL color.</pre>
+<p>"<code>100</code> não é uma cor HSL válida." Na forma com vírgulas, a saturação e a luminosidade <strong>precisam</strong> do <code>%</code>. (Na forma com espaços, <code>hsl(9 100 64)</code>, os navegadores recentes e o validador aceitam os números sem <code>%</code>; os navegadores mais antigos, não. Escreva sempre o <code>%</code> e você não precisa decorar quando ele é opcional.)</p>
+<p><strong>Como consertar:</strong> <code>hsl(9 100% 64%)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: Invalid RGB function.</code> (num <code>hsl()</code>!)</strong>
+<p><strong>O que aconteceu:</strong> vírgula e espaço misturados (<code>hsl(9, 100% 64%)</code>), ou faltou um valor (<code>hsl(9 100%)</code>).</p>
+<pre class="term" data-cwd="~/hsl">$ vnu --css mistura.css
+"file:/home/ana/hsl/mistura.css":2.25-2.25: error: CSS: “color”: Invalid RGB function.
+$ vnu --css dois.css
+"file:/home/ana/hsl/dois.css":2.20-2.20: error: CSS: “color”: Invalid RGB function.</pre>
+<p>A mensagem diz "função RGB inválida" mesmo sendo um <code>hsl()</code>: o validador usa o mesmo texto para as duas funções. Olhe a posição (linha 2, coluna 25 ou 20) para achar o problema.</p>
+<p><strong>Como consertar:</strong> três valores, todos separados do mesmo jeito: <code>hsl(9 100% 64%)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: “0.5” is not a valid HSL color.</code></strong>
+<p><strong>O que aconteceu:</strong> a transparência sem a barra: <code>hsl(9 100% 64% 0.5)</code>.</p>
+<pre class="term" data-cwd="~/hsl">$ vnu --css sem-barra.css
+"file:/home/ana/hsl/sem-barra.css":2.28-2.28: error: CSS: “color”: “0.5” is not a valid HSL color.</pre>
+<p><strong>Como consertar:</strong> <code>hsl(9 100% 64% / 0.5)</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>hsl(matiz saturação luminosidade)</code></td><td>Uma cor por "qual cor, quão viva, quão clara"</td></tr>
+<tr><td>Matiz <code>0</code> a <code>360</code></td><td>0 vermelho, 60 amarelo, 120 verde, 180 ciano, 240 azul, 300 magenta; dá a volta</td></tr>
+<tr><td>Saturação <code>0%</code> a <code>100%</code></td><td><code>0%</code> = cinza; <code>100%</code> = a cor mais viva</td></tr>
+<tr><td>Luminosidade <code>0%</code> a <code>100%</code></td><td><code>0%</code> = preto; <code>50%</code> = a cor pura; <code>100%</code> = branco</td></tr>
+<tr><td><code>hsl(9 100% 64% / 50%)</code></td><td>Com transparência; calculado <code>rgba(255, 99, 71, 0.5)</code></td></tr>
+<tr><td><code>hsl(9, 100%, 64%)</code>, <code>hsla(…)</code></td><td>Formas antigas, com vírgulas</td></tr>
+<tr><td>Tons da mesma cor</td><td>Mude só a luminosidade: <code>hsl(12 73% 30%)</code>, <code>45%</code>, <code>95%</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A matiz do azul</h3>
+<p>Complete com a matiz do azul puro:</p>
+<div class="ex-code">h1 { color: hsl(<input data-answer="240" aria-label="matiz"> 100% 50%); }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Um cinza</h3>
+<p>Complete a saturação para esta cor virar um cinza:</p>
+<div class="ex-code">p { color: hsl(200 <input data-answer="0%" aria-label="saturação"> 30%); }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. A Ana tem <code>hsl(200 70% 40%)</code> e quer a versão <strong>bem clara</strong> dessa cor para um fundo. O que ela muda?</p>
+<label><input type="radio" name="q3"> A matiz, para <code>360</code></label>
+<label><input type="radio" name="q3"> A saturação, para <code>0%</code></label>
+<label><input type="radio" name="q3"> A luminosidade, para algo como <code>92%</code></label>
+<label><input type="radio" name="q3"> Nada: não dá para clarear em <code>hsl()</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">4. Que cor é <code>hsl(120 100% 50%)</code>?</p>
+<label><input type="radio" name="q4"> Verde</label>
+<label><input type="radio" name="q4"> Vermelho</label>
+<label><input type="radio" name="q4"> Azul</label>
+<label><input type="radio" name="q4"> Branco</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Por que <code>color: hsl(9, 100, 64);</code> não funciona?</p>
+<label><input type="radio" name="q5"> Porque a matiz não pode ser 9</label>
+<label><input type="radio" name="q5"> Porque na forma com vírgulas a saturação e a luminosidade precisam do <code>%</code></label>
+<label><input type="radio" name="q5"> Porque <code>hsl()</code> não aceita vírgulas</label>
+<label><input type="radio" name="q5"> Porque falta o <code>#</code></label>
+</div>
+
+<h3>Missão final: o cartão em outra cor</h3>
+
+<div class="tryhtml" data-goal="css:.cartao{background-color}=rgb(220, 249, 230),css:.cartao{border-top-color}=rgb(47, 218, 104),css:.cartao h2{color}=rgb(31, 132, 65),nsrc:hsl\(\s*200">
+<p class="try-task"><strong>Missão:</strong> o cartão de receita está todo em azul (matiz <code>200</code>). A Ana quer o mesmo cartão em <strong>verde</strong>: troque a matiz das três cores para <code>140</code>, sem mexer na saturação nem na luminosidade.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Salada de verão&lt;/h2&gt;
+  &lt;p&gt;Pronta em 15 minutos.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  background-color: hsl(200 70% 92%);
+  border: 3px solid hsl(200 70% 52%);
+  padding: 10px;
+}
+
+.cartao h2 {
+  color: hsl(200 62% 32%);
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  background-color: hsl(140 70% 92%);
+  border: 3px solid hsl(140 70% 52%);
+  padding: 10px;
+}
+
+.cartao h2 {
+  color: hsl(140 62% 32%);
+}
+</pre>
+</div>
+
+<p>Três números trocados, e o cartão inteiro mudou de cor, com o fundo, a borda e o título ainda combinando entre si. Com <code>rgb()</code> ou hexadecimal, você teria de calcular nove números novos.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>hsl(matiz saturação luminosidade)</code> descreve a cor como as pessoas pensam: qual cor, quão viva, quão clara.</li>
+  <li>Matiz: o ângulo na roda de cores, de 0 a 360 (0 vermelho, 120 verde, 240 azul). Ela dá a volta: 400 = 40.</li>
+  <li>Saturação: <code>0%</code> é cinza, <code>100%</code> é a cor mais viva. Luminosidade: <code>0%</code> preto, <code>50%</code> a cor pura, <code>100%</code> branco.</li>
+  <li>O grande truque: mudando só a luminosidade, você cria tons da mesma cor que combinam; mudando só a matiz, a mesma paleta em outra cor.</li>
+  <li>Transparência com a barra: <code>hsl(9 100% 64% / 50%)</code>. Formas antigas: vírgulas e <code>hsla()</code>, sempre com <code>%</code>.</li>
+  <li>O navegador guarda tudo como <code>rgb()</code>. E o "50%" do amarelo parece mais claro que o do azul: confira o contraste.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
