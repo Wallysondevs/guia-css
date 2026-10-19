@@ -1,0 +1,1883 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Projeto: Formulário de Contato — campos legíveis, foco visível e erro só na hora certa | Guia CSS</title>
+<meta name="description" content="Projeto do Guia CSS: o formulário de contato da Lojinha da Ana em seis versões, com font: inherit, campos de largura total, foco visível com :focus-visible, erro com :user-invalid, caixa de seleção com accent-color, botão e duas colunas com Grid e @media.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Projeto: Formulário de Contato</span></h1>
+
+<p class="intro">A Lojinha da Ana quer receber encomendas pelo site: nome, e-mail, assunto, mensagem e uma caixinha "quero receber as novidades". O HTML do formulário já funciona (o navegador até confere os campos obrigatórios), mas, sem CSS, os campos são pequenos, com uma letra diferente do resto da página, e não se alinham. Neste projeto você estiliza esse formulário em <strong>seis versões</strong>, pensando em quem vai <strong>usar</strong>: quem digita no celular, quem navega pelo teclado e quem errou o e-mail.</p>
+
+<div class="note">
+<strong>Você vai aprender (juntando o que já viu)</strong>
+<ul>
+  <li>Por que os campos não herdam a fonte da página, e o <code>font: inherit</code> que resolve.</li>
+  <li>A deixar rótulo em cima e campo da largura toda, e a desenhar campos com borda, cantos e preenchimento.</li>
+  <li>A mostrar <strong>onde está o foco</strong> com <code>:focus-visible</code>, sem apagar o contorno.</li>
+  <li>A pintar de vermelho o campo errado <strong>só depois</strong> que a pessoa mexeu nele, com <code>:user-invalid</code>.</li>
+  <li>A alinhar a caixa de seleção com o texto, colori-la com <code>accent-color</code> e desenhar o botão.</li>
+  <li>A pôr o cartão de contato com o mapa ao lado do formulário, só na tela larga.</li>
+</ul>
+</div>
+
+<p>As descrições do resultado foram conferidas em fotos do Chromium, nos quadros de 768 px e 375 px (os botões <strong>768</strong> e <strong>375</strong> da barra de cada caixa). As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>). Os formulários das caixas são enviados para o editor, que mostra os dados na página "📨 Formulário enviado"; nada sai do seu computador.</p>
+
+<hr>
+
+<h2>O que vamos construir</h2>
+<p>Pense numa ficha de pedido em papel: cada pergunta com o nome em cima e uma linha comprida para escrever embaixo, a letra igual em toda a ficha, um quadradinho para marcar e, no fim, o carimbo "Enviar". Uma ficha ruim tem linhas curtas demais, letras diferentes e nenhuma indicação de onde você está escrevendo.</p>
+
+<p>No fim, num quadro de 768 px, o formulário fica à esquerda: rótulos em negrito acima de campos brancos, da largura da coluna, com borda cinza e cantos arredondados; o campo em que você está ganha uma borda laranja e um contorno pêssego; o e-mail errado fica vermelho depois que você sai dele; a caixinha marcada é laranja; o botão "Enviar mensagem" é laranja com letra branca. À direita, um cartão branco com o desenho da Ana, o endereço e o mapa do bairro. No celular, o cartão desce para baixo do formulário.</p>
+
+<h3>O HTML (é o mesmo em todas as versões)</h3>
+<p>Cada campo tem o seu <code>&lt;label for="…"&gt;</code>, ligado ao <code>id</code> do campo: clicar no nome põe o cursor no campo, e o leitor de tela lê o nome junto. Nome, e-mail e mensagem são obrigatórios (<code>required</code>), e o e-mail é <code>type="email"</code>. Os detalhes estão no <a href="https://wallysondevs.github.io/guia-html/">Guia HTML</a>. O avatar tem <code>alt=""</code> porque o nome da Ana vem escrito logo depois: a imagem é só enfeite.</p>
+
+<pre class="file" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Fale com a Ana&lt;/h1&gt;
+  &lt;div class="contato"&gt;
+    &lt;form class="formulario" action="obrigado.html"&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="nome"&gt;Nome&lt;/label&gt;
+        &lt;input id="nome" name="nome" autocomplete="name" required&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="email"&gt;E-mail&lt;/label&gt;
+        &lt;input id="email" name="email" type="email" autocomplete="email" required&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="assunto"&gt;Assunto&lt;/label&gt;
+        &lt;select id="assunto" name="assunto"&gt;
+          &lt;option&gt;Encomenda de bolo&lt;/option&gt;
+          &lt;option&gt;Clube do Bolo&lt;/option&gt;
+          &lt;option&gt;Outro assunto&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="mensagem"&gt;Mensagem&lt;/label&gt;
+        &lt;textarea id="mensagem" name="mensagem" rows="5" required&gt;&lt;/textarea&gt;
+      &lt;/p&gt;
+      &lt;p class="caixinha"&gt;
+        &lt;input id="novidades" name="novidades" type="checkbox" checked&gt;
+        &lt;label for="novidades"&gt;Quero receber as novidades da lojinha&lt;/label&gt;
+      &lt;/p&gt;
+      &lt;button type="submit"&gt;Enviar mensagem&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;aside class="cartao-contato"&gt;
+      &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="" width="96" height="96"&gt;
+      &lt;p&gt;&lt;strong&gt;Ana&lt;/strong&gt;&lt;br&gt;Lojinha da Ana&lt;/p&gt;
+      &lt;p&gt;Rua das Flores, perto da Av. Central&lt;/p&gt;
+      &lt;img class="mapa" src="assets/midia/mapa-400.png" alt="Mapa do bairro: a Lojinha da Ana fica na Rua das Flores, perto da Av. Central e da Praça da Árvore" width="400" height="250"&gt;
+    &lt;/aside&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+</pre>
+
+<p>Com o <code>style.css</code> vazio, cada rótulo fica <strong>na mesma linha</strong> do seu campo, os campos são curtos (uns 185 px) e cada um começa num ponto diferente; o texto da página é serifado, mas o dos campos e do botão é menor (13,33 px) e sem serifa; a "Mensagem" fica alinhada pelo pé da caixa de texto.</p>
+
+<hr>
+
+<h2 id="versao1">Versão 1 · Mesma letra, rótulo em cima, campo largo</h2>
+
+<pre class="file" data-file="style.css (versão 1)">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>input, select, textarea, button { font: inherit; }</code></dt>
+  <dd>Os campos de formulário são uma exceção: <strong>não herdam</strong> a fonte do <code>body</code>; o navegador põe a fonte dele, em 13,33 px. O atalho <code>font: inherit</code> manda herdar tudo (família, tamanho, peso, altura de linha). Aulas: <a href="heranca.html">Herança</a> e <a href="formularios.html">Estilizando Formulários</a>.</dd>
+  <dt><code>.campo label { display: block; }</code></dt>
+  <dd>O <code>&lt;label&gt;</code> é em linha; como bloco, ocupa a linha toda e o campo desce para a linha de baixo. Aula: <a href="display.html">display</a>.</dd>
+  <dt><code>width: 100%</code> nos campos</dt>
+  <dd>Cada campo fica da largura do formulário. Isso só dá certo por causa do <code>box-sizing: border-box</code> lá em cima: sem ele, a borda e o preenchimento se somariam aos 100% e o campo passaria da borda (veja "Quando dá errado"). Aula: <a href="box-sizing.html">box-sizing</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 768 px, "Nome", "E-mail", "Assunto" e "Mensagem" ficam em negrito, cada um em cima do seu campo, e os quatro campos vão de uma borda à outra (736 px), na mesma letra do texto (16 px). Os campos ainda têm a cara de fábrica: borda fina, cantos retos, sem respiro por dentro. O botão "Enviar mensagem" e a caixinha também.</p>
+
+<h3>Experimente: a versão 1</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Fale com a Ana&lt;/h1&gt;
+  &lt;div class="contato"&gt;
+    &lt;form class="formulario" action="obrigado.html"&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="nome"&gt;Nome&lt;/label&gt;
+        &lt;input id="nome" name="nome" autocomplete="name" required&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="email"&gt;E-mail&lt;/label&gt;
+        &lt;input id="email" name="email" type="email" autocomplete="email" required&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="assunto"&gt;Assunto&lt;/label&gt;
+        &lt;select id="assunto" name="assunto"&gt;
+          &lt;option&gt;Encomenda de bolo&lt;/option&gt;
+          &lt;option&gt;Clube do Bolo&lt;/option&gt;
+          &lt;option&gt;Outro assunto&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="mensagem"&gt;Mensagem&lt;/label&gt;
+        &lt;textarea id="mensagem" name="mensagem" rows="5" required&gt;&lt;/textarea&gt;
+      &lt;/p&gt;
+      &lt;p class="caixinha"&gt;
+        &lt;input id="novidades" name="novidades" type="checkbox" checked&gt;
+        &lt;label for="novidades"&gt;Quero receber as novidades da lojinha&lt;/label&gt;
+      &lt;/p&gt;
+      &lt;button type="submit"&gt;Enviar mensagem&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;aside class="cartao-contato"&gt;
+      &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="" width="96" height="96"&gt;
+      &lt;p&gt;&lt;strong&gt;Ana&lt;/strong&gt;&lt;br&gt;Lojinha da Ana&lt;/p&gt;
+      &lt;p&gt;Rua das Flores, perto da Av. Central&lt;/p&gt;
+      &lt;img class="mapa" src="assets/midia/mapa-400.png" alt="Mapa do bairro: a Lojinha da Ana fica na Rua das Flores, perto da Av. Central e da Praça da Árvore" width="400" height="250"&gt;
+    &lt;/aside&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+}
+</pre>
+</div>
+
+<p>Brinque: apague a regra do <code>font: inherit</code> e compare o tamanho da letra dentro dos campos com a dos rótulos (digite algo para ver).</p>
+
+<h3>Missão 1</h3>
+<div class="tryhtml" data-goal="css:#nome{font-size}=16px,css:button{font-size}=16px,css:.campo label{display}=block,src:\.campo input[^{]*\{[^}]*width:\s*100%">
+<p class="try-task"><strong>Missão:</strong> faça os campos e o botão herdarem a fonte da página, ponha cada rótulo em cima do seu campo e deixe os campos da largura toda.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;form action="obrigado.html"&gt;
+  &lt;p class="campo"&gt;
+    &lt;label for="nome"&gt;Nome&lt;/label&gt;
+    &lt;input id="nome" name="nome" required&gt;
+  &lt;/p&gt;
+  &lt;p class="campo"&gt;
+    &lt;label for="email"&gt;E-mail&lt;/label&gt;
+    &lt;input id="email" name="email" type="email" required&gt;
+  &lt;/p&gt;
+  &lt;p class="campo"&gt;
+    &lt;label for="mensagem"&gt;Mensagem&lt;/label&gt;
+    &lt;textarea id="mensagem" name="mensagem" rows="4" required&gt;&lt;/textarea&gt;
+  &lt;/p&gt;
+  &lt;button type="submit"&gt;Enviar mensagem&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+}
+</pre>
+<pre class="solucao" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+}
+
+.campo input,
+.campo textarea {
+  width: 100%;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao2">Versão 2 · A cara dos campos</h2>
+
+<pre class="file" data-file="style.css (versão 2: o que entra)">
+.campo input,
+.campo select,
+.campo textarea {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #78716c;
+  border-radius: 6px;
+  background-color: #fff;
+}
+
+.campo textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>padding: 0.5rem 0.75rem</code></dt>
+  <dd>8 px em cima e embaixo, 12 px dos lados: o texto digitado não encosta na borda, e o campo fica mais alto, mais fácil de tocar no celular. Aula: <a href="padding.html">padding</a>.</dd>
+  <dt><code>border: 1px solid #78716c</code></dt>
+  <dd>Uma borda cinza-amarronzada. A borda de um campo precisa de contraste de pelo menos 3 para 1 com o fundo, para quem enxerga pouco perceber onde está o campo; este cinza sobre branco passa com folga. Aula: <a href="acessibilidade.html">CSS e Acessibilidade</a>.</dd>
+  <dt><code>border-radius: 6px</code> e <code>background-color: #fff</code></dt>
+  <dd>Cantos levemente arredondados e fundo branco garantido (sobre o fundo creme da página).</dd>
+  <dt><code>textarea { min-height: 8rem; resize: vertical; }</code></dt>
+  <dd>A caixa da mensagem tem pelo menos 8rem (128 px) de altura, e o puxador do canto (<code>resize</code>, "redimensionar") só deixa aumentar <strong>para baixo</strong>: puxar para o lado quebraria o alinhamento. Aula: <a href="width-height.html">Largura e Altura</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> os campos ficam mais altos (42 px), brancos, com borda cinza e cantos arredondados; a caixa de mensagem fica com 138 px de altura. O <code>&lt;select&gt;</code> do assunto fica igual aos outros, com a setinha à direita. Clique num campo: o navegador ainda desenha o contorno de foco dele, que é diferente de navegador para navegador.</p>
+
+<h3>Experimente: a versão 2</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Fale com a Ana&lt;/h1&gt;
+  &lt;div class="contato"&gt;
+    &lt;form class="formulario" action="obrigado.html"&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="nome"&gt;Nome&lt;/label&gt;
+        &lt;input id="nome" name="nome" autocomplete="name" required&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="email"&gt;E-mail&lt;/label&gt;
+        &lt;input id="email" name="email" type="email" autocomplete="email" required&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="assunto"&gt;Assunto&lt;/label&gt;
+        &lt;select id="assunto" name="assunto"&gt;
+          &lt;option&gt;Encomenda de bolo&lt;/option&gt;
+          &lt;option&gt;Clube do Bolo&lt;/option&gt;
+          &lt;option&gt;Outro assunto&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="mensagem"&gt;Mensagem&lt;/label&gt;
+        &lt;textarea id="mensagem" name="mensagem" rows="5" required&gt;&lt;/textarea&gt;
+      &lt;/p&gt;
+      &lt;p class="caixinha"&gt;
+        &lt;input id="novidades" name="novidades" type="checkbox" checked&gt;
+        &lt;label for="novidades"&gt;Quero receber as novidades da lojinha&lt;/label&gt;
+      &lt;/p&gt;
+      &lt;button type="submit"&gt;Enviar mensagem&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;aside class="cartao-contato"&gt;
+      &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="" width="96" height="96"&gt;
+      &lt;p&gt;&lt;strong&gt;Ana&lt;/strong&gt;&lt;br&gt;Lojinha da Ana&lt;/p&gt;
+      &lt;p&gt;Rua das Flores, perto da Av. Central&lt;/p&gt;
+      &lt;img class="mapa" src="assets/midia/mapa-400.png" alt="Mapa do bairro: a Lojinha da Ana fica na Rua das Flores, perto da Av. Central e da Praça da Árvore" width="400" height="250"&gt;
+    &lt;/aside&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #78716c;
+  border-radius: 6px;
+  background-color: #fff;
+}
+
+.campo textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+</pre>
+</div>
+
+<h3>Missão 2</h3>
+<div class="tryhtml" data-goal="css:#nome{padding-top}=8px,css:#nome{border-top-left-radius}=6px,css:#nome{border-top-color}=rgb(120, 113, 108),css:#mensagem{resize}=vertical">
+<p class="try-task"><strong>Missão:</strong> dê aos campos <code>0.5rem 0.75rem</code> de preenchimento, borda de <code>1px</code> contínua <code>#78716c</code> e cantos de <code>6px</code>; e deixe a caixa de mensagem crescer só na vertical.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;form action="obrigado.html"&gt;
+  &lt;p class="campo"&gt;
+    &lt;label for="nome"&gt;Nome&lt;/label&gt;
+    &lt;input id="nome" name="nome" required&gt;
+  &lt;/p&gt;
+  &lt;p class="campo"&gt;
+    &lt;label for="email"&gt;E-mail&lt;/label&gt;
+    &lt;input id="email" name="email" type="email" required&gt;
+  &lt;/p&gt;
+  &lt;p class="campo"&gt;
+    &lt;label for="mensagem"&gt;Mensagem&lt;/label&gt;
+    &lt;textarea id="mensagem" name="mensagem" rows="4" required&gt;&lt;/textarea&gt;
+  &lt;/p&gt;
+  &lt;button type="submit"&gt;Enviar mensagem&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+}
+
+input,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+}
+
+.campo input,
+.campo textarea {
+  width: 100%;
+}
+</pre>
+<pre class="solucao" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+}
+
+input,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+}
+
+.campo input,
+.campo textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #78716c;
+  border-radius: 6px;
+}
+
+.campo textarea {
+  resize: vertical;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao3">Versão 3 · O foco à vista</h2>
+<p>Quem preenche o formulário pelo teclado (<kbd>Tab</kbd> de campo em campo), e muita gente faz isso, precisa ver claramente onde está. O navegador já desenha um contorno, mas ele é fino e muda de navegador para navegador. Em vez de apagá-lo, a gente o <strong>troca</strong> por um mais visível, na cor do site.</p>
+
+<pre class="file" data-file="style.css (versão 3: o que entra)">
+.campo input:focus-visible,
+.campo select:focus-visible,
+.campo textarea:focus-visible {
+  border-color: #c2410c;
+  outline: 3px solid #fdba74;
+  outline-offset: 1px;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>:focus-visible</code></dt>
+  <dd>"Com foco, quando o navegador acha que o foco deve aparecer." Num campo de texto, isso é sempre (com o clique e com o <kbd>Tab</kbd>); num botão, só pelo teclado. Aula: <a href="hover-focus.html">:hover, :focus e :active</a>.</dd>
+  <dt><code>border-color: #c2410c</code></dt>
+  <dd>A borda do campo com foco fica laranja-escura.</dd>
+  <dt><code>outline: 3px solid #fdba74</code> + <code>outline-offset: 1px</code></dt>
+  <dd>Um contorno pêssego de 3 px, afastado 1 px da borda. O contorno não ocupa espaço: a página não "pula" quando o foco muda de campo. Aula: <a href="outline.html">Contorno</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> com o foco no e-mail, a borda dele fica laranja-escura e, em volta, aparece uma faixa pêssego. Os outros campos continuam cinza. Clique em outro campo e a faixa muda para ele.</p>
+
+<h3>Experimente: a versão 3</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Fale com a Ana&lt;/h1&gt;
+  &lt;div class="contato"&gt;
+    &lt;form class="formulario" action="obrigado.html"&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="nome"&gt;Nome&lt;/label&gt;
+        &lt;input id="nome" name="nome" autocomplete="name" required&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="email"&gt;E-mail&lt;/label&gt;
+        &lt;input id="email" name="email" type="email" autocomplete="email" required&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="assunto"&gt;Assunto&lt;/label&gt;
+        &lt;select id="assunto" name="assunto"&gt;
+          &lt;option&gt;Encomenda de bolo&lt;/option&gt;
+          &lt;option&gt;Clube do Bolo&lt;/option&gt;
+          &lt;option&gt;Outro assunto&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="mensagem"&gt;Mensagem&lt;/label&gt;
+        &lt;textarea id="mensagem" name="mensagem" rows="5" required&gt;&lt;/textarea&gt;
+      &lt;/p&gt;
+      &lt;p class="caixinha"&gt;
+        &lt;input id="novidades" name="novidades" type="checkbox" checked&gt;
+        &lt;label for="novidades"&gt;Quero receber as novidades da lojinha&lt;/label&gt;
+      &lt;/p&gt;
+      &lt;button type="submit"&gt;Enviar mensagem&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;aside class="cartao-contato"&gt;
+      &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="" width="96" height="96"&gt;
+      &lt;p&gt;&lt;strong&gt;Ana&lt;/strong&gt;&lt;br&gt;Lojinha da Ana&lt;/p&gt;
+      &lt;p&gt;Rua das Flores, perto da Av. Central&lt;/p&gt;
+      &lt;img class="mapa" src="assets/midia/mapa-400.png" alt="Mapa do bairro: a Lojinha da Ana fica na Rua das Flores, perto da Av. Central e da Praça da Árvore" width="400" height="250"&gt;
+    &lt;/aside&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #78716c;
+  border-radius: 6px;
+  background-color: #fff;
+}
+
+.campo textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.campo input:focus-visible,
+.campo select:focus-visible,
+.campo textarea:focus-visible {
+  border-color: #c2410c;
+  outline: 3px solid #fdba74;
+  outline-offset: 1px;
+}
+</pre>
+</div>
+
+<p>Brinque: clique dentro do quadro, perto do título, e aperte <kbd>Tab</kbd> várias vezes: o foco passa pelos campos, pela caixinha e pelo botão.</p>
+
+<h3>Missão 3</h3>
+<div class="tryhtml" data-goal="foco:#email{outline-color}=rgb(253, 186, 116),foco:#email{outline-width}=3px,foco:#email{border-top-color}=rgb(194, 65, 12)">
+<p class="try-task"><strong>Missão:</strong> quando um campo tiver foco (<code>:focus-visible</code>), troque a cor da borda para <code>#c2410c</code> e ponha um contorno de <code>3px</code> contínuo <code>#fdba74</code>. Para a missão conferir, clique no campo E-mail.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;form action="obrigado.html"&gt;
+  &lt;p class="campo"&gt;
+    &lt;label for="nome"&gt;Nome&lt;/label&gt;
+    &lt;input id="nome" name="nome" required&gt;
+  &lt;/p&gt;
+  &lt;p class="campo"&gt;
+    &lt;label for="email"&gt;E-mail&lt;/label&gt;
+    &lt;input id="email" name="email" type="email" required&gt;
+  &lt;/p&gt;
+  &lt;p class="campo"&gt;
+    &lt;label for="mensagem"&gt;Mensagem&lt;/label&gt;
+    &lt;textarea id="mensagem" name="mensagem" rows="4" required&gt;&lt;/textarea&gt;
+  &lt;/p&gt;
+  &lt;button type="submit"&gt;Enviar mensagem&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+}
+
+input,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+}
+
+.campo input,
+.campo textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #78716c;
+  border-radius: 6px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+}
+
+input,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+}
+
+.campo input,
+.campo textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #78716c;
+  border-radius: 6px;
+}
+
+.campo input:focus-visible,
+.campo textarea:focus-visible {
+  border-color: #c2410c;
+  outline: 3px solid #fdba74;
+  outline-offset: 1px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao4">Versão 4 · O erro na hora certa</h2>
+<p>O navegador já sabe que "ana" não é um e-mail e que o nome está vazio: ele bloqueia o envio e mostra um balãozinho. Dá para usar esse mesmo conhecimento no CSS e pintar o campo errado de vermelho. A questão é <strong>quando</strong>.</p>
+
+<pre class="file" data-file="style.css (versão 4: o que entra)">
+.campo input:user-invalid,
+.campo textarea:user-invalid {
+  border-color: #b91c1c;
+  background-color: #fef2f2;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>:user-invalid</code></dt>
+  <dd>"Inválido <strong>depois que a pessoa mexeu</strong>": o campo só casa quando ela digitou e saiu dele, ou tentou enviar o formulário. Um campo obrigatório vazio, recém-aberto, não fica vermelho. Aula: <a href="formularios.html">Estilizando Formulários</a>.</dd>
+  <dt><code>border-color</code> + <code>background-color</code></dt>
+  <dd>Borda vermelho-escura e fundo rosado bem claro. Não dependa só da cor: quem não distingue o vermelho também precisa saber do erro. Aqui, o balão do navegador, no envio, traz o texto.</dd>
+</dl>
+
+<div class="note"><strong>Suporte do <code>:user-invalid</code>:</strong> Chrome e Edge 119+, Firefox 88+, Safari 16.5+ (caniuse.com). Num navegador mais antigo, a regra é ignorada: os campos simplesmente não ficam vermelhos, e o balão do navegador continua avisando no envio.</div>
+
+<p><strong>O que muda na tela:</strong> ao abrir, nada: todos os campos estão cinza, mesmo vazios. Digite <code>ana</code> no E-mail e clique na Mensagem: o E-mail fica com borda vermelha e fundo rosado (a Mensagem, com o foco, ganha a faixa pêssego); o Nome, em que você não mexeu, continua cinza. Complete para <code>ana@exemplo.com</code> e o vermelho some.</p>
+
+<h3>Experimente: a versão 4</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Fale com a Ana&lt;/h1&gt;
+  &lt;div class="contato"&gt;
+    &lt;form class="formulario" action="obrigado.html"&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="nome"&gt;Nome&lt;/label&gt;
+        &lt;input id="nome" name="nome" autocomplete="name" required&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="email"&gt;E-mail&lt;/label&gt;
+        &lt;input id="email" name="email" type="email" autocomplete="email" required&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="assunto"&gt;Assunto&lt;/label&gt;
+        &lt;select id="assunto" name="assunto"&gt;
+          &lt;option&gt;Encomenda de bolo&lt;/option&gt;
+          &lt;option&gt;Clube do Bolo&lt;/option&gt;
+          &lt;option&gt;Outro assunto&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="mensagem"&gt;Mensagem&lt;/label&gt;
+        &lt;textarea id="mensagem" name="mensagem" rows="5" required&gt;&lt;/textarea&gt;
+      &lt;/p&gt;
+      &lt;p class="caixinha"&gt;
+        &lt;input id="novidades" name="novidades" type="checkbox" checked&gt;
+        &lt;label for="novidades"&gt;Quero receber as novidades da lojinha&lt;/label&gt;
+      &lt;/p&gt;
+      &lt;button type="submit"&gt;Enviar mensagem&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;aside class="cartao-contato"&gt;
+      &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="" width="96" height="96"&gt;
+      &lt;p&gt;&lt;strong&gt;Ana&lt;/strong&gt;&lt;br&gt;Lojinha da Ana&lt;/p&gt;
+      &lt;p&gt;Rua das Flores, perto da Av. Central&lt;/p&gt;
+      &lt;img class="mapa" src="assets/midia/mapa-400.png" alt="Mapa do bairro: a Lojinha da Ana fica na Rua das Flores, perto da Av. Central e da Praça da Árvore" width="400" height="250"&gt;
+    &lt;/aside&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #78716c;
+  border-radius: 6px;
+  background-color: #fff;
+}
+
+.campo textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.campo input:focus-visible,
+.campo select:focus-visible,
+.campo textarea:focus-visible {
+  border-color: #c2410c;
+  outline: 3px solid #fdba74;
+  outline-offset: 1px;
+}
+
+.campo input:user-invalid,
+.campo textarea:user-invalid {
+  border-color: #b91c1c;
+  background-color: #fef2f2;
+}
+</pre>
+</div>
+
+<p>Brinque: clique em "Enviar mensagem" com tudo vazio: o navegador mostra o balão no primeiro campo obrigatório, e os três campos obrigatórios ficam vermelhos de uma vez.</p>
+
+<h3>Missão 4</h3>
+<div class="tryhtml" data-goal="css:#email{border-top-color}=rgb(120, 113, 108),css:#nome{background-color}=rgb(255, 255, 255),src::user-invalid">
+<p class="try-task"><strong>Missão:</strong> do jeito que está, o formulário já abre todo vermelho, acusando erro antes de a pessoa digitar qualquer coisa. Faça os campos ficarem vermelhos só depois que a pessoa mexer neles.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;form action="obrigado.html"&gt;
+  &lt;p class="campo"&gt;
+    &lt;label for="nome"&gt;Nome&lt;/label&gt;
+    &lt;input id="nome" name="nome" required&gt;
+  &lt;/p&gt;
+  &lt;p class="campo"&gt;
+    &lt;label for="email"&gt;E-mail&lt;/label&gt;
+    &lt;input id="email" name="email" type="email" required&gt;
+  &lt;/p&gt;
+  &lt;p class="campo"&gt;
+    &lt;label for="mensagem"&gt;Mensagem&lt;/label&gt;
+    &lt;textarea id="mensagem" name="mensagem" rows="4" required&gt;&lt;/textarea&gt;
+  &lt;/p&gt;
+  &lt;button type="submit"&gt;Enviar mensagem&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+}
+
+input,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+}
+
+.campo input,
+.campo textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #78716c;
+  border-radius: 6px;
+}
+
+.campo input:invalid,
+.campo textarea:invalid {
+  border-color: #b91c1c;
+  background-color: #fef2f2;
+}
+</pre>
+<pre class="solucao" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+}
+
+input,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+}
+
+.campo input,
+.campo textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #78716c;
+  border-radius: 6px;
+}
+
+.campo input:user-invalid,
+.campo textarea:user-invalid {
+  border-color: #b91c1c;
+  background-color: #fef2f2;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao5">Versão 5 · A caixinha e o botão</h2>
+
+<pre class="file" data-file="style.css (versão 5: o que entra)">
+.caixinha {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.caixinha input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  accent-color: #c2410c;
+}
+
+button {
+  padding: 0.75rem 1.5rem;
+  border: 0;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #9a3412;
+}
+
+button:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 3px;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>.caixinha { display: flex; align-items: center; gap: 0.5rem; }</code></dt>
+  <dd>A caixa de seleção e o texto dela ficam na mesma linha, centralizados na altura, com 8 px entre eles. Aula: <a href="align-items.html">align-items</a>.</dd>
+  <dt><code>width</code>, <code>height</code> e <code>accent-color</code></dt>
+  <dd>A caixinha cresce para 20 × 20 px (mais fácil de acertar com o dedo) e, marcada, fica laranja-escura em vez do azul do navegador. O <code>accent-color</code> pinta caixas de seleção, botões de rádio, barras de progresso e controles deslizantes. Aula: <a href="accent-color.html">accent-color e appearance</a>.</dd>
+  <dt><code>button</code></dt>
+  <dd>Sem a borda de fábrica (<code>border: 0</code>), fundo laranja-escuro, letra branca em negrito, cantos de 8 px, cursor de "mãozinha". No <code>:hover</code>, escurece; no <code>:focus-visible</code>, contorno azul afastado 3 px. Aulas: <a href="botoes.html">Estilizando Botões</a> e <a href="cursor.html">Cursor</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> a caixinha marcada fica maior e laranja, com o ✓ branco, alinhada no meio da altura da frase "Quero receber as novidades da lojinha". O botão vira um retângulo laranja de cantos arredondados, com "Enviar mensagem" em branco e negrito.</p>
+
+<h3>Experimente: a versão 5</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Fale com a Ana&lt;/h1&gt;
+  &lt;div class="contato"&gt;
+    &lt;form class="formulario" action="obrigado.html"&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="nome"&gt;Nome&lt;/label&gt;
+        &lt;input id="nome" name="nome" autocomplete="name" required&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="email"&gt;E-mail&lt;/label&gt;
+        &lt;input id="email" name="email" type="email" autocomplete="email" required&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="assunto"&gt;Assunto&lt;/label&gt;
+        &lt;select id="assunto" name="assunto"&gt;
+          &lt;option&gt;Encomenda de bolo&lt;/option&gt;
+          &lt;option&gt;Clube do Bolo&lt;/option&gt;
+          &lt;option&gt;Outro assunto&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="mensagem"&gt;Mensagem&lt;/label&gt;
+        &lt;textarea id="mensagem" name="mensagem" rows="5" required&gt;&lt;/textarea&gt;
+      &lt;/p&gt;
+      &lt;p class="caixinha"&gt;
+        &lt;input id="novidades" name="novidades" type="checkbox" checked&gt;
+        &lt;label for="novidades"&gt;Quero receber as novidades da lojinha&lt;/label&gt;
+      &lt;/p&gt;
+      &lt;button type="submit"&gt;Enviar mensagem&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;aside class="cartao-contato"&gt;
+      &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="" width="96" height="96"&gt;
+      &lt;p&gt;&lt;strong&gt;Ana&lt;/strong&gt;&lt;br&gt;Lojinha da Ana&lt;/p&gt;
+      &lt;p&gt;Rua das Flores, perto da Av. Central&lt;/p&gt;
+      &lt;img class="mapa" src="assets/midia/mapa-400.png" alt="Mapa do bairro: a Lojinha da Ana fica na Rua das Flores, perto da Av. Central e da Praça da Árvore" width="400" height="250"&gt;
+    &lt;/aside&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #78716c;
+  border-radius: 6px;
+  background-color: #fff;
+}
+
+.campo textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.campo input:focus-visible,
+.campo select:focus-visible,
+.campo textarea:focus-visible {
+  border-color: #c2410c;
+  outline: 3px solid #fdba74;
+  outline-offset: 1px;
+}
+
+.campo input:user-invalid,
+.campo textarea:user-invalid {
+  border-color: #b91c1c;
+  background-color: #fef2f2;
+}
+
+.caixinha {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.caixinha input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  accent-color: #c2410c;
+}
+
+button {
+  padding: 0.75rem 1.5rem;
+  border: 0;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #9a3412;
+}
+
+button:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 3px;
+}
+</pre>
+</div>
+
+<h3>Missão 5</h3>
+<div class="tryhtml" data-goal="css:button{background-color}=rgb(194, 65, 12),css:button{color}=rgb(255, 255, 255),css:button{border-top-style}=none,css:button{cursor}=pointer,hover:button{background-color}=rgb(154, 52, 18)">
+<p class="try-task"><strong>Missão:</strong> desenhe o botão: sem borda, fundo <code>#c2410c</code>, letra branca, cursor de mãozinha (<code>pointer</code>) e, com o mouse em cima, fundo <code>#9a3412</code>. Para conferir o <code>:hover</code>, passe o mouse no botão.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;form action="obrigado.html"&gt;
+  &lt;p class="campo"&gt;
+    &lt;label for="nome"&gt;Nome&lt;/label&gt;
+    &lt;input id="nome" name="nome" required&gt;
+  &lt;/p&gt;
+  &lt;p class="campo"&gt;
+    &lt;label for="email"&gt;E-mail&lt;/label&gt;
+    &lt;input id="email" name="email" type="email" required&gt;
+  &lt;/p&gt;
+  &lt;p class="campo"&gt;
+    &lt;label for="mensagem"&gt;Mensagem&lt;/label&gt;
+    &lt;textarea id="mensagem" name="mensagem" rows="4" required&gt;&lt;/textarea&gt;
+  &lt;/p&gt;
+  &lt;button type="submit"&gt;Enviar mensagem&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+}
+
+input,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+}
+
+.campo input,
+.campo textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #78716c;
+  border-radius: 6px;
+}
+
+button {
+  padding: 0.75rem 1.5rem;
+}
+</pre>
+<pre class="solucao" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+}
+
+input,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+}
+
+.campo input,
+.campo textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #78716c;
+  border-radius: 6px;
+}
+
+button {
+  padding: 0.75rem 1.5rem;
+  border: 0;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #9a3412;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao6">Versão 6 · O cartão de contato ao lado</h2>
+
+<pre class="file" data-file="style.css (versão 6: o que entra)">
+.cartao-contato {
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.cartao-contato .avatar {
+  border-radius: 50%;
+}
+
+.cartao-contato .mapa {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+@media (min-width: 48rem) {
+  .contato {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>.cartao-contato</code></dt>
+  <dd>Um cartão branco, com cantos de 12 px e o texto centralizado. O avatar fica redondo (<code>border-radius: 50%</code>), e o mapa ocupa a largura do cartão, com cantos arredondados. Aula: <a href="border-radius.html">border-radius</a>.</dd>
+  <dt><code>@media (min-width: 48rem)</code> + <code>grid-template-columns: 2fr 1fr</code></dt>
+  <dd>A partir de 768 px, o <code>.contato</code> vira uma grade de duas colunas: o formulário com 2 partes, o cartão com 1. Aulas: <a href="media-queries.html">Media Queries</a> e <a href="grid-colunas.html">Colunas</a>.</dd>
+  <dt><code>align-items: start</code></dt>
+  <dd>Sem isso, o cartão esticaria até a altura do formulário, com um vão branco embaixo do mapa. Com <code>start</code>, ele fica da altura do conteúdo, no alto. Aula: <a href="grid-alinhar.html">Alinhando no Grid</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 768 px, o formulário fica numa coluna de 469 px à esquerda, e o cartão branco, à direita, com o avatar redondo da Ana, "Ana / Lojinha da Ana" em negrito e normal, "Rua das Flores, perto da Av. Central" e o mapa pequeno. No quadro de 375 px, o cartão fica embaixo do botão, da largura toda.</p>
+
+<h3>Experimente: a versão 6 (a página completa)</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Fale com a Ana&lt;/h1&gt;
+  &lt;div class="contato"&gt;
+    &lt;form class="formulario" action="obrigado.html"&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="nome"&gt;Nome&lt;/label&gt;
+        &lt;input id="nome" name="nome" autocomplete="name" required&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="email"&gt;E-mail&lt;/label&gt;
+        &lt;input id="email" name="email" type="email" autocomplete="email" required&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="assunto"&gt;Assunto&lt;/label&gt;
+        &lt;select id="assunto" name="assunto"&gt;
+          &lt;option&gt;Encomenda de bolo&lt;/option&gt;
+          &lt;option&gt;Clube do Bolo&lt;/option&gt;
+          &lt;option&gt;Outro assunto&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="mensagem"&gt;Mensagem&lt;/label&gt;
+        &lt;textarea id="mensagem" name="mensagem" rows="5" required&gt;&lt;/textarea&gt;
+      &lt;/p&gt;
+      &lt;p class="caixinha"&gt;
+        &lt;input id="novidades" name="novidades" type="checkbox" checked&gt;
+        &lt;label for="novidades"&gt;Quero receber as novidades da lojinha&lt;/label&gt;
+      &lt;/p&gt;
+      &lt;button type="submit"&gt;Enviar mensagem&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;aside class="cartao-contato"&gt;
+      &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="" width="96" height="96"&gt;
+      &lt;p&gt;&lt;strong&gt;Ana&lt;/strong&gt;&lt;br&gt;Lojinha da Ana&lt;/p&gt;
+      &lt;p&gt;Rua das Flores, perto da Av. Central&lt;/p&gt;
+      &lt;img class="mapa" src="assets/midia/mapa-400.png" alt="Mapa do bairro: a Lojinha da Ana fica na Rua das Flores, perto da Av. Central e da Praça da Árvore" width="400" height="250"&gt;
+    &lt;/aside&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #78716c;
+  border-radius: 6px;
+  background-color: #fff;
+}
+
+.campo textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.campo input:focus-visible,
+.campo select:focus-visible,
+.campo textarea:focus-visible {
+  border-color: #c2410c;
+  outline: 3px solid #fdba74;
+  outline-offset: 1px;
+}
+
+.campo input:user-invalid,
+.campo textarea:user-invalid {
+  border-color: #b91c1c;
+  background-color: #fef2f2;
+}
+
+.caixinha {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.caixinha input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  accent-color: #c2410c;
+}
+
+button {
+  padding: 0.75rem 1.5rem;
+  border: 0;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #9a3412;
+}
+
+button:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 3px;
+}
+
+.cartao-contato {
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.cartao-contato .avatar {
+  border-radius: 50%;
+}
+
+.cartao-contato .mapa {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+@media (min-width: 48rem) {
+  .contato {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+}
+</pre>
+</div>
+
+<p>Brinque: preencha tudo certo e envie. O editor abre a página "📨 Formulário enviado", com o endereço que abriria (<code>obrigado.html?nome=…&amp;email=…</code>) e a tabela dos campos; o ↻ volta ao formulário. Repare que a caixinha marcada aparece como <code>novidades=on</code>.</p>
+
+<h3>Missão 6</h3>
+<div class="tryhtml" data-largura="768" data-goal="css:.contato{display}=grid,css:.contato{column-gap}=32px,css:.contato{align-items}=start,src:@media\s*\(\s*min-width:\s*48rem\s*\)">
+<p class="try-task"><strong>Missão:</strong> a partir de <code>48rem</code>, ponha o formulário e o cartão lado a lado (<code>2fr 1fr</code>, <code>2rem</code> de espaço), com o cartão do tamanho do conteúdo, no alto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Fale com a Ana&lt;/h1&gt;
+  &lt;div class="contato"&gt;
+    &lt;form class="formulario" action="obrigado.html"&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="nome"&gt;Nome&lt;/label&gt;
+        &lt;input id="nome" name="nome" autocomplete="name" required&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="email"&gt;E-mail&lt;/label&gt;
+        &lt;input id="email" name="email" type="email" autocomplete="email" required&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="assunto"&gt;Assunto&lt;/label&gt;
+        &lt;select id="assunto" name="assunto"&gt;
+          &lt;option&gt;Encomenda de bolo&lt;/option&gt;
+          &lt;option&gt;Clube do Bolo&lt;/option&gt;
+          &lt;option&gt;Outro assunto&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/p&gt;
+      &lt;p class="campo"&gt;
+        &lt;label for="mensagem"&gt;Mensagem&lt;/label&gt;
+        &lt;textarea id="mensagem" name="mensagem" rows="5" required&gt;&lt;/textarea&gt;
+      &lt;/p&gt;
+      &lt;p class="caixinha"&gt;
+        &lt;input id="novidades" name="novidades" type="checkbox" checked&gt;
+        &lt;label for="novidades"&gt;Quero receber as novidades da lojinha&lt;/label&gt;
+      &lt;/p&gt;
+      &lt;button type="submit"&gt;Enviar mensagem&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;aside class="cartao-contato"&gt;
+      &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="" width="96" height="96"&gt;
+      &lt;p&gt;&lt;strong&gt;Ana&lt;/strong&gt;&lt;br&gt;Lojinha da Ana&lt;/p&gt;
+      &lt;p&gt;Rua das Flores, perto da Av. Central&lt;/p&gt;
+      &lt;img class="mapa" src="assets/midia/mapa-400.png" alt="Mapa do bairro: a Lojinha da Ana fica na Rua das Flores, perto da Av. Central e da Praça da Árvore" width="400" height="250"&gt;
+    &lt;/aside&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #78716c;
+  border-radius: 6px;
+  background-color: #fff;
+}
+
+.campo textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.campo input:focus-visible,
+.campo select:focus-visible,
+.campo textarea:focus-visible {
+  border-color: #c2410c;
+  outline: 3px solid #fdba74;
+  outline-offset: 1px;
+}
+
+.campo input:user-invalid,
+.campo textarea:user-invalid {
+  border-color: #b91c1c;
+  background-color: #fef2f2;
+}
+
+.caixinha {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.caixinha input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  accent-color: #c2410c;
+}
+
+button {
+  padding: 0.75rem 1.5rem;
+  border: 0;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #9a3412;
+}
+
+button:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 3px;
+}
+
+.cartao-contato {
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.cartao-contato .avatar {
+  border-radius: 50%;
+}
+
+.cartao-contato .mapa {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* a partir de 48rem: duas colunas aqui embaixo */
+</pre>
+<pre class="solucao" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+.campo label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #78716c;
+  border-radius: 6px;
+  background-color: #fff;
+}
+
+.campo textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.campo input:focus-visible,
+.campo select:focus-visible,
+.campo textarea:focus-visible {
+  border-color: #c2410c;
+  outline: 3px solid #fdba74;
+  outline-offset: 1px;
+}
+
+.campo input:user-invalid,
+.campo textarea:user-invalid {
+  border-color: #b91c1c;
+  background-color: #fef2f2;
+}
+
+.caixinha {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.caixinha input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  accent-color: #c2410c;
+}
+
+button {
+  padding: 0.75rem 1.5rem;
+  border: 0;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #9a3412;
+}
+
+button:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 3px;
+}
+
+.cartao-contato {
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.cartao-contato .avatar {
+  border-radius: 50%;
+}
+
+.cartao-contato .mapa {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* a partir de 48rem: duas colunas aqui embaixo */
+@media (min-width: 48rem) {
+  .contato {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Formas diferentes de fazer as mesmas coisas</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Para</th><th>Usamos</th><th>Também daria</th><th>Quando preferir a outra</th></tr></thead>
+<tbody>
+<tr><td>Rótulo em cima</td><td><code>label { display: block; }</code></td><td><code>.campo { display: grid; gap: 0.25rem; }</code></td><td>Quando você quer controlar o espaço entre rótulo e campo com <code>gap</code>.</td></tr>
+<tr><td>Rótulo ao lado (tela larga)</td><td>Não usamos</td><td><code>.campo { display: grid; grid-template-columns: 8rem 1fr; }</code></td><td>Formulários longos de cadastro, em telas largas; no celular, rótulo em cima é sempre melhor.</td></tr>
+<tr><td>Foco</td><td><code>:focus-visible</code> com <code>outline</code></td><td><code>:focus</code> com <code>box-shadow</code></td><td><code>box-shadow</code> acompanha os cantos arredondados em navegadores antigos; mas some no modo de alto contraste do Windows, e o <code>outline</code> não.</td></tr>
+<tr><td>Erro</td><td><code>:user-invalid</code></td><td><code>:invalid</code></td><td>Quase nunca: <code>:invalid</code> pinta o formulário vazio de vermelho ao abrir.</td></tr>
+<tr><td>Cor da caixinha</td><td><code>accent-color</code></td><td><code>appearance: none</code> e desenhar a caixa do zero</td><td>Quando o design pede uma caixa que o <code>accent-color</code> não faz (outro formato, outro ícone).</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<h2>Quando dá errado</h2>
+
+<div class="cenario">
+<h3>A letra dos campos é menor e diferente</h3>
+<p>Sem o <code>font: inherit</code>: o texto digitado fica em 13,33 px (o estilo calculado do <code>font-size</code> do campo é <code>13.3333px</code>), na fonte que o navegador escolhe para formulários, e o botão também. <strong>Por quê:</strong> os navegadores dão aos campos uma fonte própria, e por isso eles não herdam a do <code>body</code>. Não é erro do seu CSS, e o validador não diz nada; é um padrão do navegador que todo site corrige.</p>
+</div>
+
+<div class="cenario">
+<h3>Os campos passam da borda direita</h3>
+<p>Sem a regra do <code>box-sizing: border-box</code>, com <code>width: 100%</code> e <code>padding</code>:</p>
+<p><strong>O que você vê:</strong> no quadro de 768 px, o Nome, o E-mail e a Mensagem saem 26 px para fora da coluna (762 px em vez de 736), e o quadro ganha rolagem para o lado. O Assunto, curiosamente, fica certo. <strong>Por quê:</strong> no modelo de caixa padrão, o <code>width</code> é só do conteúdo; o preenchimento (12 + 12) e a borda (1 + 1) se somam por fora. O <code>&lt;select&gt;</code> já vem do navegador com <code>border-box</code>, os outros não. O validador não acusa: o CSS é válido. Aula: <a href="box-sizing.html">box-sizing</a>.</p>
+</div>
+
+<div class="cenario">
+<h3>O formulário abre todo vermelho</h3>
+<pre class="file" data-file="style.css · erro de propósito">.campo input:invalid,
+.campo textarea:invalid {
+  border-color: #b91c1c;
+  background-color: #fef2f2;
+}
+</pre>
+<p><strong>O que você vê:</strong> antes de digitar qualquer coisa, Nome, E-mail e Mensagem já estão com borda vermelha e fundo rosado. Só o Assunto (que não é obrigatório) fica cinza. <strong>Por quê:</strong> <code>:invalid</code> vale <strong>a qualquer momento</strong>, e um campo obrigatório vazio é inválido desde o início. Para quem chega, parece que já errou. Troque por <code>:user-invalid</code> (versão 4).</p>
+</div>
+
+<div class="cenario">
+<h3>Não dá para saber em que campo se está</h3>
+<pre class="file" data-file="style.css · erro de propósito">.campo input:focus {
+  outline: none;
+}
+</pre>
+<p><strong>O que você vê:</strong> com o foco no E-mail, o campo fica exatamente igual aos outros: nenhuma borda nova, nenhum contorno. Com o mouse, você ainda vê o cursor piscando; pelo teclado, depois de alguns <kbd>Tab</kbd>, fica difícil saber onde está. <strong>Por quê:</strong> o <code>outline: none</code> apaga o indicador de foco do navegador e não põe nada no lugar. O validador não acusa, mas é uma das falhas de acessibilidade mais comuns. Se for tirar o contorno de fábrica, ponha outro indicador visível na mesma regra (versão 3). Aula: <a href="acessibilidade.html">CSS e Acessibilidade</a>.</p>
+</div>
+
+<div class="cenario">
+<h3>A caixa de mensagem continua esticando para o lado</h3>
+<pre class="file" data-file="style.css · erro de propósito">.campo textarea {
+  min-height: 8rem;
+  resize: vertial;
+}
+</pre>
+<p><strong>O que você vê:</strong> o puxador do canto continua deixando a caixa ficar mais larga que o formulário. <strong>Por quê:</strong> <code>vertial</code> (faltou o "c") não é um valor de <code>resize</code>; o navegador descarta a declaração e fica com o padrão, que estica nas duas direções. O validador:</p>
+<pre class="term" data-cwd="~/contato">$ vnu --css style.css
+"file:/home/ana/contato/style.css":3.11-3.17: error: CSS: “resize”: “vertial” is not a “resize” value.</pre>
+</div>
+
+<hr>
+
+<h2>Referência: o que o projeto usou</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Versão</th><th>Propriedades e seletores</th><th>Aulas</th></tr></thead>
+<tbody>
+<tr><td>1 · Base</td><td><code>font: inherit</code>, <code>display: block</code>, <code>width: 100%</code>, <code>box-sizing</code></td><td><a href="heranca.html">Herança</a>, <a href="box-sizing.html">box-sizing</a></td></tr>
+<tr><td>2 · Campos</td><td><code>padding</code>, <code>border</code>, <code>border-radius</code>, <code>min-height</code>, <code>resize</code></td><td><a href="formularios.html">Formulários</a></td></tr>
+<tr><td>3 · Foco</td><td><code>:focus-visible</code>, <code>outline</code>, <code>outline-offset</code>, <code>border-color</code></td><td><a href="outline.html">Contorno</a>, <a href="hover-focus.html">Estados</a></td></tr>
+<tr><td>4 · Erro</td><td><code>:user-invalid</code></td><td><a href="formularios.html">Formulários</a></td></tr>
+<tr><td>5 · Caixinha e botão</td><td><code>display: flex</code>, <code>align-items</code>, <code>accent-color</code>, <code>border: 0</code>, <code>cursor</code>, <code>:hover</code></td><td><a href="accent-color.html">accent-color</a>, <a href="botoes.html">Botões</a></td></tr>
+<tr><td>6 · Duas colunas</td><td><code>@media</code>, <code>display: grid</code>, <code>grid-template-columns</code>, <code>align-items: start</code></td><td><a href="media-queries.html">Media Queries</a>, <a href="grid-alinhar.html">Alinhando no Grid</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Desafios extras</h2>
+<ul>
+  <li>Escreva uma mensagem de erro embaixo do e-mail (<code>&lt;p class="erro"&gt;</code>) que só aparece com <code>.campo:has(input:user-invalid) .erro</code> (aula <a href="has.html">:has()</a>).</li>
+  <li>Ponha Nome e E-mail lado a lado na tela larga, com uma grade dentro do formulário.</li>
+  <li>Crie a versão escura do formulário com <a href="tema-escuro.html">prefers-color-scheme</a> e <code>color-scheme: dark</code>, para os campos acompanharem.</li>
+</ul>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A letra dos campos</h3>
+<p>Complete para os campos herdarem a fonte da página:</p>
+<div class="ex-code">input, select, textarea, button { font: <input data-answer="inherit" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Erro só depois de mexer</h3>
+<p>Complete o seletor do campo inválido que a pessoa já tocou:</p>
+<div class="ex-code">.campo input:<input data-answer="user-invalid" aria-label="pseudo-classe"> { border-color: #b91c1c; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. Qual é o problema de <code>input:focus { outline: none; }</code> sozinho?</p>
+<label><input type="radio" name="q3"> O validador acusa erro</label>
+<label><input type="radio" name="q3"> O campo para de receber o foco</label>
+<label><input type="radio" name="q3"> Quem usa o teclado não vê mais em que campo está</label>
+<label><input type="radio" name="q3"> O formulário não é mais enviado</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">4. Para que serve o <code>accent-color</code>?</p>
+<label><input type="radio" name="q4"> Mudar a cor de caixas de seleção, botões de rádio e controles parecidos</label>
+<label><input type="radio" name="q4"> Mudar a cor do texto digitado</label>
+<label><input type="radio" name="q4"> Mudar a cor da borda do campo com foco</label>
+<label><input type="radio" name="q4"> Mudar a cor do cursor que pisca</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Os campos com <code>width: 100%</code> e <code>padding</code> passaram da borda. O que falta?</p>
+<label><input type="radio" name="q5"> <code>max-width: 100%</code></label>
+<label><input type="radio" name="q5"> <code>box-sizing: border-box</code></label>
+<label><input type="radio" name="q5"> <code>overflow: hidden</code> no formulário</label>
+<label><input type="radio" name="q5"> <code>display: block</code> nos campos</label>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Campos de formulário não herdam a fonte: <code>font: inherit</code> em <code>input</code>, <code>select</code>, <code>textarea</code> e <code>button</code>.</li>
+  <li>Rótulo em cima (<code>display: block</code>), campo da largura toda (<code>width: 100%</code>, com <code>box-sizing: border-box</code>), preenchimento, borda com contraste e cantos.</li>
+  <li>Foco sempre visível: troque o contorno de fábrica por um seu no <code>:focus-visible</code>, nunca só <code>outline: none</code>.</li>
+  <li>Erro com <code>:user-invalid</code>, que espera a pessoa mexer; <code>:invalid</code> pinta o formulário vazio ao abrir.</li>
+  <li><code>accent-color</code> pinta a caixinha; o botão perde a borda de fábrica e ganha cor, cursor e estados.</li>
+  <li>Na tela larga, Grid de duas colunas com <code>align-items: start</code> para o cartão não esticar.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
