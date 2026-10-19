@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Reset e Normalize — os estilos do navegador e um reset moderno curto | Guia CSS</title>
+<meta name="description" content="Reset e normalize em CSS para quem está começando: os estilos padrão que o navegador põe em toda página (margem do body, tamanho do h1, recuo das listas, fonte dos botões), o reset agressivo e por que ele estraga as listas, o normalize, e um reset moderno curto explicado linha por linha, com as fontes, as licenças e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Reset e Normalize</span></h1>
+
+<p class="intro">Abra uma página sem nenhum CSS e ela já tem estilo: o título é grande e em negrito, a lista tem bolinhas e recuo, o texto não encosta na borda da janela. Quem fez isso foi o <strong>navegador</strong>, com uma folha de estilos própria, que vem antes da sua. Esses estilos padrão são úteis, mas alguns atrapalham: a fonte dos botões é menor que a do texto, uma foto grande estoura a tela do celular. Um <strong>reset</strong> é um pequeno trecho de CSS, no começo do seu arquivo, que acerta esses pontos antes de você começar. Nesta aula você vai ver os estilos do navegador, os jeitos de lidar com eles e montar um reset moderno curto, entendendo cada linha.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Os estilos que o navegador põe em toda página, com os valores medidos.</li>
+  <li>O reset "agressivo" (<code>* { margin: 0; padding: 0; }</code>) e por que ele estraga as listas.</li>
+  <li>A diferença entre <strong>reset</strong> e <strong>normalize</strong>.</li>
+  <li>Um reset moderno de cinco regras, explicado linha por linha.</li>
+  <li>Onde pôr o reset: no começo do arquivo, num arquivo próprio ou numa camada.</li>
+  <li>O que dá errado: o reset no fim do arquivo, a imagem que pula de linha, e a mensagem real do validador.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador. Os valores em pixels foram medidos no Chromium, com o estilo calculado (outros navegadores têm valores parecidos, mas não idênticos: é justamente o assunto da aula). As mensagens de erro são do validador W3C (<code>vnu</code>) rodado na máquina fictícia da Ana (<code>ana@notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a casa alugada</h2>
+<p>A Ana alugou uma casa para abrir a padaria. A casa veio com paredes pintadas, cortinas e uma estante. Ela tem três opções:</p>
+<ul>
+  <li><strong>Deixar tudo como veio</strong> e decorar por cima. Rápido, mas a cortina verde não combina com nada.</li>
+  <li><strong>Esvaziar e pintar tudo de branco</strong> antes de decorar. Fica tudo do jeito dela, mas ela tem que comprar de novo até o que era útil, como a estante. Esse é o <strong>reset agressivo</strong>.</li>
+  <li><strong>Consertar só o que incomoda</strong>: trocar a cortina, prender a estante que balançava, e manter o resto. Esse é o <strong>reset moderno</strong> desta aula.</li>
+</ul>
+
+<hr>
+
+<h2>1. O que o navegador já faz</h2>
+<p>Esta página não tem nenhum CSS do autor. Tudo o que você vê é o estilo do navegador (a folha de estilos do <em>user agent</em>, "agente do usuário", o nome técnico do navegador):</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura com cobertura.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;3 cenouras&lt;/li&gt;
+  &lt;li&gt;3 ovos&lt;/li&gt;
+&lt;/ul&gt;
+&lt;button&gt;Encomendar&lt;/button&gt;
+&lt;input type="text" value="Seu nome" aria-label="Nome"&gt;
+</pre>
+
+<p>Os valores que o Chromium calculou para essa página, sem uma linha de CSS sua:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Elemento</th><th>Estilo do navegador</th><th>Bom ou ruim?</th></tr>
+<tr><td><code>body</code></td><td><code>margin: 8px</code></td><td>Evita o texto colado na borda, mas é um número que você não escolheu, e atrapalha fundos e cabeçalhos que deveriam ir de ponta a ponta.</td></tr>
+<tr><td><code>body</code></td><td><code>line-height: normal</code></td><td>Linhas apertadas para ler textos longos (aula <a href="line-height.html">Espaçamento</a>).</td></tr>
+<tr><td><code>h1</code></td><td><code>font-size: 32px</code>, <code>font-weight: 700</code>, <code>margin: 21.44px 0</code></td><td>Útil: o título parece título.</td></tr>
+<tr><td><code>p</code>, <code>ul</code></td><td><code>margin: 16px 0</code></td><td>Útil: separa os parágrafos.</td></tr>
+<tr><td><code>ul</code></td><td><code>padding-left: 40px</code>, bolinhas</td><td>Útil: é onde as bolinhas moram.</td></tr>
+<tr><td><code>button</code>, <code>input</code></td><td><code>font-size: 13.3333px</code>, fonte própria</td><td>Ruim: os campos ficam com letra menor e diferente do resto do site.</td></tr>
+<tr><td><code>img</code></td><td><code>display: inline</code>, sem limite de largura</td><td>Ruim no celular: uma foto de 400 px estoura uma tela de 300 px.</td></tr>
+<tr><td>Todas as caixas</td><td><code>box-sizing: content-box</code></td><td>Ruim para contas: a borda e o preenchimento somam na largura (aula <a href="box-sizing.html">box-sizing</a>).</td></tr>
+</table>
+</div>
+
+<p>Você pode ver esses estilos no F12: no painel de estilos do elemento, abaixo das suas regras, aparece um bloco marcado como <em>user agent stylesheet</em> ("folha de estilos do agente do usuário"). É o CSS do navegador.</p>
+
+<hr>
+
+<h2>2. O reset agressivo: zerar tudo</h2>
+<p>Por muitos anos, o primeiro passo de todo CSS era este:</p>
+
+<pre class="file" data-file="style.css">* {
+  margin: 0;
+  padding: 0;
+}
+</pre>
+
+<p>O seletor universal <code>*</code> (aula <a href="seletor-universal.html">Seletor Universal</a>) zera a margem e o preenchimento de <strong>todos</strong> os elementos. Com a mesma página de cima, o Chromium desenhou tudo grudado: o título encostado no parágrafo, o parágrafo na lista, e a lista <strong>sem as bolinhas</strong>. As bolinhas ficam do lado de fora do texto, no espaço do <code>padding-left</code>; com o <code>padding</code> zerado (o estilo calculado ficou <code>padding-left: 0px</code>), elas foram parar fora da janela. Para ter a página de volta, você precisaria reescrever as margens de cada título, parágrafo e lista: é a casa pintada de branco, sem a estante.</p>
+
+<p>Houve resets ainda mais agressivos, como o de Eric Meyer (2007–2011, em domínio público), que também deixava o <code>h1</code> do tamanho do texto. Eles faziam sentido quando os navegadores eram muito diferentes entre si. Hoje não são mais necessários.</p>
+
+<hr>
+
+<h2>3. Normalize: igualar os navegadores</h2>
+<p>A outra escola é o <strong>normalize</strong>: em vez de apagar os estilos do navegador, ele <strong>mantém os úteis</strong> e corrige só as diferenças entre um navegador e outro, para a página sair igual em todos. Os mais conhecidos são o <em>normalize.css</em> (de Nicolas Gallagher e Jonathan Neal) e o <em>modern-normalize</em> (de Sindre Sorhus, que se descreve como <em>"Normalize browsers' default style"</em>, "normalizar o estilo padrão dos navegadores"). Os dois são de código aberto, com licença MIT: você pode usá-los no seu site, desde que mantenha o aviso de licença que vem no arquivo.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th>Reset</th><th>Normalize</th></tr>
+<tr><td>O que faz com os estilos do navegador</td><td>Remove ou troca</td><td>Mantém os úteis, corrige as diferenças</td></tr>
+<tr><td>A página depois dele</td><td>"Crua": você estiliza tudo</td><td>Parecida com o padrão, igual em todos os navegadores</td></tr>
+<tr><td>Bom para</td><td>Sites com visual todo próprio</td><td>Quem quer partir dos padrões</td></tr>
+</table>
+</div>
+
+<p>Na prática, os resets modernos ficaram no meio do caminho: <strong>poucos ajustes</strong>, cada um com um motivo. É o que você vai montar agora.</p>
+
+<hr>
+
+<h2>4. Um reset moderno, linha por linha</h2>
+<p>Este é o reset deste guia: cinco regras curtas. Ideias parecidas aparecem em vários resets conhecidos (por exemplo, o "A Modern CSS Reset" de Josh W. Comeau, em <a href="https://www.joshwcomeau.com/css/custom-css-reset/">joshwcomeau.com</a>, que ele publica em domínio público). Este aqui foi escrito para a aula, e você não precisa copiar nenhum outro.</p>
+
+<pre class="file" data-file="reset.css">/* 1. Largura que inclui borda e preenchimento */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 2. Sem a margem do navegador; linhas mais abertas */
+body {
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* 3. Imagens e vídeos nunca maiores que o espaço */
+img,
+picture,
+video,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* 4. Campos com a fonte do resto da página */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* 5. Palavras compridas quebram em vez de estourar */
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: break-word;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>*, *::before, *::after</dt><dd>Todos os elementos, e também os pseudo-elementos <code>::before</code> e <code>::after</code> (aula <a href="before-after.html">::before e ::after</a>), que o <code>*</code> sozinho não pega.</dd>
+  <dt>box-sizing: border-box</dt><dd>A largura que você escreve passa a incluir a borda e o preenchimento: <code>width: 200px</code> com <code>padding: 20px</code> continua com 200 px. Sem isso, a caixa teria 240 px. No Chromium, o campo de texto do exemplo passou de <code>content-box</code> para <code>border-box</code> (aula <a href="box-sizing.html">box-sizing</a>).</dd>
+  <dt>body { margin: 0; }</dt><dd>Tira os 8 px do navegador. O texto passa a encostar na borda: é de propósito. O espaço da página agora é decisão sua (um <code>padding</code> no <code>main</code>, por exemplo), e um cabeçalho com fundo colorido pode ir de ponta a ponta.</dd>
+  <dt>line-height: 1.5</dt><dd>Altura da linha de 1,5 vez o tamanho da letra, sem unidade: com a fonte de 16 px, 24 px (foi o valor calculado no Chromium). Textos ficam mais fáceis de ler. Por ser herdada, vale para a página toda.</dd>
+  <dt>img, picture, video, svg</dt><dd>Os elementos de mídia.</dd>
+  <dt>display: block</dt><dd>Por padrão, a imagem é <code>inline</code>, como uma letra, e fica com um vãozinho embaixo (o espaço das "pernas" das letras, como no <code>g</code>). Como bloco, o vão some e ela ocupa a linha dela.</dd>
+  <dt>max-width: 100%; height: auto</dt><dd>A imagem nunca fica mais larga que o espaço onde está, e a altura acompanha a proporção. No Chromium, a foto de 400 × 300 num quadro de 300 px ficou com <strong>300 × 225</strong>, em vez de estourar (aula <a href="imagens-responsivas.html">Imagens que se Adaptam</a>).</dd>
+  <dt>input, button, textarea, select</dt><dd>Os campos de formulário.</dd>
+  <dt>font: inherit</dt><dd>O atalho <code>font</code> (família, tamanho, peso, altura da linha…) com o valor <code>inherit</code> ("herdar"): o campo usa a mesma fonte do elemento em volta. Os campos <strong>não</strong> herdam a fonte sozinhos; no Chromium, o botão passou de <strong>13,33 px</strong> para <strong>16 px</strong>, com a mesma família do texto.</dd>
+  <dt>overflow-wrap: break-word</dt><dd>Uma palavra que não cabe na linha (um endereço comprido, um nome sem espaço) é quebrada, em vez de sair pela lateral da tela (aula <a href="texto-longo.html">Texto que Não Cabe</a>).</dd>
+</dl>
+
+<p>O que este reset <strong>não</strong> faz, de propósito: não mexe nos títulos, nos parágrafos nem nas listas. As margens do <code>h1</code> e do <code>p</code> e as bolinhas da lista continuam, porque são úteis. No Chromium, com o reset, o <code>h1</code> continuou com <code>font-size: 32px</code> e <code>margin-top: 21.44px</code>, e a lista com <code>padding-left: 40px</code>.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> a mesma página do começo da aula, agora com o reset. Compare com o primeiro resultado: o botão e o campo com a letra do tamanho do texto, a foto do tamanho do quadro, as linhas mais abertas. Depois apague uma regra por vez do <code>style.css</code> e veja o que ela fazia.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura com cobertura.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;3 cenouras&lt;/li&gt;
+  &lt;li&gt;3 ovos&lt;/li&gt;
+&lt;/ul&gt;
+&lt;button&gt;Encomendar&lt;/button&gt;
+&lt;input type="text" value="Seu nome" aria-label="Nome"&gt;
+&lt;img src="assets/midia/bolo-1200.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="1200" height="900"&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  line-height: 1.5;
+}
+
+img,
+picture,
+video,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: break-word;
+}
+</pre>
+</div>
+
+<p>Repare que a foto deste exemplo tem 1200 px de largura, bem mais que o quadro. Apague a regra das imagens e ela estoura para a direita.</p>
+
+<hr>
+
+<h2>5. Onde pôr o reset</h2>
+<p>O reset tem de vir <strong>antes</strong> dos seus estilos, para eles poderem mudar o que o reset fez. Três formas:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Como</th><th>Quando usar</th></tr>
+<tr><td>No começo do <code>style.css</code></td><td>As cinco regras nas primeiras linhas, com um comentário <code>/* Reset */</code></td><td>Sites pequenos, um arquivo só. É o mais simples.</td></tr>
+<tr><td>Num arquivo próprio</td><td><code>&lt;link rel="stylesheet" href="reset.css"&gt;</code> <strong>antes</strong> do <code>&lt;link&gt;</code> do <code>style.css</code></td><td>Quando o CSS é dividido em vários arquivos (aula <a href="organizar-arquivos.html">Organizando os Arquivos</a>).</td></tr>
+<tr><td>Numa camada</td><td><code>@layer reset { … }</code>, declarada primeiro (aula <a href="layer.html">@layer</a>)</td><td>Projetos maiores: a camada do reset perde para as outras mesmo que a ordem dos arquivos mude.</td></tr>
+</table>
+</div>
+
+<div class="tryhtml" data-goal="css:body{margin-top}=0px,css:.cartao{box-sizing}=border-box,css:button{font-size}=16px">
+<p class="try-task"><strong>Missão:</strong> o cartão da Ana tem <code>width: 200px</code>, mas fica mais largo por causa da borda e do preenchimento, e o botão tem letra pequena. No começo do <code>style.css</code>, antes das regras que já estão lá, escreva três regras do reset: o <code>box-sizing: border-box</code> para todos (<code>*, *::before, *::after</code>), o <code>margin: 0</code> no <code>body</code> e o <code>font: inherit</code> nos campos (<code>input, button, textarea, select</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;p&gt;Bolo de cenoura&lt;/p&gt;
+  &lt;button&gt;Encomendar&lt;/button&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  width: 200px;
+  padding: 20px;
+  border: 4px solid tomato;
+}
+</pre>
+<pre class="solucao" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+.cartao {
+  width: 200px;
+  padding: 20px;
+  border: 4px solid tomato;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>O reset no fim do arquivo: apagou o seu estilo</strong>
+<pre class="file" data-file="style.css · erro de propósito">body {
+  margin: 2rem;
+}
+
+/* … o resto do site … */
+
+/* Reset */
+body {
+  margin: 0;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> a página encostada na borda, como se o <code>margin: 2rem</code> não existisse.</p>
+<p><strong>Por quê:</strong> as duas regras têm o mesmo seletor (<code>body</code>), a mesma especificidade, e pela cascata vence <strong>a última</strong> (aula <a href="cascata.html">Cascata</a>). O reset, posto no fim, desfez o estilo da Ana. No F12, o <code>margin: 2rem</code> aparece riscado, vencido pela regra de baixo. O validador não reclama: as duas declarações estão corretas.</p>
+<p><strong>Como consertar:</strong> o reset sempre no começo (ou numa camada <code>@layer</code>, que não depende da ordem).</p>
+</div>
+
+<div class="cenario">
+<strong><code>img { display: block; }</code> e o ícone no meio da frase</strong>
+<pre class="file" data-file="index.html · efeito do reset" data-resultado>&lt;style&gt;
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+&lt;/style&gt;
+&lt;p&gt;Feito com amor &lt;img src="assets/midia/favicon-32.png" alt="(bolo)" width="16" height="16"&gt; pela Ana.&lt;/p&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> o ícone, que deveria ficar no meio da frase, vai para uma linha própria, quebrando o texto em três pedaços.</p>
+<p><strong>Por quê:</strong> o reset transformou <strong>toda</strong> imagem em bloco, e um bloco ocupa a linha inteira (aula <a href="display.html">display</a>). Para fotos é ótimo; para um ícone dentro do texto, não.</p>
+<p><strong>Como consertar:</strong> uma regra para a exceção, depois do reset: <code>.icone { display: inline; vertical-align: middle; }</code>, e <code>class="icone"</code> na imagem. O reset dá o padrão; os seus estilos tratam os casos especiais.</p>
+</div>
+
+<div class="cenario">
+<strong>Erro de digitação no reset: <code>Too many values or values are not recognized</code></strong>
+<pre class="file" data-file="reset.css · erro de propósito">*,
+*::before,
+*::after {
+  box-sizing: border box;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css reset.css
+"file:/home/ana/site/reset.css":4.22-4.24: error: CSS: “box-sizing”: Too many values or values are not recognized.</pre>
+<p><strong>O que significa:</strong> "<code>box-sizing</code>: valores demais, ou valores não reconhecidos". O <code>box-sizing</code> aceita <strong>uma</strong> palavra, e o validador encontrou duas (<code>border</code> e <code>box</code>, a coluna 22 a 24 da linha 4 é o <code>box</code>). O valor é <code>border-box</code>, com hífen.</p>
+<p><strong>O que o leitor vê:</strong> o reset parece não funcionar só nessa parte: as caixas continuam com <code>content-box</code> e as larguras somam a borda. O resto do reset continua valendo, porque o navegador ignora só a declaração errada. No F12, a linha aparece riscada.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Regra</th><th>Corrige</th></tr>
+<tr><td><code>*, *::before, *::after { box-sizing: border-box; }</code></td><td>Larguras que somam borda e preenchimento</td></tr>
+<tr><td><code>body { margin: 0; line-height: 1.5; }</code></td><td>Os 8 px do navegador; linhas apertadas</td></tr>
+<tr><td><code>img, picture, video, svg { display: block; max-width: 100%; height: auto; }</code></td><td>Mídia que estoura a tela; o vão embaixo da imagem</td></tr>
+<tr><td><code>input, button, textarea, select { font: inherit; }</code></td><td>Campos com letra menor e diferente</td></tr>
+<tr><td><code>h1, h2, h3, p { overflow-wrap: break-word; }</code></td><td>Palavras compridas que estouram</td></tr>
+<tr><td><code>* { margin: 0; padding: 0; }</code></td><td>Reset agressivo: evite (some com as bolinhas das listas)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A margem do navegador</h3>
+<p>Complete para tirar os 8 px que o navegador põe no <code>body</code>:</p>
+<div class="ex-code">body {
+  margin: <input data-answer="0|0px" aria-label="valor">;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. A fonte dos campos</h3>
+<p>Complete para os campos usarem a fonte da página:</p>
+<div class="ex-code">input, button, textarea, select {
+  font: <input data-answer="inherit" aria-label="valor">;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>3. A foto que estoura</h3>
+<p>Complete para a imagem nunca ficar mais larga que o espaço dela:</p>
+<div class="ex-code">img {
+  max-width: <input data-answer="100%" aria-label="valor">;
+  height: auto;
+}</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Por que as bolinhas da lista somem com <code>* { margin: 0; padding: 0; }</code>?</p>
+<label><input type="radio" name="q4"> Porque o <code>*</code> apaga o <code>list-style</code></label>
+<label><input type="radio" name="q4"> Porque as bolinhas ficam no espaço do <code>padding-left</code> da lista, que foi zerado</label>
+<label><input type="radio" name="q4"> Porque a lista vira <code>display: none</code></label>
+<label><input type="radio" name="q4"> Porque o reset troca o <code>ul</code> por <code>div</code></label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Qual a diferença entre reset e normalize?</p>
+<label><input type="radio" name="q5"> Nenhuma, são nomes diferentes para a mesma coisa</label>
+<label><input type="radio" name="q5"> O normalize apaga todos os estilos do navegador</label>
+<label><input type="radio" name="q5"> O reset remove ou troca os estilos do navegador; o normalize mantém os úteis e iguala os navegadores</label>
+<label><input type="radio" name="q5"> O reset só funciona no Chrome</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Onde o reset deve ficar no <code>style.css</code>?</p>
+<label><input type="radio" name="q6"> No começo, antes dos estilos do site</label>
+<label><input type="radio" name="q6"> No fim, para vencer todo mundo</label>
+<label><input type="radio" name="q6"> Tanto faz</label>
+<label><input type="radio" name="q6"> Dentro de cada regra</label>
+</div>
+
+<h3>Missão final: o reset completo</h3>
+
+<div class="tryhtml" data-goal="css:img{max-width}=100%,css:img{display}=block,css:body{line-height}=24px,css:h1{overflow-wrap}=break-word">
+<p class="try-task"><strong>Missão:</strong> o <code>style.css</code> da Ana já tem o <code>box-sizing</code> e os campos. Complete o reset: no <code>body</code>, <code>margin: 0</code> e <code>line-height: 1.5</code>; nas mídias (<code>img, picture, video, svg</code>), <code>display: block</code>, <code>max-width: 100%</code> e <code>height: auto</code>; nos textos (<code>h1, h2, h3, p</code>), <code>overflow-wrap: break-word</code>. A foto e a hashtag do título devem caber no quadro.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;#BoloDeCenouraComCoberturaDeChocolate&lt;/h1&gt;
+&lt;img src="assets/midia/bolo-1200.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="1200" height="900"&gt;
+&lt;p&gt;A receita favorita da família.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">/* Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+</pre>
+<pre class="solucao" data-file="style.css">/* Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  line-height: 1.5;
+}
+
+img,
+picture,
+video,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: break-word;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O navegador tem uma folha de estilos própria (<em>user agent stylesheet</em>): margem de 8 px no <code>body</code>, títulos grandes, listas com recuo, campos com letra de 13,33 px, imagens sem limite de largura.</li>
+  <li>O reset agressivo (<code>* { margin: 0; padding: 0; }</code>) apaga até o que era útil, como as bolinhas das listas. O normalize mantém os padrões úteis e iguala os navegadores (normalize.css e modern-normalize, licença MIT).</li>
+  <li>Um reset moderno curto: <code>box-sizing: border-box</code> para todos, <code>body</code> sem margem e com <code>line-height: 1.5</code>, mídia com <code>display: block; max-width: 100%; height: auto</code>, campos com <code>font: inherit</code>, textos com <code>overflow-wrap: break-word</code>.</li>
+  <li>O reset vem <strong>antes</strong> dos seus estilos: no começo do arquivo, num <code>reset.css</code> ligado primeiro ou numa <code>@layer</code>.</li>
+  <li>Os casos especiais (o ícone no meio da frase) ganham uma regra própria depois do reset.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
