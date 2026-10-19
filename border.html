@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS border — bordas: espessura, estilo e cor | Guia CSS</title>
+<meta name="description" content="A propriedade border do CSS para quem nunca escreveu CSS: as três partes da borda (border-width, border-style, border-color), todos os estilos lado a lado (solid, dashed, dotted, double…), o atalho border, uma borda num lado só, a borda que aumenta a caixa e os erros reais do validador W3C, inclusive a borda sem estilo que não aparece.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">border</span></h1>
+
+<p class="intro">A <code>border</code> ("borda") é a linha em volta da caixa: a moldura do quadro. Com ela, a Ana destaca um aviso, separa os itens do cardápio, sublinha um título com uma faixa grossa ou desenha uma caixa tracejada de "recorte este cupom". Nesta aula você vai conhecer as três partes de uma borda, ver <strong>todos os estilos lado a lado</strong> e entender o erro mais comum de todos: a borda que não aparece porque faltou o estilo.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>As três partes de uma borda: espessura (<code>border-width</code>), estilo (<code>border-style</code>) e cor (<code>border-color</code>).</li>
+  <li>Todos os valores de <code>border-style</code>: <code>solid</code>, <code>dashed</code>, <code>dotted</code>, <code>double</code> e os outros.</li>
+  <li>O atalho <code>border</code>, que junta as três partes numa linha.</li>
+  <li>Bordas num lado só: <code>border-top</code>, <code>border-bottom</code>, <code>border-left</code>, <code>border-right</code>.</li>
+  <li>Como a borda aumenta o tamanho da caixa.</li>
+  <li>Os erros reais: a borda sem estilo (que o validador não acusa), valores demais, número sem unidade, espessura negativa.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a moldura do quadro</h2>
+<p>Numa loja de molduras, o vendedor pergunta três coisas: <strong>qual a largura</strong> da moldura (fininha ou larga), <strong>qual o modelo</strong> (lisa, entalhada, dupla) e <strong>qual a cor</strong>. Sem escolher o modelo, não há moldura para fazer.</p>
+<p>A borda do CSS é igual: tem uma <strong>espessura</strong>, um <strong>estilo</strong> e uma <strong>cor</strong>. E, como na loja, o estilo é obrigatório: sem ele, não há borda.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Na moldura</th><th>No CSS</th><th>Valor inicial</th></tr>
+<tr><td>A largura da madeira</td><td><code>border-width</code> (espessura)</td><td><code>medium</code> (3px)</td></tr>
+<tr><td>O modelo</td><td><code>border-style</code> (estilo)</td><td><code>none</code>: <strong>nenhuma borda</strong></td></tr>
+<tr><td>A cor</td><td><code>border-color</code> (cor)</td><td>a cor do texto do elemento</td></tr>
+</table>
+</div>
+
+<p>A borda fica entre o <code>padding</code> (o espaço de dentro) e a <code>margin</code> (o espaço de fora). O desenho completo está na aula <a href="box-model.html">O Modelo de Caixa</a>.</p>
+
+<hr>
+
+<h2>1. A primeira borda</h2>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .aviso {
+    border-width: 3px;
+    border-style: solid;
+    border-color: crimson;
+    padding: 12px;
+  }
+&lt;/style&gt;
+&lt;p class="aviso"&gt;A lojinha fecha no feriado.&lt;/p&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>border-width: 3px;</dt><dd>A <strong>espessura</strong> da linha: 3 pixels. <em>Width</em> = "largura".</dd>
+  <dt>border-style: solid;</dt><dd>O <strong>estilo</strong>: uma linha contínua. <em>Solid</em> = "sólido". É esta declaração que faz a borda existir.</dd>
+  <dt>border-color: crimson;</dt><dd>A <strong>cor</strong> da linha, com qualquer cor do CSS (aula <a href="cores.html">Cores</a>).</dd>
+  <dt>padding: 12px;</dt><dd>Não é da borda, mas quase sempre anda junto: afasta o texto da linha (aula <a href="padding.html">padding</a>).</dd>
+</dl>
+
+<p>Repare: a linha vermelha vai de ponta a ponta da página, porque o <code>&lt;p&gt;</code> é um bloco e ocupa toda a largura disponível. A borda contorna a <strong>caixa</strong>, não só as palavras.</p>
+
+<hr>
+
+<h2>2. Os estilos: <code>border-style</code></h2>
+<p>Cada caixa abaixo usa um valor de <code>border-style</code>, com a mesma espessura (6px) e a mesma cor. O nome do estilo está escrito dentro:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .estilo {
+    display: inline-block;
+    width: 110px;
+    padding: 14px 4px;
+    margin: 6px;
+    text-align: center;
+    font-family: monospace;
+    border-width: 6px;
+    border-color: teal;
+    background-color: azure;
+  }
+&lt;/style&gt;
+&lt;div class="estilo" style="border-style: none"&gt;none&lt;/div&gt;
+&lt;div class="estilo" style="border-style: hidden"&gt;hidden&lt;/div&gt;
+&lt;div class="estilo" style="border-style: solid"&gt;solid&lt;/div&gt;
+&lt;div class="estilo" style="border-style: dashed"&gt;dashed&lt;/div&gt;
+&lt;div class="estilo" style="border-style: dotted"&gt;dotted&lt;/div&gt;
+&lt;div class="estilo" style="border-style: double"&gt;double&lt;/div&gt;
+&lt;div class="estilo" style="border-style: groove"&gt;groove&lt;/div&gt;
+&lt;div class="estilo" style="border-style: ridge"&gt;ridge&lt;/div&gt;
+&lt;div class="estilo" style="border-style: inset"&gt;inset&lt;/div&gt;
+&lt;div class="estilo" style="border-style: outset"&gt;outset&lt;/div&gt;
+</pre>
+
+<p>(O atributo <code>style="…"</code> põe CSS direto no elemento; aqui ele só evita dez classes diferentes. No seu site, prefira classes no <code>style.css</code>: aula <a href="onde-colocar.html">Onde Colocar o CSS</a>.)</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>Tradução</th><th>O que desenha</th><th>Uso comum</th></tr>
+<tr><td><code>none</code></td><td>nenhum</td><td>Nada (o valor inicial)</td><td>Tirar a borda que o navegador põe, como a de um <code>&lt;input&gt;</code> ou de uma <code>&lt;fieldset&gt;</code></td></tr>
+<tr><td><code>hidden</code></td><td>escondido</td><td>Nada, como o <code>none</code></td><td>Só faz diferença em tabelas (aula <a href="tabelas.html">Tabelas</a>)</td></tr>
+<tr><td><code>solid</code></td><td>sólido</td><td>Linha contínua</td><td>O mais usado de todos</td></tr>
+<tr><td><code>dashed</code></td><td>tracejado</td><td>Tracinhos</td><td>Cupom de "recorte aqui", área de soltar arquivos</td></tr>
+<tr><td><code>dotted</code></td><td>pontilhado</td><td>Pontinhos</td><td>Separadores discretos</td></tr>
+<tr><td><code>double</code></td><td>duplo</td><td>Duas linhas paralelas; precisa de pelo menos 3px para aparecerem as duas</td><td>Molduras "clássicas", certificados</td></tr>
+<tr><td><code>groove</code></td><td>sulco</td><td>Parece cavada na página</td><td>Raro hoje: visual dos anos 1990</td></tr>
+<tr><td><code>ridge</code></td><td>crista</td><td>Parece saltada da página (o contrário de <code>groove</code>)</td><td>Raro</td></tr>
+<tr><td><code>inset</code></td><td>embutido</td><td>A caixa parece afundada</td><td>Raro</td></tr>
+<tr><td><code>outset</code></td><td>saliente</td><td>A caixa parece um botão em relevo</td><td>Raro</td></tr>
+</table>
+</div>
+
+<p>Os quatro últimos fazem o efeito de relevo escurecendo e clareando a cor em lados diferentes. O resultado muda um pouco de navegador para navegador e costuma parecer antigo; para profundidade, os sites de hoje usam sombras (aula <a href="box-shadow.html">box-shadow</a>).</p>
+
+<hr>
+
+<h2>3. A espessura: <code>border-width</code></h2>
+<p>A espessura aceita um tamanho (<code>1px</code>, <code>0.25rem</code>…) ou uma de três palavras:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .linha {
+    display: inline-block;
+    padding: 10px;
+    margin: 6px;
+    font-family: monospace;
+    border-style: solid;
+    border-color: darkslateblue;
+  }
+&lt;/style&gt;
+&lt;div class="linha" style="border-width: thin"&gt;thin&lt;/div&gt;
+&lt;div class="linha" style="border-width: medium"&gt;medium&lt;/div&gt;
+&lt;div class="linha" style="border-width: thick"&gt;thick&lt;/div&gt;
+&lt;div class="linha" style="border-width: 10px"&gt;10px&lt;/div&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Palavra</th><th>Tradução</th><th>Calculado (F12, aba <em>Computed</em>)</th></tr>
+<tr><td><code>thin</code></td><td>fina</td><td><code>1px</code></td></tr>
+<tr><td><code>medium</code></td><td>média (o valor inicial)</td><td><code>3px</code></td></tr>
+<tr><td><code>thick</code></td><td>grossa</td><td><code>5px</code></td></tr>
+</table>
+</div>
+
+<p>A especificação do CSS não fixa esses números; os navegadores atuais usam 1, 3 e 5 pixels. Se o tamanho exato importa para o seu desenho, escreva em <code>px</code>.</p>
+
+<hr>
+
+<h2>4. A cor: <code>border-color</code></h2>
+<p>Se você não der cor, a borda usa a <strong>cor do texto</strong> do próprio elemento (o valor <code>currentColor</code>, "a cor atual"). Um elemento de texto azul-marinho ganha borda azul-marinho:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .selo {
+    display: inline-block;
+    color: navy;
+    border-style: solid;
+    border-width: 2px;
+    padding: 4px 10px;
+  }
+  .verde { color: darkgreen; }
+&lt;/style&gt;
+&lt;span class="selo"&gt;Sem glúten&lt;/span&gt;
+&lt;span class="selo verde"&gt;Vegano&lt;/span&gt;
+</pre>
+
+<p>Sem nenhum <code>border-color</code>, a primeira borda saiu azul-marinho e a segunda verde, iguais ao texto. Trocar o <code>color</code> troca as duas coisas de uma vez, o que é bem prático em botões e etiquetas.</p>
+
+<hr>
+
+<h2>5. O atalho <code>border</code></h2>
+<p>Escrever três propriedades para cada borda cansa. O atalho <code>border</code> junta espessura, estilo e cor numa linha, separados por <strong>espaço</strong>:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .cupom {
+    border: 3px dashed darkorange;
+    padding: 16px;
+    max-width: 300px;
+  }
+&lt;/style&gt;
+&lt;div class="cupom"&gt;Cupom: 10% de desconto no bolo de cenoura. Recorte aqui.&lt;/div&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>border:</dt><dd>O atalho das três partes, para os <strong>quatro lados</strong>.</dd>
+  <dt>3px</dt><dd>A espessura.</dd>
+  <dt>dashed</dt><dd>O estilo. É a única parte obrigatória.</dd>
+  <dt>darkorange</dt><dd>A cor.</dd>
+</dl>
+
+<ul>
+  <li><strong>A ordem é livre:</strong> <code>border: dashed darkorange 3px;</code> também funciona. O costume é espessura, estilo e cor, e é assim que o guia escreve.</li>
+  <li><strong>O que falta volta ao valor inicial:</strong> <code>border: dashed;</code> dá uma borda tracejada de 3px (<code>medium</code>) na cor do texto.</li>
+  <li><strong>Um valor de cada tipo:</strong> o atalho não aceita duas cores nem dois estilos (veja <a href="#errado">Quando dá errado</a>).</li>
+</ul>
+
+<div class="note">
+<strong>O atalho não aparece no calculado</strong>
+<p>No F12, na aba <em>Computed</em>, você não acha "border: 3px dashed darkorange". O navegador guarda cada parte de cada lado separada: <code>border-top-width: 3px</code>, <code>border-top-style: dashed</code>, <code>border-top-color: rgb(255, 140, 0)</code>, e o mesmo para <code>right</code>, <code>bottom</code> e <code>left</code>. São doze propriedades longas.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:.aviso{border-top-width}=3px,css:.aviso{border-top-style}=dashed,css:.aviso{border-top-color}=rgb(220\, 20\, 60),css:.aviso{border-left-style}=dashed">
+<p class="try-task"><strong>Missão:</strong> o aviso de encomendas precisa chamar atenção. Dê a ele uma borda de <strong>3px</strong>, <strong>tracejada</strong> (<code>dashed</code>), na cor <code>crimson</code>, usando o atalho <code>border</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p class="aviso"&gt;Encomendas de bolo só até quinta-feira.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.aviso {
+  padding: 12px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.aviso {
+  padding: 12px;
+  border: 3px dashed crimson;
+}
+</pre>
+</div>
+
+<p>Depois de cumprir, experimente trocar <code>dashed</code> por <code>dotted</code> e por <code>double</code>, e a espessura por <code>8px</code>.</p>
+
+<hr>
+
+<h2>6. Um lado só</h2>
+<p>Cada lado tem o próprio atalho: <code>border-top</code> (em cima), <code>border-right</code> (à direita), <code>border-bottom</code> (embaixo) e <code>border-left</code> (à esquerda). Eles aceitam as mesmas três partes:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  h2 {
+    border-bottom: 4px solid tomato;
+    padding-bottom: 4px;
+  }
+  .dica {
+    border-left: 6px solid seagreen;
+    background-color: honeydew;
+    padding: 8px 12px;
+  }
+  .item {
+    border-top: 1px dotted gray;
+    padding: 6px 0;
+    margin: 0;
+  }
+&lt;/style&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p class="dica"&gt;Dica: peneire o açúcar da cobertura.&lt;/p&gt;
+&lt;p class="item"&gt;Bolo de cenoura: R$ 35&lt;/p&gt;
+&lt;p class="item"&gt;Pão de queijo: R$ 2&lt;/p&gt;
+&lt;p class="item"&gt;Brigadeiro: R$ 3&lt;/p&gt;
+</pre>
+
+<p>Três usos que você vai ver em muitos sites: o título "sublinhado" por uma faixa (<code>border-bottom</code>), a caixa de dica com uma barra colorida à esquerda (<code>border-left</code>) e a lista com uma linha fina separando os itens (<code>border-top</code>).</p>
+
+<h3>Uma parte de um lado</h3>
+<p>Dá para ir mais fundo e mudar só uma parte de um lado, com as propriedades longas: <code>border-top-color</code>, <code>border-left-width</code>, <code>border-bottom-style</code>… São 12 combinações (4 lados × 3 partes). O jeito mais comum de usá-las é fazer a borda geral e depois ajustar um detalhe:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .cartao {
+    border: 2px solid lightgray;
+    border-top-color: purple;
+    border-top-width: 6px;
+    padding: 12px;
+    max-width: 260px;
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;Brigadeiro gourmet: R$ 4&lt;/div&gt;
+</pre>
+
+<h3>Vários valores por lado</h3>
+<p><code>border-width</code>, <code>border-style</code> e <code>border-color</code> também aceitam de 1 a 4 valores, na regra do relógio (cima, direita, baixo, esquerda), como o <a href="padding.html">padding</a>:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .relogio {
+    border-style: solid dashed dotted double;
+    border-width: 6px;
+    border-color: red green blue orange;
+    padding: 16px;
+    max-width: 260px;
+    font-family: monospace;
+  }
+&lt;/style&gt;
+&lt;div class="relogio"&gt;cima: red solid · direita: green dashed · baixo: blue dotted · esquerda: orange double&lt;/div&gt;
+</pre>
+
+<hr>
+
+<h2>7. A borda aumenta a caixa</h2>
+<p>Como o padding, a borda é somada <strong>por fora</strong> da largura (<code>width</code>), no comportamento padrão:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .caixa {
+    width: 200px;
+    background-color: lightcyan;
+    margin-bottom: 8px;
+    border: 1px solid teal;
+  }
+  .grossa { border-width: 20px; }
+&lt;/style&gt;
+&lt;div class="caixa"&gt;width: 200px, borda 1px&lt;/div&gt;
+&lt;div class="caixa grossa"&gt;width: 200px, borda 20px&lt;/div&gt;
+</pre>
+
+<p>A segunda caixa ocupa 240px de largura (200 + 20 + 20), contra 202px da primeira. Isso também explica um tremor clássico: um botão que ganha borda só no <code>:hover</code> cresce e empurra os vizinhos. Os consertos são o <code>box-sizing: border-box</code> (aula <a href="box-sizing.html">box-sizing</a>), deixar uma borda <code>transparent</code> desde o começo e só trocar a cor, ou usar o <code>outline</code>, que não ocupa espaço (aula <a href="outline.html">outline</a>).</p>
+
+<hr>
+
+<h2>8. Formas de escrever e qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Quando usar</th></tr>
+<tr><td><code>border: 1px solid #ccc;</code></td><td>A mesma borda nos quatro lados. É o caso de 9 em cada 10 bordas.</td></tr>
+<tr><td><code>border-bottom: 2px solid tomato;</code></td><td>Um lado só: títulos, separadores, abas.</td></tr>
+<tr><td><code>border: 2px solid gray;</code> + <code>border-top-color: purple;</code></td><td>Uma borda geral com um detalhe diferente. Escreva o atalho <strong>antes</strong> do ajuste.</td></tr>
+<tr><td><code>border-color: red green blue orange;</code></td><td>Cada lado de um jeito, numa linha (regra do relógio).</td></tr>
+<tr><td><code>border: none;</code> ou <code>border: 0;</code></td><td>Tirar a borda (de um <code>&lt;input&gt;</code>, de um <code>&lt;button&gt;</code>). <code>none</code> zera o estilo; <code>0</code>, a espessura. Os dois somem com a borda.</td></tr>
+<tr><td><code>border: 2px solid transparent;</code></td><td>Reservar o espaço de uma borda que só vai aparecer depois (no <code>:hover</code>, por exemplo), sem a caixa mudar de tamanho.</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Lembre: o CSS não mostra mensagens de erro na página. Uma declaração inválida é <strong>ignorada</strong> inteira, e o F12 a mostra <strong>riscada</strong> no painel de estilos (aula <a href="devtools.html">DevTools</a>).</p>
+
+<div class="cenario">
+<strong>Esqueceu o estilo: a borda não aparece (e o validador não reclama)</strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  .aviso {
+    border: 2px red;
+    padding: 12px;
+  }
+&lt;/style&gt;
+&lt;p class="aviso"&gt;Cadê a minha borda vermelha?&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> o texto, sem borda nenhuma.</p>
+<p><strong>Por quê:</strong> a declaração é <strong>válida</strong>: o atalho aceita que falte uma parte. Só que a parte que faltou foi o estilo, que volta ao valor inicial, <code>none</code>. Sem estilo, não há borda. No F12, na aba <em>Computed</em>, aparece <code>border-top-style: none</code> e até <code>border-top-width: 0px</code>: com estilo <code>none</code>, o navegador zera a espessura, mesmo você tendo escrito 2px.</p>
+<pre class="term" data-cwd="~/site">$ cat sem-estilo.css
+.aviso {
+  border: 2px red;
+}
+$ vnu --css sem-estilo.css
+$</pre>
+<p><strong>O que o validador diz:</strong> nada. Para ele, é CSS correto.</p>
+<p><strong>Como consertar:</strong> sempre ponha o estilo: <code>border: 2px solid red;</code>.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:.destaque{border-top-style}=solid,css:.destaque{border-top-width}=4px,css:.destaque{border-bottom-style}=solid">
+<p class="try-task"><strong>Missão:</strong> a Ana quer uma borda de 4px azul-marinho em volta do destaque, mas nada aparece. Conserte a declaração.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="destaque"&gt;Receita da semana: torta de limão.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.destaque {
+  border: 4px navy;
+  padding: 12px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.destaque {
+  border: 4px solid navy;
+  padding: 12px;
+}
+</pre>
+</div>
+
+<div class="cenario">
+<strong>Duas cores no atalho: <code>Too many values or values are not recognized</code></strong>
+<pre class="term" data-cwd="~/site">$ cat duas-cores.css
+.aviso {
+  border: 2px solid red blue;
+}
+$ vnu --css duas-cores.css
+"file:/home/ana/site/duas-cores.css":2.25-2.28: error: CSS: “border”: Too many values or values are not recognized.</pre>
+<p><strong>O que você vê:</strong> nenhuma borda. O navegador não usa "o que deu para entender": joga fora a declaração inteira.</p>
+<p><strong>O que significa:</strong> "valores demais ou valores não reconhecidos". O atalho <code>border</code> aceita <strong>uma</strong> cor, que vale para os quatro lados.</p>
+<p><strong>Como consertar:</strong> para cores diferentes por lado, use <code>border-color: red blue;</code> depois do atalho.</p>
+</div>
+
+<div class="cenario">
+<strong>Número sem unidade: <code>You must put a unit after your number</code></strong>
+<pre class="term" data-cwd="~/site">$ vnu --css sem-unidade.css
+"file:/home/ana/site/sem-unidade.css":2.19-2.21: error: CSS: “border”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<p>Em <code>border: 2 solid red;</code>, o <code>2</code> está sem unidade: "só o <code>0</code> pode ficar sem unidade". A declaração toda é ignorada. Conserto: <code>border: 2px solid red;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Espessura negativa ou estilo inventado</strong>
+<pre class="term" data-cwd="~/site">$ vnu --css negativa.css
+"file:/home/ana/site/negativa.css":2.18-2.20: error: CSS: “border-width”: “-2px” negative values are not allowed.
+$ vnu --css estilo-pt.css
+"file:/home/ana/site/estilo-pt.css":2.17-2.25: error: CSS: “border-style”: “tracejado” is not a “border-style” value.</pre>
+<p>"Valores negativos não são permitidos" na espessura; e "<code>tracejado</code> não é um valor de <code>border-style</code>": os valores do CSS são palavras em inglês, sempre (<code>dashed</code>). Nos dois casos, o navegador ignora a declaração.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>Valores</th><th>Inicial</th></tr>
+<tr><td><code>border</code></td><td>espessura estilo cor (ordem livre, só o estilo é obrigatório)</td><td><code>medium none currentColor</code></td></tr>
+<tr><td><code>border-width</code></td><td><code>thin</code> (1px), <code>medium</code> (3px), <code>thick</code> (5px) ou um tamanho ≥ 0; de 1 a 4 valores</td><td><code>medium</code></td></tr>
+<tr><td><code>border-style</code></td><td><code>none</code>, <code>hidden</code>, <code>solid</code>, <code>dashed</code>, <code>dotted</code>, <code>double</code>, <code>groove</code>, <code>ridge</code>, <code>inset</code>, <code>outset</code>; de 1 a 4 valores</td><td><code>none</code></td></tr>
+<tr><td><code>border-color</code></td><td>qualquer cor; de 1 a 4 valores</td><td><code>currentColor</code> (a cor do texto)</td></tr>
+<tr><td><code>border-top</code>, <code>-right</code>, <code>-bottom</code>, <code>-left</code></td><td>espessura estilo cor, para um lado</td><td></td></tr>
+<tr><td><code>border-top-width</code>, <code>border-left-color</code>…</td><td>uma parte de um lado (12 propriedades)</td><td></td></tr>
+<tr><td>Herdada?</td><td colspan="2">Não: o filho não ganha a borda do pai</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A parte obrigatória</h3>
+<p>Complete com o estilo de linha contínua:</p>
+<div class="ex-code">.foto { border: 2px <input data-answer="solid" aria-label="estilo"> gray; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Só embaixo</h3>
+<p>Complete para fazer uma borda só na parte de baixo do título:</p>
+<div class="ex-code">h2 { <input data-answer="border-bottom" aria-label="propriedade">: 3px solid tomato; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Tracejado</h3>
+<p>Qual valor de <code>border-style</code> desenha tracinhos, como num cupom de recortar?</p>
+<div class="ex-code">border-style: <input data-answer="dashed" aria-label="estilo">;</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. A Ana escreveu <code>border: 3px green;</code>. O que aparece?</p>
+<label><input type="radio" name="q4"> Uma borda verde contínua de 3px</label>
+<label><input type="radio" name="q4"> Uma borda verde de 3px, tracejada</label>
+<label><input type="radio" name="q4"> Nenhuma borda: faltou o estilo</label>
+<label><input type="radio" name="q4"> Uma mensagem de erro na página</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Sem <code>border-color</code>, de que cor fica a borda?</p>
+<label><input type="radio" name="q5"> Preta, sempre</label>
+<label><input type="radio" name="q5"> Da cor do texto do elemento</label>
+<label><input type="radio" name="q5"> Cinza</label>
+<label><input type="radio" name="q5"> Transparente</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. Uma caixa tem <code>width: 100px</code> e <code>border: 10px solid black</code>, sem <code>box-sizing</code>. Que largura ela ocupa?</p>
+<label><input type="radio" name="q6"> 100px</label>
+<label><input type="radio" name="q6"> 110px</label>
+<label><input type="radio" name="q6"> 80px</label>
+<label><input type="radio" name="q6"> 120px</label>
+</div>
+
+<h3>Missão final: o cardápio da padaria</h3>
+
+<div class="tryhtml" data-goal="css:.cardapio{border-top-style}=double,css:.cardapio{border-top-width}=6px,css:.cardapio{border-top-color}=rgb(139\, 69\, 19),css:h2{border-bottom-style}=solid,css:h2{border-bottom-width}=2px,css:h2{border-top-style}=none,css:li{border-bottom-style}=dotted">
+<p class="try-task"><strong>Missão:</strong> monte as bordas do cardápio. (1) O <code>.cardapio</code> ganha uma moldura <strong>dupla</strong> (<code>double</code>) de <strong>6px</strong> na cor <code>saddlebrown</code>. (2) O <code>h2</code> ganha uma linha <strong>só embaixo</strong>, contínua, de <strong>2px</strong>. (3) Cada <code>li</code> ganha uma linha <strong>pontilhada</strong> embaixo, de 1px, na cor <code>tan</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cardapio"&gt;
+  &lt;h2&gt;Padaria da Ana&lt;/h2&gt;
+  &lt;ul&gt;
+    &lt;li&gt;Pão de queijo: R$ 2&lt;/li&gt;
+    &lt;li&gt;Bolo de cenoura: R$ 35&lt;/li&gt;
+    &lt;li&gt;Brigadeiro: R$ 3&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cardapio {
+  max-width: 300px;
+  padding: 16px;
+  background-color: oldlace;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+li {
+  padding: 6px 0;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cardapio {
+  max-width: 300px;
+  padding: 16px;
+  background-color: oldlace;
+  border: 6px double saddlebrown;
+}
+
+h2 {
+  margin-top: 0;
+  border-bottom: 2px solid saddlebrown;
+}
+
+li {
+  padding: 6px 0;
+  border-bottom: 1px dotted tan;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Uma borda tem três partes: espessura (<code>border-width</code>), estilo (<code>border-style</code>) e cor (<code>border-color</code>).</li>
+  <li>O estilo é <strong>obrigatório</strong>: o inicial é <code>none</code>. <code>border: 2px red;</code> não desenha nada, e o validador não avisa.</li>
+  <li>Estilos: <code>solid</code>, <code>dashed</code>, <code>dotted</code>, <code>double</code> são os do dia a dia; <code>groove</code>, <code>ridge</code>, <code>inset</code>, <code>outset</code> fazem relevo; <code>none</code> e <code>hidden</code> escondem.</li>
+  <li>Sem cor, a borda usa a cor do texto (<code>currentColor</code>). Sem espessura, <code>medium</code> (3px).</li>
+  <li>Atalho: <code>border: 3px dashed crimson;</code>. Um lado: <code>border-bottom</code>, <code>border-left</code>… Uma parte de um lado: <code>border-top-color</code>… No F12 (<em>Computed</em>), só aparecem as propriedades longas.</li>
+  <li>A borda soma à largura, como o padding (o conserto é o <code>box-sizing: border-box</code>).</li>
+  <li>Erros: duas cores no atalho, número sem unidade, espessura negativa, estilo em português. Em todos, a declaração inteira é ignorada.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
