@@ -1,0 +1,1427 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Projeto: Página de Receita — passo a passo, do HTML cru ao layout responsivo | Guia CSS</title>
+<meta name="description" content="Projeto do Guia CSS: estilizar a página de receita do bolo de cenoura em seis versões, com cor e fonte, coluna centralizada, foto que se adapta, cartões com Flexbox, listas com ::marker e duas colunas com Grid e @media.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Projeto: Página de Receita</span></h1>
+
+<p class="intro">No Guia HTML, a Ana montou a página do bolo de cenoura da avó: título, foto, informações, ingredientes, modo de preparo e uma dica. O conteúdo está todo lá, mas a página tem a cara de um documento de 1995: letra serifada, tudo colado na esquerda, nenhuma cor. Neste projeto você vai vestir essa página com CSS, <strong>em seis versões</strong>. Cada versão acrescenta uma coisa só, tem uma caixa "Experimente" com a página inteira até ali e uma missão para você fazer a mesma coisa com as próprias mãos.</p>
+
+<div class="note">
+<strong>Você vai aprender (juntando o que já viu)</strong>
+<ul>
+  <li>A começar todo site pelo mesmo "chão": <code>box-sizing</code>, fonte, altura da linha e cores no <code>body</code>.</li>
+  <li>A fazer uma <strong>coluna de leitura</strong> centralizada com <code>max-width</code> e <code>margin: 0 auto</code>.</li>
+  <li>A deixar a foto <strong>caber em qualquer tela</strong> com <code>width: 100%</code> e <code>height: auto</code>.</li>
+  <li>A transformar uma lista de definições (<code>&lt;dl&gt;</code>) em três cartões com Flexbox.</li>
+  <li>A pintar os marcadores das listas com <code>::marker</code> e destacar a dica com uma borda lateral.</li>
+  <li>A passar para <strong>duas colunas</strong> só em telas largas, com Grid dentro de um <code>@media</code>.</li>
+</ul>
+</div>
+
+<p>Cada passo usa uma aula do guia; o link fica ao lado, se você quiser rever. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>). As descrições do resultado foram conferidas numa foto do Chromium; o resultado nas caixas é desenhado agora pelo <strong>seu</strong> navegador, com a foto de verdade do guia.</p>
+
+<hr>
+
+<h2>O que vamos construir</h2>
+<p>Pense numa receita escrita num caderno, e na mesma receita impressa num livro de culinária. O texto é igual; o livro tem margens, título colorido, foto bem enquadrada, um quadrinho com "tempo, rendimento, dificuldade" e, numa página larga, os ingredientes numa coluna estreita ao lado do modo de preparo. O HTML é o caderno; o CSS é o trabalho do diagramador do livro.</p>
+
+<p>No fim, a página fica assim:</p>
+<ul>
+  <li><strong>No celular</strong> (tela estreita): uma coluna só. Título laranja-escuro grande, a foto com cantos arredondados ocupando a largura toda, os cartões "Tempo" e "Rendimento" lado a lado e "Dificuldade" embaixo, depois os ingredientes com bolinhas laranja, o modo de preparo com números laranja em negrito e a dica numa caixa creme com uma barra laranja à esquerda.</li>
+  <li><strong>No computador</strong> (tela de 48rem, ou 768 px, para cima): os três cartões numa linha só, e os ingredientes numa coluna estreita à esquerda do modo de preparo.</li>
+</ul>
+
+<h3>O HTML (é o mesmo em todas as versões)</h3>
+<p>É a receita do <a href="https://wallysondevs.github.io/guia-html/projeto-receita.html">projeto do Guia HTML</a>, um pouco mais curta e com algumas <strong>classes</strong> para o CSS se agarrar: <code>receita</code> no <code>&lt;main&gt;</code>, <code>foto</code> no <code>&lt;figure&gt;</code>, <code>info</code> na lista de informações, <code>colunas</code> em volta das duas seções e <code>dica</code> na citação. Repare que, dentro do <code>&lt;dl&gt;</code>, cada par <code>&lt;dt&gt;</code> + <code>&lt;dd&gt;</code> está dentro de um <code>&lt;div&gt;</code>: o HTML permite isso, e é esse <code>&lt;div&gt;</code> que vai virar um cartão na versão 4.</p>
+
+<pre class="file" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="receita"&gt;
+  &lt;h1&gt;Bolo de cenoura com cobertura de chocolate&lt;/h1&gt;
+  &lt;p class="resumo"&gt;O bolo que a avó da Ana fazia todo domingo: fofinho, laranja por dentro e com casquinha de chocolate.&lt;/p&gt;
+  &lt;figure class="foto"&gt;
+    &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate escorrendo pelos lados" width="800" height="600"&gt;
+    &lt;figcaption&gt;O bolo pronto, ainda morno.&lt;/figcaption&gt;
+  &lt;/figure&gt;
+  &lt;dl class="info"&gt;
+    &lt;div&gt;&lt;dt&gt;Tempo&lt;/dt&gt;&lt;dd&gt;1h10&lt;/dd&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;dt&gt;Rendimento&lt;/dt&gt;&lt;dd&gt;12 fatias&lt;/dd&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;dt&gt;Dificuldade&lt;/dt&gt;&lt;dd&gt;Fácil&lt;/dd&gt;&lt;/div&gt;
+  &lt;/dl&gt;
+  &lt;div class="colunas"&gt;
+    &lt;section class="ingredientes"&gt;
+      &lt;h2&gt;Ingredientes&lt;/h2&gt;
+      &lt;ul&gt;
+        &lt;li&gt;3 cenouras médias&lt;/li&gt;
+        &lt;li&gt;3 ovos&lt;/li&gt;
+        &lt;li&gt;1 xícara de óleo&lt;/li&gt;
+        &lt;li&gt;2 xícaras de açúcar&lt;/li&gt;
+        &lt;li&gt;2 e 1/2 xícaras de farinha&lt;/li&gt;
+        &lt;li&gt;1 colher (sopa) de fermento&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/section&gt;
+    &lt;section class="preparo"&gt;
+      &lt;h2&gt;Modo de preparo&lt;/h2&gt;
+      &lt;ol&gt;
+        &lt;li&gt;Ligue o forno a 180 °C e unte uma fôrma.&lt;/li&gt;
+        &lt;li&gt;Bata a cenoura, os ovos e o óleo no liquidificador.&lt;/li&gt;
+        &lt;li&gt;Misture com o açúcar e a farinha. Por último, o fermento.&lt;/li&gt;
+        &lt;li&gt;Asse por uns 40 minutos. &lt;strong&gt;Não abra o forno antes dos 30 minutos.&lt;/strong&gt;&lt;/li&gt;
+      &lt;/ol&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+  &lt;blockquote class="dica"&gt;
+    &lt;p&gt;Bolo bom é bolo feito sem pressa e comido com companhia.&lt;/p&gt;
+  &lt;/blockquote&gt;
+&lt;/main&gt;
+</pre>
+
+<p>A primeira linha liga a folha de estilo, como na aula <a href="onde-colocar.html">Três Jeitos de Usar CSS</a>. Num site seu, essa linha fica no <code>&lt;head&gt;</code> de uma página completa; nas caixas do guia, basta o trecho.</p>
+
+<h3>Antes de começar</h3>
+<p>No computador, crie uma pasta <code>receita</code> com o <code>index.html</code> acima, um <code>style.css</code> vazio e a foto do bolo. Abra o <code>index.html</code> no navegador e, a cada versão, salve o <code>style.css</code> e aperte F5. Aqui no guia é mais fácil: cada caixa já tem as duas abas, <code>index.html</code> e <code>style.css</code>.</p>
+
+<p>Com o <code>style.css</code> vazio, a página aparece como o navegador desenha "de fábrica": fundo branco, letra serifada preta (Times, na maioria dos computadores), o título em negrito e a foto no tamanho natural dela, 800 × 600 pixels. Num celular, a foto passa da borda da tela e a página ganha rolagem para o lado. As informações aparecem como uma lista de definições: "Tempo" numa linha, "1h10" recuado na linha de baixo.</p>
+
+<hr>
+
+<h2 id="versao1">Versão 1 · O chão da página: caixa, fonte e cores</h2>
+<p>Todo site começa pelas mesmas regras de base. Elas não fazem nada vistoso, mas tudo o que vem depois fica mais previsível.</p>
+
+<pre class="file" data-file="style.css (versão 1)">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: #3b2f2a;
+  background-color: #fff8f0;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>*, *::before, *::after { box-sizing: border-box; }</code></dt>
+  <dd>Em todo elemento, a largura passa a <strong>incluir</strong> o preenchimento e a borda. Uma caixa de <code>width: 100%</code> com <code>padding</code> não passa mais da largura do pai. Aula: <a href="box-sizing.html">box-sizing: border-box</a>.</dd>
+  <dt><code>margin: 0</code> no <code>body</code></dt>
+  <dd>Tira os 8 px de margem que o navegador põe em volta da página. Quem vai cuidar do espaço é a coluna da versão 2. Aula: <a href="margin.html">Margem</a>.</dd>
+  <dt><code>font-family: system-ui, sans-serif</code></dt>
+  <dd>A fonte do sistema do leitor (Segoe UI no Windows, San Francisco no Mac e no iPhone, Roboto no Android…), sem baixar nada; se não houver, qualquer fonte sem serifa. Aula: <a href="font-family.html">Fontes</a>.</dd>
+  <dt><code>line-height: 1.6</code></dt>
+  <dd>Cada linha ocupa 1,6 vez o tamanho da letra. Receita é texto para ler com a mão suja de farinha: linhas mais soltas cansam menos. Sem unidade, o número vale para os filhos também, cada um com o próprio tamanho de letra. Aula: <a href="line-height.html">Espaçamento</a>.</dd>
+  <dt><code>color: #3b2f2a</code> e <code>background-color: #fff8f0</code></dt>
+  <dd>Um marrom muito escuro no texto e um creme bem claro no fundo: mais quentes que o preto no branco, e com contraste de sobra. Aulas: <a href="cores-hex.html">Cores Hexadecimais</a> e <a href="background-color.html">Cor de Fundo</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> o fundo fica creme, a letra vira a sem serifa do sistema, num marrom quase preto, e as linhas ganham ar. A página ainda encosta na borda esquerda (agora sem nem os 8 px de margem) e a foto continua no tamanho natural.</p>
+
+<h3>Experimente: a versão 1</h3>
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="receita"&gt;
+  &lt;h1&gt;Bolo de cenoura com cobertura de chocolate&lt;/h1&gt;
+  &lt;p class="resumo"&gt;O bolo que a avó da Ana fazia todo domingo: fofinho, laranja por dentro e com casquinha de chocolate.&lt;/p&gt;
+  &lt;figure class="foto"&gt;
+    &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate escorrendo pelos lados" width="800" height="600"&gt;
+    &lt;figcaption&gt;O bolo pronto, ainda morno.&lt;/figcaption&gt;
+  &lt;/figure&gt;
+  &lt;dl class="info"&gt;
+    &lt;div&gt;&lt;dt&gt;Tempo&lt;/dt&gt;&lt;dd&gt;1h10&lt;/dd&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;dt&gt;Rendimento&lt;/dt&gt;&lt;dd&gt;12 fatias&lt;/dd&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;dt&gt;Dificuldade&lt;/dt&gt;&lt;dd&gt;Fácil&lt;/dd&gt;&lt;/div&gt;
+  &lt;/dl&gt;
+  &lt;div class="colunas"&gt;
+    &lt;section class="ingredientes"&gt;
+      &lt;h2&gt;Ingredientes&lt;/h2&gt;
+      &lt;ul&gt;
+        &lt;li&gt;3 cenouras médias&lt;/li&gt;
+        &lt;li&gt;3 ovos&lt;/li&gt;
+        &lt;li&gt;1 xícara de óleo&lt;/li&gt;
+        &lt;li&gt;2 xícaras de açúcar&lt;/li&gt;
+        &lt;li&gt;2 e 1/2 xícaras de farinha&lt;/li&gt;
+        &lt;li&gt;1 colher (sopa) de fermento&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/section&gt;
+    &lt;section class="preparo"&gt;
+      &lt;h2&gt;Modo de preparo&lt;/h2&gt;
+      &lt;ol&gt;
+        &lt;li&gt;Ligue o forno a 180 °C e unte uma fôrma.&lt;/li&gt;
+        &lt;li&gt;Bata a cenoura, os ovos e o óleo no liquidificador.&lt;/li&gt;
+        &lt;li&gt;Misture com o açúcar e a farinha. Por último, o fermento.&lt;/li&gt;
+        &lt;li&gt;Asse por uns 40 minutos. &lt;strong&gt;Não abra o forno antes dos 30 minutos.&lt;/strong&gt;&lt;/li&gt;
+      &lt;/ol&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+  &lt;blockquote class="dica"&gt;
+    &lt;p&gt;Bolo bom é bolo feito sem pressa e comido com companhia.&lt;/p&gt;
+  &lt;/blockquote&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: #3b2f2a;
+  background-color: #fff8f0;
+}
+</pre>
+</div>
+
+<p>Brinque: troque o <code>1.6</code> por <code>1</code> e veja as linhas do modo de preparo se apertarem; troque o <code>#fff8f0</code> por <code>white</code> e compare o "calor" da página.</p>
+
+<h3>Missão 1</h3>
+<div class="tryhtml" data-goal="css:body{background-color}=rgb(255, 248, 240),css:body{color}=rgb(59, 47, 42),src:line-height:\s*1\.6">
+<p class="try-task"><strong>Missão:</strong> o <code>body</code> já tem a fonte. Complete o chão da página: altura de linha <code>1.6</code>, texto <code>#3b2f2a</code> e fundo <code>#fff8f0</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Bolo de cenoura com cobertura de chocolate&lt;/h1&gt;
+&lt;p&gt;O bolo que a avó da Ana fazia todo domingo: fofinho, laranja por dentro e com casquinha de chocolate.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: #3b2f2a;
+  background-color: #fff8f0;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao2">Versão 2 · Uma coluna de leitura e títulos com cor</h2>
+<p>Num monitor largo, uma linha de texto que vai de uma borda à outra é cansativa: o olho se perde ao voltar para o começo da linha seguinte. Os livros resolvem isso com margens; a gente resolve com uma <strong>coluna de largura máxima</strong>, centralizada.</p>
+
+<pre class="file" data-file="style.css (versão 2: o que entra)">
+.receita {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: 2rem;
+  line-height: 1.2;
+  color: #c2410c;
+}
+
+h2 {
+  color: #9a3412;
+  border-bottom: 2px solid #fed7aa;
+}
+
+.resumo {
+  font-size: 1.125rem;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>max-width: 40rem</code></dt>
+  <dd>O <code>&lt;main&gt;</code> pode ser mais estreito, mas nunca mais largo que 40rem (640 px com a letra padrão de 16 px). Num celular, ele ocupa a tela toda; num monitor, para nos 640 px. É <code>max-width</code>, e não <code>width</code>, justamente para não passar da tela do celular. Aula: <a href="width-height.html">Largura e Altura</a>.</dd>
+  <dt><code>margin: 0 auto</code></dt>
+  <dd>Margem de cima e de baixo 0; esquerda e direita <code>auto</code>, que divide igualmente o espaço que sobra. É o que centraliza a coluna. Aula: <a href="centralizar.html">Centralizando Qualquer Coisa</a>.</dd>
+  <dt><code>padding: 1rem</code></dt>
+  <dd>Um respiro de 16 px por dentro da coluna, para o texto não encostar na borda do celular. Aula: <a href="padding.html">Espaço Interno</a>.</dd>
+  <dt><code>h1</code> e <code>h2</code></dt>
+  <dd>O título fica em <code>2rem</code>, com <code>line-height: 1.2</code> (título grande com linha solta fica esquisito quando quebra em duas linhas) e laranja-escuro <code>#c2410c</code>. Os subtítulos ganham um marrom-alaranjado e um sublinhado de borda (<code>border-bottom</code>) cor de pêssego. Aula: <a href="border.html">Bordas</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> num quadro largo, o texto fica numa coluna no meio, com sobra de creme dos dois lados. O título fica laranja e quebra em duas linhas ("Bolo de cenoura com cobertura / de chocolate"); "Ingredientes" e "Modo de preparo" ganham a linha cor de pêssego embaixo, da largura da coluna. Mas olhe a foto: ela começa dentro da coluna e <strong>passa da borda direita</strong>, porque continua com os 800 px naturais dentro de uma coluna de 640. Na foto que tiramos com o quadro de 870 px, a página ficou com 971 px de largura e ganhou rolagem para o lado. É o assunto da versão 3.</p>
+
+<h3>Experimente: a versão 2</h3>
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="receita"&gt;
+  &lt;h1&gt;Bolo de cenoura com cobertura de chocolate&lt;/h1&gt;
+  &lt;p class="resumo"&gt;O bolo que a avó da Ana fazia todo domingo: fofinho, laranja por dentro e com casquinha de chocolate.&lt;/p&gt;
+  &lt;figure class="foto"&gt;
+    &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate escorrendo pelos lados" width="800" height="600"&gt;
+    &lt;figcaption&gt;O bolo pronto, ainda morno.&lt;/figcaption&gt;
+  &lt;/figure&gt;
+  &lt;dl class="info"&gt;
+    &lt;div&gt;&lt;dt&gt;Tempo&lt;/dt&gt;&lt;dd&gt;1h10&lt;/dd&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;dt&gt;Rendimento&lt;/dt&gt;&lt;dd&gt;12 fatias&lt;/dd&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;dt&gt;Dificuldade&lt;/dt&gt;&lt;dd&gt;Fácil&lt;/dd&gt;&lt;/div&gt;
+  &lt;/dl&gt;
+  &lt;div class="colunas"&gt;
+    &lt;section class="ingredientes"&gt;
+      &lt;h2&gt;Ingredientes&lt;/h2&gt;
+      &lt;ul&gt;
+        &lt;li&gt;3 cenouras médias&lt;/li&gt;
+        &lt;li&gt;3 ovos&lt;/li&gt;
+        &lt;li&gt;1 xícara de óleo&lt;/li&gt;
+        &lt;li&gt;2 xícaras de açúcar&lt;/li&gt;
+        &lt;li&gt;2 e 1/2 xícaras de farinha&lt;/li&gt;
+        &lt;li&gt;1 colher (sopa) de fermento&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/section&gt;
+    &lt;section class="preparo"&gt;
+      &lt;h2&gt;Modo de preparo&lt;/h2&gt;
+      &lt;ol&gt;
+        &lt;li&gt;Ligue o forno a 180 °C e unte uma fôrma.&lt;/li&gt;
+        &lt;li&gt;Bata a cenoura, os ovos e o óleo no liquidificador.&lt;/li&gt;
+        &lt;li&gt;Misture com o açúcar e a farinha. Por último, o fermento.&lt;/li&gt;
+        &lt;li&gt;Asse por uns 40 minutos. &lt;strong&gt;Não abra o forno antes dos 30 minutos.&lt;/strong&gt;&lt;/li&gt;
+      &lt;/ol&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+  &lt;blockquote class="dica"&gt;
+    &lt;p&gt;Bolo bom é bolo feito sem pressa e comido com companhia.&lt;/p&gt;
+  &lt;/blockquote&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: #3b2f2a;
+  background-color: #fff8f0;
+}
+
+.receita {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: 2rem;
+  line-height: 1.2;
+  color: #c2410c;
+}
+
+h2 {
+  color: #9a3412;
+  border-bottom: 2px solid #fed7aa;
+}
+
+.resumo {
+  font-size: 1.125rem;
+}
+</pre>
+</div>
+
+<p>Brinque: troque <code>max-width</code> por <code>width</code> e abra o resultado numa aba nova (↗): estreite a janela e veja a coluna de 640 px passar da tela, em vez de encolher.</p>
+
+<h3>Missão 2</h3>
+<div class="tryhtml" data-goal="css:.receita{max-width}=640px,src:margin(-inline)?:\s*(0\s+)?auto">
+<p class="try-task"><strong>Missão:</strong> o texto vai de uma borda à outra do quadro. Limite a coluna <code>.receita</code> a <code>40rem</code> e centralize-a.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="receita"&gt;
+  &lt;h1&gt;Bolo de cenoura com cobertura de chocolate&lt;/h1&gt;
+  &lt;p&gt;O bolo que a avó da Ana fazia todo domingo: fofinho, laranja por dentro e com casquinha de chocolate. A receita rende 12 fatias e fica pronta em pouco mais de uma hora.&lt;/p&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  margin: 0;
+  background-color: #fff8f0;
+}
+
+.receita {
+  padding: 1rem;
+  background-color: white;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  margin: 0;
+  background-color: #fff8f0;
+}
+
+.receita {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1rem;
+  background-color: white;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao3">Versão 3 · A foto que cabe em qualquer tela</h2>
+<p>A foto tem <code>width="800" height="600"</code> no HTML. Esses atributos dizem ao navegador a <strong>proporção</strong> da foto antes de ela chegar (ele reserva o espaço e a página não "pula"), mas também viram o tamanho dela quando o CSS não diz outra coisa. Agora o CSS vai dizer.</p>
+
+<pre class="file" data-file="style.css (versão 3: o que entra)">
+.foto {
+  margin: 1.5rem 0;
+}
+
+.foto img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.foto figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b5b53;
+  text-align: center;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>display: block</code></dt>
+  <dd>Uma imagem é, de fábrica, um elemento em linha: fica apoiada na linha do texto, com um vãozinho embaixo, reservado para as "pernas" de letras como g e p. Como bloco, o vão some. Aula: <a href="display.html">display</a>.</dd>
+  <dt><code>width: 100%</code> + <code>height: auto</code></dt>
+  <dd>A largura passa a ser a da coluna (640 px no computador, a tela menos o preenchimento no celular), e a altura acompanha, mantendo a proporção 4:3 que os atributos informaram. Sem o <code>height: auto</code>, a altura continuaria nos 600 px do atributo e o bolo ficaria achatado. Aula: <a href="imagens-responsivas.html">Imagens que se Adaptam</a>.</dd>
+  <dt><code>border-radius: 12px</code></dt>
+  <dd>Arredonda os quatro cantos da foto. Aula: <a href="border-radius.html">Cantos Arredondados</a>.</dd>
+  <dt><code>.foto figcaption</code></dt>
+  <dd>A legenda fica menor (<code>0.875rem</code>, 14 px), num marrom mais claro e centralizada: informação de apoio, que não compete com o texto.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> a foto encaixa exatamente na coluna, com os cantos arredondados, e a rolagem para o lado desaparece. No quadro de 375 px (um celular), ela fica com 343 × 257 px, os 375 menos 16 px de cada lado. A legenda "O bolo pronto, ainda morno." aparece pequena e centralizada embaixo.</p>
+
+<div class="tip"><strong>Por que não <code>max-width: 100%</code>?</strong> Também funciona, e é o que muita gente usa: a foto encolhe se não couber, mas nunca cresce além dos 800 px dela. Aqui usamos <code>width: 100%</code> porque queremos a foto <strong>sempre</strong> da largura da coluna; na versão 6, quando a coluna passa de 800 px, ela cresce junto. Para uma foto pequena, como um avatar de 96 px, use <code>max-width</code>: esticada, ela ficaria borrada.</div>
+
+<h3>Experimente: a versão 3</h3>
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="receita"&gt;
+  &lt;h1&gt;Bolo de cenoura com cobertura de chocolate&lt;/h1&gt;
+  &lt;p class="resumo"&gt;O bolo que a avó da Ana fazia todo domingo: fofinho, laranja por dentro e com casquinha de chocolate.&lt;/p&gt;
+  &lt;figure class="foto"&gt;
+    &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate escorrendo pelos lados" width="800" height="600"&gt;
+    &lt;figcaption&gt;O bolo pronto, ainda morno.&lt;/figcaption&gt;
+  &lt;/figure&gt;
+  &lt;dl class="info"&gt;
+    &lt;div&gt;&lt;dt&gt;Tempo&lt;/dt&gt;&lt;dd&gt;1h10&lt;/dd&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;dt&gt;Rendimento&lt;/dt&gt;&lt;dd&gt;12 fatias&lt;/dd&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;dt&gt;Dificuldade&lt;/dt&gt;&lt;dd&gt;Fácil&lt;/dd&gt;&lt;/div&gt;
+  &lt;/dl&gt;
+  &lt;div class="colunas"&gt;
+    &lt;section class="ingredientes"&gt;
+      &lt;h2&gt;Ingredientes&lt;/h2&gt;
+      &lt;ul&gt;
+        &lt;li&gt;3 cenouras médias&lt;/li&gt;
+        &lt;li&gt;3 ovos&lt;/li&gt;
+        &lt;li&gt;1 xícara de óleo&lt;/li&gt;
+        &lt;li&gt;2 xícaras de açúcar&lt;/li&gt;
+        &lt;li&gt;2 e 1/2 xícaras de farinha&lt;/li&gt;
+        &lt;li&gt;1 colher (sopa) de fermento&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/section&gt;
+    &lt;section class="preparo"&gt;
+      &lt;h2&gt;Modo de preparo&lt;/h2&gt;
+      &lt;ol&gt;
+        &lt;li&gt;Ligue o forno a 180 °C e unte uma fôrma.&lt;/li&gt;
+        &lt;li&gt;Bata a cenoura, os ovos e o óleo no liquidificador.&lt;/li&gt;
+        &lt;li&gt;Misture com o açúcar e a farinha. Por último, o fermento.&lt;/li&gt;
+        &lt;li&gt;Asse por uns 40 minutos. &lt;strong&gt;Não abra o forno antes dos 30 minutos.&lt;/strong&gt;&lt;/li&gt;
+      &lt;/ol&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+  &lt;blockquote class="dica"&gt;
+    &lt;p&gt;Bolo bom é bolo feito sem pressa e comido com companhia.&lt;/p&gt;
+  &lt;/blockquote&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: #3b2f2a;
+  background-color: #fff8f0;
+}
+
+.receita {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: 2rem;
+  line-height: 1.2;
+  color: #c2410c;
+}
+
+h2 {
+  color: #9a3412;
+  border-bottom: 2px solid #fed7aa;
+}
+
+.resumo {
+  font-size: 1.125rem;
+}
+
+.foto {
+  margin: 1.5rem 0;
+}
+
+.foto img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.foto figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b5b53;
+  text-align: center;
+}
+</pre>
+</div>
+
+<p>Brinque: apague só a linha <code>height: auto;</code> e veja o bolo ficar achatado; troque <code>12px</code> por <code>50%</code> e veja a foto virar uma elipse.</p>
+
+<h3>Missão 3</h3>
+<div class="tryhtml" data-goal="src:\.foto img\s*\{[^}]*width:\s*100%,css:.foto img{border-top-left-radius}=12px,css:.foto img{border-bottom-right-radius}=12px">
+<p class="try-task"><strong>Missão:</strong> nesta caixa a coluna tem só <code>20rem</code> e a foto passa dela. Faça a foto caber na coluna sem achatar e arredonde os cantos em <code>12px</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="receita"&gt;
+  &lt;figure class="foto"&gt;
+    &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate escorrendo pelos lados" width="800" height="600"&gt;
+    &lt;figcaption&gt;O bolo pronto, ainda morno.&lt;/figcaption&gt;
+  &lt;/figure&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">.receita {
+  max-width: 20rem;
+  margin: 0 auto;
+}
+
+.foto {
+  margin: 0;
+}
+
+.foto img {
+  display: block;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.receita {
+  max-width: 20rem;
+  margin: 0 auto;
+}
+
+.foto {
+  margin: 0;
+}
+
+.foto img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao4">Versão 4 · Tempo, rendimento e dificuldade em cartões</h2>
+<p>As três informações rápidas são o que a pessoa procura primeiro ("dá tempo de fazer antes do almoço?"). Em vez de uma lista empilhada, vamos pô-las lado a lado, cada uma num cartão, como o quadrinho colorido dos livros de receita.</p>
+
+<pre class="file" data-file="style.css (versão 4: o que entra)">
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0 0 1.5rem;
+}
+
+.info div {
+  flex: 1 1 8rem;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+}
+
+.info dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9a3412;
+}
+
+.info dd {
+  margin: 0;
+  font-weight: 700;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>.info { display: flex; }</code></dt>
+  <dd>Os filhos diretos do <code>&lt;dl&gt;</code>, os três <code>&lt;div&gt;</code>, ficam um ao lado do outro. Aula: <a href="flexbox.html">Introdução ao Flexbox</a>.</dd>
+  <dt><code>flex-wrap: wrap</code> e <code>gap: 0.75rem</code></dt>
+  <dd>Se não couberem numa linha, os cartões descem para a seguinte; entre eles, 12 px de espaço, nas duas direções. Aulas: <a href="flex-wrap.html">Quebrando Linha</a> e <a href="gap.html">Espaço entre Itens</a>.</dd>
+  <dt><code>.info div { flex: 1 1 8rem; }</code></dt>
+  <dd>Cada cartão parte de 8rem (128 px), pode crescer para dividir a sobra e pode encolher. Aula: <a href="flex-grow.html">Crescer e Encolher</a>.</dd>
+  <dt><code>.info dt</code> e <code>.info dd</code></dt>
+  <dd>O rótulo fica pequeno, em maiúsculas (<code>text-transform: uppercase</code>, sem mudar o texto do HTML) e com as letras um pouco afastadas; o valor fica em negrito e perde o recuo de 40 px que o navegador põe em todo <code>&lt;dd&gt;</code>. Aula: <a href="text-transform.html">Maiúsculas e Minúsculas</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 640 px da coluna, os três cartões brancos, com borda pêssego e cantos arredondados, ficam numa linha só: "TEMPO / 1h10", "RENDIMENTO / 12 fatias", "DIFICULDADE / Fácil", cada um com o rótulo pequeno e laranja em cima e o valor em negrito embaixo. No quadro de 375 px, cabem dois por linha: "Tempo" e "Rendimento" em cima e "Dificuldade" sozinho embaixo, esticado na largura toda (por causa do <code>flex-grow</code> 1).</p>
+
+<h3>Experimente: a versão 4</h3>
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="receita"&gt;
+  &lt;h1&gt;Bolo de cenoura com cobertura de chocolate&lt;/h1&gt;
+  &lt;p class="resumo"&gt;O bolo que a avó da Ana fazia todo domingo: fofinho, laranja por dentro e com casquinha de chocolate.&lt;/p&gt;
+  &lt;figure class="foto"&gt;
+    &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate escorrendo pelos lados" width="800" height="600"&gt;
+    &lt;figcaption&gt;O bolo pronto, ainda morno.&lt;/figcaption&gt;
+  &lt;/figure&gt;
+  &lt;dl class="info"&gt;
+    &lt;div&gt;&lt;dt&gt;Tempo&lt;/dt&gt;&lt;dd&gt;1h10&lt;/dd&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;dt&gt;Rendimento&lt;/dt&gt;&lt;dd&gt;12 fatias&lt;/dd&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;dt&gt;Dificuldade&lt;/dt&gt;&lt;dd&gt;Fácil&lt;/dd&gt;&lt;/div&gt;
+  &lt;/dl&gt;
+  &lt;div class="colunas"&gt;
+    &lt;section class="ingredientes"&gt;
+      &lt;h2&gt;Ingredientes&lt;/h2&gt;
+      &lt;ul&gt;
+        &lt;li&gt;3 cenouras médias&lt;/li&gt;
+        &lt;li&gt;3 ovos&lt;/li&gt;
+        &lt;li&gt;1 xícara de óleo&lt;/li&gt;
+        &lt;li&gt;2 xícaras de açúcar&lt;/li&gt;
+        &lt;li&gt;2 e 1/2 xícaras de farinha&lt;/li&gt;
+        &lt;li&gt;1 colher (sopa) de fermento&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/section&gt;
+    &lt;section class="preparo"&gt;
+      &lt;h2&gt;Modo de preparo&lt;/h2&gt;
+      &lt;ol&gt;
+        &lt;li&gt;Ligue o forno a 180 °C e unte uma fôrma.&lt;/li&gt;
+        &lt;li&gt;Bata a cenoura, os ovos e o óleo no liquidificador.&lt;/li&gt;
+        &lt;li&gt;Misture com o açúcar e a farinha. Por último, o fermento.&lt;/li&gt;
+        &lt;li&gt;Asse por uns 40 minutos. &lt;strong&gt;Não abra o forno antes dos 30 minutos.&lt;/strong&gt;&lt;/li&gt;
+      &lt;/ol&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+  &lt;blockquote class="dica"&gt;
+    &lt;p&gt;Bolo bom é bolo feito sem pressa e comido com companhia.&lt;/p&gt;
+  &lt;/blockquote&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: #3b2f2a;
+  background-color: #fff8f0;
+}
+
+.receita {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: 2rem;
+  line-height: 1.2;
+  color: #c2410c;
+}
+
+h2 {
+  color: #9a3412;
+  border-bottom: 2px solid #fed7aa;
+}
+
+.resumo {
+  font-size: 1.125rem;
+}
+
+.foto {
+  margin: 1.5rem 0;
+}
+
+.foto img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.foto figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b5b53;
+  text-align: center;
+}
+
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0 0 1.5rem;
+}
+
+.info div {
+  flex: 1 1 8rem;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+}
+
+.info dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9a3412;
+}
+
+.info dd {
+  margin: 0;
+  font-weight: 700;
+}
+</pre>
+</div>
+
+<p>Brinque: tire o <code>flex-wrap: wrap;</code> e estreite a janela (↗): os cartões espremem o texto em vez de descer. Troque <code>flex: 1 1 8rem</code> por <code>flex: none</code> e veja cada cartão ficar só do tamanho do texto.</p>
+
+<h3>Missão 4</h3>
+<div class="tryhtml" data-goal="css:.info{display}=flex,css:.info{column-gap}=12px,css:.info dd{margin-left}=0px">
+<p class="try-task"><strong>Missão:</strong> os cartões já têm cara de cartão, mas estão empilhados. Ponha-os lado a lado com <code>12px</code> (<code>0.75rem</code>) entre eles, e tire o recuo da esquerda do <code>dd</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;dl class="info"&gt;
+  &lt;div&gt;&lt;dt&gt;Tempo&lt;/dt&gt;&lt;dd&gt;1h10&lt;/dd&gt;&lt;/div&gt;
+  &lt;div&gt;&lt;dt&gt;Rendimento&lt;/dt&gt;&lt;dd&gt;12 fatias&lt;/dd&gt;&lt;/div&gt;
+  &lt;div&gt;&lt;dt&gt;Dificuldade&lt;/dt&gt;&lt;dd&gt;Fácil&lt;/dd&gt;&lt;/div&gt;
+&lt;/dl&gt;
+</pre>
+<pre class="script" data-file="style.css">.info {
+  margin: 0;
+}
+
+.info div {
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+}
+
+.info dd {
+  font-weight: 700;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.info {
+  display: flex;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.info div {
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+}
+
+.info dd {
+  margin: 0;
+  font-weight: 700;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao5">Versão 5 · Listas com marcadores coloridos e a dica em destaque</h2>
+<p>Os ingredientes e os passos já estão bem organizados pelo HTML (<code>&lt;ul&gt;</code> e <code>&lt;ol&gt;</code>). Falta pouco: dar a cor do site às bolinhas e aos números, separar os passos e destacar o que não pode ser esquecido.</p>
+
+<pre class="file" data-file="style.css (versão 5: o que entra)">
+.ingredientes li::marker {
+  color: #ea580c;
+}
+
+.preparo li {
+  margin-bottom: 0.5rem;
+}
+
+.preparo li::marker {
+  font-weight: 700;
+  color: #c2410c;
+}
+
+.preparo strong {
+  background-color: #fef3c7;
+}
+
+.dica {
+  margin: 1.5rem 0 0;
+  padding: 1rem 1.5rem;
+  background-color: #ffedd5;
+  border-left: 4px solid #ea580c;
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+}
+
+.dica p {
+  margin: 0;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>li::marker</code></dt>
+  <dd>O <code>::marker</code> é a bolinha (ou o número) de cada item. Ele aceita poucas propriedades, sobretudo cor e fonte; aqui, bolinhas laranja nos ingredientes e números laranja-escuros em negrito nos passos. O texto do item continua marrom. Aula: <a href="listas.html">Estilizando Listas</a>.</dd>
+  <dt><code>.preparo li { margin-bottom: 0.5rem; }</code></dt>
+  <dd>Um espaço de 8 px depois de cada passo, para o olho achar o próximo passo sem esforço.</dd>
+  <dt><code>.preparo strong</code></dt>
+  <dd>O aviso "Não abra o forno…" já está em negrito pelo HTML; o fundo amarelo-claro faz o efeito de marca-texto.</dd>
+  <dt><code>.dica</code></dt>
+  <dd>A citação perde o recuo de fábrica (<code>margin</code>), ganha fundo creme, uma borda só do lado esquerdo (<code>border-left</code>), cantos arredondados só na direita (<code>border-radius: 0 8px 8px 0</code>, no sentido do relógio a partir do canto de cima à esquerda) e itálico. O <code>.dica p { margin: 0; }</code> tira a margem do parágrafo de dentro, senão a caixa fica com um vão em cima e embaixo do texto.</dd>
+</dl>
+
+<div class="note"><strong>Suporte do <code>::marker</code>:</strong> Chrome e Edge 86+, Firefox 68+. O Safari tem suporte <strong>parcial</strong> (caniuse.com): mudar a cor, como fazemos aqui, funciona. Num navegador sem suporte, a regra é ignorada e as bolinhas ficam da cor do texto; nada quebra.</div>
+
+<p><strong>O que muda na tela:</strong> as bolinhas dos ingredientes ficam laranja, os números "1." a "4." do preparo ficam laranja-escuros e em negrito, os passos se afastam um pouco, o "Não abra o forno antes dos 30 minutos." ganha fundo amarelinho, e a frase da avó aparece em itálico numa faixa creme com uma barra laranja à esquerda.</p>
+
+<h3>Experimente: a versão 5</h3>
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="receita"&gt;
+  &lt;h1&gt;Bolo de cenoura com cobertura de chocolate&lt;/h1&gt;
+  &lt;p class="resumo"&gt;O bolo que a avó da Ana fazia todo domingo: fofinho, laranja por dentro e com casquinha de chocolate.&lt;/p&gt;
+  &lt;figure class="foto"&gt;
+    &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate escorrendo pelos lados" width="800" height="600"&gt;
+    &lt;figcaption&gt;O bolo pronto, ainda morno.&lt;/figcaption&gt;
+  &lt;/figure&gt;
+  &lt;dl class="info"&gt;
+    &lt;div&gt;&lt;dt&gt;Tempo&lt;/dt&gt;&lt;dd&gt;1h10&lt;/dd&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;dt&gt;Rendimento&lt;/dt&gt;&lt;dd&gt;12 fatias&lt;/dd&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;dt&gt;Dificuldade&lt;/dt&gt;&lt;dd&gt;Fácil&lt;/dd&gt;&lt;/div&gt;
+  &lt;/dl&gt;
+  &lt;div class="colunas"&gt;
+    &lt;section class="ingredientes"&gt;
+      &lt;h2&gt;Ingredientes&lt;/h2&gt;
+      &lt;ul&gt;
+        &lt;li&gt;3 cenouras médias&lt;/li&gt;
+        &lt;li&gt;3 ovos&lt;/li&gt;
+        &lt;li&gt;1 xícara de óleo&lt;/li&gt;
+        &lt;li&gt;2 xícaras de açúcar&lt;/li&gt;
+        &lt;li&gt;2 e 1/2 xícaras de farinha&lt;/li&gt;
+        &lt;li&gt;1 colher (sopa) de fermento&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/section&gt;
+    &lt;section class="preparo"&gt;
+      &lt;h2&gt;Modo de preparo&lt;/h2&gt;
+      &lt;ol&gt;
+        &lt;li&gt;Ligue o forno a 180 °C e unte uma fôrma.&lt;/li&gt;
+        &lt;li&gt;Bata a cenoura, os ovos e o óleo no liquidificador.&lt;/li&gt;
+        &lt;li&gt;Misture com o açúcar e a farinha. Por último, o fermento.&lt;/li&gt;
+        &lt;li&gt;Asse por uns 40 minutos. &lt;strong&gt;Não abra o forno antes dos 30 minutos.&lt;/strong&gt;&lt;/li&gt;
+      &lt;/ol&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+  &lt;blockquote class="dica"&gt;
+    &lt;p&gt;Bolo bom é bolo feito sem pressa e comido com companhia.&lt;/p&gt;
+  &lt;/blockquote&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: #3b2f2a;
+  background-color: #fff8f0;
+}
+
+.receita {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: 2rem;
+  line-height: 1.2;
+  color: #c2410c;
+}
+
+h2 {
+  color: #9a3412;
+  border-bottom: 2px solid #fed7aa;
+}
+
+.resumo {
+  font-size: 1.125rem;
+}
+
+.foto {
+  margin: 1.5rem 0;
+}
+
+.foto img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.foto figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b5b53;
+  text-align: center;
+}
+
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0 0 1.5rem;
+}
+
+.info div {
+  flex: 1 1 8rem;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+}
+
+.info dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9a3412;
+}
+
+.info dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.ingredientes li::marker {
+  color: #ea580c;
+}
+
+.preparo li {
+  margin-bottom: 0.5rem;
+}
+
+.preparo li::marker {
+  font-weight: 700;
+  color: #c2410c;
+}
+
+.preparo strong {
+  background-color: #fef3c7;
+}
+
+.dica {
+  margin: 1.5rem 0 0;
+  padding: 1rem 1.5rem;
+  background-color: #ffedd5;
+  border-left: 4px solid #ea580c;
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+}
+
+.dica p {
+  margin: 0;
+}
+</pre>
+</div>
+
+<p>Brinque: no <code>.ingredientes li::marker</code>, acrescente <code>font-size: 1.5rem;</code> e veja só as bolinhas crescerem; tente <code>background-color: yellow;</code> no mesmo lugar e veja que nada acontece (o <code>::marker</code> não aceita fundo).</p>
+
+<h3>Missão 5</h3>
+<div class="tryhtml" data-goal="css:.dica{border-left-width}=4px,css:.dica{border-left-style}=solid,css:.dica{border-left-color}=rgb(234, 88, 12)">
+<p class="try-task"><strong>Missão:</strong> a dica está numa faixa creme, mas sem a barra. Dê a ela uma borda <strong>só do lado esquerdo</strong>: <code>4px</code>, contínua, cor <code>#ea580c</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;blockquote class="dica"&gt;
+  &lt;p&gt;Bolo bom é bolo feito sem pressa e comido com companhia.&lt;/p&gt;
+&lt;/blockquote&gt;
+</pre>
+<pre class="script" data-file="style.css">.dica {
+  margin: 0;
+  padding: 1rem 1.5rem;
+  background-color: #ffedd5;
+  font-style: italic;
+}
+
+.dica p {
+  margin: 0;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.dica {
+  margin: 0;
+  padding: 1rem 1.5rem;
+  background-color: #ffedd5;
+  border-left: 4px solid #ea580c;
+  font-style: italic;
+}
+
+.dica p {
+  margin: 0;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao6">Versão 6 · Duas colunas na tela larga</h2>
+<p>Na cozinha, a pessoa olha os ingredientes e o passo atual ao mesmo tempo. Num monitor, há espaço para isso: ingredientes numa coluna estreita, modo de preparo numa coluna larga ao lado. No celular, não há: continua tudo empilhado. Isso é <strong>mobile first</strong>: o CSS de antes é o do celular, e a regra nova só entra a partir de uma largura.</p>
+
+<pre class="file" data-file="style.css (versão 6: o que entra)">
+@media (min-width: 48rem) {
+  .receita {
+    max-width: 60rem;
+  }
+
+  .colunas {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+  }
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>@media (min-width: 48rem) { … }</code></dt>
+  <dd>As regras de dentro só valem quando a área da página tem 48rem (768 px) ou mais. Dentro de uma caixa do guia, quem conta é a largura do <strong>quadro</strong> do resultado, não a da sua janela. Aulas: <a href="media-queries.html">Media Queries</a> e <a href="mobile-first.html">Mobile First</a>.</dd>
+  <dt><code>.receita { max-width: 60rem; }</code></dt>
+  <dd>Na tela larga, a coluna pode chegar a 960 px, para caberem as duas colunas de dentro.</dd>
+  <dt><code>display: grid</code> + <code>grid-template-columns: 1fr 2fr</code></dt>
+  <dd>O <code>.colunas</code> vira uma grade de duas colunas: a primeira com 1 parte do espaço, a segunda com 2 partes. Os dois filhos (as duas <code>&lt;section&gt;</code>) caem um em cada coluna, na ordem do HTML. Aulas: <a href="grid.html">Introdução ao Grid</a> e <a href="grid-colunas.html">Colunas</a>.</dd>
+  <dt><code>gap: 2rem</code></dt>
+  <dd>32 px entre as duas colunas.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 870 px (o de um computador, nesta coluna do guia), a página ocupa o quadro todo, a foto cresce junto (838 px de largura), os três cartões ficam numa linha, e "Ingredientes" fica numa coluna à esquerda com cerca de 269 px, ao lado de "Modo de preparo", com cerca de 537 px; cada título com a sua linha cor de pêssego. No quadro de 375 px, nada disso acontece: a página fica igual à da versão 5, empilhada.</p>
+
+<h3>Experimente: a versão 6 (a página completa)</h3>
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="receita"&gt;
+  &lt;h1&gt;Bolo de cenoura com cobertura de chocolate&lt;/h1&gt;
+  &lt;p class="resumo"&gt;O bolo que a avó da Ana fazia todo domingo: fofinho, laranja por dentro e com casquinha de chocolate.&lt;/p&gt;
+  &lt;figure class="foto"&gt;
+    &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate escorrendo pelos lados" width="800" height="600"&gt;
+    &lt;figcaption&gt;O bolo pronto, ainda morno.&lt;/figcaption&gt;
+  &lt;/figure&gt;
+  &lt;dl class="info"&gt;
+    &lt;div&gt;&lt;dt&gt;Tempo&lt;/dt&gt;&lt;dd&gt;1h10&lt;/dd&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;dt&gt;Rendimento&lt;/dt&gt;&lt;dd&gt;12 fatias&lt;/dd&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;dt&gt;Dificuldade&lt;/dt&gt;&lt;dd&gt;Fácil&lt;/dd&gt;&lt;/div&gt;
+  &lt;/dl&gt;
+  &lt;div class="colunas"&gt;
+    &lt;section class="ingredientes"&gt;
+      &lt;h2&gt;Ingredientes&lt;/h2&gt;
+      &lt;ul&gt;
+        &lt;li&gt;3 cenouras médias&lt;/li&gt;
+        &lt;li&gt;3 ovos&lt;/li&gt;
+        &lt;li&gt;1 xícara de óleo&lt;/li&gt;
+        &lt;li&gt;2 xícaras de açúcar&lt;/li&gt;
+        &lt;li&gt;2 e 1/2 xícaras de farinha&lt;/li&gt;
+        &lt;li&gt;1 colher (sopa) de fermento&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/section&gt;
+    &lt;section class="preparo"&gt;
+      &lt;h2&gt;Modo de preparo&lt;/h2&gt;
+      &lt;ol&gt;
+        &lt;li&gt;Ligue o forno a 180 °C e unte uma fôrma.&lt;/li&gt;
+        &lt;li&gt;Bata a cenoura, os ovos e o óleo no liquidificador.&lt;/li&gt;
+        &lt;li&gt;Misture com o açúcar e a farinha. Por último, o fermento.&lt;/li&gt;
+        &lt;li&gt;Asse por uns 40 minutos. &lt;strong&gt;Não abra o forno antes dos 30 minutos.&lt;/strong&gt;&lt;/li&gt;
+      &lt;/ol&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+  &lt;blockquote class="dica"&gt;
+    &lt;p&gt;Bolo bom é bolo feito sem pressa e comido com companhia.&lt;/p&gt;
+  &lt;/blockquote&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: #3b2f2a;
+  background-color: #fff8f0;
+}
+
+.receita {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: 2rem;
+  line-height: 1.2;
+  color: #c2410c;
+}
+
+h2 {
+  color: #9a3412;
+  border-bottom: 2px solid #fed7aa;
+}
+
+.resumo {
+  font-size: 1.125rem;
+}
+
+.foto {
+  margin: 1.5rem 0;
+}
+
+.foto img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.foto figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b5b53;
+  text-align: center;
+}
+
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0 0 1.5rem;
+}
+
+.info div {
+  flex: 1 1 8rem;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+}
+
+.info dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9a3412;
+}
+
+.info dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.ingredientes li::marker {
+  color: #ea580c;
+}
+
+.preparo li {
+  margin-bottom: 0.5rem;
+}
+
+.preparo li::marker {
+  font-weight: 700;
+  color: #c2410c;
+}
+
+.preparo strong {
+  background-color: #fef3c7;
+}
+
+.dica {
+  margin: 1.5rem 0 0;
+  padding: 1rem 1.5rem;
+  background-color: #ffedd5;
+  border-left: 4px solid #ea580c;
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+}
+
+.dica p {
+  margin: 0;
+}
+
+@media (min-width: 48rem) {
+  .receita {
+    max-width: 60rem;
+  }
+
+  .colunas {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+  }
+}
+</pre>
+</div>
+
+<p>Brinque: abra o resultado numa aba nova (↗) e estreite e alargue a janela devagar; no ponto dos 768 px, as colunas se juntam ou se separam. Troque <code>1fr 2fr</code> por <code>1fr 1fr</code>. Se você estiver num celular, o quadro é estreito e você verá só a versão empilhada: é o <code>@media</code> funcionando.</p>
+
+<h3>Missão 6</h3>
+<div class="tryhtml" data-goal="src:@media\s*\(\s*min-width:\s*48rem\s*\),src:grid-template-columns:\s*1fr\s+2fr,src:display:\s*grid">
+<p class="try-task"><strong>Missão:</strong> escreva a media query: a partir de <code>48rem</code>, o <code>.colunas</code> vira uma grade de duas colunas, <code>1fr 2fr</code>, com <code>2rem</code> de espaço. (Como o resultado depende da largura do quadro, a missão confere o seu código; para ver as colunas, use um quadro largo.)</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="colunas"&gt;
+  &lt;section class="ingredientes"&gt;
+    &lt;h2&gt;Ingredientes&lt;/h2&gt;
+    &lt;ul&gt;
+      &lt;li&gt;3 cenouras médias&lt;/li&gt;
+      &lt;li&gt;3 ovos&lt;/li&gt;
+      &lt;li&gt;1 xícara de óleo&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/section&gt;
+  &lt;section class="preparo"&gt;
+    &lt;h2&gt;Modo de preparo&lt;/h2&gt;
+    &lt;ol&gt;
+      &lt;li&gt;Ligue o forno a 180 °C e unte uma fôrma.&lt;/li&gt;
+      &lt;li&gt;Bata a cenoura, os ovos e o óleo no liquidificador.&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/section&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+
+/* escreva a media query aqui embaixo */
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+
+/* escreva a media query aqui embaixo */
+@media (min-width: 48rem) {
+  .colunas {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Formas diferentes de fazer as mesmas coisas</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Para</th><th>Usamos</th><th>Também daria</th><th>Quando preferir a outra</th></tr></thead>
+<tbody>
+<tr><td>Centralizar a coluna</td><td><code>max-width</code> + <code>margin: 0 auto</code></td><td><code>width: min(100%, 40rem)</code> + <code>margin-inline: auto</code></td><td>Quando você já usa <a href="clamp.html">min() e clamp()</a> e <a href="propriedades-logicas.html">propriedades lógicas</a>; o resultado é o mesmo.</td></tr>
+<tr><td>A foto caber</td><td><code>width: 100%</code> + <code>height: auto</code></td><td><code>max-width: 100%</code> + <code>height: auto</code></td><td>Imagem pequena, que não pode crescer além do tamanho dela.</td></tr>
+<tr><td>Cartões lado a lado</td><td>Flexbox com <code>flex-wrap</code></td><td>Grid com <code>repeat(auto-fit, minmax(8rem, 1fr))</code></td><td>Quando os cartões têm de ficar alinhados em colunas, também na linha de baixo (<a href="grid-repeat.html">repeat, minmax e auto-fit</a>).</td></tr>
+<tr><td>Duas colunas</td><td>Grid <code>1fr 2fr</code> no <code>@media</code></td><td>Flexbox, com <code>flex: 1</code> e <code>flex: 2</code> nas seções</td><td>Grid é mais direto para "colunas da página"; veja <a href="flex-ou-grid.html">Flexbox ou Grid?</a>.</td></tr>
+<tr><td>Cor dos marcadores</td><td><code>::marker</code></td><td><code>list-style: none</code> + <code>::before</code> com a bolinha</td><td>Quando você precisa de um marcador que o <code>::marker</code> não aceita (fundo, borda, ícone); veja <a href="before-after.html">::before e ::after</a>.</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<h2>Quando dá errado</h2>
+
+<div class="cenario">
+<h3>A foto passa da coluna (e a página rola para o lado)</h3>
+<p>É o que você viu na versão 2: sem regra para a imagem, ela usa os 800 px dos atributos <code>width</code> e <code>height</code>, mesmo dentro de uma coluna de 640 px ou de uma tela de celular. A causa mais comum, depois de já ter escrito a regra, é <strong>esquecer o <code>;</code></strong>:</p>
+<pre class="file" data-file="style.css · erro de propósito">.foto img {
+  display: block;
+  width: 100%
+  height: auto;
+  border-radius: 12px;
+}
+</pre>
+<p><strong>O que você vê:</strong> no quadro de 375 px, os cantos continuam arredondados, mas a foto volta para 800 × 600 px, sai pela direita da tela, e a página inteira ganha rolagem para o lado; o resto (título, cartões, listas) continua na largura certa. <strong>Por quê:</strong> sem o <code>;</code>, o navegador lê <code>width: 100% height: auto</code> como <strong>uma</strong> declaração de <code>width</code> com um valor sem sentido e a ignora inteira; a altura vai junto. No F12, a declaração aparece riscada. O validador diz:</p>
+<pre class="term" data-cwd="~/receita">$ vnu --css style.css
+"file:/home/ana/receita/style.css":4.3-4.8: error: CSS: “width”: Missing a semicolon before the property name “height”.</pre>
+<p>"Falta um ponto e vírgula antes da propriedade <code>height</code>". A posição <code>4.3-4.8</code> (linha 4, colunas 3 a 8) aponta para a palavra <code>height</code>, mas o <code>;</code> que falta é o do fim da linha 3.</p>
+</div>
+
+<div class="cenario">
+<h3>A coluna não centraliza: ocupa a tela toda</h3>
+<pre class="file" data-file="style.css · erro de propósito">.receita {
+  max-width: 40 rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+</pre>
+<p><strong>O que você vê:</strong> num quadro largo, o texto vai de uma borda à outra, como antes da versão 2. O <code>margin: 0 auto</code> está certo, mas não tem o que centralizar: sem largura máxima, a coluna já é da largura toda. <strong>Por quê:</strong> o espaço entre <code>40</code> e <code>rem</code> transforma o valor em dois pedaços, um número sem unidade e uma palavra, e o navegador descarta a declaração. O estilo calculado do <code>max-width</code> fica <code>none</code>. O validador:</p>
+<pre class="term" data-cwd="~/receita">$ vnu --css style.css
+"file:/home/ana/receita/style.css":2.17-2.19: error: CSS: “max-width”: Too many values or values are not recognized.</pre>
+<p>"Valores demais, ou valores não reconhecidos." Número e unidade andam sempre grudados: <code>40rem</code>, <code>12px</code>.</p>
+</div>
+
+<div class="cenario">
+<h3>As duas colunas nunca aparecem</h3>
+<p>Dois jeitos comuns de errar o <code>@media</code>, cada um com a sua mensagem:</p>
+<pre class="file" data-file="style.css · erro de propósito">@media (min-width: 48 rem) {
+  .colunas {
+    display: grid;
+  }
+}
+</pre>
+<pre class="term" data-cwd="~/receita">$ vnu --css style.css
+"file:/home/ana/receita/style.css":1.26-1.26: error: CSS: only “0” can be a “unit”. You must put a unit after your number</pre>
+<pre class="file" data-file="style.css · erro de propósito">@media min-width: 48rem {
+  .colunas {
+    display: grid;
+  }
+}
+</pre>
+<pre class="term" data-cwd="~/receita">$ vnu --css style.css
+"file:/home/ana/receita/style.css":5.2-6.1: error: CSS: unrecognized media “min-width”.</pre>
+<p><strong>O que você vê, nos dois casos:</strong> mesmo no quadro de 870 px, os ingredientes ficam em cima do modo de preparo; o <code>.colunas</code> continua <code>display: block</code>. <strong>Por quê:</strong> uma condição de <code>@media</code> que o navegador não entende é tratada como falsa, e o bloco inteiro é pulado, em silêncio. No primeiro, o espaço separa o número da unidade ("só o 0 pode ficar sem unidade: ponha uma unidade depois do número"). No segundo, faltaram os parênteses em volta de <code>min-width: 48rem</code>.</p>
+<p>Um terceiro motivo, que o validador não pega: o <code>@media</code> está certo, mas a tela (ou o quadro) tem menos de 768 px. Antes de procurar erro, confira a largura: no celular, a página empilhada é o resultado <strong>certo</strong>.</p>
+</div>
+
+<div class="cenario">
+<h3>O cartão não ficou ao lado: cada um numa linha</h3>
+<p>O <code>display: flex</code> foi parar no lugar errado:</p>
+<pre class="file" data-file="style.css · erro de propósito">.info div {
+  display: flex;
+}
+</pre>
+<p><strong>O que você vê:</strong> os três cartões continuam um embaixo do outro. Dentro de cada um, o rótulo e o valor é que ficam lado a lado ("TEMPO 1h10"). <strong>Por quê:</strong> <code>display: flex</code> organiza os <strong>filhos</strong> do elemento que o recebe. Para os cartões ficarem lado a lado, quem precisa dele é o pai dos cartões, o <code>.info</code>. O validador não acusa nada: o CSS é válido, só não faz o que você queria.</p>
+</div>
+
+<hr>
+
+<h2>Referência: o que o projeto usou</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Versão</th><th>Propriedades</th><th>Aulas</th></tr></thead>
+<tbody>
+<tr><td>1 · Chão</td><td><code>box-sizing</code>, <code>margin</code>, <code>font-family</code>, <code>line-height</code>, <code>color</code>, <code>background-color</code></td><td><a href="box-sizing.html">box-sizing</a>, <a href="font-family.html">Fontes</a>, <a href="line-height.html">Espaçamento</a></td></tr>
+<tr><td>2 · Coluna</td><td><code>max-width</code>, <code>margin: 0 auto</code>, <code>padding</code>, <code>font-size</code>, <code>border-bottom</code></td><td><a href="width-height.html">Largura e Altura</a>, <a href="centralizar.html">Centralizando</a></td></tr>
+<tr><td>3 · Foto</td><td><code>display: block</code>, <code>width: 100%</code>, <code>height: auto</code>, <code>border-radius</code>, <code>text-align</code></td><td><a href="imagens-responsivas.html">Imagens que se Adaptam</a>, <a href="border-radius.html">border-radius</a></td></tr>
+<tr><td>4 · Cartões</td><td><code>display: flex</code>, <code>flex-wrap</code>, <code>gap</code>, <code>flex</code>, <code>text-transform</code>, <code>letter-spacing</code></td><td><a href="flexbox.html">Flexbox</a>, <a href="flex-grow.html">flex-grow</a>, <a href="gap.html">gap</a></td></tr>
+<tr><td>5 · Listas e dica</td><td><code>::marker</code>, <code>margin-bottom</code>, <code>border-left</code>, <code>font-style</code></td><td><a href="listas.html">Listas</a>, <a href="border.html">Bordas</a></td></tr>
+<tr><td>6 · Colunas</td><td><code>@media (min-width)</code>, <code>display: grid</code>, <code>grid-template-columns</code>, <code>gap</code></td><td><a href="media-queries.html">Media Queries</a>, <a href="mobile-first.html">Mobile First</a>, <a href="grid-colunas.html">Colunas</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Desafios extras</h2>
+<ul>
+  <li>Ponha a foto e os cartões lado a lado também, numa tela de 64rem para cima (uma segunda media query).</li>
+  <li>Troque as cores fixas por variáveis (<code>--laranja</code>, <code>--creme</code>) no <code>:root</code>, como na aula <a href="variaveis.html">Variáveis</a>, e faça uma versão escura com <a href="tema-escuro.html">prefers-color-scheme</a>.</li>
+  <li>Prepare a receita para imprimir: sem a foto e sem cores de fundo (<a href="impressao.html">CSS para Impressão</a>).</li>
+</ul>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A foto que cabe</h3>
+<p>Complete para a foto ocupar a largura da coluna sem achatar:</p>
+<div class="ex-code">.foto img { width: <input data-answer="100%" aria-label="largura">; height: <input data-answer="auto" aria-label="altura">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Só na tela larga</h3>
+<p>Complete a regra que só vale a partir de 48rem:</p>
+<div class="ex-code">@media (<input data-answer="min-width" aria-label="condição">: 48rem) { … }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. A Ana escreveu <code>.receita { margin: 0 auto; }</code>, mas a coluna não ficou no meio. O que falta?</p>
+<label><input type="radio" name="q3"> Um <code>text-align: center</code></label>
+<label><input type="radio" name="q3"> Uma largura menor que a do pai, como <code>max-width: 40rem</code></label>
+<label><input type="radio" name="q3"> Um <code>display: flex</code> no <code>.receita</code></label>
+<label><input type="radio" name="q3"> Trocar <code>auto</code> por <code>center</code></label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Para os três cartões de informação ficarem lado a lado, onde vai o <code>display: flex</code>?</p>
+<label><input type="radio" name="q4"> No <code>.info div</code>, cada cartão</label>
+<label><input type="radio" name="q4"> No <code>.info dt</code></label>
+<label><input type="radio" name="q4"> No <code>.info</code>, o pai dos cartões</label>
+<label><input type="radio" name="q4"> No <code>body</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. No celular, a página da versão 6 aparece com os ingredientes em cima do modo de preparo. Isso é…</p>
+<label><input type="radio" name="q5"> O certo: a regra das duas colunas só vale a partir de 48rem</label>
+<label><input type="radio" name="q5"> Um erro no <code>@media</code></label>
+<label><input type="radio" name="q5"> Um problema do celular, que não entende Grid</label>
+<label><input type="radio" name="q5"> Falta de <code>!important</code></label>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Comece pelo chão: <code>box-sizing: border-box</code> para todos, e fonte, altura de linha e cores no <code>body</code>.</li>
+  <li>Coluna de leitura: <code>max-width</code> + <code>margin: 0 auto</code> + um <code>padding</code> para o celular.</li>
+  <li>Foto que se adapta: <code>display: block; width: 100%; height: auto;</code>. Os atributos <code>width</code> e <code>height</code> do HTML continuam úteis: dão a proporção e evitam o "pulo" da página.</li>
+  <li>Cartões: <code>display: flex</code> no pai, com <code>flex-wrap</code> e <code>gap</code>; <code>flex: 1 1 8rem</code> nos filhos.</li>
+  <li><code>::marker</code> pinta bolinhas e números; <code>border-left</code> faz a barra de destaque.</li>
+  <li>Mobile first: o CSS de fora vale para todos; o <code>@media (min-width: 48rem)</code> acrescenta as duas colunas com Grid só onde cabem.</li>
+  <li>Quando algo "não pega", o navegador ignorou a declaração: procure o <code>;</code> que faltou, o espaço entre número e unidade e os parênteses do <code>@media</code>. O validador acha esses três.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
