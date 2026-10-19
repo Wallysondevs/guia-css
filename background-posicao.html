@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS background-repeat e background-position — repetição e posição do fundo | Guia CSS</title>
+<meta name="description" content="Repetição e posição da imagem de fundo em CSS para quem está começando: background-repeat (repeat, no-repeat, repeat-x, repeat-y, space, round), background-position com palavras, porcentagens, pixels e distância a partir da direita e de baixo, várias imagens, background-attachment e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Repetição e Posição do Fundo</span></h1>
+
+<p class="intro">Na aula <a href="background-image.html">Imagem de Fundo</a>, a imagem se repetia sozinha e ficava sempre grudada no canto de cima, à esquerda. Agora você vai mandar nela: <strong>se</strong> ela se repete (<code>background-repeat</code>, "repetição do fundo") e <strong>onde</strong> ela fica (<code>background-position</code>, "posição do fundo"). Com as duas, o avatar da Ana vai para o canto do cartão, e o logo da lojinha fica num canto do mapa.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Os seis valores do <code>background-repeat</code>, lado a lado: <code>repeat</code>, <code>no-repeat</code>, <code>repeat-x</code>, <code>repeat-y</code>, <code>space</code> e <code>round</code>.</li>
+  <li>Como posicionar a imagem com palavras (<code>center</code>, <code>bottom right</code>), porcentagens e pixels.</li>
+  <li>Como medir a distância a partir da <strong>direita</strong> e de <strong>baixo</strong>: <code>right 20px bottom 10px</code>.</li>
+  <li>O que o navegador guarda (<code>50% 50%</code>, <code>calc(100% - 20px)</code>).</li>
+  <li>Repetição e posição com várias imagens, e o fundo que não rola (<code>background-attachment</code>).</li>
+  <li>O que acontece quando dá errado, e as mensagens reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>As imagens são as do guia: o ícone do bolo com vela (<code>favicon.svg</code>, 64×64 pixels, um quadrado laranja-avermelhado de cantos arredondados), o avatar redondo da Ana (<code>avatar-ana-96.png</code>, 96×96, com os cantos transparentes), o logo e o mapa da lojinha. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana.</p>
+
+<hr>
+
+<h2>A ideia: azulejo ou quadro na parede</h2>
+<p>Uma parede pode ser coberta de <strong>azulejos</strong>, todos iguais, um ao lado do outro, ou ter <strong>um quadro só</strong>, pendurado num prego. O <code>background-repeat</code> decide entre azulejo (repetir) e quadro (não repetir). O <code>background-position</code> decide onde fica o prego: no meio da parede, no canto de baixo, a 20 centímetros da direita.</p>
+
+<hr>
+
+<h2>1. <code>background-repeat</code>: repetir ou não</h2>
+<p>As seis caixas têm o mesmo tamanho (250×150 pixels), a mesma imagem de 64×64 e o mesmo fundo amarelo-claro. Só muda o <code>background-repeat</code>, escrito dentro de cada uma:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa repeat"&gt;&lt;code&gt;repeat&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa no-repeat"&gt;&lt;code&gt;no-repeat&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa repeat-x"&gt;&lt;code&gt;repeat-x&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa repeat-y"&gt;&lt;code&gt;repeat-y&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa space"&gt;&lt;code&gt;space&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa round"&gt;&lt;code&gt;round&lt;/code&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  background-color: lightyellow;
+  background-image: url("assets/midia/favicon.svg");
+  width: 250px;
+  height: 150px;
+  border: 1px solid gray;
+  margin-bottom: 8px;
+}
+
+.caixa code {
+  background-color: white;
+}
+
+.repeat {
+  background-repeat: repeat;
+}
+
+.no-repeat {
+  background-repeat: no-repeat;
+}
+
+.repeat-x {
+  background-repeat: repeat-x;
+}
+
+.repeat-y {
+  background-repeat: repeat-y;
+}
+
+.space {
+  background-repeat: space;
+}
+
+.round {
+  background-repeat: round;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que você vê</th><th>Quando usar</th></tr>
+<tr><td><code>repeat</code></td><td>O ícone se repete para os lados e para baixo, a partir do canto de cima, à esquerda. Na direita e embaixo, os últimos ficam cortados (250 e 150 não são múltiplos de 64). É o valor inicial.</td><td>Texturas e padrões feitos para emendar.</td></tr>
+<tr><td><code>no-repeat</code></td><td>Um ícone só, no canto de cima, à esquerda. O resto da caixa fica só com a cor.</td><td>Fotos, logos, ícones: quase sempre.</td></tr>
+<tr><td><code>repeat-x</code></td><td>Uma fileira na horizontal (o eixo <em>x</em>), no alto da caixa.</td><td>Uma faixa decorativa no topo.</td></tr>
+<tr><td><code>repeat-y</code></td><td>Uma coluna na vertical (o eixo <em>y</em>), na esquerda.</td><td>Uma faixa decorativa na lateral.</td></tr>
+<tr><td><code>space</code></td><td>Só ícones <strong>inteiros</strong> (3 por linha, 2 linhas), com o espaço que sobra distribuído entre eles. Os da ponta encostam nas beiradas.</td><td>Padrão sem nenhum ícone cortado, mantendo o tamanho.</td></tr>
+<tr><td><code>round</code></td><td>Só ícones inteiros, mas <strong>esticados ou encolhidos</strong> para fechar a conta: 4 por linha e 2 linhas, cada um com 62,5×75 pixels, um pouco achatados.</td><td>Padrão sem corte e sem buraco, quando a imagem aguenta ser deformada.</td></tr>
+</table>
+</div>
+
+<p>Mude a largura das caixas (<code>width: 400px;</code>) e veja o <code>space</code> e o <code>round</code> refazerem a conta.</p>
+
+<div class="tip">
+<strong>Dois valores: horizontal e vertical</strong>
+<p>O <code>background-repeat</code> aceita dois valores, o primeiro para a horizontal e o segundo para a vertical: <code>background-repeat: repeat no-repeat;</code> é o mesmo que <code>repeat-x</code>. Também dá para misturar: <code>space round</code>. O <code>repeat-x</code> e o <code>repeat-y</code> são só atalhos.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:.capa{background-repeat}=no-repeat">
+<p class="try-task"><strong>Missão:</strong> o bolo aparece duas vezes, um ao lado do outro, e o segundo fica cortado. Faça a foto aparecer <strong>uma vez só</strong>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="capa"&gt;
+  &lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.capa {
+  background-color: saddlebrown;
+  background-image: url("assets/midia/bolo-400.jpg");
+  height: 300px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.capa {
+  background-color: saddlebrown;
+  background-image: url("assets/midia/bolo-400.jpg");
+  background-repeat: no-repeat;
+  height: 300px;
+}
+</pre>
+</div>
+
+<p>Com <code>no-repeat</code>, a foto fica uma vez só, na esquerda, e o resto da caixa mostra o marrom do <code>background-color</code>. Colocar a foto no meio é o próximo passo.</p>
+
+<hr>
+
+<h2>2. <code>background-position</code> com palavras</h2>
+<p>Com a imagem sem repetir, o <code>background-position</code> diz onde ela fica. O jeito mais fácil é com palavras: <code>top</code> ("em cima"), <code>bottom</code> ("embaixo"), <code>left</code> ("esquerda"), <code>right</code> ("direita") e <code>center</code> ("centro"):</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa p1"&gt;&lt;code&gt;top left&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa p2"&gt;&lt;code&gt;top right&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa p3"&gt;&lt;code&gt;center&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa p4"&gt;&lt;code&gt;bottom left&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa p5"&gt;&lt;code&gt;bottom right&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa p6"&gt;&lt;code&gt;right&lt;/code&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  background-color: lightyellow;
+  background-image: url("assets/midia/avatar-ana-96.png");
+  background-repeat: no-repeat;
+  width: 250px;
+  height: 150px;
+  border: 1px solid gray;
+  margin-bottom: 8px;
+}
+
+.caixa code {
+  background-color: white;
+}
+
+.p1 {
+  background-position: top left;
+}
+
+.p2 {
+  background-position: top right;
+}
+
+.p3 {
+  background-position: center;
+}
+
+.p4 {
+  background-position: bottom left;
+}
+
+.p5 {
+  background-position: bottom right;
+}
+
+.p6 {
+  background-position: right;
+}
+</pre>
+</div>
+
+<ul>
+  <li>Com duas palavras, uma diz a altura (<code>top</code>, <code>center</code>, <code>bottom</code>) e a outra o lado (<code>left</code>, <code>center</code>, <code>right</code>). A ordem das palavras não importa: <code>top left</code> e <code>left top</code> dão o mesmo. (Com números, a ordem importa: seção 3.)</li>
+  <li>Com <strong>uma</strong> palavra, a outra direção fica no centro: <code>right</code> põe o avatar encostado na direita e no meio da altura. <code>center</code> sozinho é o centro nas duas direções.</li>
+  <li><code>top left</code> é o valor inicial: o canto onde a imagem já estava.</li>
+</ul>
+
+<hr>
+
+<h2>3. Porcentagens e pixels</h2>
+<p>Por baixo das palavras há números. Com dois números, o primeiro é sempre a <strong>horizontal</strong> (da esquerda para a direita) e o segundo, a <strong>vertical</strong> (de cima para baixo).</p>
+
+<h3>Pixels: a distância do canto</h3>
+<p><code>background-position: 20px 40px;</code> põe o canto de cima, à esquerda, da imagem a 20 pixels da esquerda da caixa e a 40 pixels do topo. É como medir com a régua a partir do canto.</p>
+
+<h3>Porcentagens: o ponto da imagem no ponto da caixa</h3>
+<p>A porcentagem funciona de um jeito diferente, e esperto. <code>background-position: 25% 50%;</code> quer dizer: "o ponto a 25% da largura <strong>da imagem</strong> fica sobre o ponto a 25% da largura <strong>da caixa</strong>" (e o mesmo com 50% na altura). Por isso:</p>
+<ul>
+  <li><code>0% 0%</code> encosta a imagem no canto de cima, à esquerda (o canto da imagem no canto da caixa);</li>
+  <li><code>100% 100%</code> encosta no canto de baixo, à direita: o canto de baixo da imagem no canto de baixo da caixa, e a imagem não sai para fora;</li>
+  <li><code>50% 50%</code> põe o centro da imagem no centro da caixa: é o <code>center</code>.</li>
+</ul>
+
+<p>As palavras são atalhos para porcentagens. É assim que o navegador as guarda (o valor calculado, lido no Chromium):</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você escreveu</th><th>O navegador guardou</th></tr>
+<tr><td><code>top left</code></td><td><code>0% 0%</code></td></tr>
+<tr><td><code>center</code></td><td><code>50% 50%</code></td></tr>
+<tr><td><code>bottom right</code></td><td><code>100% 100%</code></td></tr>
+<tr><td><code>right</code></td><td><code>100% 50%</code></td></tr>
+<tr><td><code>20px 40px</code></td><td><code>20px 40px</code></td></tr>
+<tr><td><code>20px</code> (um número só)</td><td><code>20px 50%</code>: o segundo vira o centro</td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque os números e veja o avatar andar. Tente <code>0% 100%</code>, <code>75% 25%</code>, <code>200px 0</code> e <code>-30px 20px</code> (sim, valores negativos empurram a imagem para fora da caixa, e a parte de fora fica escondida).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa"&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  background-color: lightyellow;
+  background-image: url("assets/midia/avatar-ana-96.png");
+  background-repeat: no-repeat;
+  background-position: 20px 40px;
+  width: 250px;
+  height: 150px;
+  border: 1px solid gray;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>4. A partir da direita e de baixo</h2>
+<p>Os pixels sempre medem a partir da esquerda e do topo. E se você quer o avatar a 20 pixels da <strong>direita</strong>? A largura da caixa muda com a tela, então não dá para fazer a conta. Para isso existe a forma com quatro partes: a palavra do lado e a distância a partir dele.</p>
+
+<pre class="file" data-file="style.css">.caixa {
+  background-position: right 20px bottom 10px;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>right 20px</dt><dd>A borda direita da imagem fica a 20 pixels da borda direita da caixa.</dd>
+  <dt>bottom 10px</dt><dd>A borda de baixo da imagem fica a 10 pixels da borda de baixo da caixa.</dd>
+</dl>
+
+<p>O navegador guarda isso como uma conta: <code>calc(100% - 20px) calc(100% - 10px)</code> ("a ponta direita, menos 20 pixels"). A função <code>calc()</code> tem aula própria: <a href="calc.html">Contas com calc()</a>. Também dá para misturar com <code>center</code>: <code>right 16px center</code> fica a 16 pixels da direita e no meio da altura (guardado como <code>calc(100% - 16px) 50%</code>).</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Ana Souza&lt;/h2&gt;
+  &lt;p&gt;Confeiteira. Bolos sob encomenda.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  background-color: lightyellow;
+  background-image: url("assets/midia/avatar-ana-96.png");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding: 16px;
+  padding-right: 128px;
+}
+</pre>
+</div>
+
+<p>O avatar fica na direita do cartão, com uma folga de 16 pixels da beirada, e centralizado na altura. O <code>padding-right: 128px</code> (o espaço de dentro, na direita; aula <a href="padding.html">Espaço Interno</a>) reserva o lugar dele: sem isso, numa tela estreita, o texto passaria por cima do avatar. Experimente apagar essa linha e estreitar a janela.</p>
+
+<hr>
+
+<h2>5. Com várias imagens</h2>
+<p>Na aula anterior, o logo e o mapa juntos ficaram confusos, porque os dois se repetiam. Com várias imagens, o <code>background-repeat</code> e o <code>background-position</code> também aceitam uma lista separada por vírgula, <strong>na mesma ordem</strong> das imagens. Se a lista tiver um valor só, ele vale para todas:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="onde"&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.onde {
+  background-color: #e8efe0;
+  background-image:
+    url("assets/midia/logo-lojinha-200.png"),
+    url("assets/midia/mapa-400.png");
+  background-repeat: no-repeat;
+  background-position:
+    right 10px top 10px,
+    center;
+  height: 250px;
+}
+</pre>
+</div>
+
+<p>O logo (a primeira imagem, por cima) vai para o canto de cima, à direita; o mapa (a segunda) fica no centro, uma vez só, e o verde-claro do <code>background-color</code> preenche as laterais. No F12, o valor calculado mostra as duas posições: <code>calc(100% - 10px) 10px, 50% 50%</code>.</p>
+
+<hr>
+
+<h2>6. O fundo que não rola: <code>background-attachment</code></h2>
+<p>Normalmente, o fundo rola junto com a página. Com <code>background-attachment: fixed</code> ("fixo"), a imagem fica <strong>parada em relação à janela</strong>: o texto rola por cima dela, como se a página fosse um vidro deslizando sobre uma foto.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> role o texto dentro do quadro. A foto do bolo fica parada no meio do quadro. Troque <code>fixed</code> por <code>scroll</code> (o valor inicial) e role de novo: agora a foto sobe junto com o texto. (O <code>min-height: 1200px</code> só deixa a página comprida, para ter o que rolar.)</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;p&gt;Ingredientes: 3 cenouras médias, 4 ovos, 1 xícara de óleo, 2 xícaras de açúcar, 2 xícaras de farinha de trigo, 1 colher de sopa de fermento.&lt;/p&gt;
+&lt;p&gt;Bata no liquidificador as cenouras, os ovos e o óleo. Despeje numa tigela, junte o açúcar e a farinha e misture. Por último, o fermento.&lt;/p&gt;
+&lt;p&gt;Asse em forno médio, pré-aquecido, por uns 40 minutos.&lt;/p&gt;
+&lt;p&gt;Cobertura: 1 colher de manteiga, 3 colheres de chocolate em pó, 1 xícara de açúcar e 5 colheres de leite. Ferva até engrossar e espalhe sobre o bolo ainda quente.&lt;/p&gt;
+&lt;p&gt;Rende 12 pedaços.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  background-color: saddlebrown;
+  background-image: url("assets/midia/bolo-400.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 1200px;
+}
+
+p,
+h1 {
+  background-color: rgb(255 255 255 / 85%);
+}
+</pre>
+</div>
+
+<div class="note">
+<strong>Suporte</strong>
+<p>O <code>fixed</code> funciona no Chrome, no Edge e no Firefox, no computador e no celular. No <strong>Safari do iPhone e do iPad</strong>, ele é aceito mas <strong>não faz efeito</strong>: o fundo rola normalmente (dados de compatibilidade do MDN). Por isso, use-o só como enfeite: a página tem de ficar boa sem ele. E pense em quem passa mal com movimento na tela (aula <a href="reduced-motion.html">Respeitando Quem Prefere Menos Movimento</a>).</p>
+</div>
+
+<hr>
+
+<h2>Qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Use</th></tr>
+<tr><td>Uma foto ou um logo no fundo</td><td><code>background-repeat: no-repeat;</code> + uma posição</td></tr>
+<tr><td>Um padrão, uma textura</td><td><code>repeat</code> (o inicial); <code>space</code> ou <code>round</code> se o corte na beirada incomodar</td></tr>
+<tr><td>Centralizar</td><td><code>background-position: center;</code></td></tr>
+<tr><td>Num canto, colado</td><td>palavras: <code>bottom right</code></td></tr>
+<tr><td>Num canto, com folga</td><td>quatro partes: <code>right 16px bottom 16px</code></td></tr>
+<tr><td>A uma distância exata da esquerda/topo</td><td>pixels: <code>20px 40px</code></td></tr>
+<tr><td>Uma proporção da caixa</td><td>porcentagem: <code>75% 25%</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Como sempre no CSS, um valor que o navegador não entende é ignorado: a imagem volta a se repetir ou volta para o canto de cima, à esquerda.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Erro de propósito:</strong> as quatro caixas queriam o avatar uma vez só, cada uma num lugar. Nenhuma funcionou direito. Leia os cenários e conserte.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa um"&gt;&lt;/div&gt;
+&lt;div class="caixa dois"&gt;&lt;/div&gt;
+&lt;div class="caixa tres"&gt;&lt;/div&gt;
+&lt;div class="caixa quatro"&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  background-color: lightyellow;
+  background-image: url("assets/midia/avatar-ana-96.png");
+  width: 250px;
+  height: 150px;
+  border: 1px solid gray;
+}
+
+.um {
+  background-repeat: norepeat;
+}
+
+.dois {
+  background-repeat: no-repeat;
+  background-position: centre;
+}
+
+.tres {
+  background-repeat: no-repeat;
+  background-position: top 20px;
+}
+
+.quatro {
+  background-repeat: no-repeat;
+  background-position: 20px, 40px;
+}
+</pre>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-repeat”: “norepeat” is not a “background-repeat” value.</code></strong>
+<p><strong>O que aconteceu:</strong> faltou o hífen de <code>no-repeat</code>. O valor é ignorado, e a imagem continua repetindo (o <code>repeat</code> inicial): a caixa 1 fica cheia de avatares.</p>
+<pre class="term" data-cwd="~/posicao">$ vnu --css style.css
+"file:/home/ana/posicao/style.css":10.22-10.29: error: CSS: “background-repeat”: “norepeat” is not a “background-repeat” value.</pre>
+<p><strong>Como consertar:</strong> <code>no-repeat</code>, com hífen.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-position”: Too many values or values are not recognized.</code></strong>
+<p><strong>O que aconteceu:</strong> na caixa 2, <code>centre</code>, com a grafia inglesa britânica. O CSS usa a americana: <code>center</code>. A declaração é ignorada, e o avatar fica no canto de cima, à esquerda.</p>
+<pre class="term" data-cwd="~/posicao">$ vnu --css style.css
+"file:/home/ana/posicao/style.css":15.24-15.29: error: CSS: “background-position”: Too many values or values are not recognized.</pre>
+<p>"Valores demais, ou valores não reconhecidos."</p>
+<p><strong>Como consertar:</strong> <code>center</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-position”: “top” and “20px” are incompatible.</code></strong>
+<p><strong>O que aconteceu:</strong> na caixa 3, <code>top 20px</code>. Com um número no meio, o <strong>primeiro valor é a horizontal</strong>, e <code>top</code> não é uma horizontal. A declaração é ignorada (no F12, o valor calculado continua <code>0% 0%</code>), e o avatar fica no canto de cima, à esquerda.</p>
+<pre class="term" data-cwd="~/posicao">$ vnu --css style.css
+"file:/home/ana/posicao/style.css":20.28-20.31: error: CSS: “background-position”: “top” and “20px” are incompatible.</pre>
+<p>"<code>top</code> e <code>20px</code> são incompatíveis." Só com duas <strong>palavras</strong> a ordem não importa.</p>
+<p><strong>Como consertar:</strong> horizontal primeiro (<code>20px top</code>), ou as quatro partes (<code>left 20px top 0</code>).</p>
+</div>
+
+<div class="cenario">
+<strong>Sem mensagem: a vírgula que separa camadas</strong>
+<p><strong>O que aconteceu:</strong> na caixa 4, <code>20px, 40px</code>, com vírgula. O validador aceita, porque a vírgula é válida: ela separa as posições de <strong>várias imagens</strong> (seção 5). Como só há uma imagem, o navegador usa a primeira posição, <code>20px</code>, e completa com o centro: o avatar fica a 20 pixels da esquerda e no meio da altura (no F12: <code>20px 50%</code>), e não a 40 pixels do topo.</p>
+<p><strong>Como consertar:</strong> horizontal e vertical se separam com <strong>espaço</strong>: <code>20px 40px</code>. Vírgula só entre imagens.</p>
+</div>
+
+<div class="cenario">
+<strong>Sem mensagem: a posição que "não faz nada"</strong>
+<p><strong>O que aconteceu:</strong> <code>background-position: bottom right;</code> numa caixa sem altura, ou numa imagem do mesmo tamanho da caixa. Se a imagem preenche tudo, não há para onde ela andar. E, com a imagem se repetindo, a posição só muda onde começa o padrão, o que quase não se nota.</p>
+<p><strong>Como consertar:</strong> confira se a caixa é maior que a imagem e se o <code>no-repeat</code> está lá.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>background-repeat: repeat;</code></td><td>Repete nas duas direções (inicial)</td></tr>
+<tr><td><code>background-repeat: no-repeat;</code></td><td>Uma vez só</td></tr>
+<tr><td><code>background-repeat: repeat-x;</code> / <code>repeat-y;</code></td><td>Só na horizontal / só na vertical</td></tr>
+<tr><td><code>background-repeat: space;</code></td><td>Só cópias inteiras, com espaço entre elas</td></tr>
+<tr><td><code>background-repeat: round;</code></td><td>Só cópias inteiras, esticadas ou encolhidas</td></tr>
+<tr><td><code>background-position: center;</code></td><td>No centro (<code>50% 50%</code>)</td></tr>
+<tr><td><code>background-position: bottom right;</code></td><td>No canto (<code>100% 100%</code>); a ordem das palavras não importa</td></tr>
+<tr><td><code>background-position: 20px 40px;</code></td><td>A 20px da esquerda e 40px do topo (horizontal primeiro)</td></tr>
+<tr><td><code>background-position: 25% 75%;</code></td><td>O ponto 25%/75% da imagem sobre o ponto 25%/75% da caixa</td></tr>
+<tr><td><code>background-position: right 20px bottom 10px;</code></td><td>A 20px da direita e 10px de baixo</td></tr>
+<tr><td><code>background-attachment: fixed;</code></td><td>A imagem fica parada enquanto a página rola (sem efeito no Safari do iPhone)</td></tr>
+<tr><td>Várias imagens</td><td>Listas com vírgula, na ordem das imagens</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Uma vez só</h3>
+<p>Complete para o logo não se repetir:</p>
+<div class="ex-code">.topo {
+  background-repeat: <input data-answer="no-repeat" aria-label="valor">;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. No centro</h3>
+<p>Complete com <strong>uma palavra</strong> que centraliza a imagem nas duas direções:</p>
+<div class="ex-code">.capa {
+  background-position: <input data-answer="center" aria-label="valor">;
+}</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. Qual valor o navegador guarda para <code>background-position: right;</code>?</p>
+<label><input type="radio" name="q3"> <code>100% 0%</code></label>
+<label><input type="radio" name="q3"> <code>100% 50%</code></label>
+<label><input type="radio" name="q3"> <code>right 0px</code></label>
+<label><input type="radio" name="q3"> <code>0% 100%</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">4. Você quer bolinhas repetidas, mas sem nenhuma cortada na beirada e <strong>sem deformar</strong> as bolinhas. Qual valor?</p>
+<label><input type="radio" name="q4"> <code>repeat</code></label>
+<label><input type="radio" name="q4"> <code>round</code></label>
+<label><input type="radio" name="q4"> <code>no-repeat</code></label>
+<label><input type="radio" name="q4"> <code>space</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Qual escrita põe a imagem a 16 pixels da direita e a 16 pixels de baixo, qualquer que seja a largura da caixa?</p>
+<label><input type="radio" name="q5"> <code>background-position: right 16px bottom 16px;</code></label>
+<label><input type="radio" name="q5"> <code>background-position: 16px 16px;</code></label>
+<label><input type="radio" name="q5"> <code>background-position: 16px, 16px;</code></label>
+<label><input type="radio" name="q5"> <code>background-position: -16px -16px;</code></label>
+</div>
+
+<h3>Missão final: o cartão da Ana</h3>
+
+<div class="tryhtml" data-goal="css:.cartao{background-repeat}=no-repeat,css:.cartao{background-position}=calc(100% - 16px) 50%">
+<p class="try-task"><strong>Missão:</strong> o cartão está cheio de avatares repetidos. Deixe <strong>um avatar só</strong>, a <strong>16 pixels da direita</strong> e <strong>no meio da altura</strong>. Há um erro de escrita na regra.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Ana Souza&lt;/h2&gt;
+  &lt;p&gt;Confeiteira. Bolos sob encomenda.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  background-color: lightyellow;
+  background-image: url("assets/midia/avatar-ana-96.png");
+  background-position: centre;
+  padding: 16px;
+  padding-right: 128px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  background-color: lightyellow;
+  background-image: url("assets/midia/avatar-ana-96.png");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding: 16px;
+  padding-right: 128px;
+}
+</pre>
+</div>
+
+<p>Faltava o <code>no-repeat</code>, e <code>centre</code> é a grafia britânica, que o CSS não conhece. <code>right 16px center</code> (ou <code>right 16px top 50%</code>) dá o mesmo valor calculado: <code>calc(100% - 16px) 50%</code>.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>background-repeat</code>: <code>repeat</code> (inicial, azulejo), <code>no-repeat</code> (uma vez), <code>repeat-x</code>/<code>repeat-y</code> (uma fileira), <code>space</code> (inteiras, com espaço) e <code>round</code> (inteiras, deformadas).</li>
+  <li><code>background-position</code> com palavras (<code>center</code>, <code>bottom right</code>), pixels (distância do canto de cima, à esquerda), porcentagens (o ponto da imagem sobre o mesmo ponto da caixa) ou quatro partes (<code>right 20px bottom 10px</code>).</li>
+  <li>Com dois números, a horizontal vem primeiro. Com um valor só, o outro vira o centro. O navegador guarda tudo em <code>%</code>, <code>px</code> ou <code>calc()</code>.</li>
+  <li>Com várias imagens, repetição e posição também viram listas com vírgula, na mesma ordem.</li>
+  <li><code>background-attachment: fixed</code> prende a imagem na janela; no Safari do iPhone não tem efeito.</li>
+  <li>Valor errado (<code>norepeat</code>, <code>centre</code>, <code>top 20px</code>): o navegador ignora e o validador aponta. A vírgula no lugar do espaço passa no validador, mas muda o sentido.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
