@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Propriedades Lógicas — inline, block, start e end | Guia CSS</title>
+<meta name="description" content="Propriedades lógicas em CSS para quem está começando: inline e block no lugar de esquerda, direita, cima e baixo, margin-inline, padding-block, inline-size, start e end, o que muda num texto da direita para a esquerda (dir=rtl) e na escrita vertical, a tabela de equivalências e os erros reais do validador.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Propriedades Lógicas</span></h1>
+
+<p class="intro">Até aqui, o guia usou <code>margin-left</code>, <code>padding-top</code>, <code>border-right</code>: esquerda, cima, direita. Funciona porque o português se escreve da esquerda para a direita, de cima para baixo. Mas a lojinha da Ana começou a vender para clientes que leem árabe, e o árabe se escreve da <strong>direita para a esquerda</strong>. As <strong>propriedades lógicas</strong> trocam "esquerda e direita" por "começo e fim da linha", e o navegador descobre sozinho para que lado é cada um.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Os dois eixos do texto: <strong>inline</strong> (a linha) e <strong>block</strong> (os blocos, um embaixo do outro).</li>
+  <li><code>start</code> e <code>end</code>: o começo e o fim de cada eixo.</li>
+  <li><code>margin-inline</code>, <code>padding-block</code>, <code>border-inline-start</code>, <code>inline-size</code> e as outras, com a tabela de equivalências.</li>
+  <li>O que muda num texto da direita para a esquerda (<code>dir="rtl"</code>) e na escrita vertical.</li>
+  <li>Quando vale a pena usar as lógicas, e os erros mais comuns.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="margin.html">Margem</a>, <a href="padding.html">Espaço Interno</a>, <a href="border.html">Bordas</a> e <a href="width-height.html">Largura e Altura</a>. Os resultados são desenhados agora pelo seu navegador, e as mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: "no começo da fila", e não "à esquerda"</h2>
+<p>Numa fila de padaria, "o primeiro da fila" é sempre quem vai ser atendido, não importa se a fila vai para a esquerda ou para a direita do balcão. Já "a pessoa da esquerda" depende de onde você está olhando.</p>
+
+<p>As propriedades de antes são <strong>físicas</strong>: <code>left</code> é sempre o lado esquerdo da tela. As lógicas falam do <strong>texto</strong>: <code>start</code> é onde a linha começa, e <code>end</code> é onde ela termina. Em português, o começo da linha fica à esquerda; em árabe ou hebraico, fica à direita. Com <code>start</code>, o mesmo CSS serve para os dois.</p>
+
+<h3>Os dois eixos</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Eixo</th><th>O que é</th><th>Em português</th><th>Em árabe</th></tr>
+<tr><td><strong>inline</strong> ("em linha")</td><td>a direção em que as letras de uma linha vão sendo escritas</td><td>horizontal: começa à esquerda, termina à direita</td><td>horizontal: começa à direita, termina à esquerda</td></tr>
+<tr><td><strong>block</strong> ("bloco")</td><td>a direção em que os parágrafos (os blocos) vão se empilhando</td><td>vertical: começa em cima, termina embaixo</td><td>vertical: começa em cima, termina embaixo</td></tr>
+</table>
+</div>
+
+<p>Os nomes vêm dos elementos em linha e em bloco da aula <a href="display.html">display</a>: um <code>&lt;span&gt;</code> segue na linha (eixo inline); um <code>&lt;p&gt;</code> vai para baixo do anterior (eixo block).</p>
+
+<hr>
+
+<h2>1. A primeira propriedade lógica</h2>
+<p>A citação da Ana tem uma barra colorida do lado onde o texto começa. Dois jeitos de escrever, cada um num parágrafo, primeiro em português (da esquerda para a direita) e depois dentro de um <code>&lt;div dir="rtl"&gt;</code>, que faz o texto correr da direita para a esquerda, como em árabe:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .fisica {
+    border-left: 4px solid tomato;
+    padding-left: 12px;
+  }
+  .logica {
+    border-inline-start: 4px solid navy;
+    padding-inline-start: 12px;
+  }
+&lt;/style&gt;
+&lt;p class="fisica"&gt;Física: border-left&lt;/p&gt;
+&lt;p class="logica"&gt;Lógica: border-inline-start&lt;/p&gt;
+
+&lt;div dir="rtl" lang="ar"&gt;
+  &lt;p class="fisica"&gt;مرحبا (física)&lt;/p&gt;
+  &lt;p class="logica"&gt;مرحبا (lógica)&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Nas duas primeiras linhas, em português, as duas barras ficam à esquerda: nesse caso, "começo da linha" e "esquerda" são o mesmo lugar. Nas duas de baixo, o texto (<span lang="ar">مرحبا</span>, "olá" em árabe) fica encostado à direita. A barra <code>tomato</code> da física continuou à esquerda, longe do começo do texto; a barra <code>navy</code> da lógica foi para a direita, junto do começo da linha, que é onde ela devia estar.</p>
+
+<dl class="anatomy">
+  <dt>border</dt><dd>A propriedade de sempre: a borda.</dd>
+  <dt>-inline</dt><dd>O eixo: o da linha.</dd>
+  <dt>-start</dt><dd>A ponta: o começo. <code>-end</code> seria o fim.</dd>
+  <dt>4px solid navy</dt><dd>Os mesmos valores de <code>border-left</code>. Só o "endereço" mudou.</dd>
+</dl>
+
+<p>O <code>dir="rtl"</code> é um atributo do HTML (<em>direction</em> = "direção", <em>right-to-left</em> = "da direita para a esquerda"); o guia de HTML fala dele em <a href="https://wallysondevs.github.io/guia-html/">wallysondevs.github.io/guia-html</a>. Quem decide a direção é o HTML, e o CSS lógico se adapta.</p>
+
+<div class="tryhtml" data-goal="css:[dir=&quot;rtl&quot;] .citacao{border-right-width}=4px,css:[dir=&quot;rtl&quot;] .citacao{padding-right}=12px,css:.citacao{border-left-width}=4px,nsrc:border-left|padding-left">
+<p class="try-task"><strong>Missão:</strong> na versão em árabe, a barra da citação ficou do lado errado. Troque <code>border-left</code> e <code>padding-left</code> pelas propriedades lógicas do começo da linha, para que a barra acompanhe o texto nas duas línguas.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;blockquote class="citacao"&gt;O melhor bolo é o que a gente divide.&lt;/blockquote&gt;
+&lt;div dir="rtl" lang="ar"&gt;
+  &lt;blockquote class="citacao"&gt;مرحبا&lt;/blockquote&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.citacao {
+  margin: 0 0 16px;
+  border-left: 4px solid tomato;
+  padding-left: 12px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.citacao {
+  margin: 0 0 16px;
+  border-inline-start: 4px solid tomato;
+  padding-inline-start: 12px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. A tabela de equivalências</h2>
+<p>Para cada propriedade física que você já conhece, há uma lógica. Em português (da esquerda para a direita, de cima para baixo), elas fazem a mesma coisa:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Física</th><th>Lógica</th><th>Em português, é…</th></tr>
+<tr><td><code>margin-top</code></td><td><code>margin-block-start</code></td><td>cima</td></tr>
+<tr><td><code>margin-bottom</code></td><td><code>margin-block-end</code></td><td>baixo</td></tr>
+<tr><td><code>margin-left</code></td><td><code>margin-inline-start</code></td><td>esquerda</td></tr>
+<tr><td><code>margin-right</code></td><td><code>margin-inline-end</code></td><td>direita</td></tr>
+<tr><td><code>margin-top</code> + <code>margin-bottom</code></td><td><code>margin-block</code></td><td>cima e baixo</td></tr>
+<tr><td><code>margin-left</code> + <code>margin-right</code></td><td><code>margin-inline</code></td><td>esquerda e direita</td></tr>
+<tr><td><code>padding-…</code>, <code>border-…</code></td><td><code>padding-inline</code>, <code>padding-block-end</code>, <code>border-inline-start</code>…</td><td>o mesmo esquema</td></tr>
+<tr><td><code>width</code></td><td><code>inline-size</code></td><td>largura</td></tr>
+<tr><td><code>height</code></td><td><code>block-size</code></td><td>altura</td></tr>
+<tr><td><code>max-width</code>, <code>min-height</code>…</td><td><code>max-inline-size</code>, <code>min-block-size</code>…</td><td>largura máxima, altura mínima…</td></tr>
+<tr><td><code>top</code>, <code>left</code> (com <code>position</code>)</td><td><code>inset-block-start</code>, <code>inset-inline-start</code></td><td>posição (aula <a href="position-absolute.html">position: absolute</a>)</td></tr>
+<tr><td><code>text-align: left</code> / <code>right</code></td><td><code>text-align: start</code> / <code>end</code></td><td>alinhar no começo / no fim</td></tr>
+<tr><td><code>border-top-left-radius</code></td><td><code>border-start-start-radius</code></td><td>o canto de cima do começo da linha</td></tr>
+</table>
+</div>
+
+<h3>Os atalhos com dois valores</h3>
+<p><code>margin-inline</code>, <code>padding-block</code> e companhia aceitam <strong>um</strong> valor (os dois lados iguais) ou <strong>dois</strong> (o começo e o fim):</p>
+
+<pre class="file" data-file="style.css">.cartao {
+  padding-block: 16px;          /* cima e baixo: 16px */
+  padding-inline: 32px 8px;     /* começo: 32px, fim: 8px */
+  margin-inline: auto;          /* centraliza na linha */
+}
+</pre>
+
+<p>Repare que eles <strong>não</strong> funcionam como o <code>margin</code> de quatro valores (cima, direita, baixo, esquerda). Cada atalho cuida de um eixo só.</p>
+
+<hr>
+
+<h2>3. Um cartão todo lógico</h2>
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .cartao {
+    max-inline-size: 20rem;
+    margin-inline: auto;
+    padding-block: 1rem;
+    padding-inline: 1.5rem;
+    border-inline-start: 6px solid tomato;
+    background-color: whitesmoke;
+    text-align: start;
+    font-family: sans-serif;
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;R$ 35,00&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Um cartão cinza-claro de no máximo 20rem (320 pixels) de largura, centralizado, com uma barra <code>tomato</code> à esquerda e o texto alinhado à esquerda. Em português, o resultado é igual ao de <code>max-width</code>, <code>margin-left/right: auto</code>, <code>padding</code> e <code>border-left</code>. A diferença só aparece quando a direção muda.</p>
+
+<p>No F12, na aba <em>Computed</em>, o navegador mostra as duas formas: o <code>max-inline-size: 320px</code> que você escreveu e o <code>max-width: 320px</code> calculado a partir dele. Por isso o <code>getComputedStyle(cartao).maxWidth</code> também dá <code>"320px"</code>.</p>
+
+<hr>
+
+<h2>4. E na escrita vertical?</h2>
+<p>O japonês e o chinês podem ser escritos em colunas, de cima para baixo. A propriedade <code>writing-mode</code> ("modo de escrita") vira o texto: com <code>vertical-rl</code>, as letras descem e as colunas vão da direita para a esquerda. Aí os eixos giram junto: o <strong>inline</strong> passa a ser vertical, e o <strong>block</strong>, horizontal.</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .placa {
+    writing-mode: vertical-rl;
+    inline-size: 150px;
+    block-size: 80px;
+    padding-inline-start: 20px;
+    background-color: gold;
+    font-family: sans-serif;
+  }
+&lt;/style&gt;
+&lt;div class="placa"&gt;Bolo de cenoura&lt;/div&gt;
+</pre>
+
+<p>A placa amarela ficou estreita e alta: 80 pixels de largura e 150 de altura (mais o espaço interno). O <code>inline-size: 150px</code> virou a <strong>altura</strong>, porque agora a linha corre de cima para baixo; e o <code>padding-inline-start</code> virou um espaço em <strong>cima</strong>, onde a linha começa. Com <code>width</code>, <code>height</code> e <code>padding-left</code>, a placa ficaria deitada e com o texto apertado.</p>
+
+<div class="note">
+<p><strong>Suporte:</strong> as propriedades lógicas desta aula funcionam em todos os navegadores atuais desde 2021 (o MDN marca o <code>margin-inline</code> como <em>Baseline: amplamente disponível</em>, desde abril de 2021). Alguns detalhes chegaram depois em alguns navegadores (o MDN avisa que "algumas partes" têm suporte variado): se usar algo menos comum, confira a página da propriedade no MDN. O validador W3C (<code>vnu</code> 26.10.12) conhece as propriedades desta aula.</p>
+</div>
+
+<hr>
+
+<h2>5. Quando usar as lógicas</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Use</th><th>Por quê</th></tr>
+<tr><td>Site em mais de uma língua, ou que pode ganhar uma da direita para a esquerda</td><td>Lógicas</td><td>Um CSS só serve para todas as direções.</td></tr>
+<tr><td>Espaço "antes" e "depois" de um texto, um ícone, uma lista</td><td>Lógicas (<code>margin-inline-end</code>, <code>padding-inline-start</code>)</td><td>O espaço acompanha o texto.</td></tr>
+<tr><td>Centralizar na linha</td><td><code>margin-inline: auto</code></td><td>Mais curto que <code>margin-left: auto; margin-right: auto;</code>.</td></tr>
+<tr><td>Algo preso a um lado <strong>da tela</strong>, não do texto (a sombra que vem da luz da esquerda, um botão fixo no canto)</td><td>Físicas</td><td>Ali "esquerda" é mesmo esquerda, em qualquer língua.</td></tr>
+<tr><td>Um site só em português, com CSS antigo</td><td>Qualquer uma, sem misturar à toa</td><td>Funciona igual; escolha uma e mantenha.</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong><code>error: CSS: “margin-inline-left”: Property “margin-inline-left” doesn't exist.</code></strong>
+<p><strong>O que aconteceu:</strong> uma mistura das duas formas: <code>margin-inline-left: 1rem;</code>. No eixo inline, os lados se chamam <code>start</code> e <code>end</code>, nunca <code>left</code> e <code>right</code>.</p>
+<pre class="term" data-cwd="~/logicas">$ vnu --css left.css
+"file:/home/ana/logicas/left.css":2.23-2.26: error: CSS: “margin-inline-left”: Property “margin-inline-left” doesn't exist.</pre>
+<p>"A propriedade <code>margin-inline-left</code> não existe." No navegador, a declaração é ignorada e a margem não aparece.</p>
+<p><strong>Como consertar:</strong> <code>margin-inline-start</code> (ou, se é mesmo a esquerda da tela, <code>margin-left</code>).</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “padding-inline”: Too many values or values are not recognized.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>padding-inline: 1rem 2rem 3rem;</code>, três valores, como se fosse o <code>padding</code> comum. O <code>padding-inline</code> só aceita um ou dois.</p>
+<pre class="term" data-cwd="~/logicas">$ vnu --css tres.css
+"file:/home/ana/logicas/tres.css":2.29-2.32: error: CSS: “padding-inline”: Too many values or values are not recognized.</pre>
+<p>A declaração inteira é ignorada: nenhum dos lados ganha o espaço.</p>
+<p><strong>Como consertar:</strong> um eixo por atalho: <code>padding-inline: 1rem 3rem;</code> e, se precisar, <code>padding-block: 2rem;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Física e lógica brigando</strong>
+<p><strong>O que aconteceu:</strong> a Ana tinha <code>margin-left: 0;</code> e, mais abaixo, acrescentou <code>margin-inline-start: 2rem;</code>. Em português, as duas falam do <strong>mesmo</strong> lado, e a que vem depois vence (a <a href="cascata.html">cascata</a> de sempre). Num texto da direita para a esquerda, elas falam de lados diferentes, e as duas valem. O validador não reclama: as duas são válidas.</p>
+<p><strong>Como consertar:</strong> não misture as duas formas para o mesmo lado. Escolha a lógica e troque as físicas antigas.</p>
+</div>
+
+<div class="cenario">
+<strong>Mudei para lógica e nada mudou</strong>
+<p><strong>O que aconteceu:</strong> a Ana trocou tudo para <code>-inline-start</code> e o site, em português, ficou idêntico. Não é erro: em português, <code>start</code> é a esquerda. A diferença aparece só com <code>dir="rtl"</code> (ou com <code>writing-mode</code> vertical).</p>
+<p><strong>Como conferir:</strong> ponha <code>dir="rtl"</code> no <code>&lt;html&gt;</code> por um momento e veja se tudo "espelha" direitinho.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Código</th><th>Em português, equivale a</th></tr>
+<tr><td><code>margin-inline: auto;</code></td><td><code>margin-left: auto; margin-right: auto;</code></td></tr>
+<tr><td><code>margin-block: 1rem;</code></td><td><code>margin-top: 1rem; margin-bottom: 1rem;</code></td></tr>
+<tr><td><code>padding-inline: 2rem 1rem;</code></td><td><code>padding-left: 2rem; padding-right: 1rem;</code></td></tr>
+<tr><td><code>padding-block-end: 1rem;</code></td><td><code>padding-bottom: 1rem;</code></td></tr>
+<tr><td><code>border-inline-start: 4px solid;</code></td><td><code>border-left: 4px solid;</code></td></tr>
+<tr><td><code>inline-size: 50%;</code> / <code>block-size: 10rem;</code></td><td><code>width: 50%;</code> / <code>height: 10rem;</code></td></tr>
+<tr><td><code>max-inline-size: 40rem;</code></td><td><code>max-width: 40rem;</code></td></tr>
+<tr><td><code>inset-inline-start: 0;</code></td><td><code>left: 0;</code></td></tr>
+<tr><td><code>text-align: start;</code></td><td><code>text-align: left;</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A largura lógica</h3>
+<p>Complete com a propriedade lógica que corresponde a <code>width</code>:</p>
+<div class="ex-code">.foto { <input data-answer="inline-size" aria-label="propriedade">: 300px; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Centralizando</h3>
+<p>Complete para centralizar o bloco na linha, com uma propriedade lógica:</p>
+<div class="ex-code">.cartao { <input data-answer="margin-inline" aria-label="propriedade">: auto; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. Num texto da direita para a esquerda (<code>dir="rtl"</code>), <code>padding-inline-start</code> fica de que lado?</p>
+<label><input type="radio" name="q3"> Esquerda</label>
+<label><input type="radio" name="q3"> Direita</label>
+<label><input type="radio" name="q3"> Em cima</label>
+<label><input type="radio" name="q3"> Embaixo</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">4. O que é o eixo <strong>block</strong>, em português?</p>
+<label><input type="radio" name="q4"> O vertical: a direção em que os parágrafos se empilham</label>
+<label><input type="radio" name="q4"> O horizontal: a direção da linha</label>
+<label><input type="radio" name="q4"> Só os elementos com <code>display: block</code></label>
+<label><input type="radio" name="q4"> A borda de baixo</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. Qual destas declarações é <strong>inválida</strong>?</p>
+<label><input type="radio" name="q5"> <code>margin-inline-end: 1rem;</code></label>
+<label><input type="radio" name="q5"> <code>padding-block: 8px 16px;</code></label>
+<label><input type="radio" name="q5"> <code>text-align: start;</code></label>
+<label><input type="radio" name="q5"> <code>margin-inline-right: 1rem;</code></label>
+</div>
+
+<h3>Missão final: o cartão que serve em qualquer língua</h3>
+
+<div class="tryhtml" data-goal="css:.cartao{max-width}=640px,css:[dir=&quot;rtl&quot;] .cartao{border-right-width}=6px,src:max-inline-size,src:margin-inline:\s*auto,src:padding-block,src:padding-inline,nsrc:max-width|margin-left|margin-right|padding-top|padding-bottom|padding-left|padding-right|border-left">
+<p class="try-task"><strong>Missão:</strong> reescreva o <code>.cartao</code> só com propriedades lógicas: <code>max-inline-size</code>, <code>margin-inline: auto</code>, <code>padding-block</code>, <code>padding-inline</code> e <code>border-inline-start</code>. Os valores continuam os mesmos.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;R$ 35,00&lt;/p&gt;
+&lt;/div&gt;
+&lt;div dir="rtl" lang="ar"&gt;
+  &lt;div class="cartao"&gt;
+    &lt;h2&gt;مرحبا&lt;/h2&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  max-width: 40rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  border-left: 6px solid tomato;
+  background-color: whitesmoke;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  max-inline-size: 40rem;
+  margin-inline: auto;
+  padding-block: 1rem;
+  padding-inline: 2rem;
+  border-inline-start: 6px solid tomato;
+  background-color: whitesmoke;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Propriedades físicas falam da tela (<code>left</code>, <code>top</code>); as lógicas falam do texto: o eixo <strong>inline</strong> (a linha) e o eixo <strong>block</strong> (o empilhamento), cada um com <code>start</code> e <code>end</code>.</li>
+  <li>Em português, <code>inline-start</code> = esquerda, <code>inline-end</code> = direita, <code>block-start</code> = cima, <code>block-end</code> = baixo. Com <code>dir="rtl"</code>, o inline se inverte; com <code>writing-mode</code> vertical, os eixos giram.</li>
+  <li><code>margin-inline</code>, <code>padding-block</code> etc. aceitam um ou dois valores (começo e fim). <code>inline-size</code> = largura, <code>block-size</code> = altura, <code>margin-inline: auto</code> centraliza.</li>
+  <li>Use as lógicas em sites com várias línguas e para espaços que acompanham o texto; as físicas para o que é preso à tela.</li>
+  <li>Não existe <code>-inline-left</code>; os atalhos não aceitam três ou quatro valores; não misture física e lógica para o mesmo lado. Baseline desde 2021.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
