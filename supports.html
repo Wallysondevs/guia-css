@@ -287,7 +287,7 @@
 <pre class="term" data-cwd="~/site">$ vnu --css estilo.css
 "file:/home/ana/site/estilo.css":1.25-1.35: error: CSS: “display”: “inexistente” is not a “display” value.</pre>
 <p><strong>O que significa:</strong> "<code>inexistente</code> não é um valor de <code>display</code>". O validador confere a declaração de dentro da condição como se fosse uma declaração comum. Mas, num <code>@supports not</code>, testar algo que o navegador não entende é justamente a ideia, e no Chromium a regra funcionou (o <code>.b</code> ficou verde). O mesmo acontece ao testar um recurso que o validador ainda não conhece.</p>
-<p><strong>O que fazer:</strong> leia a mensagem e decida. Se a declaração da condição está escrita certo e você <strong>quer</strong> testar algo que pode não existir, o aviso pode ser ignorado. Se foi um erro de digitação (<code>dispaly</code>, <code>gird</code>), conserte.</p>
+<p><strong>O que fazer:</strong> leia a mensagem e decida. Se a declaração da condição está escrita certo e você <strong>quer</strong> testar algo que pode não existir, o aviso pode ser ignorado. Se foi um erro de digitação (<code>dispaly</code>, <code>gird</code>), conserte. No botão <strong>Validar no W3C</strong> das caixas do guia, esse erro aparece marcado como <em>Error (falso)</em>.</p>
 </div>
 
 <div class="cenario">
