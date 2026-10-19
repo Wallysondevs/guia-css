@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Cores Hexadecimais — o código #ff6347, a forma curta #f60 e o alfa | Guia CSS</title>
+<meta name="description" content="Cores hexadecimais no CSS para quem nunca escreveu CSS: o que quer dizer #ff6347, como contar de 00 a ff, a mistura de vermelho, verde e azul, a forma curta #f60, maiúsculas, os 8 dígitos com transparência, onde achar o código de uma cor e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Cores Hexadecimais (#)</span></h1>
+
+<p class="intro">Os nomes de cor da aula anterior são só quase 150. O logo da Lojinha da Ana tem um laranja-tijolo que não está em nenhum nome. Para ele, o CSS tem o <strong>código hexadecimal</strong>: uma cerquilha (<code>#</code>) e seis letras e números, como <code>#c7401f</code>. É a forma de cor mais comum nos sites, e a que os programas de desenho entregam. Nesta aula você vai aprender a ler esse código, e não só a copiá-lo.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que quer dizer cada parte de <code>#ff6347</code>: três pares, um para cada luz (vermelho, verde e azul).</li>
+  <li>Como contar de <code>00</code> a <code>ff</code> e por que <code>ff</code> é o máximo.</li>
+  <li>Por que vermelho + verde dá <strong>amarelo</strong> na tela.</li>
+  <li>A forma curta de três dígitos: <code>#f60</code> = <code>#ff6600</code>.</li>
+  <li>Os oito dígitos, com transparência: <code>#ff634780</code>.</li>
+  <li>Onde achar o código de uma cor e os erros reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter feito <a href="cores.html">Cores por Nome</a>. Os quadros "Resultado" e as caixas "Experimente" são desenhados agora pelo <strong>seu</strong> navegador. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: o código da tinta</h2>
+<p>Numa loja de tintas, você não precisa dizer "aquele laranja meio queimado". Você entrega o <strong>código</strong> da cor, e a máquina mistura a quantidade certa de cada pigmento. Qualquer loja, com o mesmo código, faz a mesma cor.</p>
+<p>A tela faz o mesmo, com três luzes em vez de pigmentos: <strong>vermelho</strong> (<em>red</em>), <strong>verde</strong> (<em>green</em>) e <strong>azul</strong> (<em>blue</em>), o famoso RGB. Cada pontinho da tela acende essas três luzes, cada uma com uma força de 0 (apagada) a 255 (no máximo). O código hexadecimal é a receita: quanto de cada luz.</p>
+
+<hr>
+
+<h2>1. A anatomia de <code>#ff6347</code></h2>
+<p>Lembra do <code>tomato</code>? O navegador guardava <code>rgb(255, 99, 71)</code>. Em hexadecimal, ele é <code>#ff6347</code>:</p>
+
+<dl class="anatomy">
+  <dt>#</dt><dd>A cerquilha avisa: "aqui vem um código de cor". Sem ela, <code>ff6347</code> é só uma palavra que o CSS não conhece.</dd>
+  <dt>ff</dt><dd>O 1º par: a luz <strong>vermelha</strong>. <code>ff</code> é o máximo, 255.</dd>
+  <dt>63</dt><dd>O 2º par: a luz <strong>verde</strong>. <code>63</code> vale 99.</dd>
+  <dt>47</dt><dd>O 3º par: a luz <strong>azul</strong>. <code>47</code> vale 71.</dd>
+</dl>
+
+<p>Muito vermelho, pouco verde e menos azul ainda: um vermelho alaranjado. É o mesmo tomate:</p>
+
+<pre class="file" data-file="tomate.html" data-resultado>&lt;style&gt;
+  .nome { color: tomato; }
+  .hex { color: #ff6347; }
+&lt;/style&gt;
+&lt;h2 class="nome"&gt;color: tomato&lt;/h2&gt;
+&lt;h2 class="hex"&gt;color: #ff6347&lt;/h2&gt;
+</pre>
+
+<p>Os dois títulos saíram da mesma cor. O navegador guarda os dois como <code>rgb(255, 99, 71)</code>.</p>
+
+<hr>
+
+<h2>2. Contando de 00 a ff</h2>
+<p>"Hexadecimal" quer dizer "de base 16": cada algarismo vai de 0 a 15. Como só temos dez algarismos (0 a 9), as letras <code>a</code> a <code>f</code> fazem o papel do 10 ao 15:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Algarismo</th><td><code>0</code></td><td><code>1</code></td><td>…</td><td><code>9</code></td><td><code>a</code></td><td><code>b</code></td><td><code>c</code></td><td><code>d</code></td><td><code>e</code></td><td><code>f</code></td></tr>
+<tr><th>Vale</th><td>0</td><td>1</td><td>…</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td><td>15</td></tr>
+</table>
+</div>
+
+<p>Com dois algarismos, o primeiro vale 16 vezes mais (como, no nosso sistema, a dezena vale 10 vezes a unidade). A conta é <strong>16 × o primeiro + o segundo</strong>:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Par</th><th>Conta</th><th>Força da luz</th></tr>
+<tr><td><code>00</code></td><td>16 × 0 + 0</td><td>0 (apagada)</td></tr>
+<tr><td><code>33</code></td><td>16 × 3 + 3</td><td>51</td></tr>
+<tr><td><code>47</code></td><td>16 × 4 + 7</td><td>71</td></tr>
+<tr><td><code>63</code></td><td>16 × 6 + 3</td><td>99</td></tr>
+<tr><td><code>80</code></td><td>16 × 8 + 0</td><td>128 (metade)</td></tr>
+<tr><td><code>c7</code></td><td>16 × 12 + 7</td><td>199</td></tr>
+<tr><td><code>ff</code></td><td>16 × 15 + 15</td><td>255 (o máximo)</td></tr>
+</table>
+</div>
+
+<p>Você não precisa fazer essas contas no dia a dia. Basta o "olho": <strong>perto de <code>00</code></strong> é pouca luz, <strong>perto de <code>ff</code></strong> é muita. Em <code>#c7401f</code>, o vermelho (<code>c7</code>) está alto e os outros dois, baixos: é um vermelho, meio escuro.</p>
+
+<hr>
+
+<h2>3. Misturando as três luzes</h2>
+<p>Cada caixa abaixo tem o código escrito dentro, com a cor de fundo desse código:</p>
+
+<pre class="file" data-file="misturas.html" data-resultado>&lt;style&gt;
+  p {
+    margin: 4px 0;
+    padding: 6px 10px; /* espaço em volta do texto (aula Espaço Interno) */
+    font-family: monospace;
+  }
+  .vermelho { background-color: #ff0000; color: #ffffff; }
+  .verde { background-color: #00ff00; color: #000000; }
+  .azul { background-color: #0000ff; color: #ffffff; }
+  .amarelo { background-color: #ffff00; color: #000000; }
+  .ciano { background-color: #00ffff; color: #000000; }
+  .magenta { background-color: #ff00ff; color: #000000; }
+  .branco { background-color: #ffffff; color: #000000; }
+  .cinza { background-color: #808080; color: #ffffff; }
+  .preto { background-color: #000000; color: #ffffff; }
+&lt;/style&gt;
+&lt;p class="vermelho"&gt;#ff0000 só vermelho&lt;/p&gt;
+&lt;p class="verde"&gt;#00ff00 só verde&lt;/p&gt;
+&lt;p class="azul"&gt;#0000ff só azul&lt;/p&gt;
+&lt;p class="amarelo"&gt;#ffff00 vermelho + verde = amarelo&lt;/p&gt;
+&lt;p class="ciano"&gt;#00ffff verde + azul = ciano&lt;/p&gt;
+&lt;p class="magenta"&gt;#ff00ff vermelho + azul = magenta&lt;/p&gt;
+&lt;p class="branco"&gt;#ffffff as três no máximo = branco&lt;/p&gt;
+&lt;p class="cinza"&gt;#808080 as três pela metade = cinza&lt;/p&gt;
+&lt;p class="preto"&gt;#000000 tudo apagado = preto&lt;/p&gt;
+</pre>
+
+<p>Na tinta, vermelho com verde dá um marrom sujo. Na tela é diferente, porque <strong>luz somada fica mais clara</strong>: vermelho e verde acesos juntos dão amarelo, e as três luzes no máximo dão branco. Repare também na regra dos cinzas: quando os três pares são <strong>iguais</strong> (<code>#808080</code>, <code>#333333</code>, <code>#d3d3d3</code>), a cor é um cinza; quanto maior o número, mais claro.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> mude um par de cada vez e veja a cor mudar. Comece trocando o <code>00</code> do meio por <code>80</code>, depois por <code>ff</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: #ff0000;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>4. As cores do logo da Ana</h2>
+<p>Quem desenhou o logo da lojinha entregou as cores em hexadecimal: <code>#c7401f</code> (o laranja-tijolo de "Lojinha") e <code>#1d6f6a</code> (o verde-petróleo de "da Ana"). Com o código, o site fica com <strong>exatamente</strong> as mesmas cores do logo:</p>
+
+<pre class="file" data-file="logo.html" data-resultado>&lt;style&gt;
+  h1 { color: #c7401f; }
+  p { color: #1d6f6a; }
+&lt;/style&gt;
+&lt;img src="assets/midia/logo-lojinha.svg" alt="Lojinha da Ana" width="200" height="80"&gt;
+&lt;h1&gt;Bolos e doces por encomenda&lt;/h1&gt;
+&lt;p&gt;Feitos na hora, entregues no bairro.&lt;/p&gt;
+</pre>
+
+<div class="tryhtml" data-goal="css:h1{color}=rgb(199, 64, 31),css:.subtitulo{color}=rgb(29, 111, 106)">
+<p class="try-task"><strong>Missão:</strong> pinte o título com o laranja do logo, <code>#c7401f</code>, e o parágrafo <code>.subtitulo</code> com o verde do logo, <code>#1d6f6a</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;img src="assets/midia/logo-lojinha.svg" alt="Lojinha da Ana" width="200" height="80"&gt;
+&lt;h1&gt;Bolos e doces por encomenda&lt;/h1&gt;
+&lt;p class="subtitulo"&gt;Feitos na hora, entregues no bairro.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: black;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: #c7401f;
+}
+
+.subtitulo {
+  color: #1d6f6a;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>5. A forma curta: três dígitos</h2>
+<p>Quando os dois algarismos de <strong>cada</strong> par são iguais, dá para escrever um só de cada: o navegador repete cada um.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Curta</th><th>O navegador lê como</th><th>Valor calculado</th></tr>
+<tr><td><code>#f00</code></td><td><code>#ff0000</code></td><td><code>rgb(255, 0, 0)</code></td></tr>
+<tr><td><code>#f60</code></td><td><code>#ff6600</code></td><td><code>rgb(255, 102, 0)</code></td></tr>
+<tr><td><code>#fc0</code></td><td><code>#ffcc00</code></td><td><code>rgb(255, 204, 0)</code></td></tr>
+<tr><td><code>#333</code></td><td><code>#333333</code></td><td><code>rgb(51, 51, 51)</code></td></tr>
+<tr><td><code>#fff</code></td><td><code>#ffffff</code></td><td><code>rgb(255, 255, 255)</code></td></tr>
+<tr><td><code>#000</code></td><td><code>#000000</code></td><td><code>rgb(0, 0, 0)</code></td></tr>
+</table>
+</div>
+
+<pre class="file" data-file="curta.html" data-resultado>&lt;style&gt;
+  .longa { color: #ff6600; }
+  .curta { color: #f60; }
+&lt;/style&gt;
+&lt;h2 class="longa"&gt;#ff6600&lt;/h2&gt;
+&lt;h2 class="curta"&gt;#f60&lt;/h2&gt;
+</pre>
+
+<p>Os dois títulos têm a mesma cor. Mas atenção: <code>#ff6347</code> <strong>não</strong> tem forma curta, porque <code>63</code> e <code>47</code> não são pares repetidos. E <code>#f63</code> não é o tomate: é <code>#ff6633</code>, outra cor. Use a forma curta só quando ela é exata; o <code>#333</code> (cinza bem escuro, ótimo para texto) e o <code>#fff</code> são os mais comuns.</p>
+
+<hr>
+
+<h2>6. Maiúsculas ou minúsculas?</h2>
+<p><code>#FF6347</code> e <code>#ff6347</code> são a mesma cor, e o validador aceita os dois. Os programas de desenho costumam entregar em maiúsculas; o estilo do guia (e de muitos projetos) é minúsculas. O importante é escolher um jeito e usar no arquivo todo.</p>
+
+<hr>
+
+<h2>7. Oito dígitos: a cor com transparência</h2>
+<p>Um <strong>quarto par</strong> no fim diz quanto a cor é opaca (o "alfa"): <code>ff</code> é totalmente opaca, <code>00</code> é invisível, <code>80</code> é mais ou menos a metade.</p>
+
+<pre class="file" data-file="alfa.html" data-resultado>&lt;style&gt;
+  p {
+    margin: 4px 0;
+    padding: 6px 10px;
+    font-family: monospace;
+  }
+  .a { background-color: #ff6347ff; }
+  .b { background-color: #ff6347b3; }
+  .c { background-color: #ff634780; }
+  .d { background-color: #ff634740; }
+&lt;/style&gt;
+&lt;p class="a"&gt;#ff6347ff (opaca)&lt;/p&gt;
+&lt;p class="b"&gt;#ff6347b3&lt;/p&gt;
+&lt;p class="c"&gt;#ff634780 (metade)&lt;/p&gt;
+&lt;p class="d"&gt;#ff634740&lt;/p&gt;
+</pre>
+
+<p>O tomate vai ficando mais fraco porque o fundo branco aparece através dele. O navegador guarda <code>#ff634780</code> como <code>rgba(255, 99, 71, 0.5)</code>. Também existe a forma curta de quatro dígitos (<code>#f008</code>). O assunto "cor meio transparente" é da aula <a href="opacity.html">Transparência</a>, onde a forma com <code>rgb()</code> costuma ser mais fácil de ler.</p>
+
+<div class="note">
+<strong>Suporte</strong>
+<p>Os oito (e os quatro) dígitos funcionam em todos os navegadores atuais: Firefox desde a versão 49, Safari desde a 10, Chrome desde a 62 e Edge desde a 79 (de 2020, o último a chegar). Segundo o caniuse.com, isso cobre mais de 97% das pessoas. O velho Internet Explorer não entende.</p>
+</div>
+
+<hr>
+
+<h2>8. Onde achar o código de uma cor</h2>
+<ul>
+  <li><strong>Programas de desenho</strong> (Figma, Inkscape, GIMP, Photoshop): o seletor de cor mostra o código com <code>#</code>. Copie e cole.</li>
+  <li><strong>O F12</strong> (aula <a href="devtools.html">Inspecionando com o F12</a>): no painel de estilos, cada cor tem um quadradinho; clicando nele, abre um seletor de cor onde você escolhe com o mouse e o código muda junto. (Descrição ilustrativa: o desenho do seletor muda de navegador para navegador.)</li>
+  <li><strong>O próprio HTML</strong>: o campo <code>&lt;input type="color"&gt;</code> abre o seletor de cor do seu sistema e devolve o código. Clique no quadrado colorido abaixo e escolha uma cor:</li>
+</ul>
+
+<pre class="file" data-file="seletor.html" data-resultado>&lt;label&gt;Escolha uma cor: &lt;input type="color" value="#c7401f"&gt;&lt;/label&gt;
+</pre>
+
+<p>O valor de um <code>&lt;input type="color"&gt;</code> é sempre um código de seis dígitos em minúsculas, como <code>#c7401f</code>.</p>
+
+<hr>
+
+<h2>9. Nome ou hexadecimal?</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Use</th><th>Por quê</th></tr>
+<tr><td>A cor exata de um logo ou de um desenho</td><td><code>#c7401f</code></td><td>O nome mais próximo seria outra cor</td></tr>
+<tr><td>Texto escuro, mas não preto puro</td><td><code>#333</code></td><td>Curto e exato; o preto puro cansa mais a vista em textos longos</td></tr>
+<tr><td>Branco, preto, transparente</td><td><code>white</code> ou <code>#fff</code>; <code>transparent</code></td><td>Os dois jeitos são igualmente claros</td></tr>
+<tr><td>Um exemplo ou um teste rápido</td><td><code>tomato</code></td><td>Mais fácil de lembrar e de ler</td></tr>
+<tr><td>Uma cor meio transparente</td><td><code>rgb()</code> (aula <a href="cores-rgb.html">rgb()</a>) ou <code>#rrggbbaa</code></td><td>O <code>rgb()</code> mostra o alfa como número de 0 a 1</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Como em toda cor errada, o navegador não mostra mensagem: ele <strong>ignora</strong> a declaração, e o texto fica com a cor que já tinha. Os quatro títulos abaixo queriam ser tomate:</p>
+
+<pre class="file" data-file="erros.html · erro de propósito" data-resultado>&lt;style&gt;
+  .a { color: ff6347; }
+  .b { color: #ff634; }
+  .c { color: #gg6347; }
+  .d { color: # ff6347; }
+&lt;/style&gt;
+&lt;h2 class="a"&gt;color: ff6347&lt;/h2&gt;
+&lt;h2 class="b"&gt;color: #ff634&lt;/h2&gt;
+&lt;h2 class="c"&gt;color: #gg6347&lt;/h2&gt;
+&lt;h2 class="d"&gt;color: # ff6347&lt;/h2&gt;
+</pre>
+
+<p>Os quatro ficaram pretos. No F12, cada declaração aparece riscada no painel de estilos. O validador explica:</p>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: “ff6347” is not a “color” value.</code></strong>
+<p><strong>O que aconteceu:</strong> faltou a cerquilha: <code>color: ff6347;</code>.</p>
+<pre class="term" data-cwd="~/hex">$ vnu --css sem-cerquilha.css
+"file:/home/ana/hex/sem-cerquilha.css":2.10-2.15: error: CSS: “color”: “ff6347” is not a “color” value.</pre>
+<p>"<code>ff6347</code> não é um valor de cor." Sem o <code>#</code>, o CSS procura uma cor com esse <strong>nome</strong>, e ela não existe.</p>
+<p><strong>Como consertar:</strong> <code>color: #ff6347;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: “#ff634” is not a valid color 3 or 6 hexadecimals numbers.</code></strong>
+<p><strong>O que aconteceu:</strong> sobrou um algarismo a menos (ou a mais): cinco dígitos.</p>
+<pre class="term" data-cwd="~/hex">$ vnu --css cinco.css
+"file:/home/ana/hex/cinco.css":2.10-2.15: error: CSS: “color”: “#ff634” is not a valid color 3 or 6 hexadecimals numbers.</pre>
+<p>"<code>#ff634</code> não é uma cor válida de 3 ou 6 números hexadecimais." O código tem de ter 3, 4, 6 ou 8 algarismos depois do <code>#</code>. (A mensagem do validador só cita 3 e 6, mas ele aceita também 4 e 8, como os navegadores.)</p>
+<p><strong>Como consertar:</strong> copie o código de novo, de onde você o pegou. Contar os algarismos ajuda: seis.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: “#gg6347” is not a valid color 3 or 6 hexadecimals numbers.</code></strong>
+<p><strong>O que aconteceu:</strong> uma letra que não existe em hexadecimal: só valem <code>0</code> a <code>9</code> e <code>a</code> a <code>f</code>.</p>
+<pre class="term" data-cwd="~/hex">$ vnu --css letra-g.css
+"file:/home/ana/hex/letra-g.css":2.10-2.16: error: CSS: “color”: “#gg6347” is not a valid color 3 or 6 hexadecimals numbers.</pre>
+<p>Um engano parecido: a letra <code>o</code> no lugar do zero (<code>#ff63o7</code>) ou o <code>l</code> no lugar do um.</p>
+<p><strong>Como consertar:</strong> confira cada caractere; na dúvida, copie e cole em vez de digitar.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: “ff6347” is not a “color” value.</code> (com espaço depois do <code>#</code>)</strong>
+<p><strong>O que aconteceu:</strong> <code>color: # ff6347;</code>, com um espaço entre a cerquilha e o código.</p>
+<pre class="term" data-cwd="~/hex">$ vnu --css espaco.css
+"file:/home/ana/hex/espaco.css":2.12-2.17: error: CSS: “color”: “ff6347” is not a “color” value.</pre>
+<p>A mesma mensagem da falta de <code>#</code>: com o espaço, o <code>#</code> fica sozinho, e o <code>ff6347</code> vira uma palavra separada.</p>
+<p><strong>Como consertar:</strong> tudo junto: <code>#ff6347</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que é</th><th>Valor calculado</th></tr>
+<tr><td><code>#rrggbb</code></td><td>Vermelho, verde e azul, de <code>00</code> a <code>ff</code></td><td><code>#ff6347</code> → <code>rgb(255, 99, 71)</code></td></tr>
+<tr><td><code>#rgb</code></td><td>Forma curta: cada algarismo é repetido</td><td><code>#f60</code> → <code>rgb(255, 102, 0)</code></td></tr>
+<tr><td><code>#rrggbbaa</code></td><td>Com o alfa (opacidade) no fim</td><td><code>#ff634780</code> → <code>rgba(255, 99, 71, 0.5)</code></td></tr>
+<tr><td><code>#rgba</code></td><td>Forma curta com alfa</td><td><code>#f008</code> → <code>rgba(255, 0, 0, 0.533)</code></td></tr>
+<tr><td><code>#000</code> / <code>#fff</code></td><td>Preto / branco</td><td><code>rgb(0, 0, 0)</code> / <code>rgb(255, 255, 255)</code></td></tr>
+<tr><td>Pares iguais</td><td>Cinza (<code>#808080</code>, <code>#333</code>)</td><td><code>rgb(128, 128, 128)</code>, <code>rgb(51, 51, 51)</code></td></tr>
+<tr><td><code>#FF6347</code></td><td>Maiúsculas valem; o costume é minúsculas</td><td><code>rgb(255, 99, 71)</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O branco</h3>
+<p>Escreva o branco em hexadecimal, na forma de seis dígitos:</p>
+<div class="ex-code">body { background-color: <input data-answer="#ffffff|#FFFFFF" aria-label="código do branco">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. A forma curta</h3>
+<p>Escreva <code>#ffcc00</code> na forma curta, de três dígitos:</p>
+<div class="ex-code">h1 { color: <input data-answer="#fc0|#FC0" aria-label="forma curta">; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. Em <code>#1d6f6a</code>, qual par diz a força da luz <strong>verde</strong>?</p>
+<label><input type="radio" name="q3"> <code>1d</code></label>
+<label><input type="radio" name="q3"> <code>6f</code></label>
+<label><input type="radio" name="q3"> <code>6a</code></label>
+<label><input type="radio" name="q3"> nenhum: a cor não tem verde</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">4. Que cor é <code>#ffff00</code>?</p>
+<label><input type="radio" name="q4"> Marrom, porque vermelho com verde dá marrom</label>
+<label><input type="radio" name="q4"> Branco</label>
+<label><input type="radio" name="q4"> Verde</label>
+<label><input type="radio" name="q4"> Amarelo: vermelho e verde no máximo, sem azul</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Qual destes códigos é um <strong>cinza</strong>?</p>
+<label><input type="radio" name="q5"> <code>#ff0000</code></label>
+<label><input type="radio" name="q5"> <code>#1d6f6a</code></label>
+<label><input type="radio" name="q5"> <code>#999999</code></label>
+<label><input type="radio" name="q5"> <code>#00ff00</code></label>
+</div>
+
+<h3>Missão final: o cartaz com as cores da marca</h3>
+
+<div class="tryhtml" data-goal="css:h1{color}=rgb(199, 64, 31),css:p{color}=rgb(51, 51, 51),css:.destaque{background-color}=rgb(255, 209, 102)">
+<p class="try-task"><strong>Missão:</strong> nenhuma cor do cartaz pegou. Conserte o <code>style.css</code>: o título deve ficar <code>#c7401f</code>, os parágrafos <code>#333</code> (cinza-escuro) e o fundo do <code>.destaque</code> <code>#ffd166</code> (o amarelo do logo).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;p&gt;Bolos e doces por encomenda.&lt;/p&gt;
+&lt;p class="destaque"&gt;Nesta semana: torta de limão!&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: c7401f;
+}
+
+p {
+  color: #33;
+}
+
+.destaque {
+  background-color: #ffd16;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: #c7401f;
+}
+
+p {
+  color: #333;
+}
+
+.destaque {
+  background-color: #ffd166;
+}
+</pre>
+</div>
+
+<p>Os três erros: faltava o <code>#</code> no título, o <code>#33</code> tinha só dois algarismos (a forma curta tem três: <code>#333</code>) e o <code>#ffd16</code> tinha cinco.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O código hexadecimal <code>#rrggbb</code> diz quanto de cada luz acender: vermelho, verde e azul, cada uma de <code>00</code> (apagada) a <code>ff</code> (255, o máximo).</li>
+  <li>Os algarismos vão de <code>0</code> a <code>9</code> e de <code>a</code> (10) a <code>f</code> (15). Par = 16 × o primeiro + o segundo.</li>
+  <li>Luz somada clareia: vermelho + verde = amarelo; tudo no máximo = branco; pares iguais = cinza.</li>
+  <li>Forma curta <code>#rgb</code> só quando os pares se repetem: <code>#f60</code> = <code>#ff6600</code>. Maiúsculas valem, mas use minúsculas.</li>
+  <li>Oito dígitos (<code>#ff634780</code>) acrescentam a transparência; o navegador guarda como <code>rgba(…)</code>.</li>
+  <li>Sem <code>#</code>, com espaço, com letra fora de <code>a</code>–<code>f</code> ou com o número errado de algarismos: a cor é ignorada em silêncio, e o validador mostra o motivo.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
