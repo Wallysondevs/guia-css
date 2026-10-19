@@ -328,7 +328,12 @@
   function vnuFalsoLinha(m, texto) {
     if (!texto) return null;
     var ls = String(texto).split("\n"), l1 = ls[(m.firstLine || m.lastLine) - 1] || "", l2 = ls[m.lastLine - 1] || "";
-    if (/is not a “[\w-]+” value|Parse Error/.test(m.message || "") && /@supports\b/.test(l2.slice(0, m.firstColumn || m.lastColumn || l2.length))) return "valor dentro da condição de um @supports";
+    // só "is not a … value", com a condição bem formada: "(propriedade: valor)" sem ";", e o valor
+    // apontado fechando o parêntese logo depois ("@supports (display: grid;)" continua erro)
+    if (/is not a “[\w-]+” value/.test(m.message || "") && m.firstColumn && m.lastLine === (m.firstLine || m.lastLine)) {
+      var antes = l2.slice(0, m.firstColumn - 1), depois = l2.slice(m.lastColumn);
+      if (/@supports\s+(?:not\s+)?(?:\(\s*[\w-]+\s*:\s*[^;(){}]*\)\s*(?:and|or)\s+(?:not\s+)?)*\(\s*[\w-]+\s*:\s*$/i.test(antes) && /^\s*\)/.test(depois)) return "valor dentro da condição de um @supports";
+    }
     if (/Parse Error/.test(m.message || "") && /::picker\(/.test(l1 + "\n" + l2)) return "::picker(select)";
     // unidades de contêiner (cqi, cqw…) em qualquer lugar, também dentro de calc()/clamp() ("Parse Error")
     if (/Unknown dimension|Parse Error/.test(m.message || "") && /\d(cqi|cqb|cqw|cqh|cqmin|cqmax)\b/.test(l1 + "\n" + l2)) return "unidade de contêiner (cq…)";

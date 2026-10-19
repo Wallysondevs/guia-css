@@ -37,11 +37,42 @@ if (fotos) fs.mkdirSync(fotos, { recursive: true });
 (async () => {
   const srv = await T.servidor();
   const origem = "http://127.0.0.1:" + srv.address().port;
-  const nav = await T.puppeteer().launch({ executablePath: T.CHROMIUM, headless: true, args: ["--no-sandbox", "--disable-gpu", "--mute-audio", "--lang=pt-BR", "--disable-dev-shm-usage"] });
+  // o Chromium é reaberto a cada POR_NAVEGADOR páginas e quando cai (em rodadas longas ele perdia a
+  // sessão: "Protocol error (Target.createTarget): Session with given id not found")
+  const POR_NAVEGADOR = 8;
+  let nav = null, usadas = 0;
+  async function abrirNavegador() {
+    if (nav) { try { await nav.close(); } catch (e) { /* já caiu */ } }
+    nav = await T.puppeteer().launch({ executablePath: T.CHROMIUM, headless: true, protocolTimeout: 120000, args: ["--no-sandbox", "--disable-gpu", "--mute-audio", "--lang=pt-BR", "--disable-dev-shm-usage"] });
+    usadas = 0;
+  }
+  const caiu = (txt) => /Protocol error|Session with given id|Target closed|detached|Connection closed|browser has disconnected|Navigating frame was detached/i.test(String(txt));
   let ruins = 0;
   for (const nome of paginas) {
-    const probs = [], oks = [];
     if (!fs.existsSync(path.join(T.RAIZ, nome))) { console.log("== " + nome + "  (arquivo não encontrado)"); ruins++; continue; }
+    let r = null;
+    for (let tentativa = 1; tentativa <= 2; tentativa++) {
+      if (!nav || !nav.connected || usadas >= POR_NAVEGADOR) await abrirNavegador();
+      usadas++;
+      try { r = await testarPagina(nome); } catch (e) { r = { probs: ["erro do testador: " + String((e && e.message) || e).split("\n")[0]], oks: [] }; }
+      if (!r.probs.some(caiu)) break;
+      if (tentativa === 1) { console.error("(o Chromium caiu em " + nome + "; reabrindo e testando de novo)"); nav = null; }
+    }
+    const { probs, oks } = r;
+    if (probs.length) ruins++;
+    if (!quieto || probs.length) {
+      console.log("== " + nome + (probs.length ? "  (" + probs.length + " problema(s))" : "  ok"));
+      if (!quieto) oks.forEach((x) => console.log("  ok     " + x));
+      probs.forEach((x) => console.log("  FALHA  " + x));
+    }
+  }
+  if (nav) { try { await nav.close(); } catch (e) { /* já caiu */ } }
+  srv.close();
+  console.log("\n" + paginas.length + " página(s), " + ruins + " com problema");
+  process.exitCode = ruins ? 1 : 0;
+
+  async function testarPagina(nome) {
+    const probs = [], oks = [];
     const pg = await nav.newPage();
     await pg.setViewport(celular ? { width: 375, height: 800, isMobile: true, hasTouch: true } : { width: 1200, height: 900 });
     // o que vem de dentro de um quadro (pasta virtual assets/sim/, srcdoc, blob) é código do leitor
@@ -110,15 +141,7 @@ if (fotos) fs.mkdirSync(fotos, { recursive: true });
       if (lateral) probs.push("rolagem lateral no celular (375 px): a página tem " + lateral);
       if (fotos) await pg.screenshot({ path: path.join(fotos, nome.replace(/[\/\\]/g, "-").replace(/\.html$/, ".png")), fullPage: true });
     } catch (e) { probs.push("erro do testador: " + String((e && e.message) || e).split("\n")[0]); }
-    await pg.close();
-    if (probs.length) ruins++;
-    if (!quieto || probs.length) {
-      console.log("== " + nome + (probs.length ? "  (" + probs.length + " problema(s))" : "  ok"));
-      if (!quieto) oks.forEach((x) => console.log("  ok     " + x));
-      probs.forEach((x) => console.log("  FALHA  " + x));
-    }
+    try { await pg.close(); } catch (e) { /* o Chromium caiu */ }
+    return { probs, oks };
   }
-  await nav.close(); srv.close();
-  console.log("\n" + paginas.length + " página(s), " + ruins + " com problema");
-  process.exitCode = ruins ? 1 : 0;
 })().catch((e) => { console.error("erro: " + (e.stack || e)); process.exitCode = 2; });
