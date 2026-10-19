@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS para Impressão — @media print, @page e quebras de página | Guia CSS</title>
+<meta name="description" content="CSS para impressão para quem está começando: @media print para esconder o menu e os botões no papel, fundo branco e letra preta, o endereço dos links impresso com ::after e attr(href), quebras de página (break-before, break-inside), margens do papel com @page, o arquivo separado com media=&quot;print&quot;, como ver a prévia e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS para <span class="hl">Impressão</span></h1>
+
+<p class="intro">Muita gente ainda imprime receitas, currículos e ingressos. Se ninguém pensou nisso, o papel sai com o menu do site, o botão "Imprimir", o fundo escuro gastando tinta e links que ninguém consegue clicar. Com um bloco <code>@media print</code>, a mesma página ganha uma <strong>segunda roupa</strong>, só para o papel. Nesta aula a receita da Ana vai sair da impressora limpa e legível.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O bloco <code>@media print { … }</code>: regras que só valem na impressão.</li>
+  <li>O que costuma mudar no papel: esconder menu e botões, fundo branco, letra preta.</li>
+  <li>Como imprimir o endereço de cada link com <code>::after</code> e <code>attr(href)</code>.</li>
+  <li>Quebras de página (<code>break-before</code>, <code>break-inside</code>) e as margens do papel (<code>@page</code>).</li>
+  <li>Duas formas de organizar: o bloco no mesmo arquivo ou um arquivo só para o papel (<code>media="print"</code>).</li>
+  <li>Como ver a prévia sem gastar papel, e os erros que fazem as regras de impressão sumirem.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter feito a aula <a href="media-queries.html">Media Queries (@media)</a>: o <code>@media print</code> é uma media query, só que para o papel em vez de para a largura da tela.</p>
+
+<hr>
+
+<h2>A ideia: a roupa de sair e a roupa de trabalho</h2>
+<p>Você é a mesma pessoa na festa e no trabalho, mas troca de roupa conforme o lugar. Com a página é igual: o <strong>conteúdo</strong> (o HTML) é um só; a <strong>aparência</strong> (o CSS) pode mudar conforme o lugar onde ela aparece. A tela do computador é um lugar; a folha de papel é outro.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Na tela</th><th>No papel</th></tr>
+<tr><td>O menu leva a outras páginas</td><td>Ninguém clica no papel: o menu só ocupa espaço</td></tr>
+<tr><td>O botão "Imprimir" é útil</td><td>Um botão impresso não serve para nada</td></tr>
+<tr><td>Fundo escuro com letra clara é confortável</td><td>Fundo escuro gasta tinta e, se o navegador não imprimir o fundo, a letra clara some no papel branco</td></tr>
+<tr><td>O link mostra só o texto ("Receitas do mundo")</td><td>Quem lê o papel quer saber o <strong>endereço</strong></td></tr>
+<tr><td>A página rola sem fim</td><td>O papel tem folhas: um título pode cair sozinho no pé da página</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. O bloco <code>@media print</code></h2>
+<p>As regras que você escreve dentro do bloco só valem quando a página vai para a impressora (ou para "Salvar como PDF", que é uma impressão também). Na tela, o navegador as ignora.</p>
+
+<pre class="file" data-file="style.css">.menu {
+  background-color: tomato;
+}
+
+@media print {
+  .menu {
+    display: none;
+  }
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>@media</dt><dd>Uma <strong>regra-at</strong> (começa com <code>@</code>): "as regras aqui dentro só valem numa condição". É a mesma <code>@media</code> das telas pequenas.</dd>
+  <dt>print</dt><dd>O <strong>tipo de mídia</strong>: "impressão". Os outros tipos que importam são <code>screen</code> ("tela") e <code>all</code> ("todos", o padrão quando você não diz nada).</dd>
+  <dt>{ … }</dt><dd>As chaves do bloco. Dentro delas vão regras CSS completas, cada uma com o seu seletor e as suas chaves. São <strong>duas</strong> chaves para fechar: a da regra e a do bloco.</dd>
+  <dt>.menu { display: none; }</dt><dd>Uma regra comum: esconde o menu. Como está dentro do bloco, só esconde no papel (<code>display: none</code> tem aula própria: <a href="esconder.html">Escondendo</a>).</dd>
+</dl>
+
+<p>Repare que a regra de fora (<code>background-color: tomato</code>) continua valendo no papel também: o <code>@media print</code> não apaga o resto do CSS, só <strong>acrescenta</strong> regras. Como ele vem depois no arquivo, ganha os empates da cascata (aula <a href="cascata.html">A Cascata</a>). Por isso o bloco de impressão costuma ficar <strong>no fim</strong> do <code>style.css</code>.</p>
+
+<h3>O resultado, lado a lado</h3>
+<p>Esta é a receita da Ana com um tema escuro e um bloco de impressão. Na caixa abaixo você vê a versão da <strong>tela</strong>, que é onde o quadro desenha:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o quadro é uma tela, então o bloco <code>@media print</code> não aparece nele. Para espiar a versão de papel, troque <code>print</code> por <code>screen</code> na linha do <code>@media</code>: o menu e o botão somem, o fundo fica branco e o endereço aparece depois do link. Depois desfaça a troca (ou clique em Restaurar).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav class="menu"&gt;
+  &lt;a href="index.html"&gt;Início&lt;/a&gt;
+  &lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;
+  &lt;a href="sobre.html"&gt;Sobre&lt;/a&gt;
+&lt;/nav&gt;
+&lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;p&gt;Receita da avó, adaptada no &lt;a href="https://example.com"&gt;Receitas do mundo&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Ingredientes&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;3 cenouras&lt;/li&gt;
+  &lt;li&gt;3 ovos&lt;/li&gt;
+  &lt;li&gt;2 xícaras de farinha&lt;/li&gt;
+&lt;/ul&gt;
+&lt;button class="imprimir" type="button"&gt;Imprimir receita&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: sans-serif;
+  background-color: #2b2b3a;
+  color: #f5f5f5;
+}
+.menu {
+  background-color: tomato;
+  padding: 8px;
+}
+.menu a {
+  color: white;
+}
+a {
+  color: #ffcc66;
+}
+
+@media print {
+  .menu,
+  .imprimir {
+    display: none;
+  }
+  body {
+    background-color: white;
+    color: black;
+  }
+  a {
+    color: black;
+  }
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+  }
+}
+</pre>
+</div>
+
+<p>Na prévia de impressão do Chromium, essa página sai assim: o menu laranja e o botão desaparecem, o fundo fica branco, todo o texto fica preto, e o link vira "Receitas do mundo (https://example.com)". O título, o parágrafo e a lista continuam no mesmo lugar: o conteúdo não mudou, só a roupa.</p>
+
+<div class="tip">
+<strong>O truque do <code>screen</code></strong>
+<p>Trocar <code>print</code> por <code>screen</code> (ou por <code>all</code>) por um instante é um jeito rápido de conferir as regras de impressão em qualquer lugar, até no editor do guia. Só não esqueça de voltar para <code>print</code>.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:.menu{display}=block,src:@media\s+print\s*\{[\s\S]*\.menu\s*\{\s*display:\s*none">
+<p class="try-task"><strong>Missão:</strong> o menu da Ana sai impresso em toda receita. Dentro do bloco <code>@media print</code>, que já existe e está vazio, escreva uma regra que esconda o <code>.menu</code>. Na tela (no quadro), o menu tem de <strong>continuar aparecendo</strong>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav class="menu"&gt;
+  &lt;a href="index.html"&gt;Início&lt;/a&gt;
+  &lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;
+&lt;/nav&gt;
+&lt;h1&gt;Pão de queijo&lt;/h1&gt;
+&lt;p&gt;Rende 20 unidades.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu {
+  background-color: navy;
+  padding: 8px;
+}
+.menu a {
+  color: white;
+}
+
+@media print {
+
+}
+</pre>
+<pre class="solucao" data-file="style.css">.menu {
+  background-color: navy;
+  padding: 8px;
+}
+.menu a {
+  color: white;
+}
+
+@media print {
+  .menu {
+    display: none;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. O que costuma mudar no papel</h2>
+<p>Não existe uma lista obrigatória, mas quase todo bloco de impressão faz as mesmas coisas:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>O quê</th><th>Como</th><th>Por quê</th></tr>
+<tr><td>Esconder o que não serve no papel</td><td><code>nav, .imprimir, footer form { display: none; }</code></td><td>Menu, botões, formulários de busca e anúncios não funcionam impressos</td></tr>
+<tr><td>Fundo branco, letra preta</td><td><code>body { background-color: white; color: black; }</code></td><td>Economiza tinta e garante contraste, mesmo numa impressora preto e branco</td></tr>
+<tr><td>Links pretos</td><td><code>a { color: black; }</code></td><td>Azul-claro ou amarelo ficam pálidos no papel</td></tr>
+<tr><td>Usar a largura toda</td><td><code>main { width: auto; max-width: none; }</code></td><td>A folha já tem margens; colunas laterais desperdiçam papel</td></tr>
+<tr><td>Letra em <code>pt</code></td><td><code>body { font-size: 12pt; }</code></td><td>O ponto (<code>pt</code>) é a unidade das gráficas; 12pt é o tamanho de um texto comum impresso (aula <a href="unidades.html">Unidades</a>)</td></tr>
+</table>
+</div>
+
+<div class="note">
+<strong>O fundo já não sai, mesmo sem CSS</strong>
+<p>Para economizar tinta, os navegadores <strong>não imprimem cores e imagens de fundo</strong> por padrão: na janela de impressão, a opção de "gráficos de fundo" vem desmarcada. Por isso uma página com fundo escuro e letra clara sai com <strong>letra clara em papel branco</strong>, quase invisível, se você não mudar a cor do texto no <code>@media print</code>. Quando o fundo é importante (a cor de uma etiqueta "Sem glúten", um gráfico), a propriedade <code>print-color-adjust: exact;</code> pede ao navegador que imprima as cores daquele elemento como estão. É <strong>Baseline 2025</strong> no MDN: funciona nas versões atuais do Chrome, Edge, Firefox e Safari, mas não em navegadores antigos, que conheciam só o nome com prefixo <code>-webkit-print-color-adjust</code>.</p>
+</div>
+
+<hr>
+
+<h2>3. O endereço dos links no papel</h2>
+<p>Num papel, "Receitas do mundo" sublinhado não diz aonde ir. O pseudo-elemento <code>::after</code> (aula <a href="before-after.html">::before e ::after</a>) junto com a função <code>attr()</code> escreve o endereço logo depois do texto:</p>
+
+<pre class="file" data-file="style.css">@media print {
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+  }
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>a[href^="http"]</dt><dd>Só os links cujo <code>href</code> <strong>começa com</strong> <code>http</code>: os links para outros sites (aula <a href="seletores-atributo.html">Seletores de Atributo</a>). Os links internos, como <code>receitas.html</code>, não ganham o endereço, porque no papel ele não ajudaria ninguém.</dd>
+  <dt>::after</dt><dd>Cria um pedacinho de texto <strong>depois</strong> do conteúdo do link.</dd>
+  <dt>content: " (" attr(href) ")"</dt><dd>O texto criado, em três partes coladas: <code>" ("</code> (espaço e parêntese), o <strong>valor do atributo</strong> <code>href</code>, e <code>")"</code>.</dd>
+</dl>
+
+<p>Na prévia de impressão do Chromium, o parêntese com o endereço sai <strong>sublinhado também</strong>, como o resto do link: o <code>::after</code> fica dentro do <code>&lt;a&gt;</code> e recebe o sublinhado dele. Tudo bem: o sublinhado até ajuda a ver que o endereço faz parte do link.</p>
+
+<hr>
+
+<h2>4. Quebras de página</h2>
+<p>O papel é cortado em folhas. Sem cuidado, um título "Modo de preparo" pode cair sozinho na última linha de uma folha, com o texto dele na folha seguinte. Três propriedades decidem onde o corte <strong>pode</strong> e onde <strong>não pode</strong> acontecer:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade e valor</th><th>O que faz</th><th>Exemplo de uso</th></tr>
+<tr><td><code>break-before: page;</code></td><td>Começa uma folha nova <strong>antes</strong> do elemento</td><td>Cada receita de um livro de receitas numa folha própria</td></tr>
+<tr><td><code>break-after: page;</code></td><td>Começa uma folha nova <strong>depois</strong> do elemento</td><td>Uma capa sozinha na primeira folha</td></tr>
+<tr><td><code>break-inside: avoid;</code></td><td>Evita cortar o elemento no meio</td><td>Uma tabela, uma foto com legenda, a lista de ingredientes</td></tr>
+<tr><td><code>break-after: avoid;</code></td><td>Evita cortar logo depois do elemento</td><td>Títulos (<code>h2</code>), para não ficarem órfãos no pé da folha</td></tr>
+</table>
+</div>
+
+<pre class="file" data-file="style.css">@media print {
+  .receita {
+    break-before: page;
+  }
+  h2 {
+    break-after: avoid;
+  }
+  ul,
+  figure {
+    break-inside: avoid;
+  }
+}
+</pre>
+
+<p>As palavras <code>avoid</code> ("evitar") são um <strong>pedido</strong>, não uma ordem: se uma tabela for maior que a folha inteira, o navegador corta mesmo assim. Já o <code>page</code> do <code>break-before</code> é obedecido.</p>
+
+<div class="note">
+<strong>O jeito antigo: <code>page-break-*</code></strong>
+<p>Em CSS antigo você vai ver <code>page-break-before: always;</code>, <code>page-break-after</code> e <code>page-break-inside: avoid;</code>. Eles ainda funcionam (o navegador os traduz para <code>break-before</code> e cia.), mas os nomes de hoje são os sem <code>page-</code>. O <code>break-inside</code> é "amplamente disponível" no MDN desde 2019.</p>
+</div>
+
+<hr>
+
+<h2>5. A folha de papel: <code>@page</code></h2>
+<p>A regra-at <code>@page</code> fala da <strong>folha</strong>, não dos elementos: o tamanho do papel e as margens em volta do conteúdo.</p>
+
+<pre class="file" data-file="style.css">@page {
+  size: A4;
+  margin: 2cm;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>@page</dt><dd>"A página impressa". Não tem seletor de elemento: vale para todas as folhas.</dd>
+  <dt>size: A4;</dt><dd>O tamanho do papel: <code>A4</code>, <code>A5</code>, <code>letter</code> (o "carta" americano), ou medidas, como <code>size: 10cm 15cm;</code>. Junte <code>landscape</code> para a folha deitada: <code>size: A4 landscape;</code>.</dd>
+  <dt>margin: 2cm;</dt><dd>A margem da folha. No papel, <code>cm</code> e <code>mm</code> fazem sentido de verdade: 2cm medem 2 centímetros na régua.</dd>
+</dl>
+
+<div class="note">
+<strong>Suporte</strong>
+<p>O <code>@page</code> com <code>margin</code> funciona há muitos anos. O descritor <code>size</code> é <strong>Baseline 2024</strong> no MDN: funciona nas versões atuais do Chrome, Edge, Firefox e Safari. Mesmo assim, a pessoa pode escolher outro papel na janela de impressão, e a escolha dela vence: trate o <code>size</code> como uma sugestão.</p>
+</div>
+
+<hr>
+
+<h2>6. Duas formas de organizar</h2>
+
+<h3>Forma 1: o bloco no fim do <code>style.css</code></h3>
+<p>É o que você viu até aqui. Tudo num arquivo só, e o bloco de impressão no fim, para vencer os empates.</p>
+
+<h3>Forma 2: um arquivo só para o papel</h3>
+<p>O atributo <code>media</code> do <code>&lt;link&gt;</code> diz para qual mídia o arquivo inteiro vale. Com <code>media="print"</code>, o arquivo <code>imprimir.css</code> só entra na impressão, e dentro dele não precisa de <code>@media</code>:</p>
+
+<pre class="file" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;link rel="stylesheet" href="imprimir.css" media="print"&gt;
+</pre>
+
+<pre class="file" data-file="imprimir.css">.menu {
+  display: none;
+}
+body {
+  background-color: white;
+  color: black;
+}
+</pre>
+
+<p>O <code>&lt;link&gt;</code> de impressão vem <strong>depois</strong> do principal, pelo mesmo motivo de antes: ganhar os empates. O navegador baixa o arquivo mesmo na tela (para ter na hora de imprimir), mas sem atrasar o desenho da página.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Quando usar</th></tr>
+<tr><td><code>@media print { … }</code> no fim do <code>style.css</code></td><td>O normal: poucas regras de impressão, um arquivo a menos para baixar e para lembrar</td></tr>
+<tr><td><code>&lt;link … media="print"&gt;</code> com um <code>imprimir.css</code></td><td>Muitas regras de impressão (um site de receitas, um currículo), ou quando outra pessoa cuida só da versão impressa</td></tr>
+<tr><td><code>@import url("imprimir.css") print;</code></td><td>Evite: o <code>@import</code> atrasa o carregamento (aula <a href="performance.html">CSS Rápido</a>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>7. Como ver a prévia sem gastar papel</h2>
+<ol class="passo">
+  <li><strong>A janela de impressão:</strong> aperte <kbd>Ctrl</kbd>+<kbd>P</kbd> (no Mac, <kbd>Cmd</kbd>+<kbd>P</kbd>). A prévia mostra as folhas com as suas regras de impressão. Escolha "Salvar como PDF" como impressora e nada sai no papel.</li>
+  <li><strong>O F12:</strong> no Chrome e no Edge, o painel de renderização das ferramentas do desenvolvedor (<em>Rendering</em>) tem uma opção para <strong>emular o tipo de mídia</strong> <code>print</code>: a própria aba passa a mostrar a versão de papel, e você inspeciona os elementos como sempre. Os nomes dos menus mudam de versão para versão; procure por "Rendering" e "CSS media type" (aula <a href="devtools.html">Inspecionando com o F12</a>).</li>
+  <li><strong>O truque do <code>screen</code>:</strong> troque <code>print</code> por <code>screen</code> por um instante, como na seção 1.</li>
+</ol>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Faltou fechar a chave do <code>@media</code>: o resto do CSS some da tela</strong>
+<pre class="file" data-file="style.css · erro de propósito">@media print {
+  .menu {
+    display: none;
+  }
+
+h1 {
+  color: navy;
+}
+p {
+  color: tomato;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> na tela, o título e o parágrafo ficam <strong>pretos</strong>, como se as regras de <code>h1</code> e <code>p</code> não existissem. No Chromium, conferido: o <code>h1</code> fica com a cor calculada <code>rgb(0, 0, 0)</code> na tela e <code>rgb(0, 0, 128)</code> (o <code>navy</code>) na impressão.</p>
+<p><strong>Por quê:</strong> a chave do bloco nunca foi fechada. O navegador entende que <strong>tudo até o fim do arquivo</strong> está dentro do <code>@media print</code>: as regras de <code>h1</code> e <code>p</code> viraram regras de impressão. Nenhuma mensagem aparece; a indentação torta é a única pista.</p>
+<p><strong>O que o validador diz:</strong></p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":8.2-9.1: error: CSS: Parse Error.</pre>
+<p>"Erro de leitura" no fim do arquivo: o validador chegou ao fim sem achar a chave que faltava.</p>
+<p><strong>Como consertar:</strong> feche o bloco logo depois da última regra de impressão. Indente as regras de dentro com 2 espaços: assim a chave que falta salta aos olhos.</p>
+</div>
+
+<div class="cenario">
+<strong>Nome da mídia errado: <code>unrecognized media</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">@media printer {
+  .menu {
+    display: none;
+  }
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> na impressão, o menu continua lá. Conferido no Chromium com a mídia de impressão: o <code>.menu</code> fica com <code>display: block</code>.</p>
+<p><strong>Por quê:</strong> <code>printer</code> (ou <code>impressao</code>, em português) não é um tipo de mídia. O navegador não dá erro: só considera que a condição <strong>nunca</strong> é verdadeira, e o bloco inteiro fica de fora, na tela e no papel.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":5.2-6.1: error: CSS: unrecognized media “printer”.</pre>
+<p>"Mídia não reconhecida: <code>printer</code>". <strong>Como consertar:</strong> os tipos de mídia são só <code>print</code>, <code>screen</code> e <code>all</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>display: none</code> ficou fora do bloco: o menu some da tela também</strong>
+<pre class="file" data-file="style.css · erro de propósito">@media print {
+  body {
+    color: black;
+  }
+}
+.menu {
+  display: none;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> o menu desapareceu do site inteiro. <strong>Por quê:</strong> a regra do <code>.menu</code> está depois da chave que fecha o bloco, então vale em qualquer mídia. O validador não reclama: o CSS está correto, só faz outra coisa. <strong>Como consertar:</strong> mova a regra para dentro das chaves do <code>@media print</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>A letra sumiu no papel</strong>
+<p><strong>O que o leitor vê:</strong> o site tem fundo escuro e letra clara. Na tela, ótimo; no papel, a letra sai cinza-clarinha, quase invisível. <strong>Por quê:</strong> o navegador não imprimiu o fundo (veja a nota da seção 2), mas imprimiu a letra com a cor da tela. <strong>Como consertar:</strong> no <code>@media print</code>, <code>body { background-color: white; color: black; }</code>, e confira os outros elementos que têm cor própria (links, títulos, rodapé).</p>
+</div>
+
+<div class="cenario">
+<strong>Escrevi <code>display: nada</code></strong>
+<p>Um valor que não existe faz o navegador <strong>ignorar a declaração</strong> (o elemento continua aparecendo), e o validador aponta a linha:</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.14-3.17: error: CSS: “display”: “nada” is not a “display” value.</pre>
+<p>"<code>nada</code> não é um valor de <code>display</code>". O valor certo é <code>none</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>@media print { … }</code></td><td>Regras que só valem na impressão (e no "Salvar como PDF")</td></tr>
+<tr><td><code>@media screen { … }</code></td><td>Regras que só valem na tela</td></tr>
+<tr><td><code>&lt;link rel="stylesheet" href="imprimir.css" media="print"&gt;</code></td><td>Um arquivo inteiro só para a impressão</td></tr>
+<tr><td><code>a[href^="http"]::after { content: " (" attr(href) ")"; }</code></td><td>Imprime o endereço depois de cada link externo</td></tr>
+<tr><td><code>break-before: page;</code> · <code>break-after: page;</code></td><td>Folha nova antes · depois do elemento</td></tr>
+<tr><td><code>break-inside: avoid;</code> · <code>break-after: avoid;</code></td><td>Evita cortar no meio · logo depois</td></tr>
+<tr><td><code>page-break-before: always;</code></td><td>Nome antigo de <code>break-before: page;</code></td></tr>
+<tr><td><code>@page { size: A4; margin: 2cm; }</code></td><td>Tamanho do papel e margens da folha</td></tr>
+<tr><td><code>print-color-adjust: exact;</code></td><td>Pede para imprimir as cores e fundos do elemento como estão (Baseline 2025)</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>P</kbd></td><td>Abre a prévia de impressão</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O tipo de mídia</h3>
+<p>Complete para que a regra só valha na impressão:</p>
+<div class="ex-code">@media <input data-answer="print" aria-label="tipo de mídia"> {</div>
+</div>
+
+<div class="exercise">
+<h3>2. Folha nova</h3>
+<p>Complete para que cada receita comece numa folha nova:</p>
+<div class="ex-code">.receita { break-before: <input data-answer="page" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. O endereço do link</h3>
+<p>Complete a função que lê o valor do atributo <code>href</code>:</p>
+<div class="ex-code">a::after { content: " (" <input data-answer="attr(href)" aria-label="função"> ")"; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. O site da Ana tem fundo escuro e letra clara, e nenhuma regra de impressão. Como a receita costuma sair no papel?</p>
+<label><input type="radio" name="q4"> Igual à tela: fundo escuro e letra clara</label>
+<label><input type="radio" name="q4"> Fundo branco (o navegador não imprime fundos por padrão) e letra clara, quase invisível</label>
+<label><input type="radio" name="q4"> Fundo branco e letra preta, automaticamente</label>
+<label><input type="radio" name="q4"> A página não imprime</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. A Ana escreveu <code>@media impressao { nav { display: none; } }</code>. O que acontece?</p>
+<label><input type="radio" name="q5"> O menu some só no papel</label>
+<label><input type="radio" name="q5"> O menu some na tela e no papel</label>
+<label><input type="radio" name="q5"> O bloco é ignorado: o menu aparece na tela e no papel; o validador diz <code>unrecognized media</code></label>
+<label><input type="radio" name="q5"> A página inteira some</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Por que o bloco <code>@media print</code> costuma ficar no fim do <code>style.css</code>?</p>
+<label><input type="radio" name="q6"> Porque, em empate de especificidade, a regra que vem depois vence</label>
+<label><input type="radio" name="q6"> Porque o navegador só lê o <code>@media</code> no fim</label>
+<label><input type="radio" name="q6"> Porque o validador exige</label>
+<label><input type="radio" name="q6"> Por nada: é só costume</label>
+</div>
+
+<h3>Missão final: o arquivo de impressão da receita</h3>
+
+<div class="tryhtml" data-goal="sel:link[href='imprimir.css'][media='print'],css:.menu{display}=flex,src:\.menu[^{]*\{[^}]*display:\s*none,src:break-inside:\s*avoid,src:attr\(href\)">
+<p class="try-task"><strong>Missão:</strong> monte a versão de papel da receita num arquivo separado. (1) No <code>index.html</code>, ligue o <code>imprimir.css</code> com <code>media="print"</code>, depois do <code>style.css</code>. (2) No <code>imprimir.css</code>, esconda o <code>.menu</code>, peça para a lista de ingredientes (<code>ul</code>) não ser cortada entre duas folhas (<code>break-inside: avoid</code>) e imprima o endereço dos links externos com <code>attr(href)</code>. Na tela, o menu tem de continuar como está. Para conferir, aperte o ↗ do quadro e depois <kbd>Ctrl</kbd>+<kbd>P</kbd>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav class="menu"&gt;
+  &lt;a href="index.html"&gt;Início&lt;/a&gt;
+  &lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;
+&lt;/nav&gt;
+&lt;h1&gt;Brigadeiro&lt;/h1&gt;
+&lt;p&gt;Versão sem lactose no &lt;a href="https://example.com"&gt;Receitas do mundo&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Ingredientes&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;1 lata de leite condensado&lt;/li&gt;
+  &lt;li&gt;1 colher de manteiga&lt;/li&gt;
+  &lt;li&gt;3 colheres de chocolate em pó&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: sans-serif;
+}
+.menu {
+  display: flex;
+  gap: 16px;
+  background-color: navy;
+  padding: 8px;
+}
+.menu a {
+  color: white;
+}
+</pre>
+<pre class="script" data-file="imprimir.css">/* Regras só para o papel */
+body {
+  color: black;
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;link rel="stylesheet" href="imprimir.css" media="print"&gt;
+&lt;nav class="menu"&gt;
+  &lt;a href="index.html"&gt;Início&lt;/a&gt;
+  &lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;
+&lt;/nav&gt;
+&lt;h1&gt;Brigadeiro&lt;/h1&gt;
+&lt;p&gt;Versão sem lactose no &lt;a href="https://example.com"&gt;Receitas do mundo&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Ingredientes&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;1 lata de leite condensado&lt;/li&gt;
+  &lt;li&gt;1 colher de manteiga&lt;/li&gt;
+  &lt;li&gt;3 colheres de chocolate em pó&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="solucao" data-file="imprimir.css">/* Regras só para o papel */
+body {
+  color: black;
+}
+.menu {
+  display: none;
+}
+ul {
+  break-inside: avoid;
+}
+a[href^="http"]::after {
+  content: " (" attr(href) ")";
+}
+</pre>
+</div>
+
+<p>Repare: no quadro, que é uma tela, nada muda depois da missão, e é isso mesmo que se quer. O <code>imprimir.css</code> inteiro só entra na prévia de impressão.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>@media print { … }</code> guarda regras que só valem no papel (e no PDF). Elas se somam às regras normais; o bloco fica no fim do arquivo para vencer os empates.</li>
+  <li>No papel: esconda menu, botões e formulários (<code>display: none</code>), use fundo branco e letra preta, links pretos, letra em <code>pt</code>.</li>
+  <li>Os navegadores não imprimem fundos por padrão; <code>print-color-adjust: exact</code> pede as cores de verdade quando elas importam.</li>
+  <li><code>a[href^="http"]::after { content: " (" attr(href) ")"; }</code> imprime o endereço dos links externos.</li>
+  <li>Quebras: <code>break-before: page</code> (folha nova), <code>break-inside: avoid</code> e <code>break-after: avoid</code> (pedidos para não cortar). <code>page-break-*</code> é o nome antigo.</li>
+  <li><code>@page { size: A4; margin: 2cm; }</code> fala da folha. Alternativa ao bloco: <code>&lt;link … media="print"&gt;</code>.</li>
+  <li>Prévia: <kbd>Ctrl</kbd>+<kbd>P</kbd>, a emulação de mídia do F12 ou trocar <code>print</code> por <code>screen</code> por um instante.</li>
+  <li>Erros: chave do bloco sem fechar (o resto do CSS vira só de impressão; <code>Parse Error</code>) e mídia com nome errado (<code>unrecognized media</code>; o bloco é ignorado).</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
