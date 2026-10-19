@@ -69,8 +69,8 @@
 <p>Sem perspectiva, a caixa só ficou <strong>mais estreita</strong>: parece amassada, e não girada. Com <code>1000px</code>, o lado direito (que foi para longe) ficou um pouco mais baixo que o esquerdo, e já parece uma porta. Com <code>200px</code>, o efeito é exagerado: o lado de perto cresce para fora da linha tracejada e o de longe encolhe bastante.</p>
 
 <dl class="anatomy">
-  <dt>perspective: 1000px;</dt><dd>A <strong>distância do olho</strong> até a tela, posta no <strong>pai</strong> dos elementos 3D. Vale para todos os filhos. Quanto <strong>menor</strong> o número, mais perto o olho e mais forte o efeito. Entre <code>600px</code> e <code>1200px</code> fica natural.</dd>
-  <dt>transform: rotateY(50deg);</dt><dd>Gira em volta do eixo Y (em pé). Como no <code>rotate()</code>, a unidade é <code>deg</code> ou <code>turn</code>, e o giro é em volta do <strong>centro</strong> (veja o <code>transform-origin</code> na aula anterior).</dd>
+  <dt>.cena { perspective: 1000px; }</dt><dd>A <strong>distância do olho</strong> até a tela, posta no <strong>pai</strong> dos elementos 3D. Vale para todos os filhos. Quanto <strong>menor</strong> o número, mais perto o olho e mais forte o efeito. Entre <code>600px</code> e <code>1200px</code> fica natural.</dd>
+  <dt>.porta { transform: rotateY(50deg); }</dt><dd>Gira em volta do eixo Y (em pé). Como no <code>rotate()</code>, a unidade é <code>deg</code> ou <code>turn</code>, e o giro é em volta do <strong>centro</strong> (veja o <code>transform-origin</code> na aula anterior).</dd>
 </dl>
 
 <h3>A outra forma: a função <code>perspective()</code></h3>
