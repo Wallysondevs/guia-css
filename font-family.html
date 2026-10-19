@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Fontes — a propriedade font-family e a lista de plano B | Guia CSS</title>
+<meta name="description" content="A propriedade font-family do CSS para quem nunca escreveu CSS: as famílias genéricas serif, sans-serif e monospace lado a lado, a lista de fontes com plano B, aspas em nomes com espaço, fontes que todo computador tem (e as que não), herança a partir do body, botões que não herdam, e os erros que nem o validador pega.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Fontes (font-family)</span></h1>
+
+<p class="intro">A fonte (o desenho das letras) muda a "cara" de um site mais do que qualquer cor. Uma receita da vovó combina com letras clássicas; o cardápio de uma hamburgueria, com letras modernas. No CSS, quem escolhe a fonte é a propriedade <code>font-family</code> ("família da fonte"). Ela tem um detalhe que pega todo iniciante: o navegador só consegue usar uma fonte que <strong>existe no computador de quem está lendo</strong>. Por isso, você sempre escreve uma lista, com plano B.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>As famílias genéricas (<code>serif</code>, <code>sans-serif</code>, <code>monospace</code>…) desenhadas lado a lado.</li>
+  <li>Como escrever uma lista de fontes com plano B: <code>Georgia, "Times New Roman", serif</code>.</li>
+  <li>Quando o nome da fonte precisa de aspas.</li>
+  <li>Quais fontes quase todo computador tem, e por que nem todo.</li>
+  <li>Por que basta escolher a fonte no <code>body</code>, e por que os botões não obedecem.</li>
+  <li>Como ver no F12 qual fonte foi usada de verdade.</li>
+  <li>Os erros, inclusive os que o validador não pega: <code>"serif"</code> com aspas e a vírgula esquecida.</li>
+</ul>
+</div>
+
+<p>Os quadros "Resultado" são desenhados agora pelo <strong>seu</strong> navegador, com as fontes do <strong>seu</strong> computador: se você comparar com um amigo, alguns exemplos podem sair diferentes, e esse é justamente o assunto da aula. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: o pedido com plano B</h2>
+<p>A Ana liga para a padaria: "quero um pão de fermentação natural; se não tiver, um pão italiano; se também não tiver, <strong>qualquer pão salgado</strong>". Ela sabe que a padaria pode não ter o primeiro, então deixa alternativas, e a última é tão geral que sempre existe.</p>
+<p>A <code>font-family</code> é esse pedido. Você lista as fontes da preferida para a menos preferida, e termina com uma <strong>família genérica</strong> ("qualquer fonte sem serifa") que todo navegador tem. O navegador pega a <strong>primeira da lista que existir</strong> no computador do leitor.</p>
+
+<hr>
+
+<h2>1. As famílias genéricas</h2>
+<p>São cinco palavras-chave (mais uma moderna) que não são uma fonte, e sim um <strong>tipo</strong> de fonte. O navegador troca cada uma pela fonte daquele tipo que o sistema tiver:</p>
+
+<pre class="file" data-file="genericas.html" data-resultado>&lt;style&gt;
+  .serif { font-family: serif; }
+  .sans { font-family: sans-serif; }
+  .mono { font-family: monospace; }
+  .cursiva { font-family: cursive; }
+  .fantasia { font-family: fantasy; }
+  .sistema { font-family: system-ui; }
+&lt;/style&gt;
+&lt;p class="serif"&gt;serif: Bolo de cenoura da Ana&lt;/p&gt;
+&lt;p class="sans"&gt;sans-serif: Bolo de cenoura da Ana&lt;/p&gt;
+&lt;p class="mono"&gt;monospace: Bolo de cenoura da Ana&lt;/p&gt;
+&lt;p class="cursiva"&gt;cursive: Bolo de cenoura da Ana&lt;/p&gt;
+&lt;p class="fantasia"&gt;fantasy: Bolo de cenoura da Ana&lt;/p&gt;
+&lt;p class="sistema"&gt;system-ui: Bolo de cenoura da Ana&lt;/p&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Genérica</th><th>O que é</th><th>Bom para</th></tr>
+<tr><td><code>serif</code></td><td>Letras com <strong>serifa</strong>: os "pezinhos" nas pontas (repare no pé do <strong>r</strong> e do <strong>d</strong>). Ar clássico, de livro e jornal.</td><td>Títulos elegantes, textos longos impressos</td></tr>
+<tr><td><code>sans-serif</code></td><td>"Sem serifa" (do francês <em>sans</em>, "sem"): traço limpo, sem pezinhos. Ar moderno.</td><td>O texto do site, na tela</td></tr>
+<tr><td><code>monospace</code></td><td>"Espaçamento fixo": todas as letras com a mesma largura, o <code>i</code> ocupa o mesmo espaço que o <code>m</code>. A fonte de programador.</td><td>Código, números alinhados em coluna</td></tr>
+<tr><td><code>cursive</code></td><td>Imita a letra à mão. Muda <strong>muito</strong> de computador para computador (no Windows, costuma ser a Comic Sans).</td><td>Quase nada: resultado imprevisível</td></tr>
+<tr><td><code>fantasy</code></td><td>"Decorativa". Também muda muito (no Windows, costuma ser a Impact; em outros sistemas, nem parece decorativa).</td><td>Evite</td></tr>
+<tr><td><code>system-ui</code></td><td>A fonte do próprio sistema: a do Windows no Windows, a do iPhone no iPhone…</td><td>Sites com cara de aplicativo</td></tr>
+</table>
+</div>
+
+<p>No Resultado acima, as três primeiras linhas devem estar bem diferentes umas das outras em qualquer computador: com pezinhos, sem pezinhos e com letras de largura fixa. As três últimas dependem do seu sistema; no computador Linux do laboratório do guia, por exemplo, a <code>cursive</code> e a <code>fantasy</code> saíram iguaizinhas à <code>serif</code>, sem nada de "letra à mão" ou "decorativa". Por isso o guia usa no dia a dia só <code>serif</code>, <code>sans-serif</code>, <code>monospace</code> e <code>system-ui</code>.</p>
+
+<hr>
+
+<h2>2. A lista com plano B</h2>
+<p>Para escolher uma fonte específica, escreva o nome dela e, depois, as alternativas, separadas por <strong>vírgula</strong>:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura com cobertura de chocolate.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+p {
+  font-family: Verdana, Arial, sans-serif;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>font-family</dt><dd>A propriedade: a família (o desenho) da fonte.</dd>
+  <dt>Georgia</dt><dd>A 1ª escolha: uma fonte com serifa que vem no Windows e no Mac.</dd>
+  <dt>,</dt><dd>A vírgula separa as opções. Ela é obrigatória: sem ela, o navegador acha que é tudo um nome só (veja "Quando dá errado").</dd>
+  <dt>"Times New Roman"</dt><dd>O plano B. O nome tem espaços, então vai entre aspas (próxima seção).</dd>
+  <dt>serif</dt><dd>O último recurso: a genérica, que sempre existe. <strong>Sempre</strong> termine a lista com uma genérica do mesmo tipo das outras.</dd>
+</dl>
+
+<p>Como o navegador decide, letra por letra: ele procura <code>Georgia</code> no computador do leitor; se achar, usa e pronto. Se não, tenta <code>Times New Roman</code>; se também não houver, usa a fonte <code>serif</code> padrão do sistema. Repare que a genérica final é do <strong>mesmo tipo</strong> das outras: se faltarem todas, o título continua com serifa, como você planejou.</p>
+
+<p>Na caixa acima, troque o <code>Georgia</code> por <code>Fonte Que Não Existe</code>. O título continua com serifa: o navegador pulou para o plano B.</p>
+
+<div class="tryhtml" data-goal="src:font-family:\s*Verdana\s*\,\s*sans-serif\s*;,nsrc:&quot;sans-serif&quot;">
+<p class="try-task"><strong>Missão:</strong> o cardápio da padaria está com a fonte padrão do navegador (com serifa). Faça o <code>body</code> usar <code>Verdana</code>, com <code>sans-serif</code> como plano B.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;p&gt;Pão francês quentinho às 7h e às 17h.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  color: #333;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  color: #333;
+  font-family: Verdana, sans-serif;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Aspas: quando usar</h2>
+<p>O nome de uma fonte pode ir com ou sem aspas. A regra prática:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Caso</th><th>Exemplo</th><th>Aspas?</th></tr>
+<tr><td>Nome de uma palavra</td><td><code>Georgia</code>, <code>Verdana</code></td><td>Não precisa</td></tr>
+<tr><td>Nome com espaço</td><td><code>"Times New Roman"</code>, <code>"Courier New"</code></td><td>Use (funciona sem, mas as aspas evitam surpresas)</td></tr>
+<tr><td>Nome que começa com número ou tem símbolos</td><td><code>"3D Letras"</code></td><td><strong>Obrigatório</strong></td></tr>
+<tr><td>Família genérica</td><td><code>serif</code>, <code>sans-serif</code>, <code>monospace</code></td><td><strong>Nunca</strong>: com aspas, vira o nome de uma fonte chamada "serif", que não existe</td></tr>
+</table>
+</div>
+<p>Aspas simples (<code>'Times New Roman'</code>) e duplas (<code>"Times New Roman"</code>) funcionam igual; escolha uma e use sempre.</p>
+
+<hr>
+
+<h2>4. Fontes que (quase) todo computador tem</h2>
+<p>Algumas fontes vêm instaladas no Windows e no Mac há décadas, e por isso são chamadas de <strong>fontes seguras</strong> (<em>web-safe fonts</em>):</p>
+
+<pre class="file" data-file="seguras.html" data-resultado>&lt;style&gt;
+  .arial { font-family: Arial, sans-serif; }
+  .verdana { font-family: Verdana, sans-serif; }
+  .tahoma { font-family: Tahoma, sans-serif; }
+  .georgia { font-family: Georgia, serif; }
+  .times { font-family: "Times New Roman", serif; }
+  .courier { font-family: "Courier New", monospace; }
+&lt;/style&gt;
+&lt;p class="arial"&gt;Arial: Bolo de cenoura da Ana&lt;/p&gt;
+&lt;p class="verdana"&gt;Verdana: Bolo de cenoura da Ana&lt;/p&gt;
+&lt;p class="tahoma"&gt;Tahoma: Bolo de cenoura da Ana&lt;/p&gt;
+&lt;p class="georgia"&gt;Georgia: Bolo de cenoura da Ana&lt;/p&gt;
+&lt;p class="times"&gt;Times New Roman: Bolo de cenoura da Ana&lt;/p&gt;
+&lt;p class="courier"&gt;Courier New: Bolo de cenoura da Ana&lt;/p&gt;
+</pre>
+
+<p>No Windows e no Mac, cada linha sai com a fonte do próprio nome. Mas "segura" não é garantida: celulares Android e computadores Linux não trazem a maioria delas. Lá, cada linha cai no plano B (a genérica do final), e algumas linhas ficam iguais entre si. É por isso que a genérica no fim da lista não é enfeite: é ela que salva o desenho nesses aparelhos.</p>
+
+<div class="tip">
+<strong>E se eu quiser uma fonte que ninguém tem?</strong>
+<p>Você pode mandar o arquivo da fonte junto com o site, e aí ela aparece igual para todo mundo. É o assunto da próxima aula: <a href="fontes-web.html">Fontes da Internet (@font-face)</a>.</p>
+</div>
+
+<h3>A lista do sistema</h3>
+<p>Muitos sites modernos usam a fonte de cada sistema, que é bonita, legível e não precisa ser baixada:</p>
+<pre class="file" data-file="sistema.css">body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}</pre>
+<p>Lendo a lista: a fonte do sistema (<code>system-ui</code>); a mesma coisa em Safaris antigos (<code>-apple-system</code>); a do Windows (<code>Segoe UI</code>); a do Android (<code>Roboto</code>); e, no fim, qualquer sem serifa.</p>
+
+<hr>
+
+<h2>5. Basta escolher no <code>body</code>: a herança</h2>
+<p>A <code>font-family</code> é <strong>herdada</strong>: os elementos de dentro usam a fonte do elemento de fora, a não ser que tenham uma regra própria (aula <a href="heranca.html">Herança</a>). Por isso o costume é escolher a fonte do texto uma vez, no <code>body</code>, e só mudar o que for diferente, como os títulos:</p>
+
+<pre class="file" data-file="heranca.html" data-resultado>&lt;style&gt;
+  body {
+    font-family: Verdana, sans-serif;
+  }
+  h1 {
+    font-family: Georgia, serif;
+  }
+&lt;/style&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Tudo aqui herdou a fonte do &lt;strong&gt;body&lt;/strong&gt;: o parágrafo, o negrito e a &lt;a href="#"&gt;lista de receitas&lt;/a&gt;.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Bolo de cenoura&lt;/li&gt;
+  &lt;li&gt;Torta de limão&lt;/li&gt;
+&lt;/ul&gt;
+&lt;button&gt;Ver receita&lt;/button&gt;
+</pre>
+
+<p>O título tem a regra dele (com serifa). O parágrafo, o negrito, o link e a lista herdaram a fonte do <code>body</code>, sem serifa. Mas repare no <strong>botão</strong>: ele está com outra fonte, e menor.</p>
+
+<h3>Botões e campos não herdam</h3>
+<p>Os elementos de formulário (<code>&lt;button&gt;</code>, <code>&lt;input&gt;</code>, <code>&lt;select&gt;</code>, <code>&lt;textarea&gt;</code>) vêm com uma fonte própria, definida pelo navegador. No Chrome, o valor calculado da <code>font-family</code> de um botão é <code>Arial</code>, com <code>13.3333px</code> de tamanho, por mais que o <code>body</code> diga outra coisa. Para eles seguirem o resto da página, use a palavra <code>inherit</code> ("herde"):</p>
+<pre class="file" data-file="formularios.css">button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+}</pre>
+<p>Essa regra aparece em quase todo "reset" de CSS (aula <a href="reset.html">Reset e Normalize</a>).</p>
+
+<hr>
+
+<h2>6. Qual fonte foi usada de verdade? (F12)</h2>
+<p>O valor calculado da <code>font-family</code> é a <strong>lista inteira</strong>, como você escreveu: <code>Georgia, "Times New Roman", serif</code>. Ele não diz qual das três o navegador conseguiu usar. Para saber, no Chrome e no Edge: abra o F12 (aula <a href="devtools.html">Inspecionando com o F12</a>), selecione o elemento, vá na aba <em>Computed</em> e role até o fim: a seção <em>Rendered Fonts</em> ("fontes desenhadas") mostra o nome da fonte usada. No Firefox, a aba equivalente se chama <em>Fonts</em>. (Descrição ilustrativa: os nomes das abas mudam um pouco entre versões.)</p>
+<p>É também por isso que as missões do guia não conferem a fonte desenhada: ela depende do computador de cada leitor.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Com fontes, o "dar errado" é traiçoeiro: na maioria dos casos, o navegador simplesmente cai em <strong>outra</strong> fonte, e você pode nem perceber. Todas as linhas abaixo queriam letras de largura fixa (<code>monospace</code>):</p>
+
+<pre class="file" data-file="erros.html · erro de propósito" data-resultado>&lt;style&gt;
+  body { font-family: sans-serif; }
+  .certo { font-family: "Courier New", monospace; }
+  .aspas { font-family: "monospace"; }
+  .virgula { font-family: Courier New monospace; }
+  .ponto { font-family: Courier; monospace; }
+&lt;/style&gt;
+&lt;p class="certo"&gt;"Courier New", monospace (o certo)&lt;/p&gt;
+&lt;p class="aspas"&gt;"monospace" com aspas&lt;/p&gt;
+&lt;p class="virgula"&gt;Courier New monospace sem vírgula&lt;/p&gt;
+&lt;p class="ponto"&gt;Courier; monospace com ponto e vírgula&lt;/p&gt;
+</pre>
+
+<p>A primeira linha é a única garantida. A terceira, sem vírgula, ficou com a fonte padrão do navegador, com serifa: nem a sem serifa do <code>body</code> ela usou. A segunda e a quarta dependem do computador, e isso é justamente o perigo: no computador Linux do laboratório do guia, as duas saíram com largura fixa, porque o Linux tem um "apelido" de fonte chamado <code>monospace</code> e uma fonte parecida com a Courier. No Windows e no Mac, a segunda segue a regra do CSS e cai na fonte padrão, com serifa; a quarta só tem largura fixa se existir uma fonte chamada Courier. "Funciona no meu computador" não quer dizer que funciona no do leitor.</p>
+
+<div class="cenario">
+<strong>Nenhuma mensagem: <code>font-family: "monospace";</code> (genérica com aspas)</strong>
+<p><strong>O que aconteceu:</strong> com aspas, <code>"monospace"</code> deixa de ser a família genérica e vira o nome de uma fonte chamada "monospace", que, em geral, não existe. A lista acaba sem nenhuma fonte disponível, e o navegador usa a fonte <strong>padrão</strong> dele (no Chrome, normalmente com serifa). Em alguns sistemas Linux, um apelido com esse nome "salva" o erro, e você nem percebe. O validador acha tudo normal: um nome de fonte entre aspas é permitido.</p>
+<p><strong>Como consertar:</strong> genéricas nunca levam aspas: <code>font-family: "Courier New", monospace;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Nenhuma mensagem: <code>font-family: Courier New monospace;</code> (faltou a vírgula)</strong>
+<p><strong>O que aconteceu:</strong> sem vírgula, as três palavras viram <strong>um nome só</strong>: uma fonte chamada "Courier New monospace". Ela não existe, e o resultado é o mesmo do caso anterior. O validador também não reclama:</p>
+<pre class="term" data-cwd="~/fontes">$ cat varios.css
+body { font-family: Georgia, "Times New Roman", serif; }
+.a { font-family: Times New Roman, serif; }
+.b { font-family: system-ui, sans-serif; }
+.c { font-family: "monospace"; }
+.d { font-family: Courier New monospace; }
+.e { font-family: Arial, sans serif; }
+$ vnu --css varios.css
+$</pre>
+<p>As seis linhas passam sem nenhuma mensagem, inclusive as três erradas (<code>.c</code>, <code>.d</code> e <code>.e</code>, onde <code>sans serif</code> separado vira o nome de uma fonte inexistente). O validador confere a <strong>forma</strong>, e não se a fonte existe.</p>
+<p><strong>Como consertar:</strong> vírgula entre cada opção, e nomes compostos entre aspas: <code>"Courier New", monospace</code>; <code>sans-serif</code> com hífen.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “sans-serif”: Parse Error.</code></strong>
+<p><strong>O que aconteceu:</strong> ponto e vírgula no lugar da vírgula: <code>font-family: Arial; sans-serif;</code>.</p>
+<pre class="term" data-cwd="~/fontes">$ vnu --css pontovirgula.css
+"file:/home/ana/fontes/pontovirgula.css":2.23-2.32: error: CSS: “sans-serif”: Parse Error.</pre>
+<p>O <code>;</code> encerra a declaração depois de <code>Arial</code>: a lista ficou sem plano B. O <code>sans-serif</code> sobra sozinho, como se fosse o nome de uma propriedade, e o validador se perde nele. No navegador, quem não tem Arial cai na fonte padrão.</p>
+<p><strong>Como consertar:</strong> <code>font-family: Arial, sans-serif;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “font-family”: Unknown dimension.</code></strong>
+<p><strong>O que aconteceu:</strong> um nome de fonte que começa com número, sem aspas: <code>font-family: 1Lojinha, sans-serif;</code>.</p>
+<pre class="term" data-cwd="~/fontes">$ vnu --css numero.css
+"file:/home/ana/fontes/numero.css":2.16-2.23: error: CSS: “font-family”: Unknown dimension.</pre>
+<p>"Dimensão desconhecida": o CSS leu <code>1Lojinha</code> como o número 1 seguido de uma unidade chamada "Lojinha" (como <code>1px</code> ou <code>1rem</code>). A declaração inteira é ignorada.</p>
+<p><strong>Como consertar:</strong> aspas: <code>font-family: "1Lojinha", sans-serif;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “font-family”: Parse Error.</code> (aspas sem fechar)</strong>
+<p><strong>O que aconteceu:</strong> <code>font-family: "Open Sans, sans-serif;</code>, sem fechar as aspas.</p>
+<pre class="term" data-cwd="~/fontes">$ vnu --css aspas.css
+"file:/home/ana/fontes/aspas.css":2.39-2.39: error: CSS: “font-family”: Parse Error.</pre>
+<p>Tudo depois da aspa virou parte de um nome, até o fim da linha. A declaração é ignorada.</p>
+<p><strong>Como consertar:</strong> feche as aspas logo depois do nome: <code>"Open Sans", sans-serif</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “font”: “Arial” is not a “font” value.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>font: Arial;</code>. A propriedade <code>font</code> (sem <code>-family</code>) é um atalho que exige pelo menos o <strong>tamanho</strong> e a família juntos.</p>
+<pre class="term" data-cwd="~/fontes">$ vnu --css font.css
+"file:/home/ana/fontes/font.css":2.9-2.13: error: CSS: “font”: “Arial” is not a “font” value.</pre>
+<p><strong>Como consertar:</strong> para só a família, use <code>font-family: Arial, sans-serif;</code>. (O atalho certo seria <code>font: 16px Arial, sans-serif;</code>, com o tamanho da aula <a href="font-size.html">font-size</a>.)</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>font-family: Georgia, "Times New Roman", serif;</code></td><td>Lista de fontes: o navegador usa a primeira que existir</td></tr>
+<tr><td><code>serif</code> / <code>sans-serif</code> / <code>monospace</code></td><td>Genéricas: com serifa / sem serifa / largura fixa. Sempre no fim da lista, sem aspas</td></tr>
+<tr><td><code>system-ui</code></td><td>A fonte do sistema do leitor</td></tr>
+<tr><td><code>cursive</code> / <code>fantasy</code></td><td>Genéricas imprevisíveis: evite</td></tr>
+<tr><td><code>"Nome Com Espaço"</code></td><td>Aspas em nomes com espaço; obrigatórias se começar com número</td></tr>
+<tr><td><code>body { font-family: … }</code></td><td>A fonte do site inteiro, por herança</td></tr>
+<tr><td><code>font-family: inherit;</code></td><td>Faz botões e campos usarem a fonte da página</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O plano B</h3>
+<p>Complete com a família genérica certa para o fim desta lista:</p>
+<div class="ex-code">p { font-family: Verdana, Arial, <input data-answer="sans-serif" aria-label="genérica">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. A fonte de código</h3>
+<p>Complete com a genérica de letras de largura fixa:</p>
+<div class="ex-code">code { font-family: "Courier New", <input data-answer="monospace" aria-label="genérica">; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. Com <code>font-family: Georgia, "Times New Roman", serif;</code>, num computador que tem as duas fontes, qual é usada?</p>
+<label><input type="radio" name="q3"> As duas, misturadas</label>
+<label><input type="radio" name="q3"> Georgia, a primeira da lista que existe</label>
+<label><input type="radio" name="q3"> Times New Roman, a mais famosa</label>
+<label><input type="radio" name="q3"> A genérica <code>serif</code>, sempre</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. O que há de errado em <code>font-family: Arial, "sans-serif";</code>?</p>
+<label><input type="radio" name="q4"> Nada</label>
+<label><input type="radio" name="q4"> Arial precisa de aspas</label>
+<label><input type="radio" name="q4"> Com aspas, <code>"sans-serif"</code> vira o nome de uma fonte que não existe, e o plano B não funciona</label>
+<label><input type="radio" name="q4"> Falta o ponto e vírgula no meio</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. A Ana pôs a fonte no <code>body</code>, mas os botões continuam com outra. Por quê?</p>
+<label><input type="radio" name="q5"> Botões e campos de formulário têm fonte própria e não herdam; use <code>font-family: inherit</code></label>
+<label><input type="radio" name="q5"> Botões não aceitam <code>font-family</code></label>
+<label><input type="radio" name="q5"> Ela esqueceu as aspas</label>
+<label><input type="radio" name="q5"> O <code>body</code> não passa nada para os filhos</label>
+</div>
+
+<h3>Missão final: as fontes do blog</h3>
+
+<div class="tryhtml" data-goal="src:body\s*\{[^}]*font-family:\s*Verdana\s*\,\s*Arial\s*\,\s*sans-serif\s*;,src:h1\s*\{[^}]*font-family:\s*Georgia\s*\,\s*[&quot;']Times New Roman[&quot;']\s*\,\s*serif\s*;,src:\.codigo\s*\{[^}]*font-family:\s*[&quot;']Courier New[&quot;']\s*\,\s*monospace\s*;,nsrc:[&quot;'](serif|sans-serif|monospace)[&quot;']">
+<p class="try-task"><strong>Missão:</strong> as três listas de fontes do blog estão com erro. Conserte, sem mudar as fontes escolhidas: o <code>body</code> com <code>Verdana, Arial, sans-serif</code>; o <code>h1</code> com <code>Georgia, "Times New Roman", serif</code>; e o <code>.codigo</code> com <code>"Courier New", monospace</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Blog da Ana&lt;/h1&gt;
+&lt;p&gt;Hoje aprendi a mudar a fonte do meu site.&lt;/p&gt;
+&lt;p class="codigo"&gt;font-family: Verdana, sans-serif;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: Verdana; Arial; sans-serif;
+}
+
+h1 {
+  font-family: Georgia, "Times New Roman", "serif";
+}
+
+.codigo {
+  font-family: Courier New monospace;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: Verdana, Arial, sans-serif;
+}
+
+h1 {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.codigo {
+  font-family: "Courier New", monospace;
+}
+</pre>
+</div>
+
+<p>Os três erros: ponto e vírgula no lugar das vírgulas, a genérica <code>"serif"</code> com aspas e a vírgula esquecida (com o nome composto sem aspas).</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>font-family</code> escolhe a fonte com uma <strong>lista</strong>: o navegador usa a primeira que existir no computador do leitor.</li>
+  <li>Termine sempre com uma <strong>genérica</strong> do mesmo tipo: <code>serif</code>, <code>sans-serif</code> ou <code>monospace</code> (ou <code>system-ui</code>). <code>cursive</code> e <code>fantasy</code> são imprevisíveis.</li>
+  <li>Vírgula entre as opções; aspas em nomes com espaço (obrigatórias se começar com número); genéricas nunca com aspas.</li>
+  <li>"Fontes seguras" (Arial, Verdana, Georgia…) vêm no Windows e no Mac, mas não em todo aparelho.</li>
+  <li>A fonte é herdada: escolha no <code>body</code>. Botões e campos não herdam: <code>font-family: inherit</code>.</li>
+  <li>O valor calculado é a lista inteira; a fonte usada de verdade aparece no F12 (<em>Rendered Fonts</em>).</li>
+  <li>Genérica com aspas, vírgula esquecida e <code>sans serif</code> separado passam no validador, mas a fonte cai no padrão do navegador.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
