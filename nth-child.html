@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS :first-child, :last-child e :nth-child — escolher pela posição | Guia CSS</title>
+<meta name="description" content=":first-child, :last-child e :nth-child para quem está começando: escolher um elemento pela posição entre os irmãos, listras em tabelas (odd e even), a fórmula An+B (3n, n+4, -n+3), a pegadinha do 'child' que conta todos os irmãos, :first-of-type e :nth-of-type, e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">:first-child, :last-child e :nth-child</span></h1>
+
+<p class="intro">A lista de ingredientes da Ana tem uma linha embaixo de cada item, mas a última linha sobra. A tabela de preços ficaria mais fácil de ler com uma fileira clara e outra escura. Dá para pôr uma classe em cada item, mas e quando a lista muda? Nesta aula você vai escolher elementos pela <strong>posição</strong>: o primeiro, o último, o terceiro, um sim e um não. Sem nenhuma classe a mais no HTML.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li><code>:first-child</code> e <code>:last-child</code>: o primeiro e o último entre os irmãos.</li>
+  <li><code>:nth-child(3)</code>: pela posição.</li>
+  <li><code>odd</code> e <code>even</code>: as listras de uma tabela.</li>
+  <li>A fórmula <code>An+B</code>: de três em três, do quarto em diante, só os três primeiros.</li>
+  <li>A pegadinha do <code>child</code>, que conta <strong>todos</strong> os irmãos, e a solução: <code>:first-of-type</code> e <code>:nth-of-type</code>.</li>
+  <li>Os erros reais do validador, e um que ele não pega.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a fila da chamada</h2>
+<p>Na escola, a professora organiza a fila: "o primeiro da fila segura a porta", "o último apaga a luz", "um sim, um não, vão para o outro lado". Ela não precisa saber o nome de ninguém; basta a <strong>posição</strong>.</p>
+<p>Essas pseudo-classes fazem o mesmo. Elas olham para os <strong>irmãos</strong> (os elementos que têm o mesmo pai, como os <code>&lt;li&gt;</code> de uma lista) e contam a partir de <strong>1</strong>.</p>
+
+<hr>
+
+<h2>1. <code>:first-child</code> e <code>:last-child</code></h2>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o primeiro ingrediente está em negrito. Troque <code>:first-child</code> por <code>:last-child</code> e veja o negrito ir para o último.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul class="ingredientes"&gt;
+  &lt;li&gt;3 cenouras&lt;/li&gt;
+  &lt;li&gt;3 ovos&lt;/li&gt;
+  &lt;li&gt;2 xícaras de açúcar&lt;/li&gt;
+  &lt;li&gt;1 xícara de óleo&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.ingredientes li:first-child {
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>.ingredientes li</dt><dd>Os <code>&lt;li&gt;</code> dentro da lista. É <strong>neles</strong> que vai a pseudo-classe: "o <code>li</code> que é o primeiro filho".</dd>
+  <dt>:first-child</dt><dd>"Primeiro filho": vale para o elemento que é o primeiro entre os irmãos.</dd>
+  <dt>:last-child</dt><dd>"Último filho": o último entre os irmãos.</dd>
+</dl>
+
+<p>"3 cenouras" fica em negrito; os outros três, normais. Se a Ana acrescentar um ingrediente no começo da lista, o negrito passa para ele sozinho: a regra não depende do texto, só da posição.</p>
+
+<h3>O uso mais comum: a borda que sobra</h3>
+<p>Uma linha embaixo de cada item separa os ingredientes. Mas embaixo do último ela não separa nada. Com <code>:last-child</code>, você tira só essa:</p>
+
+<div class="tryhtml" data-goal="css:.ingredientes li:last-child{border-bottom-style}=none,css:.ingredientes li:first-child{border-bottom-style}=solid">
+<p class="try-task"><strong>Missão:</strong> todos os ingredientes têm uma linha embaixo. Tire a linha <strong>só do último</strong>, com uma regra nova que use <code>:last-child</code> e <code>border-bottom: none</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul class="ingredientes"&gt;
+  &lt;li&gt;3 cenouras&lt;/li&gt;
+  &lt;li&gt;3 ovos&lt;/li&gt;
+  &lt;li&gt;2 xícaras de açúcar&lt;/li&gt;
+  &lt;li&gt;1 xícara de óleo&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.ingredientes {
+  list-style: none;
+  padding: 0;
+  border: 2px solid #9a3412;
+}
+
+.ingredientes li {
+  padding: 8px;
+  border-bottom: 2px solid #9a3412;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.ingredientes {
+  list-style: none;
+  padding: 0;
+  border: 2px solid #9a3412;
+}
+
+.ingredientes li {
+  padding: 8px;
+  border-bottom: 2px solid #9a3412;
+}
+
+.ingredientes li:last-child {
+  border-bottom: none;
+}
+</pre>
+</div>
+
+<p>Antes, a linha embaixo do óleo fica com o <strong>dobro</strong> da grossura: são duas linhas grudadas, a do último item e a da borda da lista. Com o <code>:last-child</code>, fica só a da lista. A regra nova vence porque tem mais especificidade (a pseudo-classe conta como uma classe; aula <a href="especificidade.html">Especificidade</a>).</p>
+
+<hr>
+
+<h2>2. <code>:nth-child()</code>: pela posição</h2>
+<p><code>:nth-child()</code> ("enésimo filho") recebe a posição entre parênteses. <code>li:nth-child(3)</code> é o terceiro <code>li</code>. E aceita duas palavras que são a razão de ele existir: <code>odd</code> (ímpar) e <code>even</code> (par).</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> as fileiras pares da tabela estão com fundo. Troque <code>even</code> por <code>odd</code>, depois por <code>3</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;table class="precos"&gt;
+  &lt;tr&gt;&lt;td&gt;Pão de queijo&lt;/td&gt;&lt;td&gt;R$ 2&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Broa&lt;/td&gt;&lt;td&gt;R$ 5&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Sonho&lt;/td&gt;&lt;td&gt;R$ 4&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Rosca&lt;/td&gt;&lt;td&gt;R$ 12&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Bolo&lt;/td&gt;&lt;td&gt;R$ 30&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+</pre>
+<pre class="script" data-file="style.css">.precos {
+  border-collapse: collapse;
+}
+
+.precos td {
+  padding: 6px 12px;
+}
+
+.precos tr:nth-child(even) {
+  background-color: #ffedd5;
+}
+</pre>
+</div>
+
+<p>Com <code>even</code>, ganham fundo a Broa e a Rosca (2ª e 4ª). Com <code>odd</code>, o Pão de queijo, o Sonho e o Bolo (1ª, 3ª e 5ª). Com <code>3</code>, só o Sonho. Essas listras ("zebra") ajudam o olho a seguir a linha da esquerda até o preço, à direita (aula <a href="tabelas.html">Estilizando Tabelas</a>).</p>
+
+<div class="tip">
+<strong>Onde estão os <code>&lt;tr&gt;</code>?</strong>
+<p>Uma tabela escrita sem <code>&lt;tbody&gt;</code> ganha um <code>&lt;tbody&gt;</code> do próprio navegador, em volta das fileiras. Os <code>&lt;tr&gt;</code> são filhos dele, e é entre eles que a contagem acontece. Se a tabela tem um <code>&lt;thead&gt;</code>, as fileiras do cabeçalho são contadas à parte: o primeiro <code>tr</code> do <code>&lt;tbody&gt;</code> é sempre o 1, o que é ótimo para as listras.</p>
+</div>
+
+<hr>
+
+<h2>3. A fórmula <code>An+B</code></h2>
+<p>Dentro do <code>:nth-child()</code> cabe uma pequena conta: <code>An+B</code>. O navegador põe no <code>n</code> os valores 0, 1, 2, 3… e pega cada posição que sair (as que forem 1 ou mais).</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>A conta</th><th>Pega as posições</th></tr>
+<tr><td><code>:nth-child(3)</code></td><td>Só o número</td><td>3</td></tr>
+<tr><td><code>:nth-child(2n)</code> = <code>even</code></td><td>2·0, 2·1, 2·2…</td><td>2, 4, 6…</td></tr>
+<tr><td><code>:nth-child(2n+1)</code> = <code>odd</code></td><td>2·0+1, 2·1+1…</td><td>1, 3, 5…</td></tr>
+<tr><td><code>:nth-child(3n)</code></td><td>De três em três</td><td>3, 6, 9…</td></tr>
+<tr><td><code>:nth-child(n+4)</code></td><td>0+4, 1+4, 2+4…</td><td>4, 5, 6… (do quarto em diante)</td></tr>
+<tr><td><code>:nth-child(-n+3)</code></td><td>−0+3, −1+3, −2+3</td><td>3, 2, 1 (só os três primeiros)</td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> os itens 3, 6 e 9 estão marcados. Troque por <code>n+4</code>, depois por <code>-n+3</code>, depois por <code>3n+1</code>, e confira com a tabela acima.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ol class="numeros"&gt;
+  &lt;li&gt;um&lt;/li&gt;&lt;li&gt;dois&lt;/li&gt;&lt;li&gt;três&lt;/li&gt;&lt;li&gt;quatro&lt;/li&gt;&lt;li&gt;cinco&lt;/li&gt;
+  &lt;li&gt;seis&lt;/li&gt;&lt;li&gt;sete&lt;/li&gt;&lt;li&gt;oito&lt;/li&gt;&lt;li&gt;nove&lt;/li&gt;&lt;li&gt;dez&lt;/li&gt;
+&lt;/ol&gt;
+</pre>
+<pre class="script" data-file="style.css">.numeros li:nth-child(3n) {
+  background-color: #fed7aa;
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<p>A <code>&lt;ol&gt;</code> numera os itens, então dá para conferir de olho: com <code>3n</code>, ficam em destaque o 3, o 6 e o 9.</p>
+
+<hr>
+
+<h2>4. A pegadinha: <code>child</code> conta todos os irmãos</h2>
+<p><code>p:first-child</code> <strong>não</strong> quer dizer "o primeiro parágrafo". Quer dizer "um <code>p</code> que, por acaso, é o primeiro filho". Se o primeiro filho for um título, nenhum <code>p</code> é o primeiro filho, e a regra não pega ninguém:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .receita p:first-child {
+    color: crimson;
+  }
+  .receita p:first-of-type {
+    background-color: #ffedd5;
+  }
+&lt;/style&gt;
+&lt;div class="receita"&gt;
+  &lt;h3&gt;Bolo de cenoura&lt;/h3&gt;
+  &lt;p&gt;Primeiro parágrafo: bata as cenouras.&lt;/p&gt;
+  &lt;p&gt;Segundo parágrafo: misture a farinha.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Nenhum texto ficou vermelho: o <code>:first-child</code> do <code>.receita</code> é o <code>&lt;h3&gt;</code>, e não um <code>p</code>. Já o fundo laranja-claro apareceu no primeiro parágrafo, por causa do <code>:first-of-type</code>.</p>
+
+<p>As versões com <code>-of-type</code> ("do tipo") contam só os irmãos <strong>do mesmo elemento</strong>:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Conta todos os irmãos</th><th>Conta só os do mesmo elemento</th></tr>
+<tr><td><code>:first-child</code></td><td><code>:first-of-type</code></td></tr>
+<tr><td><code>:last-child</code></td><td><code>:last-of-type</code></td></tr>
+<tr><td><code>:nth-child(2)</code></td><td><code>:nth-of-type(2)</code></td></tr>
+<tr><td><code>:only-child</code> (o único filho)</td><td><code>:only-of-type</code></td></tr>
+</table>
+</div>
+
+<p>Qual usar: numa lista (<code>&lt;li&gt;</code>) ou numa tabela (<code>&lt;tr&gt;</code>), os irmãos são todos do mesmo elemento, e as duas famílias dão no mesmo; use a <code>-child</code>, a mais comum. Quando há elementos misturados (títulos, parágrafos, imagens), use a <code>-of-type</code>.</p>
+
+<p>E para contar <strong>do fim</strong> para o começo existem <code>:nth-last-child()</code> e <code>:nth-last-of-type()</code>: <code>li:nth-last-child(2)</code> é o penúltimo.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>A pseudo-classe no pai: <code>ul:first-child</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">ul:first-child {
+  font-weight: bold;
+}
+</pre>
+<p><strong>O que você vê:</strong> a lista <strong>inteira</strong> fica em negrito, ou nada muda.</p>
+<p><strong>Por quê:</strong> <code>ul:first-child</code> é "uma <code>ul</code> que é o primeiro filho <strong>do pai dela</strong>". Se a lista é a primeira coisa da página, ela inteira fica em negrito; se há um título antes, nada acontece. A pseudo-classe vai em quem é contado: os itens.</p>
+<p><strong>Como consertar:</strong> <code>ul li:first-child</code> (ou <code>ul &gt; li:first-child</code>).</p>
+</div>
+
+<div class="cenario">
+<strong>Palavra em português: <code>nth-child(impar)</code> (o validador não pega)</strong>
+<pre class="file" data-file="style.css · erro de propósito">li:nth-child(impar) {
+  color: crimson;
+}
+</pre>
+<p><strong>O que você vê:</strong> nada muda.</p>
+<p><strong>Por quê:</strong> só valem <code>odd</code>, <code>even</code>, números e a fórmula. Com um seletor inválido, o navegador ignora a <strong>regra inteira</strong>.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+$</pre>
+<p><strong>O validador não diz nada</strong> neste caso: o <code>vnu</code> 26.10.12 deixa passar a palavra estranha dentro dos parênteses. Só o resultado (e o F12, onde a regra não aparece aplicada no <code>li</code>) mostra o problema.</p>
+</div>
+
+<div class="cenario">
+<strong>Espaço no meio da fórmula: <code>“n” is not a “:nth-child()” value</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">li:nth-child(2 n) {
+  color: crimson;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":1.17-1.17: error: CSS: Parse Error.
+"file:/home/ana/site/style.css":1.17-1.17: error: CSS: “n” is not a “:nth-child()” value
+"file:/home/ana/site/style.css":1.17-1.17: error: CSS: Parse Error.</pre>
+<p><strong>O que significa:</strong> "<code>n</code> não é um valor de <code>:nth-child()</code>": o número e o <code>n</code> têm de vir colados (<code>2n</code>). Espaços em volta do <code>+</code> podem (<code>2n + 1</code>); entre o número e o <code>n</code>, não. A regra inteira é ignorada.</p>
+</div>
+
+<div class="cenario">
+<strong>Esqueceu os parênteses, ou inventou o nome</strong>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":1.4-1.12: error: CSS: Unknown pseudo-element or pseudo-class “:nth-child”
+$ vnu --css outro.css
+"file:/home/ana/site/outro.css":1.4-1.7: error: CSS: Unknown pseudo-element or pseudo-class “:last”</pre>
+<p><strong>O que significa:</strong> "pseudo-classe desconhecida". O primeiro é <code>li:nth-child</code> sem os parênteses (sem a posição, ele não existe). O segundo é <code>li:last</code>: o nome é <code>:last-child</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Contou a partir do zero</strong>
+<p><strong>O que você vê:</strong> a Ana queria o primeiro item e escreveu <code>li:nth-child(0)</code>. Nada mudou.</p>
+<p><strong>Por quê:</strong> a contagem começa em <strong>1</strong>. Não existe filho na posição 0. O primeiro é <code>:nth-child(1)</code>, ou simplesmente <code>:first-child</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Pega</th></tr>
+<tr><td><code>li:first-child</code></td><td>O <code>li</code> que é o primeiro filho</td></tr>
+<tr><td><code>li:last-child</code></td><td>O <code>li</code> que é o último filho</td></tr>
+<tr><td><code>li:nth-child(3)</code></td><td>O terceiro</td></tr>
+<tr><td><code>tr:nth-child(odd)</code> / <code>(even)</code></td><td>Ímpares / pares</td></tr>
+<tr><td><code>li:nth-child(3n)</code></td><td>3, 6, 9…</td></tr>
+<tr><td><code>li:nth-child(n+4)</code></td><td>Do quarto em diante</td></tr>
+<tr><td><code>li:nth-child(-n+3)</code></td><td>Os três primeiros</td></tr>
+<tr><td><code>li:nth-last-child(2)</code></td><td>O penúltimo</td></tr>
+<tr><td><code>p:first-of-type</code>, <code>p:nth-of-type(2)</code></td><td>Contando só os <code>p</code></td></tr>
+<tr><td><code>li:only-child</code></td><td>O <code>li</code> que é o único filho</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O último</h3>
+<p>Complete para pegar o último item da lista:</p>
+<div class="ex-code">li:<input data-answer="last-child" aria-label="pseudo-classe"> { border-bottom: none; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. As listras</h3>
+<p>Complete com a palavra das fileiras <strong>pares</strong>:</p>
+<div class="ex-code">tr:nth-child(<input data-answer="even" aria-label="palavra">) { background-color: #ffedd5; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Os três primeiros</h3>
+<p>Complete a fórmula que pega só os três primeiros:</p>
+<div class="ex-code">li:nth-child(<input data-answer="-n+3|-n + 3" aria-label="fórmula">) { font-weight: bold; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Quais posições <code>li:nth-child(2n+1)</code> pega?</p>
+<label><input type="radio" name="q4"> 2, 4, 6…</label>
+<label><input type="radio" name="q4"> 1, 3, 5…</label>
+<label><input type="radio" name="q4"> 3, 5, 7…</label>
+<label><input type="radio" name="q4"> Só a 3</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Uma <code>div</code> tem um <code>h2</code> e depois dois <code>p</code>. O que <code>div p:first-child</code> pega?</p>
+<label><input type="radio" name="q5"> O primeiro <code>p</code></label>
+<label><input type="radio" name="q5"> O <code>h2</code></label>
+<label><input type="radio" name="q5"> Nada: o primeiro filho é o <code>h2</code>, que não é <code>p</code></label>
+<label><input type="radio" name="q5"> Os dois <code>p</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Qual pega o primeiro parágrafo nesse caso?</p>
+<label><input type="radio" name="q6"> <code>div p:first-of-type</code></label>
+<label><input type="radio" name="q6"> <code>div p:nth-child(1)</code></label>
+<label><input type="radio" name="q6"> <code>div:first-child p</code></label>
+<label><input type="radio" name="q6"> <code>div p:nth-child(0)</code></label>
+</div>
+
+<h3>Missão final: a tabela de preços</h3>
+
+<div class="tryhtml" data-goal="css:.precos tr:nth-child(2){background-color}=rgb(255, 237, 213),css:.precos tr:nth-child(4){background-color}=rgb(255, 237, 213),css:.precos tr:nth-child(3){background-color}=rgba(0, 0, 0, 0),css:.precos tr:last-child td{font-weight}=700,css:.precos tr:first-child td{font-weight}=400">
+<p class="try-task"><strong>Missão:</strong> (1) pinte as fileiras <strong>pares</strong> da tabela com <code>#ffedd5</code>; (2) deixe em negrito (<code>bold</code>) as células da <strong>última</strong> fileira, a do bolo, que é o destaque. Nenhuma classe nova no HTML.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;table class="precos"&gt;
+  &lt;tr&gt;&lt;td&gt;Pão de queijo&lt;/td&gt;&lt;td&gt;R$ 2&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Broa&lt;/td&gt;&lt;td&gt;R$ 5&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Sonho&lt;/td&gt;&lt;td&gt;R$ 4&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Rosca&lt;/td&gt;&lt;td&gt;R$ 12&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Bolo do dia&lt;/td&gt;&lt;td&gt;R$ 30&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+</pre>
+<pre class="script" data-file="style.css">.precos {
+  border-collapse: collapse;
+}
+
+.precos td {
+  padding: 6px 12px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.precos {
+  border-collapse: collapse;
+}
+
+.precos td {
+  padding: 6px 12px;
+}
+
+.precos tr:nth-child(even) {
+  background-color: #ffedd5;
+}
+
+.precos tr:last-child td {
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<p>Com a solução, a Broa e a Rosca ganham o fundo laranja-claro, e "Bolo do dia" e "R$ 30" ficam em negrito. Acrescente uma fileira no meio da tabela: as listras se reorganizam sozinhas, e o negrito continua na última.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>:first-child</code> e <code>:last-child</code> pegam o primeiro e o último entre os irmãos; a pseudo-classe vai em quem é contado (<code>li:last-child</code>, e não <code>ul:last-child</code>).</li>
+  <li><code>:nth-child(N)</code> conta a partir de 1; <code>odd</code> e <code>even</code> fazem listras; a fórmula <code>An+B</code> faz o resto (<code>3n</code>, <code>n+4</code>, <code>-n+3</code>).</li>
+  <li><code>-child</code> conta <strong>todos</strong> os irmãos; <code>-of-type</code> conta só os do mesmo elemento. Com elementos misturados, use <code>-of-type</code>.</li>
+  <li>Erros: <code>2 n</code> com espaço e nomes inventados (<code>:last</code>) o validador pega; <code>impar</code> no lugar de <code>odd</code>, ele deixa passar, mas o navegador ignora a regra.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
