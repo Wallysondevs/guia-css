@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS repeat(), minmax() e auto-fit — colunas que se adaptam | Guia CSS</title>
+<meta name="description" content="repeat(), minmax(), auto-fill e auto-fit no CSS Grid para quem está começando: escrever muitas colunas de uma vez, dar um tamanho mínimo e máximo, e montar uma galeria que muda o número de colunas sozinha, sem media query. A diferença entre auto-fill e auto-fit, e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">repeat, minmax e auto-fit</span></h1>
+
+<p class="intro">A Ana quer uma galeria de receitas: no celular, um cartão por fileira; no notebook, quatro ou cinco lado a lado. Dá para fazer isso com várias <code>@media</code>, uma para cada largura de tela. Nesta aula você vai fazer com <strong>uma linha</strong> de CSS: <code>repeat(auto-fit, minmax(150px, 1fr))</code>. Vamos montar essa linha pedaço por pedaço, para você entender cada parte.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li><code>repeat()</code>: escrever muitas colunas iguais de uma vez.</li>
+  <li><code>minmax()</code>: uma coluna com tamanho <strong>mínimo</strong> e <strong>máximo</strong>.</li>
+  <li><code>auto-fill</code>: "quantas colunas couberem".</li>
+  <li>A linha famosa da galeria que se adapta sozinha, sem <code>@media</code>.</li>
+  <li>A diferença entre <code>auto-fill</code> e <code>auto-fit</code> (só aparece quando há poucos itens).</li>
+  <li>Os erros comuns: <code>1fr</code> com <code>auto-fit</code>, vírgula esquecida, mínimo maior que a tela.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador. Algumas caixas têm uma <strong>largura fixa</strong>, para todo mundo ver o mesmo número de colunas; use os botões <strong>375</strong>, <strong>768</strong> e <strong>cheia</strong>, na barra de cada quadro, para ver a mesma página na largura de um celular, de um tablet ou na largura toda. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: as cadeiras na mesa</h2>
+<p>Pense em arrumar cadeiras numa mesa comprida. Você não decide "vão 6 cadeiras". Você decide "cada pessoa precisa de pelo menos 60 cm" e coloca <strong>quantas couberem</strong>. Numa mesa maior, cabem mais. Se sobrar um pedaço, todo mundo se afasta um pouco, para dividir a sobra.</p>
+<p>É exatamente o que a linha da galeria faz: "cada cartão precisa de pelo menos 150px (<code>minmax</code>); ponha quantos couberem (<code>auto-fill</code>/<code>auto-fit</code>); a sobra é dividida entre eles (<code>1fr</code>)".</p>
+
+<hr>
+
+<h2>1. <code>repeat()</code>: sem escrever <code>1fr</code> cinco vezes</h2>
+<p>Na aula <a href="grid-colunas.html">Colunas</a>, cinco colunas iguais seriam <code>1fr 1fr 1fr 1fr 1fr</code>. A função <code>repeat()</code> ("repetir") escreve isso por você:</p>
+
+<div class="tryhtml" data-largura="516">
+<p class="try-task"><strong>Experimente:</strong> troque o <code>5</code> por <code>3</code>, depois por <code>2</code>. Depois tente <code>repeat(2, 100px 1fr)</code>: o que se repete é o par "estreita, larga".</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="galeria"&gt;
+  &lt;div&gt;Bolo&lt;/div&gt;
+  &lt;div&gt;Pudim&lt;/div&gt;
+  &lt;div&gt;Torta&lt;/div&gt;
+  &lt;div&gt;Mousse&lt;/div&gt;
+  &lt;div&gt;Cocada&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.galeria div {
+  background: #dcfce7;
+  border: 2px solid #15803d;
+  padding: 12px;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>repeat(</dt><dd>A função que repete. Como toda função do CSS, o nome vem colado no parêntese.</dd>
+  <dt>5</dt><dd><strong>Quantas vezes</strong> repetir.</dd>
+  <dt>,</dt><dd>A vírgula separa o número do que se repete. É obrigatória.</dd>
+  <dt>1fr</dt><dd><strong>O que</strong> se repete: um tamanho, ou vários (<code>100px 1fr</code> repete o par).</dd>
+  <dt>)</dt><dd>Fecha a função.</dd>
+</dl>
+
+<p>Com <code>repeat(5, 1fr)</code>, os cinco doces ficam lado a lado, com a mesma largura. No F12, aba Computed, o <code>grid-template-columns</code> não mostra o <code>repeat</code>: mostra as cinco larguras já calculadas, em <code>px</code>. Nesta caixa, de 516px, são <code>92px 92px 92px 92px 92px</code>.</p>
+
+<div class="tryhtml" data-largura="516" data-goal="css:.cardapio{grid-template-columns}=160px 160px 160px,src:repeat\(\s*3\s*\,\s*1fr\s*\)">
+<p class="try-task"><strong>Missão:</strong> a grade do cardápio tem 2 colunas escritas à mão. Use <code>repeat()</code> para ter <strong>3</strong> colunas iguais de <code>1fr</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cardapio"&gt;
+  &lt;div&gt;Pão de queijo&lt;/div&gt;
+  &lt;div&gt;Broa&lt;/div&gt;
+  &lt;div&gt;Sonho&lt;/div&gt;
+  &lt;div&gt;Rosca&lt;/div&gt;
+  &lt;div&gt;Pão de mel&lt;/div&gt;
+  &lt;div&gt;Biscoito&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cardapio {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.cardapio div {
+  background: #dcfce7;
+  border: 2px solid #15803d;
+  padding: 12px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cardapio {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.cardapio div {
+  background: #dcfce7;
+  border: 2px solid #15803d;
+  padding: 12px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. <code>minmax()</code>: nem menor que isto, nem maior que aquilo</h2>
+<p>Com <code>1fr</code>, a coluna encolhe o quanto for preciso. Numa tela estreita, cinco colunas de <code>1fr</code> viram tirinhas onde o texto não cabe. A função <code>minmax()</code> dá à coluna um <strong>mínimo</strong> e um <strong>máximo</strong>:</p>
+
+<pre class="file" data-file="só a regra">grid-template-columns: repeat(3, minmax(150px, 1fr));
+</pre>
+
+<dl class="anatomy">
+  <dt>minmax(</dt><dd>"Mínimo e máximo".</dd>
+  <dt>150px</dt><dd>O <strong>mínimo</strong>: a coluna nunca fica mais estreita que isso.</dd>
+  <dt>1fr</dt><dd>O <strong>máximo</strong>: se sobrar espaço, ela cresce e divide a sobra com as outras.</dd>
+</dl>
+
+<p>Mas repare: com <code>repeat(3, …)</code>, são <strong>sempre</strong> 3 colunas. Numa tela de 375px, três colunas de pelo menos 150px não cabem, e a grade passa da borda. Falta o pedaço que decide "quantas colunas couberem".</p>
+
+<div class="tryhtml" data-largura="375">
+<p class="try-task"><strong>Experimente:</strong> o quadro tem 375px, a largura de um celular. As três colunas de 150px não cabem e a terceira sai pela direita (role o quadro para o lado). Clique em <strong>768</strong> na barra do quadro: agora cabem, e as colunas crescem até dividir a largura.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="galeria"&gt;
+  &lt;div&gt;Bolo&lt;/div&gt;
+  &lt;div&gt;Pudim&lt;/div&gt;
+  &lt;div&gt;Torta&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.galeria div {
+  background: #dcfce7;
+  border: 2px solid #15803d;
+  padding: 12px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. <code>auto-fill</code>: quantas couberem</h2>
+<p>No lugar do número de repetições, escreva <code>auto-fill</code> ("preencher automaticamente"). O navegador mede a largura e cria <strong>quantas colunas couberem</strong>:</p>
+
+<div class="tryhtml" data-largura="516">
+<p class="try-task"><strong>Experimente:</strong> com 516px, cabem 3 colunas. Clique em <strong>375</strong>: ficam 2. Clique em <strong>768</strong>: ficam 4. Clique em <strong>cheia</strong> e mude a largura da janela do navegador: o número de colunas muda sozinho, sem nenhuma <code>@media</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="galeria"&gt;
+  &lt;div&gt;Bolo&lt;/div&gt;
+  &lt;div&gt;Pudim&lt;/div&gt;
+  &lt;div&gt;Torta&lt;/div&gt;
+  &lt;div&gt;Mousse&lt;/div&gt;
+  &lt;div&gt;Brigadeiro&lt;/div&gt;
+  &lt;div&gt;Quindim&lt;/div&gt;
+  &lt;div&gt;Cocada&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.galeria div {
+  background: #dcfce7;
+  border: 2px solid #15803d;
+  padding: 12px;
+}
+</pre>
+</div>
+
+<p>A conta que o navegador faz, com 516px de quadro: tira a margem de 8px de cada lado da página (sobram 500px), vê que cabem 3 colunas de 150px com os <code>gap</code> de 10px (150 + 10 + 150 + 10 + 150 = 470), mas não 4 (630, mais que 500). Ficam 3, e os 30px que sobram são divididos pelo <code>1fr</code>: cada coluna fica com <code>160px</code>. Os sete doces ocupam três fileiras, e a última tem só o "Cocada".</p>
+
+<h3>Por que o <code>minmax</code> é necessário</h3>
+<p>Dá para escrever <code>repeat(auto-fill, 150px)</code>, com um tamanho fixo. Cabem as mesmas colunas, mas elas ficam com 150px exatos, e a sobra fica vazia à direita da grade. Com <code>minmax(150px, 1fr)</code>, as colunas crescem e a galeria ocupa a largura toda.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Número de colunas</th><th>Largura de cada uma</th></tr>
+<tr><td><code>repeat(3, 1fr)</code></td><td>Sempre 3</td><td>Divide tudo, pode ficar estreita demais</td></tr>
+<tr><td><code>repeat(3, minmax(150px, 1fr))</code></td><td>Sempre 3</td><td>Pelo menos 150px; se não couber, passa da borda</td></tr>
+<tr><td><code>repeat(auto-fill, 150px)</code></td><td>Quantas couberem</td><td>Exatamente 150px; sobra espaço à direita</td></tr>
+<tr><td><code>repeat(auto-fill, minmax(150px, 1fr))</code></td><td>Quantas couberem</td><td>Pelo menos 150px, e dividem a sobra</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>4. <code>auto-fill</code> × <code>auto-fit</code></h2>
+<p>As duas palavras criam quantas colunas couberem. A diferença só aparece quando há <strong>menos itens do que colunas</strong>:</p>
+<ul>
+  <li><code>auto-fill</code> ("preencher") mantém as colunas que sobraram, <strong>vazias</strong>. Os itens ficam do tamanho normal, e o resto da fileira fica em branco.</li>
+  <li><code>auto-fit</code> ("ajustar") <strong>desmancha</strong> as colunas vazias (elas ficam com 0px), e os itens esticam para ocupar a fileira.</li>
+</ul>
+
+<p>Duas galerias com só dois doces, na mesma largura de 516px:</p>
+
+<div class="tryhtml" data-largura="516">
+<p class="try-task"><strong>Experimente:</strong> compare as duas galerias. Depois acrescente mais dois <code>&lt;div&gt;</code> em cada uma: com itens suficientes para encher a fileira, as duas ficam iguais.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;auto-fill&lt;/p&gt;
+&lt;div class="galeria preencher"&gt;
+  &lt;div&gt;Bolo&lt;/div&gt;
+  &lt;div&gt;Pudim&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;auto-fit&lt;/p&gt;
+&lt;div class="galeria ajustar"&gt;
+  &lt;div&gt;Bolo&lt;/div&gt;
+  &lt;div&gt;Pudim&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria {
+  display: grid;
+  gap: 10px;
+}
+
+.preencher {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.ajustar {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.galeria div {
+  background: #dcfce7;
+  border: 2px solid #15803d;
+  padding: 12px;
+}
+</pre>
+</div>
+
+<p>Na galeria <code>auto-fill</code>, o "Bolo" e o "Pudim" têm 160px cada, e o terço da direita fica vazio: a terceira coluna existe, só não tem ninguém nela. Na <code>auto-fit</code>, os dois esticam e dividem a largura toda, metade para cada um. No F12, o <code>grid-template-columns</code> calculado mostra a diferença: <code>160px 160px 160px</code> na primeira, <code>245px 245px 0px</code> na segunda (a terceira coluna desmanchada, com 0px).</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Use</th><th>Quando</th></tr>
+<tr><td><code>auto-fit</code></td><td>Os itens devem ocupar a fileira toda, mesmo que sejam poucos (uma faixa de 2 ou 3 destaques). É a escolha mais comum.</td></tr>
+<tr><td><code>auto-fill</code></td><td>Os itens devem ter <strong>sempre o mesmo tamanho</strong>, mesmo que sejam poucos (uma galeria que vai ganhando fotos: a primeira não deve virar um cartão gigante).</td></tr>
+</table>
+</div>
+
+<div class="tip">
+<strong>Na tela muito estreita: <code>min(150px, 100%)</code></strong>
+<p>Se a tela for mais estreita que o mínimo (um quadro de 140px, com <code>minmax(150px, 1fr)</code>), a única coluna continua com 150px e passa da borda. Para nunca passar, troque o mínimo por <code>min(150px, 100%)</code>, "150px ou a largura toda, o que for menor": <code>repeat(auto-fit, minmax(min(150px, 100%), 1fr))</code>. A função <code>min()</code> tem aula própria: <a href="clamp.html">min(), max() e clamp()</a>.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong><code>auto-fit</code> com <code>1fr</code>: <code>“1fr” is not a “grid-template-columns” value</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 1fr);
+}
+</pre>
+<p><strong>O que você vê:</strong> a galeria vira uma coluna só, com um cartão embaixo do outro.</p>
+<p><strong>Por quê:</strong> para saber quantas colunas cabem, o navegador precisa de um tamanho que ele consiga medir. <code>1fr</code> é "uma parte da sobra": não dá para contar quantos <code>1fr</code> cabem. Com <code>auto-fit</code> e <code>auto-fill</code>, o tamanho tem de ter um mínimo fixo (<code>150px</code>, ou <code>minmax(150px, 1fr)</code>). A declaração inteira é ignorada, e a grade fica sem colunas definidas: uma coluna só. No F12, ela aparece riscada.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.46-3.46: error: CSS: “grid-template-columns”: “1fr” is not a “grid-template-columns” value.</pre>
+<p><strong>Como consertar:</strong> <code>repeat(auto-fit, minmax(150px, 1fr))</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Esqueceu a vírgula: <code>“ ” is an incorrect operator</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill 150px);
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.48-3.48: error: CSS: “grid-template-columns”: “ ” is an incorrect operator.</pre>
+<p><strong>O que significa:</strong> "o espaço é um operador incorreto": entre <code>auto-fill</code> e <code>150px</code>, o validador esperava uma vírgula e achou um espaço. A mesma mensagem aparece com <code>repeat(3 1fr)</code> e <code>minmax(150px 1fr)</code>. O navegador ignora a declaração, e a galeria vira uma coluna só.</p>
+<p><strong>Como consertar:</strong> dentro de <code>repeat()</code> e de <code>minmax()</code>, as duas partes são separadas por vírgula.</p>
+</div>
+
+<div class="cenario">
+<strong>Mínimo e máximo trocados: <code>minmax(1fr, 200px)</code></strong>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.43-3.43: error: CSS: “grid-template-columns”: “1fr” is not a “grid-template-columns” value.</pre>
+<p><strong>O que significa:</strong> o <code>fr</code> só pode ser o <strong>máximo</strong> (o segundo valor) do <code>minmax()</code>. Como mínimo, ele não faz sentido ("pelo menos uma parte da sobra"?), e a declaração é ignorada. O certo é o mínimo primeiro: <code>minmax(200px, 1fr)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O mínimo é maior que a tela</strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  .galeria {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 10px;
+    width: 300px;
+    outline: 2px dashed #7c2d12;
+  }
+  .galeria div {
+    background: #dcfce7;
+    border: 2px solid #15803d;
+    padding: 12px;
+  }
+&lt;/style&gt;
+&lt;div class="galeria"&gt;
+  &lt;div&gt;Bolo&lt;/div&gt;
+  &lt;div&gt;Pudim&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> a galeria tem 300px (o contorno tracejado), mas os cartões têm 400px e passam da borda tracejada, um embaixo do outro.</p>
+<p><strong>Por quê:</strong> se nem uma coluna de 400px cabe, o navegador cria uma mesmo assim, com o mínimo. Não há erro nem aviso. Num celular, o resultado é a página rolando para o lado.</p>
+<p><strong>Como consertar:</strong> um mínimo menor, que caiba na tela de um celular (150px a 250px), ou o <code>min(400px, 100%)</code> da dica acima.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>repeat(4, 1fr)</code></td><td>4 colunas iguais (o mesmo que <code>1fr 1fr 1fr 1fr</code>)</td></tr>
+<tr><td><code>repeat(2, 100px 1fr)</code></td><td>Repete o par: <code>100px 1fr 100px 1fr</code></td></tr>
+<tr><td><code>minmax(150px, 1fr)</code></td><td>Pelo menos 150px; no máximo, uma parte da sobra</td></tr>
+<tr><td><code>repeat(auto-fill, minmax(150px, 1fr))</code></td><td>Quantas colunas couberem; as que sobram ficam vazias</td></tr>
+<tr><td><code>repeat(auto-fit, minmax(150px, 1fr))</code></td><td>Quantas couberem; as vazias somem e os itens esticam</td></tr>
+<tr><td><code>minmax(min(150px, 100%), 1fr)</code></td><td>Não passa da borda nem em tela menor que 150px</td></tr>
+<tr><td>Também vale para</td><td><code>grid-template-rows</code> (fileiras)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Seis colunas</h3>
+<p>Complete para criar 6 colunas iguais:</p>
+<div class="ex-code">grid-template-columns: <input data-answer="repeat" aria-label="função">(6, 1fr);</div>
+</div>
+
+<div class="exercise">
+<h3>2. O mínimo</h3>
+<p>Complete para as colunas terem pelo menos 200px e dividirem a sobra:</p>
+<div class="ex-code">grid-template-columns: repeat(auto-fit, <input data-answer="minmax" aria-label="função">(200px, 1fr));</div>
+</div>
+
+<div class="exercise">
+<h3>3. As colunas vazias somem</h3>
+<p>Complete com a palavra que desmancha as colunas vazias e estica os itens:</p>
+<div class="ex-code">grid-template-columns: repeat(<input data-answer="auto-fit" aria-label="palavra">, minmax(150px, 1fr));</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Por que <code>repeat(auto-fill, 1fr)</code> não funciona?</p>
+<label><input type="radio" name="q4"> Falta a vírgula</label>
+<label><input type="radio" name="q4"> Com <code>auto-fill</code>, o tamanho precisa de um mínimo fixo para o navegador contar quantas colunas cabem</label>
+<label><input type="radio" name="q4"> <code>auto-fill</code> só funciona com <code>grid-template-rows</code></label>
+<label><input type="radio" name="q4"> Funciona, mas só no Chrome</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. Uma galeria tem só 2 fotos e cabem 4 colunas. Com <code>auto-fill</code>, o que acontece?</p>
+<label><input type="radio" name="q5"> As 2 fotos esticam e ocupam a fileira toda</label>
+<label><input type="radio" name="q5"> A grade passa a ter 2 colunas</label>
+<label><input type="radio" name="q5"> As fotos somem</label>
+<label><input type="radio" name="q5"> As 2 fotos ficam do tamanho de uma coluna, e as outras 2 colunas ficam vazias</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Num quadro de 516px (500px úteis), com <code>repeat(auto-fill, minmax(150px, 1fr))</code> e <code>gap: 10px</code>, quantas colunas cabem?</p>
+<label><input type="radio" name="q6"> 3</label>
+<label><input type="radio" name="q6"> 2</label>
+<label><input type="radio" name="q6"> 4</label>
+<label><input type="radio" name="q6"> 1</label>
+</div>
+
+<h3>Missão final: os destaques da semana</h3>
+
+<div class="tryhtml" data-largura="516" data-goal="css:.destaques{grid-template-columns}=245px 245px 0px,src:minmax\(\s*150px\s*\,\s*1fr\s*\)">
+<p class="try-task"><strong>Missão:</strong> a faixa de destaques tem só dois doces esta semana, e eles estão espremidos em 150px. Troque as colunas por <code>repeat()</code> com <code>auto-fit</code> e <code>minmax(150px, 1fr)</code>, para que os dois <strong>dividam a largura toda</strong>. A missão confere na largura inicial do quadro, 516px. Depois, clique em <strong>375</strong> e em <strong>768</strong>: os dois sempre dividem a largura.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Destaques da semana&lt;/h2&gt;
+&lt;div class="destaques"&gt;
+  &lt;div&gt;Bolo de cenoura&lt;/div&gt;
+  &lt;div&gt;Pudim de leite&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.destaques {
+  display: grid;
+  grid-template-columns: 150px 150px;
+  gap: 10px;
+}
+
+.destaques div {
+  background: #dcfce7;
+  border: 2px solid #15803d;
+  padding: 12px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.destaques {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.destaques div {
+  background: #dcfce7;
+  border: 2px solid #15803d;
+  padding: 12px;
+}
+</pre>
+</div>
+
+<p>Com <code>auto-fill</code> no lugar de <code>auto-fit</code>, a missão não se cumpre: os dois cartões ficariam com 160px e sobraria uma coluna vazia. Teste e compare.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>repeat(N, tamanho)</code> repete colunas (ou fileiras): <code>repeat(4, 1fr)</code>.</li>
+  <li><code>minmax(mínimo, máximo)</code>: a coluna nunca fica menor que o mínimo e cresce até o máximo. O <code>fr</code> só pode ser o máximo.</li>
+  <li><code>repeat(auto-fill, minmax(150px, 1fr))</code> cria quantas colunas couberem e muda sozinho com a largura, sem <code>@media</code>.</li>
+  <li><code>auto-fill</code> mantém as colunas vazias; <code>auto-fit</code> as desmancha e estica os itens. A diferença só aparece com poucos itens.</li>
+  <li>Erros: <code>1fr</code> sozinho com <code>auto-fit</code>/<code>auto-fill</code> e <code>fr</code> como mínimo (<code>is not a value</code>), vírgula esquecida (<code>“ ” is an incorrect operator</code>), mínimo maior que a tela (sem aviso; use <code>min(…, 100%)</code>).</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
