@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Variáveis — custom properties e var() | Guia CSS</title>
+<meta name="description" content="Variáveis do CSS (custom properties) para quem está começando: declarar --nome no :root, usar com var(), valor reserva var(--x, padrão), escopo, herança, variações de tema redefinindo variáveis, contas com calc(), e os erros silenciosos (nome errado, unidade colada), com os valores calculados conferidos no navegador.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Variáveis</span></h1>
+
+<p class="intro">O laranja da lojinha da Ana aparece no título, nos botões, nas bordas dos cartões, nos links: <code>#c2410c</code> escrito vinte vezes no CSS. No dia em que ela quiser um laranja um pouco diferente, vai ter de achar e trocar todos, e torcer para não esquecer nenhum. As <strong>variáveis</strong> do CSS resolvem isso: você dá um nome ao valor, escreve o valor <strong>uma vez</strong> e usa o nome em todo lugar.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Declarar uma variável (<code>--cor-principal: #c2410c;</code>) e usá-la com <code>var()</code>.</li>
+  <li>Por que as variáveis "globais" ficam no <code>:root</code>.</li>
+  <li>O valor reserva: <code>var(--cor, tomato)</code>.</li>
+  <li>Escopo e herança: a variável vale para o elemento e para tudo dentro dele.</li>
+  <li>Variações (tema escuro, cartão de destaque) trocando só as variáveis.</li>
+  <li>Variáveis com <code>calc()</code> e com media queries.</li>
+  <li>Os erros silenciosos: nome errado, unidade colada, valor que não serve.</li>
+</ul>
+</div>
+
+<p>O nome oficial é <em>custom properties</em>, "propriedades personalizadas": para o navegador, uma variável é uma propriedade que <strong>você</strong> inventa. Todo mundo chama de "variável do CSS". Elas funcionam em todos os navegadores atuais há anos (o MDN as marca como "Baseline: amplamente disponível").</p>
+
+<hr>
+
+<h2>A ideia: o pote com etiqueta</h2>
+<p>Na cozinha da Ana, o açúcar fica num pote com a etiqueta "AÇÚCAR". As receitas dizem "uma xícara do pote AÇÚCAR", e não "uma xícara do saco azul da marca tal comprado no dia 3". Se um dia ela trocar por açúcar mascavo, só troca o que está dentro do pote: todas as receitas passam a usar o mascavo, sem mudar uma linha.</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Na cozinha</th><th>No CSS</th></tr>
+<tr><td>O pote com a etiqueta "AÇÚCAR"</td><td>A variável: <code>--cor-principal</code></td></tr>
+<tr><td>O que está dentro do pote</td><td>O valor: <code>#c2410c</code></td></tr>
+<tr><td>"Use o pote AÇÚCAR"</td><td><code>var(--cor-principal)</code></td></tr>
+<tr><td>Trocar o conteúdo do pote</td><td>Mudar o valor num lugar só, e todas as regras acompanham</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. Declarar e usar</h2>
+<p>São duas partes: <strong>declarar</strong> a variável (encher o pote) e <strong>usar</strong> (pegar do pote):</p>
+
+<pre class="file" data-file="style.css">:root {
+  --cor-principal: #c2410c;
+}
+
+h1 {
+  color: var(--cor-principal);
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>:root</dt><dd>Um seletor que escolhe a raiz da página, o elemento <code>&lt;html&gt;</code>. Como todos os elementos estão dentro dele, uma variável declarada ali vale para a página inteira (veja a seção 3).</dd>
+  <dt>--cor-principal</dt><dd>O nome da variável. Começa <strong>sempre</strong> com dois hífens, <code>--</code>. Depois, o nome que você quiser: letras, números, hífens. Diferencia maiúsculas de minúsculas: <code>--Cor</code> e <code>--cor</code> são duas variáveis diferentes.</dd>
+  <dt>: #c2410c;</dt><dd>O valor, como numa propriedade comum. Pode ser uma cor, um tamanho (<code>16px</code>), uma lista de fontes, qualquer coisa.</dd>
+  <dt>var(</dt><dd>A função que <strong>lê</strong> a variável: "use aqui o valor de…".</dd>
+  <dt>--cor-principal)</dt><dd>O nome, com os dois hífens, exatamente como foi declarado.</dd>
+</dl>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o título, o botão e a borda do cartão usam a mesma variável. Troque <code>#c2410c</code> por <code>teal</code>, ou por <code>#7c3aed</code>, na primeira regra: os três mudam juntos.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;div class="cartao"&gt;
+  &lt;p&gt;Bolo de cenoura com cobertura de chocolate.&lt;/p&gt;
+  &lt;button class="botao" type="button"&gt;Encomendar&lt;/button&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --cor-principal: #c2410c;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+}
+
+h1 {
+  color: var(--cor-principal);
+}
+
+.cartao {
+  padding: 16px;
+  border: 3px solid var(--cor-principal);
+  border-radius: 8px;
+}
+
+.botao {
+  font: inherit;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--cor-principal);
+  color: white;
+}
+</pre>
+</div>
+
+<p>O valor calculado do título é <code>rgb(194, 65, 12)</code>, conferido no Chromium: na hora de desenhar, o navegador troca o <code>var(--cor-principal)</code> pelo valor da variável, e daí em diante é uma cor comum. No F12, a aba <em>Computed</em> mostra a cor final, e a aba de estilos mostra a regra como você escreveu, com o <code>var(…)</code>.</p>
+
+<div class="tryhtml" data-goal="css:h1{color}=rgb(194\, 65\, 12),css:.botao{background-color}=rgb(194\, 65\, 12),css:.preco{color}=rgb(194\, 65\, 12),src:--cor-principal\s*:\s*#c2410c,nsrc:(color|background-color)\s*:\s*#c2410c">
+<p class="try-task"><strong>Missão:</strong> o laranja <code>#c2410c</code> está escrito três vezes. Crie a variável <code>--cor-principal</code> no <code>:root</code> com esse valor e troque as três cores por <code>var(--cor-principal)</code>. No fim, <code>#c2410c</code> só pode aparecer na declaração da variável.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura: &lt;span class="preco"&gt;R$ 45,00&lt;/span&gt;&lt;/p&gt;
+&lt;button class="botao" type="button"&gt;Encomendar&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: #c2410c;
+}
+
+.preco {
+  color: #c2410c;
+  font-weight: 700;
+}
+
+.botao {
+  padding: 8px 16px;
+  border: none;
+  background-color: #c2410c;
+  color: white;
+}
+</pre>
+<pre class="solucao" data-file="style.css">:root {
+  --cor-principal: #c2410c;
+}
+
+h1 {
+  color: var(--cor-principal);
+}
+
+.preco {
+  color: var(--cor-principal);
+  font-weight: 700;
+}
+
+.botao {
+  padding: 8px 16px;
+  border: none;
+  background-color: var(--cor-principal);
+  color: white;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. O valor reserva: <code>var(--x, padrão)</code></h2>
+<p>O <code>var()</code> aceita um segundo valor, depois da vírgula: o que usar <strong>se a variável não existir</strong>.</p>
+
+<pre class="file" data-file="style.css">.selo {
+  background-color: var(--cor-destaque, gold);
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>--cor-destaque</dt><dd>A variável que o <code>var()</code> procura primeiro.</dd>
+  <dt>, gold</dt><dd>A reserva: se ninguém declarou <code>--cor-destaque</code>, o fundo fica <code>gold</code>.</dd>
+</dl>
+
+<p>A reserva é útil em peças que você reaproveita em vários sites (um "componente"): ele funciona sozinho, com a cor padrão, e quem quiser muda a cor declarando a variável. Tudo depois da primeira vírgula é a reserva, então ela pode ter vírgulas também: <code>var(--fonte, Georgia, serif)</code>. E pode ser outra variável: <code>var(--cor-destaque, var(--cor-principal))</code>.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o selo usa a reserva <code>gold</code>, porque <code>--cor-destaque</code> não existe. Apague o <code>/*</code> e o <code>*/</code> da primeira regra: a variável passa a existir e vence a reserva.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;&lt;span class="selo"&gt;Novidade&lt;/span&gt; Bolo de fubá com goiabada&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">/* :root {
+  --cor-destaque: lightgreen;
+} */
+
+.selo {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background-color: var(--cor-destaque, gold);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Escopo e herança: onde a variável vale</h2>
+<p>Uma variável vale para o elemento onde foi declarada <strong>e para tudo que está dentro dele</strong>: ela é <strong>herdada</strong>, como a cor do texto (aula <a href="heranca.html">Herança</a>). Por isso o <code>:root</code> é o lugar das variáveis "globais": tudo está dentro do <code>&lt;html&gt;</code>.</p>
+<p>Mas você também pode declarar uma variável num elemento qualquer. Aí ela só existe ali dentro:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;p class="etiqueta"&gt;Dentro do cartão&lt;/p&gt;
+&lt;/div&gt;
+&lt;p class="etiqueta"&gt;Fora do cartão&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  --fundo: lightyellow;
+  padding: 8px;
+  border: 1px solid tan;
+}
+
+.etiqueta {
+  padding: 8px;
+  background-color: var(--fundo, white);
+}
+</pre>
+</div>
+
+<p>As duas etiquetas têm a mesma regra, <code>background-color: var(--fundo, white)</code>. A de dentro do cartão herda <code>--fundo</code> e fica amarelo-clara (<code>rgb(255, 255, 224)</code>). A de fora não tem <code>--fundo</code> nenhum (o valor calculado de <code>--fundo</code> nela é vazio) e usa a reserva, branco (valores conferidos no Chromium).</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Declarada em…</th><th>Vale para…</th><th>Use para</th></tr>
+<tr><td><code>:root</code></td><td>A página inteira</td><td>As cores da marca, as fontes, os espaçamentos: o "sistema" do site</td></tr>
+<tr><td>Uma classe (<code>.cartao</code>)</td><td>O elemento e tudo dentro dele</td><td>Ajustes de um componente e as suas variações</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>4. Variações: troque só as variáveis</h2>
+<p>Aqui as variáveis mostram a sua força. O cartão usa duas variáveis, <code>--fundo</code> e <code>--texto</code>. Para fazer um cartão escuro, você <strong>não</strong> reescreve as regras do cartão: só redefine as variáveis numa segunda classe.</p>
+
+<pre class="file" data-file="style.css">:root {
+  --fundo: white;
+  --texto: #222;
+}
+
+.cartao {
+  background-color: var(--fundo);
+  color: var(--texto);
+}
+
+.cartao-escuro {
+  --fundo: #333;
+  --texto: white;
+}
+</pre>
+
+<p>Um elemento com <code>class="cartao cartao-escuro"</code> tem as duas classes: a regra <code>.cartao</code> manda usar <code>var(--fundo)</code>, e a <code>.cartao-escuro</code> diz que, ali, <code>--fundo</code> vale <code>#333</code>. A redefinição vale para o elemento e para os filhos dele. É assim que se faz um <a href="tema-escuro.html">tema escuro</a> para o site inteiro: as mesmas regras, outras variáveis.</p>
+
+<h3>Variáveis que mudam com a tela</h3>
+<p>Uma media query também pode redefinir variáveis. Todas as regras que usam a variável acompanham:</p>
+<pre class="file" data-file="style.css">:root {
+  --espaco: 12px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --espaco: 24px;
+  }
+}
+
+.cartao {
+  padding: var(--espaco);
+  margin-bottom: var(--espaco);
+}
+</pre>
+
+<hr>
+
+<h2>5. Variáveis e <code>calc()</code></h2>
+<p>Uma variável guarda um valor, e você pode fazer conta com ele usando <a href="calc.html"><code>calc()</code></a>:</p>
+
+<pre class="file" data-file="style.css">:root {
+  --espaco: 16px;
+}
+
+.secao {
+  padding: var(--espaco);
+  margin-bottom: calc(var(--espaco) * 2);
+}
+</pre>
+
+<p>O <code>margin-bottom</code> calculado fica <code>32px</code>. Mude <code>--espaco</code> e os dois espaços mudam, sempre na mesma proporção.</p>
+
+<div class="warning">
+<strong>A variável não "cola" com uma unidade</strong>
+<p>Se a variável guarda só um número (<code>--colunas: 3</code>), para virar um tamanho multiplique pela unidade: <code>calc(var(--n) * 1px)</code>. Escrever <code>var(--espaco)px</code> <strong>não</strong> funciona: o navegador não junta os pedaços num valor só (veja <a href="#errado">Quando dá errado</a>).</p>
+</div>
+
+<hr>
+
+<h2>6. Variável ou valor direto?</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Use</th></tr>
+<tr><td>Um valor que se repete (a cor da marca, a fonte, o espaçamento padrão)</td><td>Variável no <code>:root</code></td></tr>
+<tr><td>Um componente com variações (cartão claro, escuro, de destaque)</td><td>Variáveis no componente, redefinidas na classe da variação</td></tr>
+<tr><td>Tema escuro, espaços maiores em telas largas</td><td>Redefinir as variáveis numa media query</td></tr>
+<tr><td>Um valor que aparece uma vez só</td><td>O valor direto: uma variável ali só deixa o código mais longo</td></tr>
+</table>
+</div>
+
+<div class="tip">
+<strong>Dê nomes pelo papel, e não pela aparência</strong>
+<p><code>--cor-principal</code> continua fazendo sentido se a Ana trocar o laranja por verde; <code>--laranja</code> vira uma mentira (<code>--laranja: green</code>). Bons nomes: <code>--cor-principal</code>, <code>--cor-texto</code>, <code>--fundo</code>, <code>--espaco</code>, <code>--raio</code>.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>As variáveis têm uma armadilha que as outras propriedades não têm. Numa declaração comum com erro, o navegador ignora a linha e fica com a declaração anterior. Com <code>var()</code>, o navegador só descobre o problema <strong>depois</strong>, na hora de calcular o valor, e aí já é tarde para voltar atrás: a propriedade fica como se nunca tivesse sido escrita, com o valor <strong>herdado</strong> do pai (nas propriedades que herdam, como <code>color</code>) ou com o valor <strong>inicial</strong> (nas outras, como <code>background-color</code>, que fica transparente).</p>
+
+<div class="cenario">
+<strong>Nome errado: nem a cor de antes sobra</strong>
+<pre class="file" data-file="style.css">:root {
+  --cor-principal: #c2410c;
+}
+
+body {
+  color: darkgreen;
+}
+
+.aviso {
+  color: red;
+  color: var(--cor-principa);
+}
+</pre>
+<p><strong>O que você vê:</strong> o aviso fica <strong>verde-escuro</strong>, a cor do <code>body</code>. Nem laranja (a variável) nem vermelho (a linha de cima). O valor calculado é <code>rgb(0, 100, 0)</code>, conferido no Chromium.</p>
+<p><strong>Por quê:</strong> falta o "l" de <code>--cor-principal</code>. A variável <code>--cor-principa</code> não existe e não há reserva, então o <code>color</code> do aviso é tratado como se não existisse, e a cor é herdada do pai. O <code>red</code> já tinha sido descartado, porque a declaração seguinte venceu a cascata.</p>
+<p><strong>O que o validador diz:</strong> nada. Para ele, <code>var(--cor-principa)</code> está escrito certo; ele não confere se a variável existe.</p>
+<p><strong>Como consertar:</strong> confira o nome letra por letra (inclusive maiúsculas: <code>--Cor</code> não é <code>--cor</code>). No F12, a aba <em>Computed</em> mostra o valor final: se ele não for o esperado, procure o nome da variável na aba de estilos e compare com a declaração.</p>
+</div>
+
+<div class="cenario">
+<strong>Unidade colada: <code>var(--espaco)px</code></strong>
+<pre class="file" data-file="style.css">:root {
+  --espaco: 16px;
+}
+
+p {
+  margin-top: var(--espaco)px;
+}
+</pre>
+<p><strong>O que você vê:</strong> o parágrafo perde até a margem de cima que o navegador dá a todo <code>&lt;p&gt;</code>. O <code>margin-top</code> calculado fica <code>0px</code> (o valor inicial), e não 16.</p>
+<p><strong>Por quê:</strong> o resultado seria <code>16px px</code>, dois pedaços separados, e não um tamanho. Como <code>margin-top</code> não é herdado, ele cai no valor inicial, zero.</p>
+<p><strong>Como consertar:</strong> guarde a unidade dentro da variável (<code>--espaco: 16px;</code> e <code>margin-top: var(--espaco);</code>), ou, com um número puro, <code>calc(var(--n) * 1px)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Um valor que não serve para a propriedade</strong>
+<pre class="file" data-file="style.css">:root {
+  --tamanho: 20;
+}
+
+p {
+  font-size: var(--tamanho);
+}
+</pre>
+<p><strong>O que você vê:</strong> a letra continua com 16 pixels, herdada do pai.</p>
+<p><strong>Por quê:</strong> a variável aceita qualquer coisa, então <code>--tamanho: 20</code> é válido. Mas <code>font-size: 20</code>, sem unidade, não é um tamanho. O problema só aparece na hora de usar.</p>
+<p><strong>Como consertar:</strong> <code>--tamanho: 1.25rem;</code></p>
+</div>
+
+<div class="cenario">
+<strong>Esqueceu os dois hífens no <code>var()</code>: o validador pega</strong>
+<pre class="file" data-file="v.css">:root {
+  --cor-principal: #c2410c;
+  --espaco: 16px;
+}
+h1 {
+  color: var(--cor-principal);
+  margin: var(--espaco)px;
+}
+p {
+  color: var(cor-principal);
+  padding: calc(var(--espaco) * 2);
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css v.css
+"file:/home/ana/site/v.css":10.27-10.27: error: CSS: “color”: Parse Error.</pre>
+<p><strong>O que significa:</strong> "erro de leitura" na linha 10: <code>var(cor-principal)</code>, sem os <code>--</code>, não é uma forma válida de <code>var()</code>. Repare no que o validador <strong>não</strong> acusa: o <code>var(--espaco)px</code> da linha 7. Ele não sabe o que a variável vai conter, então os erros das seções acima só aparecem no navegador.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>:root { --cor-principal: #c2410c; }</code></td><td>Declara uma variável para a página inteira</td></tr>
+<tr><td><code>color: var(--cor-principal);</code></td><td>Usa a variável</td></tr>
+<tr><td><code>var(--cor-destaque, gold)</code></td><td>Usa <code>gold</code> se a variável não existir</td></tr>
+<tr><td><code>var(--a, var(--b))</code></td><td>Reserva que é outra variável</td></tr>
+<tr><td><code>.cartao-escuro { --fundo: #333; }</code></td><td>Redefine a variável só ali dentro</td></tr>
+<tr><td><code>@media (…) { :root { --espaco: 24px; } }</code></td><td>Muda a variável conforme a tela</td></tr>
+<tr><td><code>calc(var(--espaco) * 2)</code></td><td>Conta com a variável</td></tr>
+<tr><td><code>calc(var(--n) * 1px)</code></td><td>Número puro vira tamanho (nunca <code>var(--n)px</code>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O começo do nome</h3>
+<p>Complete a declaração da variável:</p>
+<div class="ex-code">:root { <input data-answer="--" aria-label="começo do nome" size="3">cor-principal: #c2410c; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Ler a variável</h3>
+<p>Complete a função que usa a variável:</p>
+<div class="ex-code">h1 { color: <input data-answer="var" aria-label="função">(--cor-principal); }</div>
+</div>
+
+<div class="exercise">
+<h3>3. O lugar das variáveis globais</h3>
+<p>Complete o seletor da raiz da página:</p>
+<div class="ex-code"><input data-answer=":root|html" aria-label="seletor"> { --fundo: white; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Com <code>background-color: var(--destaque, gold);</code> e nenhuma <code>--destaque</code> declarada, qual é o fundo?</p>
+<label><input type="radio" name="q4"> Transparente</label>
+<label><input type="radio" name="q4"> <code>gold</code></label>
+<label><input type="radio" name="q4"> Branco</label>
+<label><input type="radio" name="q4"> A declaração dá erro e a página não abre</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Uma variável declarada em <code>.cartao</code> vale onde?</p>
+<label><input type="radio" name="q5"> Na página inteira</label>
+<label><input type="radio" name="q5"> Só no próprio <code>.cartao</code>, sem os filhos</label>
+<label><input type="radio" name="q5"> No <code>.cartao</code> e em tudo que está dentro dele</label>
+<label><input type="radio" name="q5"> Só nos elementos que vêm depois do cartão</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. O <code>body</code> tem <code>color: navy</code>. Um parágrafo tem <code>color: red;</code> e, logo abaixo, <code>color: var(--nao-existe);</code>. De que cor ele fica?</p>
+<label><input type="radio" name="q6"> <code>navy</code>, herdado do <code>body</code></label>
+<label><input type="radio" name="q6"> <code>red</code></label>
+<label><input type="radio" name="q6"> Preto</label>
+<label><input type="radio" name="q6"> Transparente</label>
+</div>
+
+<h3>Missão final: o cartão escuro</h3>
+
+<div class="tryhtml" data-goal="css:.cartao-escuro{background-color}=rgb(51\, 51\, 51),css:.cartao-escuro{color}=rgb(255\, 255\, 255),css:.cartao:not(.cartao-escuro){background-color}=rgb(255\, 255\, 255),css:.cartao-escuro .botao{background-color}=rgb(251\, 146\, 60),src:\.cartao-escuro\s*\{[^}]*--fundo\s*:,nsrc:\.cartao-escuro\s*\{[^}]*(background-color|[^-]color)\s*:">
+<p class="try-task"><strong>Missão:</strong> o cartão já usa as variáveis <code>--fundo</code>, <code>--texto</code> e <code>--cor-principal</code>. Crie a regra <code>.cartao-escuro</code> que <strong>só redefine as variáveis</strong>: <code>--fundo: #333</code>, <code>--texto: white</code> e <code>--cor-principal: #fb923c</code> (um laranja mais claro, que aparece bem no fundo escuro). Não escreva <code>background-color</code> nem <code>color</code> nessa regra.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;button class="botao" type="button"&gt;Encomendar&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="cartao cartao-escuro"&gt;
+  &lt;h2&gt;Bolo de chocolate&lt;/h2&gt;
+  &lt;button class="botao" type="button"&gt;Encomendar&lt;/button&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --fundo: white;
+  --texto: #222;
+  --cor-principal: #c2410c;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+}
+
+.cartao {
+  margin-bottom: 12px;
+  padding: 16px;
+  border: 1px solid silver;
+  border-radius: 8px;
+  background-color: var(--fundo);
+  color: var(--texto);
+}
+
+.botao {
+  font: inherit;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--cor-principal);
+  color: var(--fundo);
+}
+</pre>
+<pre class="solucao" data-file="style.css">:root {
+  --fundo: white;
+  --texto: #222;
+  --cor-principal: #c2410c;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+}
+
+.cartao {
+  margin-bottom: 12px;
+  padding: 16px;
+  border: 1px solid silver;
+  border-radius: 8px;
+  background-color: var(--fundo);
+  color: var(--texto);
+}
+
+.cartao-escuro {
+  --fundo: #333;
+  --texto: white;
+  --cor-principal: #fb923c;
+}
+
+.botao {
+  font: inherit;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--cor-principal);
+  color: var(--fundo);
+}
+</pre>
+</div>
+
+<p>Repare no botão do cartão escuro: a regra <code>.botao</code> é a mesma dos dois cartões, mas ele herdou o <code>--cor-principal</code> redefinido e ficou com o laranja claro. E o texto do botão usa <code>var(--fundo)</code>: branco no cartão claro, cinza-escuro no cartão escuro, que é o que dá contraste em cima do laranja claro (branco sobre laranja claro ficaria difícil de ler). Uma regra, duas aparências.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Variável (<em>custom property</em>): <code>--nome: valor;</code>, sempre com dois hífens; diferencia maiúsculas de minúsculas.</li>
+  <li>Use com <code>var(--nome)</code>. Com reserva: <code>var(--nome, padrão)</code>.</li>
+  <li>As variáveis são herdadas: no <code>:root</code>, valem para a página toda; numa classe, valem ali dentro.</li>
+  <li>Para variações (cartão escuro, tema escuro, telas largas), redefina as variáveis, e não as regras.</li>
+  <li>Contas com <code>calc(var(--x) * 2)</code>; número puro vira tamanho com <code>calc(var(--n) * 1px)</code>, nunca <code>var(--n)px</code>.</li>
+  <li>Nome errado ou valor que não serve: a propriedade fica com o valor <strong>herdado</strong> ou o <strong>inicial</strong>, e não com a declaração anterior. O validador não percebe; o F12, sim.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
