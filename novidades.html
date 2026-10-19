@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Novidades do CSS — o que chegou de 2023 a 2026 e como saber se já pode usar | Guia CSS</title>
+<meta name="description" content="As novidades do CSS de 2023 a 2026 para quem está começando: o selo Baseline, a lista do que já funciona em todos os navegadores (:has, aninhamento, container queries, subgrid, oklch, text-wrap, light-dark, @starting-style, view transitions, anchor positioning, @scope, field-sizing), o que ainda está chegando (if, animações ligadas à rolagem), como usar o novo com segurança e por que o validador W3C às vezes reclama do que o navegador já entende.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>Novidades do <span class="hl">CSS</span></h1>
+
+<p class="intro">O CSS mudou mais entre 2023 e 2026 do que nos dez anos anteriores. Coisas que antes exigiam JavaScript ou truques (escolher o pai pelo filho, um componente que se adapta ao espaço dele, um balão grudado num botão, uma caixa de texto que cresce sozinha) agora são uma linha de CSS. Esta aula é um <strong>mapa</strong>: o que chegou, onde ele já funciona, onde aprender mais neste guia, e como usar o que é novo sem quebrar o site de quem tem um navegador antigo.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O selo <strong>Baseline</strong>: como saber se um recurso já pode ser usado.</li>
+  <li>A lista do que chegou de 2023 a 2026, com a data em que passou a funcionar em todos os navegadores principais.</li>
+  <li>Exemplos ao vivo de cinco novidades que ainda não apareceram no guia: <code>text-wrap: balance</code>, <code>light-dark()</code>, <code>@starting-style</code>, <em>anchor positioning</em> e <code>field-sizing</code>.</li>
+  <li>O que ainda está chegando, e por que esperar.</li>
+  <li>Como usar o novo com segurança, e por que o validador às vezes "não conhece" o que o navegador já entende.</li>
+</ul>
+</div>
+
+<div class="note">
+<strong>Datas conferidas no MDN em outubro de 2026</strong>
+<p>Todas as datas desta aula são as do selo Baseline nas páginas do MDN (developer.mozilla.org), conferidas em outubro de 2026. Elas mudam com o tempo, sempre para melhor: o que hoje é "limitado" pode virar Baseline no ano que vem. Os exemplos ao vivo foram conferidos no Chromium 155.</p>
+</div>
+
+<hr>
+
+<h2>A ideia: o selo "pode usar"</h2>
+<p>Um recurso novo do CSS não chega a todos ao mesmo tempo. Primeiro ele aparece num navegador, depois em outro, e o último às vezes demora anos. Para não ter de conferir navegador por navegador, existe o <strong>Baseline</strong> ("linha de base"), um selo que aparece no topo das páginas do MDN e do caniuse.com. Pense no selo de "aprovado" de um alimento: você não precisa ler o laudo do laboratório, só olhar o selo.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Selo</th><th>O que quer dizer</th><th>Pode usar?</th></tr>
+<tr><td><strong>Baseline: amplamente disponível</strong> (<em>widely available</em>)</td><td>Funciona nas versões atuais do Chrome, Edge, Firefox e Safari há pelo menos dois anos e meio (30 meses)</td><td>Sim, sem medo</td></tr>
+<tr><td><strong>Baseline AAAA: recém-disponível</strong> (<em>newly available</em>)</td><td>Funciona nas versões <strong>atuais</strong> dos quatro desde o ano AAAA; quem não atualiza o navegador (ou tem um celular antigo) pode não ter</td><td>Sim, com uma alternativa para quem não tem (seção 4)</td></tr>
+<tr><td><strong>Disponibilidade limitada</strong> (<em>limited availability</em>)</td><td>Ainda falta em pelo menos um dos navegadores principais</td><td>Só como enfeite que pode faltar, ou espere</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. O que chegou de 2023 a 2026</h2>
+<p>A lista vai em ordem de chegada. A coluna "Baseline desde" é o mês em que o recurso passou a funcionar nos quatro navegadores principais.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Recurso</th><th>Para que serve</th><th>Baseline desde</th><th>Onde aprender</th></tr>
+<tr><td><code>@container</code></td><td>O componente se adapta ao espaço <strong>dele</strong>, não ao da tela</td><td>fev. 2023 (amplamente disponível)</td><td><a href="container-queries.html">Container Queries</a></td></tr>
+<tr><td><code>oklch()</code></td><td>Cores com luminosidade previsível</td><td>maio 2023 (amplamente disponível)</td><td><a href="cores-modernas.html">Cores Modernas</a></td></tr>
+<tr><td><code>subgrid</code></td><td>A grade de dentro segue as linhas da grade de fora</td><td>set. 2023 (amplamente disponível)</td><td><a href="subgrid.html">Subgrid</a></td></tr>
+<tr><td><code>:has()</code></td><td>Escolher um elemento pelo que ele <strong>contém</strong> ("o seletor do pai")</td><td>dez. 2023 (amplamente disponível)</td><td><a href="has.html">:has()</a></td></tr>
+<tr><td>Aninhamento (<code>&amp;</code>)</td><td>Escrever uma regra dentro da outra, sem repetir o seletor</td><td>dez. 2023 (amplamente disponível)</td><td><a href="aninhamento.html">CSS Aninhado</a></td></tr>
+<tr><td><code>text-wrap: balance</code></td><td>Títulos com linhas de tamanho parecido</td><td>mar. 2024 (amplamente disponível)</td><td>seção 2</td></tr>
+<tr><td><code>light-dark()</code></td><td>Uma cor para o tema claro e outra para o escuro, numa linha</td><td>maio 2024</td><td>seção 2 e <a href="tema-escuro.html">Tema Escuro</a></td></tr>
+<tr><td><code>@property</code></td><td>Variáveis com tipo (cor, número, ângulo), que podem ser animadas</td><td>jul. 2024</td><td><a href="variaveis.html">Variáveis</a></td></tr>
+<tr><td><code>@starting-style</code></td><td>Animar a <strong>chegada</strong> de um elemento na página</td><td>ago. 2024</td><td>seção 2</td></tr>
+<tr><td><code>content-visibility</code></td><td>Não desenhar o que está longe da tela</td><td>set. 2024</td><td><a href="performance.html">CSS Rápido</a></td></tr>
+<tr><td><code>print-color-adjust</code></td><td>Imprimir as cores de fundo quando elas importam</td><td>maio 2025</td><td><a href="impressao.html">CSS para Impressão</a></td></tr>
+<tr><td><em>View transitions</em> (na mesma página)</td><td>Animação suave entre dois estados da página, disparada por JavaScript</td><td>out. 2025</td><td>(fora do escopo do guia)</td></tr>
+<tr><td><em>Anchor positioning</em> (<code>anchor-name</code>)</td><td>Grudar um elemento (um balão, um menu) em outro</td><td>jan. 2026</td><td>seção 2</td></tr>
+<tr><td><code>@scope</code></td><td>Regras que só valem dentro de um pedaço da página</td><td>mar. 2026</td><td><a href="scope.html">Escopo</a></td></tr>
+<tr><td><code>field-sizing: content</code></td><td>Campos de formulário que crescem com o texto</td><td>jun. 2026</td><td>seção 2</td></tr>
+<tr><td><code>text-box-trim</code></td><td>Cortar o espaço extra acima e abaixo das letras</td><td>ago. 2026</td><td>(muito recente)</td></tr>
+</table>
+</div>
+
+<p>Repare: as primeiras linhas, de 2023, já são "amplamente disponíveis". As de 2025 e 2026 são "recém-disponíveis": funcionam nos navegadores atualizados, mas ainda há muita gente com aparelhos antigos.</p>
+
+<hr>
+
+<h2>2. Cinco novidades ao vivo</h2>
+<p>Os exemplos abaixo são desenhados pelo <strong>seu</strong> navegador. Se ele for antigo, alguns não vão funcionar, e isso já é uma lição: confira o selo antes de contar com o recurso.</p>
+
+<h3><code>text-wrap: balance</code>: títulos equilibrados</h3>
+<p>Um título longo numa caixa estreita costuma quebrar com uma linha cheia e uma palavra sozinha embaixo. Com <code>text-wrap: balance</code> ("quebra de texto: equilibrada"), o navegador distribui as palavras para as linhas ficarem de tamanho parecido:</p>
+
+<pre class="file" data-file="trecho" data-resultado>&lt;style&gt;
+h2 {
+  max-width: 16em;
+  font-family: sans-serif;
+  border: 1px dashed #999999;
+}
+.equilibrado {
+  text-wrap: balance;
+}
+&lt;/style&gt;
+&lt;h2&gt;Bolo de cenoura com cobertura de mel&lt;/h2&gt;
+&lt;h2 class="equilibrado"&gt;Bolo de cenoura com cobertura de mel&lt;/h2&gt;
+</pre>
+
+<p>No Chromium 155, o primeiro título quebra com "Bolo de cenoura com cobertura" na primeira linha e só "de mel" na segunda; o equilibrado fica com "Bolo de cenoura com" e "cobertura de mel", duas linhas de tamanho parecido. A caixa tracejada mostra que a largura disponível é a mesma: o <code>balance</code> só escolhe outros pontos de quebra. As linhas exatas dependem da fonte e da largura do seu navegador. O MDN avisa que o <code>balance</code> só age em textos curtos (até 6 linhas no Chromium e 10 no Firefox): é para títulos, não para parágrafos. Para parágrafos existe <code>text-wrap: pretty</code>, que evita uma palavra sozinha na última linha; segundo o caniuse (out. 2026), ele funciona no Chrome, no Edge e no Safari 26, mas ainda não no Firefox, onde o parágrafo só quebra do jeito normal.</p>
+
+<div class="tryhtml" data-goal="css:h1{text-wrap-style}=balance">
+<p class="try-task"><strong>Missão:</strong> equilibre as linhas do título da receita com <code>text-wrap: balance</code>. Depois apague a linha e compare.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Pão de queijo mineiro de liquidificador para o café da tarde&lt;/h1&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  max-width: 14em;
+  font-family: sans-serif;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  max-width: 14em;
+  font-family: sans-serif;
+  text-wrap: balance;
+}
+</pre>
+</div>
+
+<h3><code>light-dark()</code>: duas cores numa linha</h3>
+<p>Na aula <a href="tema-escuro.html">Tema Escuro</a> você usa <code>@media (prefers-color-scheme: dark)</code> para trocar as cores. A função <code>light-dark()</code> encurta isso: o primeiro valor vale no tema claro, o segundo no escuro. Ela só funciona se a página disser que aceita os dois temas, com <code>color-scheme: light dark</code>:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> aperte o botão <strong>◐</strong> da barra do quadro para trocar o tema que a página "vê". O fundo e o texto trocam de cor sem nenhum <code>@media</code>. Depois apague a linha do <code>color-scheme</code> e aperte o ◐ de novo: as cores não trocam mais.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="aviso"&gt;A lojinha fecha às 18h no sábado.&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  color-scheme: light dark;
+}
+.aviso {
+  padding: 12px;
+  border-radius: 8px;
+  font-family: sans-serif;
+  background-color: light-dark(#fff3cd, #3d3200);
+  color: light-dark(#5c4400, #ffe69c);
+}
+</pre>
+</div>
+
+<h3><code>@starting-style</code>: animar a chegada</h3>
+<p>Uma transição (aula <a href="transition.html">Transições</a>) anima a mudança de um valor para outro. Mas um elemento que <strong>acabou de aparecer</strong> (que estava com <code>display: none</code>, por exemplo) não tinha valor "de antes", e por isso aparecia de uma vez. O <code>@starting-style</code> ("estilo de partida") diz de onde ele parte:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> marque a caixinha "Mostrar o aviso": o aviso aparece aos poucos, descendo um pouquinho. Desmarque e marque de novo. Troque <code>0.8s</code> por <code>3s</code> (nas duas) para ver em câmera lenta, e apague o bloco <code>@starting-style</code> para comparar: o aviso surge de uma vez.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;input type="checkbox" id="mostrar" class="mostrar"&gt;
+&lt;label for="mostrar"&gt;Mostrar o aviso&lt;/label&gt;
+&lt;div class="aviso"&gt;Bolo saindo do forno!&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.aviso {
+  display: none;
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #fff3cd;
+  font-family: sans-serif;
+  transition: opacity 0.8s, transform 0.8s;
+}
+.mostrar:checked ~ .aviso {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@starting-style {
+  .mostrar:checked ~ .aviso {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+</pre>
+</div>
+
+<p>O seletor <code>.mostrar:checked ~ .aviso</code> quer dizer "o <code>.aviso</code> que vem depois da caixinha marcada" (aulas <a href="combinadores.html">Combinadores</a> e <a href="hover-focus.html">Estados</a>). Uma transição só começa quando um valor <strong>muda</strong>: um elemento que já estava na página quando ela abriu não tem de onde partir, e por isso o exemplo usa a caixinha para fazer o aviso chegar depois.</p>
+
+<h3><em>Anchor positioning</em>: grudar um elemento no outro</h3>
+<p>Balões de dica e menus que abrem embaixo de um botão sempre precisaram de JavaScript para calcular a posição. Agora o botão ganha um nome de âncora (<code>anchor-name</code>), e o balão diz em que âncora se prende (<code>position-anchor</code>) e de que lado (<code>position-area</code>):</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o balão azul-marinho fica grudado <strong>em cima</strong> do botão, centralizado com ele, embora no HTML ele venha <strong>depois</strong> do botão. Troque <code>top</code> por <code>bottom</code> ou por <code>right</code>, ou mude o <code>margin-left</code> do botão: o balão vai junto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Escolha o seu bolo e clique para comprar.&lt;/p&gt;
+&lt;button class="comprar" type="button"&gt;Comprar&lt;/button&gt;
+&lt;div class="dica"&gt;Frete grátis hoje!&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: sans-serif;
+}
+.comprar {
+  margin-top: 48px;
+  margin-left: 80px;
+  anchor-name: --botao-comprar;
+}
+.dica {
+  position: absolute;
+  position-anchor: --botao-comprar;
+  position-area: top;
+  margin-bottom: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: navy;
+  color: white;
+}
+</pre>
+</div>
+
+<h3><code>field-sizing: content</code>: o campo que cresce</h3>
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> digite uma mensagem longa, com várias linhas, na caixa de recado. Ela cresce com o texto, sem barra de rolagem. Apague a linha do <code>field-sizing</code> e digite de novo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;label for="recado"&gt;Recado para a Ana&lt;/label&gt;
+&lt;textarea id="recado"&gt;Oi, Ana!&lt;/textarea&gt;
+</pre>
+<pre class="script" data-file="style.css">label {
+  display: block;
+  font-family: sans-serif;
+}
+textarea {
+  field-sizing: content;
+  min-width: 12em;
+  max-width: 100%;
+  min-height: 2lh;
+}
+</pre>
+</div>
+<p>O <code>2lh</code> é uma unidade nova também: <code>lh</code> vale a altura de uma linha do texto, então <code>min-height: 2lh</code> é "no mínimo duas linhas".</p>
+
+<hr>
+
+<h2>3. O que ainda está chegando</h2>
+<p>Estes recursos têm o selo de <strong>disponibilidade limitada</strong> no MDN em outubro de 2026: ainda faltam em pelo menos um navegador principal. Vale conhecer o nome, mas não conte com eles num site de verdade.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Recurso</th><th>Para que serve</th><th>Situação no MDN (out. 2026)</th></tr>
+<tr><td><code>if()</code></td><td>Um "se" dentro de um valor: uma cor se a tela for larga, outra se for estreita</td><td>Limitado, marcado como experimental</td></tr>
+<tr><td><code>animation-timeline</code></td><td>Animações que andam com a <strong>rolagem</strong> (uma barra de progresso de leitura), sem JavaScript</td><td>Limitado</td></tr>
+<tr><td><code>appearance: base-select</code> e <code>::picker(select)</code></td><td>Estilizar o <code>&lt;select&gt;</code> por completo, inclusive a lista que abre</td><td>Limitado</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>4. Como usar o novo com segurança</h2>
+<p>A regra de ouro: o recurso novo <strong>melhora</strong> a página de quem tem, e quem não tem ainda recebe uma página que funciona. Isso tem nome: <strong>melhoria progressiva</strong>. Três formas:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Exemplo</th><th>Quando usar</th></tr>
+<tr><td><strong>Não faz falta</strong>: só use</td><td><code>text-wrap: balance;</code></td><td>Enfeites: quem não tem vê o título quebrado do jeito antigo, e tudo bem</td></tr>
+<tr><td><strong>Declaração reserva antes</strong></td><td><code>background-color: #fff3cd;</code><br><code>background-color: light-dark(#fff3cd, #3d3200);</code></td><td>Valores novos: o navegador antigo ignora a segunda linha (não entende) e fica com a primeira</td></tr>
+<tr><td><strong><code>@supports</code></strong></td><td><code>@supports (anchor-name: --a) { … }</code></td><td>Quando o recurso novo precisa de várias regras juntas, ou quando o jeito antigo atrapalharia o novo (aula <a href="supports.html">@supports</a>)</td></tr>
+</table>
+</div>
+
+<p>A "declaração reserva" funciona por causa de uma regra que você viu no guia todo: <strong>o navegador ignora em silêncio o que não entende</strong>. Para o navegador antigo, <code>light-dark(…)</code> é um valor inválido, e a declaração some, deixando a anterior valer.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>O validador "não conhece" o que o navegador já entende</strong>
+<pre class="file" data-file="style.css">textarea {
+  field-sizing: content;
+}
+.comprar {
+  anchor-name: --botao-comprar;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":2.17-2.23: error: CSS: “field-sizing”: Property “field-sizing” doesn't exist.
+"file:/home/ana/site/style.css":5.16-5.22: error: CSS: “anchor-name”: Property “anchor-name” doesn't exist.</pre>
+<p><strong>O que significa:</strong> "a propriedade não existe". Mas existe: as duas funcionam nos quatro navegadores principais atualizados (Baseline 2026). O validador de CSS (o <code>vnu</code> 26.10.12 do laboratório) também não reconhece o <code>@starting-style</code>:</p>
+<pre class="term" data-cwd="~/site">$ vnu --css chegada.css
+"file:/home/ana/site/chegada.css":1.1-1.15: error: CSS: Unrecognized at-rule “@starting-style”</pre>
+<p><strong>Por quê:</strong> o validador é atualizado à mão, e anda atrás dos navegadores. Já <code>text-wrap: balance</code>, <code>light-dark()</code>, <code>@scope</code> e o aninhamento passam sem erro no mesmo validador. <strong>O que fazer:</strong> quando o validador acusar uma propriedade nova, confira no MDN antes de apagar. Se o MDN mostrar o selo Baseline, o erro é do validador, não seu. Erros de digitação de verdade (<code>feild-sizing</code>) ele continua pegando.</p>
+</div>
+
+<div class="cenario">
+<strong>Funciona no meu computador, não no celular da cliente</strong>
+<p>A Ana usou <code>field-sizing: content</code> e mostrou o site no notebook dela, com o Chrome atualizado. A cliente abriu num celular de quatro anos, sem atualizações: a caixa de recado ficou do tamanho padrão, com barra de rolagem. <strong>Por quê:</strong> recurso "recém-disponível" quer dizer "nas versões atuais". O navegador antigo ignorou a declaração. <strong>Como evitar:</strong> para cada recurso novo, pergunte "e se não funcionar?". Aqui, a caixa ainda funciona (só não cresce): é uma melhoria progressiva aceitável. Se o recurso fosse essencial, precisaria de uma reserva.</p>
+</div>
+
+<div class="cenario">
+<strong><code>light-dark()</code> sem <code>color-scheme</code>: sempre a cor clara</strong>
+<p>Sem <code>color-scheme: light dark</code> na página (ou no elemento), o navegador acha que a página só tem tema claro, e o <code>light-dark()</code> devolve sempre o <strong>primeiro</strong> valor, mesmo com o sistema em modo escuro. Você testou isso na caixa da seção 2. O validador não acusa nada: o CSS está correto, só falta uma linha.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th><th>Baseline</th></tr>
+<tr><td><code>text-wrap: balance;</code></td><td>Linhas de tamanho parecido num título</td><td>mar. 2024</td></tr>
+<tr><td><code>text-wrap: pretty;</code></td><td>Evita palavra sozinha na última linha</td><td>falta no Firefox</td></tr>
+<tr><td><code>color-scheme: light dark;</code> + <code>light-dark(claro, escuro)</code></td><td>Uma cor para cada tema</td><td>maio 2024</td></tr>
+<tr><td><code>@starting-style { … }</code></td><td>Estilo de partida para animar a chegada</td><td>ago. 2024</td></tr>
+<tr><td><code>anchor-name</code>, <code>position-anchor</code>, <code>position-area</code></td><td>Prende um elemento posicionado a outro</td><td>jan. 2026</td></tr>
+<tr><td><code>field-sizing: content;</code></td><td>O campo cresce com o conteúdo</td><td>jun. 2026</td></tr>
+<tr><td><code>2lh</code></td><td>Duas alturas de linha</td><td>—</td></tr>
+<tr><td>Declaração reserva antes da nova</td><td>O navegador antigo fica com a primeira</td><td>—</td></tr>
+<tr><td><code>@supports (propriedade: valor) { … }</code></td><td>Regras só para quem entende o recurso</td><td>—</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O título equilibrado</h3>
+<p>Complete:</p>
+<div class="ex-code">h1 { text-wrap: <input data-answer="balance" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. A linha que liga o <code>light-dark()</code></h3>
+<p>Complete a propriedade que diz que a página aceita os dois temas:</p>
+<div class="ex-code">:root { <input data-answer="color-scheme" aria-label="propriedade">: light dark; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. O nome da âncora</h3>
+<p>Complete a propriedade que dá um nome de âncora ao botão:</p>
+<div class="ex-code">.comprar { <input data-answer="anchor-name" aria-label="propriedade">: --botao-comprar; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. O MDN mostra "Baseline 2026, recém-disponível" para um recurso. O que isso quer dizer?</p>
+<label><input type="radio" name="q4"> Que ele só funciona no Chrome</label>
+<label><input type="radio" name="q4"> Que funciona nas versões atuais dos quatro navegadores principais desde 2026, mas pode faltar em aparelhos e navegadores antigos</label>
+<label><input type="radio" name="q4"> Que ele vai ser removido em 2026</label>
+<label><input type="radio" name="q4"> Que funciona em todos os navegadores, de qualquer época</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. O validador diz <code>Property “field-sizing” doesn't exist</code>, mas no navegador a caixa cresce. O que fazer?</p>
+<label><input type="radio" name="q5"> Apagar a linha: o validador sempre tem razão</label>
+<label><input type="radio" name="q5"> Trocar por <code>!important</code></label>
+<label><input type="radio" name="q5"> Escrever com prefixo <code>-webkit-</code></label>
+<label><input type="radio" name="q5"> Conferir no MDN: o recurso é novo (Baseline 2026) e o validador ainda não o conhece</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. A Ana escreveu duas linhas: <code>color: #333333;</code> e, logo embaixo, <code>color: light-dark(#333333, #eeeeee);</code>. Num navegador que não conhece <code>light-dark()</code>, qual cor vale?</p>
+<label><input type="radio" name="q6"> <code>#333333</code>: a segunda declaração é ignorada, e a primeira continua valendo</label>
+<label><input type="radio" name="q6"> Nenhuma: o texto some</label>
+<label><input type="radio" name="q6"> <code>#eeeeee</code></label>
+<label><input type="radio" name="q6"> A página dá erro</label>
+</div>
+
+<h3>Missão final: o cartão com recursos novos</h3>
+
+<div class="tryhtml" data-goal="css:html{color-scheme}=light dark,css:.cartao{background-color}=rgb(255, 255, 255),src:background-color:\s*light-dark\(,css:.cartao h2{text-wrap-style}=balance,src:\.cartao\s*\{[^}]*\bh2\s*\{">
+<p class="try-task"><strong>Missão:</strong> modernize o cartão da receita. (1) No <code>:root</code>, diga que a página aceita os dois temas: <code>color-scheme: light dark</code>. (2) Troque o fundo do <code>.cartao</code> por <code>light-dark(#ffffff, #2b2b3a)</code>, e a cor do texto por <code>light-dark(#222222, #f5f5f5)</code>. (3) Mova a regra do <code>h2</code> para <strong>dentro</strong> da regra do <code>.cartao</code> (aninhamento) e acrescente <code>text-wrap: balance</code> nela. Depois aperte o ◐ do quadro para ver o tema escuro.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Bolo de cenoura com cobertura de chocolate da vovó&lt;/h2&gt;
+  &lt;p&gt;Rende 12 fatias. 50 minutos.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  font-family: sans-serif;
+}
+.cartao {
+  max-width: 18em;
+  padding: 16px;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #222222;
+}
+.cartao h2 {
+  margin-top: 0;
+}
+</pre>
+<pre class="solucao" data-file="style.css">:root {
+  font-family: sans-serif;
+  color-scheme: light dark;
+}
+.cartao {
+  max-width: 18em;
+  padding: 16px;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  background-color: light-dark(#ffffff, #2b2b3a);
+  color: light-dark(#222222, #f5f5f5);
+
+  h2 {
+    margin-top: 0;
+    text-wrap: balance;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O selo <strong>Baseline</strong> do MDN e do caniuse diz se um recurso já funciona nos quatro navegadores principais: "amplamente disponível" (pode usar), "recém-disponível" (versões atuais; tenha uma reserva) ou "limitado" (espere).</li>
+  <li>De 2023 a 2026 chegaram: <code>@container</code>, <code>oklch()</code>, <code>subgrid</code>, <code>:has()</code>, aninhamento, <code>text-wrap</code>, <code>light-dark()</code>, <code>@property</code>, <code>@starting-style</code>, <code>content-visibility</code>, view transitions, anchor positioning, <code>@scope</code>, <code>field-sizing</code>.</li>
+  <li>Ainda chegando (out. 2026): <code>if()</code>, animações ligadas à rolagem, o <code>&lt;select&gt;</code> estilizável.</li>
+  <li>Melhoria progressiva: o novo melhora para quem tem; quem não tem recebe uma página que funciona (declaração reserva antes, ou <code>@supports</code>).</li>
+  <li>O validador anda atrás dos navegadores: <code>field-sizing</code>, <code>anchor-name</code> e <code>@starting-style</code> aparecem como erro no <code>vnu</code> 26.10.12. Confira no MDN antes de apagar.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
