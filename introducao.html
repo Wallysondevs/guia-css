@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Introdução — o que é CSS e para que serve | Guia CSS</title>
+<meta name="description" content="O que é CSS para quem só viu um pouco de HTML: a linguagem que cuida da aparência das páginas, a mesma página sem e com CSS, o que quer dizer Cascading Style Sheets, o que o CSS faz e o que não faz, um pouco de história e o que acontece quando você erra uma propriedade.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Introdução</span></h1>
+
+<p class="intro">Você já sabe escrever uma página em HTML: títulos, parágrafos, listas, links, imagens. Mas ela sai com cara de documento de 1995: letra preta de jornal, fundo branco, tudo encostado na esquerda. Quem dá cor, letra bonita, espaço e organização a essa página é o <strong>CSS</strong>. Nesta aula você vai ver o que é o CSS, o que ele faz (e o que não faz) e a mesma página da Ana antes e depois de ganhar uma folha de estilo.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que é o CSS e por que ele existe separado do HTML.</li>
+  <li>A mesma página sem CSS e com CSS, desenhada ao vivo pelo seu navegador.</li>
+  <li>O que quer dizer <em>Cascading Style Sheets</em>, palavra por palavra.</li>
+  <li>A cara de uma regra de CSS (só uma olhada; os detalhes vêm nas próximas aulas).</li>
+  <li>O que o CSS faz, o que ele não faz e de onde ele veio.</li>
+  <li>O que acontece quando você erra: no CSS, quase nunca aparece mensagem de erro.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a casa e a decoração</h2>
+<p>Pense numa casa. Primeiro vêm as paredes, as portas, os cômodos: aqui é a cozinha, ali o quarto. Depois vem a <strong>decoração</strong>: a cor da tinta, o piso, as cortinas, onde fica cada móvel. Você pode pintar a casa inteira de outra cor sem derrubar uma parede.</p>
+<p>Uma página da web funciona igual:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Na casa</th><th>Na página</th><th>Quem cuida</th></tr>
+<tr><td>Paredes e cômodos: "isto é a cozinha"</td><td>A <strong>estrutura</strong>: "isto é um título", "isto é uma lista"</td><td><strong>HTML</strong></td></tr>
+<tr><td>Tinta, piso, cortinas, posição dos móveis</td><td>A <strong>aparência</strong>: cores, letras, espaços, colunas</td><td><strong>CSS</strong></td></tr>
+<tr><td>A campainha, a luz que acende sozinha</td><td>O <strong>comportamento</strong>: o que acontece num clique</td><td>JavaScript</td></tr>
+</table>
+</div>
+
+<p>O CSS é a linguagem da decoração. Ele não cria o título nem o parágrafo; ele diz <strong>como</strong> o título e o parágrafo que já existem no HTML devem aparecer. A próxima aula, <a href="html-e-css.html">HTML e CSS: Estrutura e Aparência</a>, aprofunda essa divisão.</p>
+
+<hr>
+
+<h2>1. A mesma página, sem CSS</h2>
+<p>Esta é a página de receitas da Ana, só com HTML:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p&gt;Fofinho, com cobertura de chocolate. Fica pronto em 50 minutos.&lt;/p&gt;
+&lt;h2&gt;Pão de queijo&lt;/h2&gt;
+&lt;p&gt;Crocante por fora, macio por dentro. Rende 30 unidades.&lt;/p&gt;
+</pre>
+
+<p>Repare no resultado: letra preta sobre fundo branco, com serifa (aqueles "pezinhos" nas pontas das letras, como em jornal impresso), tudo alinhado à esquerda. O título é grande e em negrito, os subtítulos um pouco menores.</p>
+<p>Mesmo sem uma linha de CSS, a página já tem <em>alguma</em> aparência. Quem decidiu isso foi o <strong>navegador</strong>: ele traz uma folha de estilo própria, com o visual padrão de cada elemento (o <code>&lt;h1&gt;</code> grande e em negrito, o link azul e sublinhado). O seu CSS vem por cima dessa folha e muda o que você quiser.</p>
+
+<hr>
+
+<h2>2. A mesma página, com CSS</h2>
+<p>Agora o mesmo HTML, com uma linha a mais no começo (o <code>&lt;link&gt;</code>, que chama o arquivo de estilo) e um segundo arquivo, o <code>style.css</code>. Clique nas abas para ver cada arquivo:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o resultado embaixo já tem o CSS aplicado. Na aba <code>style.css</code>, troque <code>firebrick</code> por <code>navy</code> e veja o título mudar de cor. Depois troque <code>center</code> por <code>right</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p&gt;Fofinho, com cobertura de chocolate. Fica pronto em 50 minutos.&lt;/p&gt;
+&lt;h2&gt;Pão de queijo&lt;/h2&gt;
+&lt;p&gt;Crocante por fora, macio por dentro. Rende 30 unidades.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: sans-serif;
+  background-color: linen;
+}
+
+h1 {
+  color: firebrick;
+  text-align: center;
+}
+
+h2 {
+  color: darkgreen;
+  border-bottom: 2px solid darkgreen;
+}
+</pre>
+</div>
+
+<p>O HTML é o mesmo, palavra por palavra. Só o CSS mudou a página:</p>
+<ul>
+  <li>o fundo ficou bege-claro (<code>linen</code>, "linho");</li>
+  <li>a letra perdeu os "pezinhos": virou uma letra <strong>sem serifa</strong> (<code>sans-serif</code>), mais limpa na tela;</li>
+  <li>o título ficou vermelho-escuro (<code>firebrick</code>, "tijolo refratário") e <strong>centralizado</strong>;</li>
+  <li>os subtítulos ficaram verdes, com uma linha verde embaixo.</li>
+</ul>
+<p>Doze linhas de CSS e a página mudou de cara. Imagine agora um site com 50 páginas: todas chamam o mesmo <code>style.css</code>. Trocar a cor dos títulos do site inteiro é mudar <strong>uma palavra num arquivo</strong>. Essa é a grande vantagem do CSS.</p>
+
+<hr>
+
+<h2>3. O nome: <em>Cascading Style Sheets</em></h2>
+<p>CSS é a sigla de <em>Cascading Style Sheets</em>, "folhas de estilo em cascata". Cada palavra tem um motivo:</p>
+
+<dl class="anatomy">
+  <dt>Style</dt><dd><strong>Estilo</strong>: a aparência. Cor, tamanho da letra, espaço, posição.</dd>
+  <dt>Sheets</dt><dd><strong>Folhas</strong>: um arquivo de CSS é uma "folha de estilo", uma lista de regras, como a folha de instruções que um decorador recebe ("paredes da sala: bege; cortinas: verdes").</dd>
+  <dt>Cascading</dt><dd><strong>Em cascata</strong>: várias regras podem falar do mesmo elemento ao mesmo tempo (a folha do navegador, a sua, uma regra geral e uma mais específica). A cascata é o jeito de decidir <strong>quem vence</strong>, como a água que desce de degrau em degrau. É uma das ideias mais importantes do CSS e tem aula própria: <a href="cascata.html">A Cascata: Quem Vence</a>.</dd>
+</dl>
+
+<hr>
+
+<h2>4. Uma olhada numa regra</h2>
+<p>Todo CSS é feito de <strong>regras</strong>. Esta é a regra que pintou o título:</p>
+
+<pre class="file" data-file="style.css">h1 {
+  color: firebrick;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>h1</dt><dd>O <strong>seletor</strong>: <strong>quem</strong> recebe o estilo. Aqui, todo <code>&lt;h1&gt;</code> da página.</dd>
+  <dt>{ }</dt><dd>As chaves guardam as instruções para esse seletor.</dd>
+  <dt>color</dt><dd>A <strong>propriedade</strong>: <strong>o que</strong> mudar. <code>color</code> = "cor" (do texto).</dd>
+  <dt>firebrick</dt><dd>O <strong>valor</strong>: <strong>como</strong> fica. Um dos nomes de cor que o CSS conhece.</dd>
+  <dt>: e ;</dt><dd>Os dois-pontos separam a propriedade do valor; o ponto e vírgula fecha a instrução.</dd>
+</dl>
+
+<p>Em português: "todo <code>h1</code>, cor do texto: tijolo". Por enquanto basta reconhecer as partes. A aula <a href="sintaxe.html">Regras, Seletores e Declarações</a> destrincha cada uma e mostra o que acontece quando falta um sinal.</p>
+
+<hr>
+
+<h2>5. O que o CSS faz</h2>
+<p>Quase tudo o que você vê num site moderno, além do texto e das imagens, é CSS. Uma amostra do que você vai aprender neste guia:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>O que</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td>Cores do texto e do fundo</td><td>título vermelho, fundo bege</td><td><a href="cores.html">Cores por Nome</a>, <a href="background-color.html">Cor de Fundo</a></td></tr>
+<tr><td>Letras</td><td>outra fonte, tamanho, negrito</td><td><a href="font-family.html">Fontes</a>, <a href="font-size.html">Tamanho da Letra</a></td></tr>
+<tr><td>Espaços e bordas</td><td>respiro em volta de um cartão, cantos arredondados</td><td><a href="box-model.html">O Modelo de Caixa</a></td></tr>
+<tr><td>Layout (a posição das partes)</td><td>menu em linha, produtos em colunas</td><td><a href="flexbox.html">Flexbox</a>, <a href="grid.html">Grid</a></td></tr>
+<tr><td>Adaptar a cada tela</td><td>uma coluna no celular, três no computador</td><td><a href="responsivo.html">Design Responsivo</a></td></tr>
+<tr><td>Estados e movimento</td><td>botão que muda de cor com o mouse, animações</td><td><a href="hover-focus.html">:hover e :focus</a>, <a href="transition.html">Transições</a></td></tr>
+<tr><td>Tema escuro, impressão</td><td>cores escuras à noite, versão para imprimir</td><td><a href="tema-escuro.html">Tema Escuro</a>, <a href="impressao.html">Impressão</a></td></tr>
+</table>
+</div>
+
+<h3>E o que ele não faz</h3>
+<ul>
+  <li><strong>Não cria conteúdo de verdade.</strong> O texto, os links e as imagens importantes ficam no HTML. Se o CSS sumir, a página tem de continuar fazendo sentido (sem cor, mas com tudo lá).</li>
+  <li><strong>Não reage como um programa.</strong> "Quando clicar, guarde o pedido e mostre o total" é JavaScript. O CSS reage a poucas coisas prontas, como o mouse em cima ou a largura da tela.</li>
+  <li><strong>Não conserta HTML errado.</strong> Um título feito com <code>&lt;p&gt;</code> continua sendo um parágrafo para o leitor de tela e para o Google, mesmo que o CSS o deixe grande.</li>
+</ul>
+
+<hr>
+
+<h2>6. De onde veio o CSS</h2>
+<p>No começo da web, o HTML fazia tudo, inclusive a aparência, com elementos como <code>&lt;font color="red"&gt;</code>. Cada página repetia a cor em cada linha, e mudar o visual de um site era refazer tudo. O CSS nasceu para separar as duas coisas.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quando</th><th>O que aconteceu</th></tr>
+<tr><td>1994</td><td>Håkon Wium Lie propõe as "folhas de estilo em cascata"; Bert Bos se junta ao trabalho.</td></tr>
+<tr><td>1996</td><td><strong>CSS 1</strong> vira recomendação do W3C (o consórcio que cuida dos padrões da web): cores, fontes, margens.</td></tr>
+<tr><td>1998</td><td><strong>CSS 2</strong>: posicionamento, tipos de mídia (tela, impressão). A revisão CSS 2.1 sai em 2011.</td></tr>
+<tr><td>Depois de 2.1</td><td>O CSS é dividido em <strong>módulos</strong> (cores, seletores, Flexbox, Grid…), cada um com o seu ritmo. O apelido "CSS3" vem daí; não existe um "CSS 4" único.</td></tr>
+<tr><td>Hoje</td><td>Os navegadores ganham recursos novos todo ano: variáveis, aninhamento, <code>:has()</code>, container queries. Este guia ensina o CSS de hoje e avisa quando algo é recente.</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>7. Do que você precisa</h2>
+<p>De nada além do que você já usou no HTML:</p>
+<ul>
+  <li>um <strong>editor de texto</strong> (o arquivo <code>.css</code> é texto puro, como o <code>.html</code>);</li>
+  <li>um <strong>navegador</strong>, que lê o CSS e desenha a página.</li>
+</ul>
+<p>Neste guia, você nem precisa sair da página: as caixas "Experimente" têm as abas <code>index.html</code> e <code>style.css</code> e desenham o resultado enquanto você digita. A aula <a href="simulador.html">O Editor do Guia</a> mostra cada botão.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>No HTML, o navegador conserta muito erro sozinho. No CSS é ainda mais silencioso: quando o navegador não entende uma instrução, ele simplesmente a <strong>ignora</strong> e segue para a próxima. Não aparece mensagem na tela. O sintoma é sempre o mesmo: <strong>nada muda</strong>.</p>
+
+<div class="cenario">
+<strong>Nome da propriedade errado: <code>Property “colr” doesn't exist</code></strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  h1 {
+    colr: firebrick;
+  }
+&lt;/style&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+</pre>
+<p><strong>O que você vê:</strong> o título continua preto, como se não houvesse CSS nenhum. Faltou um <code>o</code>: a propriedade é <code>color</code>, não <code>colr</code>. O navegador não conhece <code>colr</code>, então pula essa linha sem avisar.</p>
+<p>O <code>&lt;style&gt;</code> deste exemplo é um jeito de pôr o CSS dentro do próprio HTML; a aula <a href="onde-colocar.html">Três Jeitos de Usar CSS</a> explica quando usar cada jeito. Com o CSS num arquivo separado, o validador W3C aponta o erro:</p>
+<pre class="term" data-cwd="~/site">$ vnu --css erro.css
+"file:/home/ana/site/erro.css":2.9-2.14: error: CSS: “colr”: Property “colr” doesn't exist.</pre>
+<p><strong>O que significa:</strong> "a propriedade <code>colr</code> não existe", na linha 2, colunas 9 a 14 do arquivo.</p>
+<p><strong>Como consertar:</strong> <code>color: firebrick;</code>. Na dúvida sobre o nome de uma propriedade, consulte a <a href="ref-propriedades.html">referência de propriedades</a>.</p>
+</div>
+
+<div class="cenario">
+<strong>Valor que não existe: <code>“tomate” is not a “color” value</code></strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  h1 {
+    color: tomate;
+  }
+&lt;/style&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+</pre>
+<p><strong>O que você vê:</strong> de novo, o título preto. Os nomes de cor do CSS são em inglês: a cor é <code>tomato</code>, e <code>tomate</code> não quer dizer nada para o navegador.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css valor.css
+"file:/home/ana/site/valor.css":2.10-2.15: error: CSS: “color”: “tomate” is not a “color” value.</pre>
+<p><strong>O que significa:</strong> "<code>tomate</code> não é um valor de <code>color</code>". A propriedade está certa; o valor, não.</p>
+<p><strong>Como consertar:</strong> <code>color: tomato;</code>. A lista dos nomes está em <a href="ref-cores.html">Nomes de Cores</a>.</p>
+</div>
+
+<p>Para achar esses erros sem o validador, o navegador tem uma ferramenta que mostra cada instrução ignorada: a aula <a href="devtools.html">Inspecionando com o F12</a> ensina a usá-la.</p>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Termo</th><th>O que é</th><th>Exemplo</th></tr>
+<tr><td>CSS</td><td><em>Cascading Style Sheets</em>, a linguagem da aparência</td><td>o arquivo <code>style.css</code></td></tr>
+<tr><td>Folha de estilo</td><td>Um conjunto de regras de CSS</td><td>o <code>style.css</code> inteiro</td></tr>
+<tr><td>Regra</td><td>Um seletor com as suas instruções</td><td><code>h1 { color: firebrick; }</code></td></tr>
+<tr><td>Seletor</td><td>Quem recebe o estilo</td><td><code>h1</code></td></tr>
+<tr><td>Propriedade</td><td>O que mudar</td><td><code>color</code></td></tr>
+<tr><td>Valor</td><td>Como fica</td><td><code>firebrick</code></td></tr>
+<tr><td>Folha do navegador</td><td>O visual padrão, que vale quando você não diz nada</td><td><code>h1</code> grande e em negrito</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A sigla</h3>
+<p>Complete o que quer dizer CSS:</p>
+<div class="ex-code"><input data-answer="Cascading" aria-label="primeira palavra"> Style Sheets</div>
+</div>
+
+<div class="exercise">
+<h3>2. A propriedade da cor</h3>
+<p>Complete a regra para o título ficar azul-marinho:</p>
+<div class="ex-code">h1 {
+  <input data-answer="color" aria-label="propriedade">: navy;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>3. O valor</h3>
+<p>Complete com o nome da cor "tomate" em CSS:</p>
+<div class="ex-code">h1 {
+  color: <input data-answer="tomato" aria-label="valor">;
+}</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Quem cuida de dizer "isto é um título"?</p>
+<label><input type="radio" name="q4"> O CSS</label>
+<label><input type="radio" name="q4"> O HTML</label>
+<label><input type="radio" name="q4"> O validador</label>
+<label><input type="radio" name="q4"> O JavaScript</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. A Ana escreveu <code>colr: navy;</code>. O que acontece na tela?</p>
+<label><input type="radio" name="q5"> Aparece uma mensagem de erro na página</label>
+<label><input type="radio" name="q5"> A página fica em branco</label>
+<label><input type="radio" name="q5"> Nada muda: o navegador ignora a instrução que não entende</label>
+<label><input type="radio" name="q5"> O navegador corrige para <code>color</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Uma página sem nenhum CSS aparece com título grande e em negrito. Por quê?</p>
+<label><input type="radio" name="q6"> O navegador tem uma folha de estilo própria, com o visual padrão de cada elemento</label>
+<label><input type="radio" name="q6"> O HTML escolhe o tamanho da letra</label>
+<label><input type="radio" name="q6"> É um erro do navegador</label>
+<label><input type="radio" name="q6"> O <code>&lt;h1&gt;</code> tem um CSS escondido dentro dele</label>
+</div>
+
+<h3>Missão final: a cara do site da Ana</h3>
+
+<div class="tryhtml" data-goal="css:h1{color}=rgb(178, 34, 34),css:body{background-color}=rgb(250, 240, 230)">
+<p class="try-task"><strong>Missão:</strong> na aba <code>style.css</code>, deixe o título da cor <code>firebrick</code> e o fundo da página da cor <code>linen</code>. Só troque os valores: as propriedades já estão lá.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  background-color: white;
+}
+
+h1 {
+  color: black;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  background-color: linen;
+}
+
+h1 {
+  color: firebrick;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O <strong>HTML</strong> diz o que cada coisa é (estrutura); o <strong>CSS</strong> diz como ela aparece (aparência).</li>
+  <li>CSS = <em>Cascading Style Sheets</em>, folhas de estilo em cascata: listas de regras, com um jeito de decidir quem vence quando duas falam do mesmo elemento.</li>
+  <li>Uma regra tem seletor (<code>h1</code>), propriedade (<code>color</code>) e valor (<code>firebrick</code>): <code>h1 { color: firebrick; }</code>.</li>
+  <li>Sem CSS, vale a folha de estilo do próprio navegador. O seu CSS vem por cima.</li>
+  <li>Um único <code>style.css</code> pode vestir o site inteiro: mudar uma palavra muda todas as páginas.</li>
+  <li>CSS errado não dá mensagem na tela: o navegador ignora a instrução e nada muda. O validador (<code>vnu --css</code>) e o F12 mostram onde está o erro.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
