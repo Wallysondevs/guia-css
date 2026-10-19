@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Seletores — como o CSS escolhe os elementos | Guia CSS</title>
+<meta name="description" content="O que é um seletor de CSS: a parte da regra que escolhe quais elementos recebem o estilo. Um mapa dos tipos de seletor (elemento, classe, id, universal, grupo, combinadores, atributo, pseudo-classes e pseudo-elementos), um laboratório para testar seletores ao vivo, e os erros reais: seletor que não pega ninguém, maiúsculas na classe, o espaço que muda tudo e o seletor inválido que derruba a regra inteira.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Seletores</span></h1>
+
+<p class="intro">Toda regra de CSS começa com um <strong>seletor</strong>: a parte que diz <strong>quem</strong> vai receber o estilo. Até agora você usou os mais simples, como <code>h1</code> e <code>p</code>. Mas e se a Ana quiser destacar só <strong>um</strong> dos parágrafos? Ou só os links do menu? É para isso que existem vários tipos de seletor. Esta aula é o mapa: o que um seletor faz, os tipos que você vai aprender nas próximas aulas e os erros que fazem um seletor não pegar ninguém.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que o seletor faz: escolhe elementos da página, todos os que combinam com ele.</li>
+  <li>Um mapa dos tipos de seletor, cada um com a sua aula.</li>
+  <li>A testar seletores ao vivo, num laboratório.</li>
+  <li>Como conferir quais elementos um seletor pega, no F12.</li>
+  <li>Os erros reais: o seletor que não pega ninguém (sem nenhum aviso), as maiúsculas, o espaço que muda o sentido e o seletor inválido que derruba a regra inteira.</li>
+</ul>
+</div>
+
+<hr>
+
+<h2>A ideia: chamar pessoas numa sala</h2>
+<p>A Ana está numa festa e quer passar um recado. Ela pode chamar as pessoas de vários jeitos:</p>
+<ul>
+  <li>"<strong>Todos os cozinheiros</strong>, venham aqui" (um tipo de pessoa);</li>
+  <li>"Quem está com <strong>crachá amarelo</strong>" (um grupo marcado de propósito);</li>
+  <li>"<strong>Beto</strong>, o da mesa 3" (uma pessoa só, pelo nome);</li>
+  <li>"<strong>Todo mundo</strong>!" (todos);</li>
+  <li>"Os cozinheiros <strong>que estão na cozinha</strong>" (pelo lugar onde estão).</li>
+</ul>
+<p>O seletor é esse chamado. O navegador olha cada elemento da página e pergunta: "este combina com o chamado?". Os que combinam recebem as declarações da regra; os outros ficam como estavam.</p>
+
+<hr>
+
+<h2>1. O seletor escolhe; as declarações aplicam</h2>
+
+<pre class="file" data-file="style.css">p {
+  background-color: yellow;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>p</dt><dd>O seletor: "todos os elementos <code>&lt;p&gt;</code>". Se a página tiver dez parágrafos, os dez são escolhidos. Se não tiver nenhum, ninguém é escolhido, e nada acontece (sem erro).</dd>
+  <dt>{ background-color: yellow; }</dt><dd>O que acontece com os escolhidos: fundo amarelo.</dd>
+</dl>
+
+<p>Repare que o seletor não diz "o primeiro parágrafo" nem "os parágrafos da linha 5". Ele descreve uma <strong>característica</strong> (o tipo do elemento, uma classe, a posição dentro de outro elemento), e o navegador procura todos os que a têm. Por isso a mesma regra continua funcionando quando você acrescenta parágrafos novos.</p>
+
+<hr>
+
+<h2>2. Laboratório de seletores</h2>
+<p>A página abaixo tem um título, dois parágrafos (um deles com a classe <code>destaque</code>) e uma lista. A regra pinta de amarelo o fundo do que o seletor escolher:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque o seletor <code>p</code> da aba <code>style.css</code>, um de cada vez, e veja o que fica amarelo: <code>li</code>, <code>h1</code>, <code>.destaque</code>, <code>ul li</code>, <code>h1, li</code> e <code>*</code>. Com o <code>*</code>, a página inteira fica amarela, porque ele pega todos os elementos, até o <code>&lt;html&gt;</code> e o <code>&lt;body&gt;</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+&lt;p class="destaque"&gt;Receita da semana: bolo de cenoura.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Bolo de cenoura&lt;/li&gt;
+  &lt;li&gt;Pão de queijo&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">p {
+  background-color: yellow;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Quem fica amarelo</th></tr>
+<tr><td><code>p</code></td><td>Os dois parágrafos</td></tr>
+<tr><td><code>li</code></td><td>Os dois itens da lista</td></tr>
+<tr><td><code>.destaque</code></td><td>Só o parágrafo com <code>class="destaque"</code></td></tr>
+<tr><td><code>ul li</code></td><td>Os itens que estão dentro de um <code>&lt;ul&gt;</code> (aqui, os mesmos de <code>li</code>)</td></tr>
+<tr><td><code>h1, li</code></td><td>O título e os dois itens: a vírgula junta dois seletores</td></tr>
+<tr><td><code>*</code></td><td>Tudo, a página inteira</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>3. O mapa dos seletores</h2>
+<p>Estes são os tipos de seletor que você vai aprender, do mais simples ao mais poderoso. Não precisa decorar agora: cada um tem a sua aula.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Tipo</th><th>Exemplo</th><th>Escolhe</th><th>Aula</th></tr>
+<tr><td>Elemento (ou tipo)</td><td><code>p</code></td><td>Todos os <code>&lt;p&gt;</code></td><td><a href="seletor-elemento.html">Seletor de Elemento</a></td></tr>
+<tr><td>Classe</td><td><code>.destaque</code></td><td>Todos os elementos com <code>class="destaque"</code></td><td><a href="seletor-classe.html">Seletor de Classe</a></td></tr>
+<tr><td>ID</td><td><code>#topo</code></td><td>O elemento com <code>id="topo"</code></td><td><a href="seletor-id.html">Seletor de ID</a></td></tr>
+<tr><td>Universal</td><td><code>*</code></td><td>Todos os elementos</td><td><a href="seletor-universal.html">Seletor Universal</a></td></tr>
+<tr><td>Grupo</td><td><code>h1, h2</code></td><td>Os <code>&lt;h1&gt;</code> e os <code>&lt;h2&gt;</code>, com uma regra só</td><td><a href="seletor-grupo.html">Agrupando Seletores</a></td></tr>
+<tr><td>Combinadores</td><td><code>nav a</code>, <code>ul &gt; li</code></td><td>Elementos pela posição: dentro de outro, filho direto, irmão</td><td><a href="combinadores.html">Descendente, Filho e Irmãos</a></td></tr>
+<tr><td>Atributo</td><td><code>[type="email"]</code></td><td>Elementos com um atributo (e valor)</td><td><a href="seletores-atributo.html">Seletores de Atributo</a></td></tr>
+<tr><td>Pseudo-classe</td><td><code>a:hover</code>, <code>li:first-child</code></td><td>Elementos num estado (mouse em cima) ou numa posição (o primeiro)</td><td><a href="hover-focus.html">:hover, :focus e :active</a>, <a href="nth-child.html">:nth-child</a></td></tr>
+<tr><td>Pseudo-elemento</td><td><code>p::first-letter</code></td><td>Uma <strong>parte</strong> de um elemento (a primeira letra)</td><td><a href="before-after.html">::before e ::after</a>, <a href="pseudo-elementos.html">Outros Pseudo-elementos</a></td></tr>
+</table>
+</div>
+
+<p>Os seletores também se <strong>combinam</strong>: <code>p.destaque</code> (um <code>&lt;p&gt;</code> que tenha a classe <code>destaque</code>), <code>nav a:hover</code> (um link do menu com o mouse em cima). A lista completa está na referência <a href="ref-seletores.html">Seletores</a>.</p>
+
+<h3>Quando dois seletores pegam o mesmo elemento</h3>
+<p>No laboratório, o parágrafo da classe <code>destaque</code> é escolhido tanto por <code>p</code> quanto por <code>.destaque</code>. Se duas regras derem cores diferentes para ele, quem vence? Depende de quão "específico" é cada seletor: uma classe vence um nome de elemento, mesmo vindo antes no arquivo. Esse desempate é o assunto de <a href="especificidade.html">Especificidade</a>; por enquanto, basta saber que ele existe.</p>
+
+<hr>
+
+<h2>4. Conferindo um seletor no F12</h2>
+<p>Quando um seletor não funciona, a primeira pergunta é: "ele pega quem eu acho que pega?". Duas formas de conferir (aula <a href="devtools.html">Inspecionando com o F12</a>):</p>
+<ul>
+  <li><strong>Pelo elemento:</strong> inspecione o elemento que devia mudar. Se a regra não aparece no painel Styles, o seletor não pega esse elemento.</li>
+  <li><strong>Pelo seletor:</strong> no Chrome e no Edge, a busca do painel Elements (<kbd>Ctrl</kbd>+<kbd>F</kbd> com o painel aberto) aceita seletores: digite <code>.destaque</code> e ela mostra quantos elementos combinam e pula de um em um.</li>
+</ul>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Um seletor errado quase nunca dá erro: ele simplesmente não escolhe ninguém, e a regra fica sem efeito. (Comportamentos conferidos no Chromium.)</p>
+
+<div class="cenario">
+<strong>O seletor não pega ninguém: nenhum aviso</strong>
+<pre class="file" data-file="nada.css · erro de propósito">.Destaque {
+  color: teal;
+}
+
+paragrafo {
+  color: navy;
+}
+</pre>
+<p><strong>O que você vê:</strong> nada muda. O parágrafo com <code>class="destaque"</code> continua preto, e os parágrafos também.</p>
+<p><strong>Por quê:</strong> as duas regras estão escritas certinho, mas não descrevem nenhum elemento da página. O nome da classe <strong>diferencia maiúsculas de minúsculas</strong>: <code>.Destaque</code> não pega <code>class="destaque"</code>. E não existe elemento <code>&lt;paragrafo&gt;</code>: o seletor de elemento usa o nome da tag em inglês (<code>p</code>).</p>
+<pre class="term" data-cwd="~/site">$ vnu --css nada.css; echo "saida: $?"
+saida: 0</pre>
+<p><strong>O que o validador diz:</strong> nada. Ele confere o CSS sozinho, sem olhar o HTML, então não sabe que a página não tem esses elementos. Para o CSS, <code>paragrafo</code> é um nome de elemento possível.</p>
+<p><strong>Como consertar:</strong> copie o nome da classe do HTML para o CSS, letra por letra; use o nome da tag como no HTML (<code>p</code>, <code>li</code>, <code>h2</code>). Os nomes de elemento, esses sim, aceitam maiúsculas: <code>P</code> funciona igual a <code>p</code> numa página HTML. Mas escreva sempre em minúsculas.</p>
+</div>
+
+<div class="cenario">
+<strong>Um espaço a mais muda o sentido: <code>p .destaque</code> × <code>p.destaque</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">p .destaque {
+  color: navy;
+}
+</pre>
+<p><strong>O que você vê:</strong> o parágrafo <code>&lt;p class="destaque"&gt;</code> continua preto.</p>
+<p><strong>Por quê:</strong> num seletor, o espaço tem significado: é o combinador "dentro de". <code>p .destaque</code> quer dizer "um elemento com a classe <code>destaque</code> que esteja <strong>dentro</strong> de um <code>&lt;p&gt;</code>". O parágrafo não está dentro de outro parágrafo; ele <strong>é</strong> o parágrafo. Sem espaço, <code>p.destaque</code> quer dizer "um <code>&lt;p&gt;</code> que tem a classe <code>destaque</code>", que é o que a Ana queria.</p>
+<p><strong>O que o validador diz:</strong> nada; os dois seletores são válidos. Aula <a href="combinadores.html">Descendente, Filho e Irmãos</a>.</p>
+</div>
+
+<div class="cenario">
+<strong>Seletor inválido num grupo: a regra inteira cai</strong>
+<pre class="file" data-file="grupo.css · erro de propósito">h1, h2:hovr {
+  color: teal;
+}
+</pre>
+<p><strong>O que você vê:</strong> o <code>h1</code> continua preto, embora a parte <code>h1</code> do seletor esteja certa.</p>
+<p><strong>Por quê:</strong> <code>:hovr</code> não existe (é <code>:hover</code>). Quando uma parte de um grupo de seletores é inválida, o navegador descarta a <strong>regra inteira</strong>, não só a parte errada.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css grupo.css
+"file:/home/ana/site/grupo.css":1.8-1.11: error: CSS: Unknown pseudo-element or pseudo-class “:hovr”</pre>
+<p><strong>O que significa:</strong> "pseudo-elemento ou pseudo-classe desconhecida: <code>:hovr</code>".</p>
+<p><strong>Como consertar:</strong> <code>h1, h2:hover</code>. Mais sobre grupos: <a href="seletor-grupo.html">Agrupando Seletores</a>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Lê-se</th></tr>
+<tr><td><code>p</code></td><td>todo <code>&lt;p&gt;</code></td></tr>
+<tr><td><code>.destaque</code></td><td>todo elemento com a classe <code>destaque</code></td></tr>
+<tr><td><code>#topo</code></td><td>o elemento com o id <code>topo</code></td></tr>
+<tr><td><code>*</code></td><td>todo elemento</td></tr>
+<tr><td><code>h1, h2</code></td><td>todo <code>&lt;h1&gt;</code> e todo <code>&lt;h2&gt;</code></td></tr>
+<tr><td><code>ul li</code></td><td>todo <code>&lt;li&gt;</code> dentro de um <code>&lt;ul&gt;</code></td></tr>
+<tr><td><code>p.destaque</code></td><td>todo <code>&lt;p&gt;</code> com a classe <code>destaque</code> (sem espaço)</td></tr>
+<tr><td><code>p .destaque</code></td><td>todo elemento com a classe <code>destaque</code> dentro de um <code>&lt;p&gt;</code> (com espaço)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Todos os itens de lista</h3>
+<p>Complete o seletor que pega todos os <code>&lt;li&gt;</code>:</p>
+<div class="ex-code"><input data-answer="li" aria-label="seletor"> {
+  color: teal;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. O seletor de todos</h3>
+<p>Complete o seletor universal, que pega todos os elementos:</p>
+<div class="ex-code"><input data-answer="*" aria-label="seletor"> {
+  color: navy;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>3. A classe</h3>
+<p>Complete o seletor que pega <code>&lt;p class="destaque"&gt;</code> pela classe:</p>
+<div class="ex-code"><input data-answer=".destaque" aria-label="seletor"> {
+  background-color: yellow;
+}</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. A página não tem nenhum <code>&lt;h3&gt;</code>, e o CSS tem <code>h3 { color: teal; }</code>. O que acontece?</p>
+<label><input type="radio" name="q4"> O navegador mostra um erro</label>
+<label><input type="radio" name="q4"> Nada: o seletor não escolhe ninguém, e a regra fica sem efeito</label>
+<label><input type="radio" name="q4"> Os <code>&lt;h2&gt;</code> ficam verde-azulados no lugar</label>
+<label><input type="radio" name="q4"> O validador recusa o arquivo</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. O HTML tem <code>class="destaque"</code>. Qual seletor <strong>não</strong> pega esse elemento?</p>
+<label><input type="radio" name="q5"> <code>.destaque</code></label>
+<label><input type="radio" name="q5"> <code>p.destaque</code> (se o elemento for um <code>&lt;p&gt;</code>)</label>
+<label><input type="radio" name="q5"> <code>.Destaque</code></label>
+<label><input type="radio" name="q5"> <code>*</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. Em <code>h1, h2:hovr { color: teal; }</code>, o que acontece com o <code>h1</code>?</p>
+<label><input type="radio" name="q6"> Fica verde-azulado; só a parte errada é ignorada</label>
+<label><input type="radio" name="q6"> Fica verde-azulado só com o mouse em cima</label>
+<label><input type="radio" name="q6"> O navegador corrige para <code>:hover</code></label>
+<label><input type="radio" name="q6"> Nada muda: um seletor inválido no grupo derruba a regra inteira</label>
+</div>
+
+<h3>Missão final: o seletor certo para cada coisa</h3>
+
+<div class="tryhtml" data-goal="css:li{color}=rgb(0, 128, 128),css:p{color}=rgb(0, 0, 0),css:h1{background-color}=rgb(240, 255, 240)">
+<p class="try-task"><strong>Missão:</strong> a Ana queria os itens da lista verde-azulados, mas errou o seletor e pintou os parágrafos. (1) Troque o seletor da primeira regra para que só os itens da lista (<code>&lt;li&gt;</code>) fiquem <code>teal</code>. (2) Escreva o seletor que falta na segunda regra, para o fundo <code>honeydew</code> ir para o título.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;As mais pedidas:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Bolo de cenoura&lt;/li&gt;
+  &lt;li&gt;Pão de queijo&lt;/li&gt;
+  &lt;li&gt;Brigadeiro&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">p {
+  color: teal;
+}
+
+/* escreva o seletor aqui */ {
+  background-color: honeydew;
+}
+</pre>
+<pre class="solucao" data-file="style.css">li {
+  color: teal;
+}
+
+h1 {
+  background-color: honeydew;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O <strong>seletor</strong> diz quem recebe o estilo. O navegador aplica a regra a <strong>todos</strong> os elementos que combinam, e a nenhum se não houver.</li>
+  <li>Os tipos: elemento (<code>p</code>), classe (<code>.destaque</code>), id (<code>#topo</code>), universal (<code>*</code>), grupo (<code>h1, h2</code>), combinadores (<code>nav a</code>), atributo, pseudo-classe (<code>:hover</code>) e pseudo-elemento (<code>::first-letter</code>). Cada um tem a sua aula.</li>
+  <li>Seletor que não pega ninguém não dá erro, nem no validador. Confira no F12 se a regra aparece no elemento.</li>
+  <li>Classes diferenciam maiúsculas de minúsculas. Um espaço muda o sentido (<code>p .destaque</code> ≠ <code>p.destaque</code>).</li>
+  <li>Uma parte inválida num grupo de seletores derruba a regra inteira.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
