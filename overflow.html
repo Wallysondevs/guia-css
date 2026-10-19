@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS overflow — o que transborda da caixa | Guia CSS</title>
+<meta name="description" content="A propriedade overflow para quem nunca escreveu CSS: o que acontece quando o conteúdo não cabe na caixa, os valores visible, hidden, scroll, auto e clip, overflow-x e overflow-y, a página que rola para o lado no celular e os erros reais: overflow sem altura que não faz nada, sombra e contorno cortados e a mensagem do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">overflow</span></h1>
+
+<p class="intro">Quando você dá uma altura fixa a uma caixa e põe dentro mais texto do que cabe, o que acontece? O texto não some nem encolhe: ele <strong>transborda</strong>, sai pela borda e passa por cima do que vem depois. A propriedade <code>overflow</code> ("transbordamento") decide o que fazer com essa sobra: deixar à mostra, cortar ou criar uma barra de rolagem. Nesta aula você vai ver cada opção e resolver o problema mais chato de sites no celular: a página que rola para o lado.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Quando um conteúdo transborda e o que o navegador faz por padrão.</li>
+  <li>Os valores <code>visible</code>, <code>hidden</code>, <code>scroll</code>, <code>auto</code> e <code>clip</code>, lado a lado.</li>
+  <li><code>overflow-x</code> e <code>overflow-y</code>: cada direção separada.</li>
+  <li>Os usos do dia a dia: caixa de comentários com rolagem, cartão de cantos arredondados, tabela larga.</li>
+  <li>A página que rola para o lado no celular: como achar o culpado.</li>
+  <li>Os erros: <code>overflow</code> que não faz nada, sombra e foco cortados e o validador W3C.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador. A aparência da barra de rolagem depende do sistema: no Windows e no Linux ela costuma ficar sempre à mostra; no macOS, no Android e no iPhone ela costuma aparecer só enquanto você rola.</p>
+
+<hr>
+
+<h2>A ideia: o copo cheio</h2>
+<p>Encha um copo além da boca: a água transborda e molha a mesa. Você tem três escolhas. Deixar transbordar (e molhar o que estiver em volta). Pôr uma tampa e jogar fora o que não coube. Ou trocar por uma garrafa com tampa de rosca, que guarda tudo e deixa você pegar aos poucos. No CSS, a caixa é o copo, o conteúdo é a água, e o <code>overflow</code> é a sua escolha.</p>
+
+<hr>
+
+<h2>1. O padrão: transborda à mostra</h2>
+<p>Uma caixa só transborda quando tem um <strong>tamanho fixo</strong> menor que o conteúdo. Sem <code>height</code>, a caixa cresce para caber tudo, e não há o que transbordar.</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .recado {
+    height: 40px;
+    width: 220px;
+    border: 2px solid navy;
+    background-color: #e8ecff;
+  }
+&lt;/style&gt;
+&lt;div class="recado"&gt;Bolo de cenoura com cobertura de chocolate, fofinho, perfeito para o café da tarde de domingo com a família toda.&lt;/div&gt;
+&lt;p&gt;Este parágrafo vem depois do recado.&lt;/p&gt;
+</pre>
+
+<p>A borda azul marca os 40px de altura da caixa. O texto que não coube <strong>sai por baixo</strong> da borda, sem o fundo azul-claro, e se mistura com o parágrafo seguinte. O parágrafo não desce para dar lugar: para a página, a caixa continua tendo 40px. Esse é o valor padrão, <code>overflow: visible</code> ("visível").</p>
+
+<hr>
+
+<h2>2. Os valores, lado a lado</h2>
+<p>As cinco caixas têm o mesmo texto e o mesmo tamanho. Só o <code>overflow</code> muda:</p>
+
+<pre class="file" data-file="valores.html" data-resultado>&lt;style&gt;
+  .caixa {
+    display: inline-block;
+    vertical-align: top;
+    width: 140px;
+    height: 60px;
+    margin: 6px 6px 50px;
+    border: 2px solid navy;
+    background-color: #e8ecff;
+    font-size: 14px;
+  }
+  .visible { overflow: visible; }
+  .hidden  { overflow: hidden; }
+  .scroll  { overflow: scroll; }
+  .auto    { overflow: auto; }
+  .clip    { overflow: clip; }
+&lt;/style&gt;
+&lt;div class="caixa visible"&gt;visible: o texto que não cabe sai pela borda de baixo da caixa. Bolo de cenoura com cobertura de chocolate.&lt;/div&gt;
+&lt;div class="caixa hidden"&gt;hidden: o texto que não cabe é cortado na borda da caixa. Bolo de cenoura com cobertura de chocolate.&lt;/div&gt;
+&lt;div class="caixa scroll"&gt;scroll: o texto que não cabe fica guardado, e a caixa ganha barras. Bolo de cenoura com cobertura de chocolate.&lt;/div&gt;
+&lt;div class="caixa auto"&gt;auto: a barra só aparece quando o texto não cabe, como aqui. Bolo de cenoura com cobertura de chocolate.&lt;/div&gt;
+&lt;div class="caixa auto"&gt;auto: cabe.&lt;/div&gt;
+&lt;div class="caixa clip"&gt;clip: corta como o hidden, e nem o JavaScript consegue rolar. Bolo de cenoura com cobertura de chocolate.&lt;/div&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que faz com a sobra</th><th>Rola?</th></tr>
+<tr><td><code>visible</code></td><td>Deixa à mostra, fora da caixa (padrão)</td><td>Não</td></tr>
+<tr><td><code>hidden</code></td><td>Corta na borda da caixa</td><td>Não com o mouse; o JavaScript e o foco do <kbd>Tab</kbd> ainda conseguem rolar</td></tr>
+<tr><td><code>scroll</code></td><td>Guarda dentro e mostra barras de rolagem, <strong>sempre</strong>, mesmo sem sobra</td><td>Sim</td></tr>
+<tr><td><code>auto</code></td><td>Guarda dentro e mostra a barra <strong>só quando precisa</strong></td><td>Sim</td></tr>
+<tr><td><code>clip</code></td><td>Corta na borda, e a caixa não rola de jeito nenhum</td><td>Não</td></tr>
+</table>
+</div>
+
+<p>Repare nas duas caixas <code>auto</code>: a primeira, com texto demais, ganha a barra de rolagem; a segunda, com texto curto, fica igual a uma caixa normal. Já a <code>scroll</code> reserva o lugar das barras mesmo quando não precisa delas (nos sistemas em que a barra fica sempre à mostra). Por isso, no dia a dia, <strong><code>auto</code></strong> é a escolha mais comum.</p>
+
+<div class="note">
+<strong><code>clip</code> é mais novo</strong>
+<p>O <code>overflow: clip</code> funciona no Chrome e no Edge desde a versão 90, no Firefox desde a 81 e no Safari desde a 16: todos os navegadores atuais. Num navegador antigo, a declaração é ignorada e a caixa fica com <code>visible</code>. Na maioria dos casos, <code>hidden</code> dá o mesmo resultado na tela.</p>
+</div>
+
+<hr>
+
+<h2>3. Uma direção de cada vez: <code>overflow-x</code> e <code>overflow-y</code></h2>
+<p>O <code>overflow</code> é um atalho para duas propriedades: <code>overflow-x</code> (na horizontal, para os lados) e <code>overflow-y</code> (na vertical, para baixo). Com uma palavra, vale para as duas; com duas palavras, a primeira é a do <code>x</code> e a segunda a do <code>y</code>.</p>
+
+<pre class="file" data-file="style.css">/* as duas direções */
+.comentarios {
+  overflow: auto;
+}
+
+/* só a vertical rola */
+.lista {
+  overflow-y: auto;
+}
+
+/* só a horizontal rola */
+.tabela-rolagem {
+  overflow-x: auto;
+}
+</pre>
+
+<div class="warning">
+<strong>Uma regra escondida</strong>
+<p>Não dá para ter <code>visible</code> numa direção e corte ou rolagem na outra. Se você escreve <code>overflow-y: hidden</code> e deixa o <code>x</code> no padrão, o navegador troca o <code>visible</code> do <code>x</code> por <code>auto</code>. O F12 mostra isso na aba <em>Computed</em>: <code>overflow-x: auto</code>, mesmo sem você ter escrito.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:.comentarios{overflow-y}=auto">
+<p class="try-task"><strong>Missão:</strong> os comentários estão vazando por cima do rodapé. Faça a caixa ganhar uma barra de rolagem <strong>só quando precisar</strong>, mantendo a altura de 120px.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Comentários&lt;/h2&gt;
+&lt;div class="comentarios"&gt;
+  &lt;p&gt;&lt;strong&gt;Bia:&lt;/strong&gt; Fiz no domingo e sumiu em minutos!&lt;/p&gt;
+  &lt;p&gt;&lt;strong&gt;Caio:&lt;/strong&gt; Troquei a cobertura por brigadeiro. Ficou ótimo.&lt;/p&gt;
+  &lt;p&gt;&lt;strong&gt;Duda:&lt;/strong&gt; Dá para fazer sem ovos?&lt;/p&gt;
+  &lt;p&gt;&lt;strong&gt;Ana:&lt;/strong&gt; Dá sim, Duda! Vou postar a versão.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p class="rodape"&gt;Receitas da Ana, 2026&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.comentarios {
+  height: 120px;
+  padding: 0 10px;
+  border: 1px solid #999999;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.comentarios {
+  height: 120px;
+  overflow: auto;
+  padding: 0 10px;
+  border: 1px solid #999999;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>4. O uso mais comum do <code>hidden</code>: cantos arredondados</h2>
+<p>Um cartão com cantos arredondados (aula <a href="border-radius.html">Cantos Arredondados</a>) e uma foto no topo: os cantos da foto passam por cima da curva do cartão. O <code>overflow: hidden</code> no cartão corta a foto no formato da borda:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> apague a linha <code>overflow: hidden;</code> e repare nos cantos de cima da foto: eles ficam retos, saindo da curva do cartão.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="400" height="300"&gt;
+  &lt;p&gt;Bolo de cenoura&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  width: 240px;
+  border: 2px solid tomato;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.cartao img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.cartao p {
+  margin: 10px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>5. A página que rola para o lado</h2>
+<p>No celular, você arrasta a página para cima e ela escorrega também para o lado, mostrando uma faixa vazia. Algum elemento está <strong>mais largo que a tela</strong> e transborda do <code>&lt;body&gt;</code>; como a página inteira tem <code>overflow</code> rolável, ela ganha rolagem horizontal. Os culpados de sempre:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Culpado</th><th>Conserto</th></tr>
+<tr><td>Uma imagem maior que a tela</td><td><code>img { max-width: 100%; height: auto; }</code> (aula <a href="imagens-responsivas.html">Imagens que se Adaptam</a>)</td></tr>
+<tr><td>Uma palavra ou endereço comprido, sem espaço para quebrar</td><td><code>overflow-wrap: anywhere;</code> (aula <a href="texto-longo.html">Texto que Não Cabe</a>)</td></tr>
+<tr><td>Uma tabela com muitas colunas</td><td>A tabela dentro de uma <code>&lt;div&gt;</code> com <code>overflow-x: auto</code> (aula <a href="tabelas.html">Tabelas</a>)</td></tr>
+<tr><td>Um <code>width</code> fixo em px maior que a tela</td><td><code>max-width</code> em vez de <code>width</code> (aula <a href="width-height.html">Largura e Altura</a>)</td></tr>
+<tr><td>Um elemento com <code>width: 100%</code> + padding e borda</td><td><code>box-sizing: border-box</code> (aula <a href="box-sizing.html">box-sizing</a>)</td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> a caixa tracejada faz o papel da tela do celular (260px). O endereço comprido transborda pela direita. Troque o <code>overflow: visible</code> por <code>auto</code> e veja a barra de rolagem aparecer só na caixa; depois volte para <code>visible</code> e acrescente <code>overflow-wrap: anywhere;</code> ao <code>.tela</code>: o endereço passa a quebrar e não sobra nada.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="tela"&gt;
+  &lt;p&gt;Receita completa em:&lt;/p&gt;
+  &lt;p&gt;https://receitasdaana.example/bolos/bolodecenouracomcoberturadechocolate&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.tela {
+  width: 260px;
+  border: 2px dashed gray;
+  overflow: visible;
+}
+</pre>
+</div>
+
+<div class="tip">
+<strong>Não esconda o sintoma</strong>
+<p>Um <code>body { overflow-x: hidden; }</code> some com a rolagem para o lado, mas o conteúdo largo continua cortado, só que agora sem jeito de ver. Ache o culpado: no F12, procure o elemento que passa da borda direita da tela, ou teste apagar partes da página até a rolagem sumir. Conserte nele.</p>
+</div>
+
+<hr>
+
+<h2>6. Qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Use</th></tr>
+<tr><td>Caixa de altura fixa com conteúdo que pode crescer (comentários, chat, lista)</td><td><code>overflow-y: auto</code></td></tr>
+<tr><td>Tabela ou código largo dentro de uma coluna estreita</td><td><code>overflow-x: auto</code> na caixa em volta</td></tr>
+<tr><td>Cortar a foto nos cantos arredondados do cartão</td><td><code>overflow: hidden</code> (ou <code>clip</code>)</td></tr>
+<tr><td>Barras sempre à mostra, com ou sem sobra</td><td><code>overflow: scroll</code> (raro)</td></tr>
+<tr><td>Um texto que não cabe numa linha, com "…" no fim</td><td><code>text-overflow: ellipsis</code> com <code>overflow: hidden</code> (aula <a href="texto-longo.html">Texto que Não Cabe</a>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong><code>overflow: auto</code> e nenhuma barra aparece: a caixa não tem altura</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .comentarios {
+    overflow: auto;
+    border: 1px solid #999999;
+  }
+&lt;/style&gt;
+&lt;div class="comentarios"&gt;
+  &lt;p&gt;Bia: Fiz no domingo e sumiu em minutos!&lt;/p&gt;
+  &lt;p&gt;Caio: Troquei a cobertura por brigadeiro.&lt;/p&gt;
+  &lt;p&gt;Duda: Dá para fazer sem ovos?&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> a caixa mostra todos os comentários, sem barra de rolagem. Se a lista crescer, a caixa cresce junto.</p>
+<p><strong>Por quê:</strong> sem <code>height</code> (ou <code>max-height</code>), a caixa estica para caber o conteúdo; nada transborda, então o <code>overflow</code> não tem o que fazer. O validador não reclama: a declaração é válida.</p>
+<p><strong>Como consertar:</strong> dê um limite à caixa. <code>max-height: 200px</code> é melhor que <code>height</code>: com poucos comentários a caixa fica pequena, e só ganha barra quando passa dos 200px.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>hidden</code> cortou a sombra e o contorno de foco</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .cartao {
+    overflow: hidden;
+    padding: 2px;
+    border: 1px dashed gray;
+  }
+  .cartao button {
+    box-shadow: 0 0 0 12px tomato;
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;
+  &lt;button&gt;Comprar&lt;/button&gt;
+&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> a moldura vermelha em volta do botão (uma sombra de 12px, aula <a href="box-shadow.html">Sombra</a>) aparece fininha em cima, embaixo e à esquerda, cortada na borda da caixa tracejada. Só à direita, onde sobra espaço dentro da caixa, ela aparece inteira.</p>
+<p><strong>Por quê:</strong> o <code>overflow: hidden</code> corta <strong>tudo</strong> o que passa da borda: sombras, o contorno de foco (<code>outline</code>, que mostra onde está o <kbd>Tab</kbd>), menus que abrem para fora, selos pendurados no canto. Cortar o foco prejudica quem navega pelo teclado.</p>
+<p><strong>Como consertar:</strong> dê espaço (mais <code>padding</code> no pai), ponha o <code>overflow: hidden</code> só no elemento que precisa ser cortado (a foto, e não o cartão inteiro) ou use <code>overflow: clip</code> com <code>overflow-clip-margin</code>, que deixa uma margem antes do corte.</p>
+</div>
+
+<div class="cenario">
+<strong><code>overflow: scrol</code>: a declaração é ignorada</strong>
+<pre class="file" data-file="style.css · erro de propósito">.comentarios {
+  height: 120px;
+  overflow: scrol;
+}
+</pre>
+<p><strong>O que você vê:</strong> o texto continua transbordando, como se não houvesse <code>overflow</code>. No F12, a declaração aparece riscada no painel <em>Styles</em>, com um ícone de aviso.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.13-3.17: error: CSS: “overflow”: “scrol” is not a “overflow” value.</pre>
+<p><strong>O que significa:</strong> "<code>scrol</code> não é um valor de <code>overflow</code>". Faltou um <code>l</code>: <code>scroll</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>overflow: visible;</code></td><td>A sobra aparece fora da caixa (padrão)</td></tr>
+<tr><td><code>overflow: hidden;</code></td><td>Corta a sobra</td></tr>
+<tr><td><code>overflow: clip;</code></td><td>Corta, e a caixa não rola nem pelo JavaScript</td></tr>
+<tr><td><code>overflow: scroll;</code></td><td>Barras de rolagem sempre</td></tr>
+<tr><td><code>overflow: auto;</code></td><td>Barra só quando precisa</td></tr>
+<tr><td><code>overflow-x: auto;</code></td><td>Rolagem só para os lados</td></tr>
+<tr><td><code>overflow-y: auto;</code></td><td>Rolagem só para baixo</td></tr>
+<tr><td><code>overflow: hidden auto;</code></td><td>Duas palavras: a primeira é o <code>x</code>, a segunda o <code>y</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Barra só quando precisa</h3>
+<p>Complete o valor:</p>
+<div class="ex-code">.comentarios { max-height: 200px; overflow: <input data-answer="auto" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Rolar só para os lados</h3>
+<p>Complete a propriedade:</p>
+<div class="ex-code">.tabela-rolagem { <input data-answer="overflow-x" aria-label="propriedade">: auto; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Cortar a sobra</h3>
+<p>Complete o valor que corta a foto nos cantos arredondados do cartão:</p>
+<div class="ex-code">.cartao { border-radius: 24px; overflow: <input data-answer="hidden|clip" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">4. Qual é o valor padrão de <code>overflow</code>?</p>
+<label><input type="radio" name="q4"> <code>auto</code></label>
+<label><input type="radio" name="q4"> <code>hidden</code></label>
+<label><input type="radio" name="q4"> <code>scroll</code></label>
+<label><input type="radio" name="q4"> <code>visible</code></label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. A Ana pôs <code>overflow: auto</code> numa caixa sem altura, e a barra nunca aparece. Por quê?</p>
+<label><input type="radio" name="q5"> <code>auto</code> nunca mostra barra</label>
+<label><input type="radio" name="q5"> Sem limite de altura, a caixa cresce com o conteúdo, e nada transborda</label>
+<label><input type="radio" name="q5"> Faltou <code>overflow-x</code></label>
+<label><input type="radio" name="q5"> O navegador dela não suporta <code>overflow</code></label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">6. Qual a diferença entre <code>scroll</code> e <code>auto</code>?</p>
+<label><input type="radio" name="q6"> Nenhuma</label>
+<label><input type="radio" name="q6"> <code>scroll</code> corta, <code>auto</code> mostra</label>
+<label><input type="radio" name="q6"> <code>scroll</code> mostra as barras sempre; <code>auto</code>, só quando há sobra</label>
+<label><input type="radio" name="q6"> <code>auto</code> só funciona na horizontal</label>
+</div>
+
+<h3>Missão final: a coluna da receita</h3>
+
+<div class="tryhtml" data-goal="css:.cartao{overflow-x}=hidden,css:.comentarios{overflow-y}=auto,css:.codigo{overflow-x}=auto">
+<p class="try-task"><strong>Missão:</strong> (1) corte a foto nos cantos arredondados do cartão com <code>hidden</code>; (2) dê aos comentários uma barra de rolagem que só aparece quando precisa; (3) o código do cupom é largo demais: faça a caixa <code>.codigo</code> rolar <strong>só para os lados</strong>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="400" height="300"&gt;
+  &lt;p&gt;Bolo de cenoura&lt;/p&gt;
+&lt;/div&gt;
+&lt;h2&gt;Comentários&lt;/h2&gt;
+&lt;div class="comentarios"&gt;
+  &lt;p&gt;Bia: Fiz no domingo e sumiu em minutos!&lt;/p&gt;
+  &lt;p&gt;Caio: Troquei a cobertura por brigadeiro.&lt;/p&gt;
+  &lt;p&gt;Duda: Dá para fazer sem ovos?&lt;/p&gt;
+  &lt;p&gt;Ana: Dá sim! Vou postar a versão.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Cupom da semana:&lt;/p&gt;
+&lt;pre class="codigo"&gt;BOLODECENOURACOMCOBERTURA-DESCONTO-DE-DEZ-POR-CENTO-2026&lt;/pre&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  width: 240px;
+  border: 2px solid tomato;
+  border-radius: 24px;
+}
+
+.cartao img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.cartao p {
+  margin: 10px;
+}
+
+.comentarios {
+  width: 240px;
+  height: 100px;
+  border: 1px solid #999999;
+}
+
+.codigo {
+  width: 240px;
+  padding: 8px;
+  background-color: #eeeeee;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  width: 240px;
+  border: 2px solid tomato;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.cartao img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.cartao p {
+  margin: 10px;
+}
+
+.comentarios {
+  width: 240px;
+  height: 100px;
+  overflow-y: auto;
+  border: 1px solid #999999;
+}
+
+.codigo {
+  width: 240px;
+  padding: 8px;
+  overflow-x: auto;
+  background-color: #eeeeee;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O conteúdo transborda quando não cabe numa caixa de tamanho fixo. Por padrão (<code>visible</code>), a sobra aparece fora da caixa, por cima do que vem depois.</li>
+  <li><code>hidden</code> e <code>clip</code> cortam; <code>scroll</code> mostra barras sempre; <code>auto</code> mostra a barra só quando precisa (o mais usado).</li>
+  <li><code>overflow-x</code> e <code>overflow-y</code> controlam cada direção. <code>visible</code> numa direção vira <code>auto</code> se a outra não for <code>visible</code>.</li>
+  <li>Usos comuns: caixa de comentários com <code>overflow-y: auto</code>, tabela larga com <code>overflow-x: auto</code>, foto cortada nos cantos do cartão com <code>overflow: hidden</code>.</li>
+  <li>Página que rola para o lado: ache o elemento largo demais (imagem, palavra comprida, <code>width</code> fixo) em vez de esconder com <code>overflow-x: hidden</code> no <code>body</code>.</li>
+  <li>Erros: <code>overflow</code> sem limite de altura não faz nada; <code>hidden</code> corta também sombras e o foco; <code>scrol</code> não existe.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
