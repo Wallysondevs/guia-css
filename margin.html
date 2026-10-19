@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS margin — a margem, margin: 0 auto e o colapso de margens | Guia CSS</title>
+<meta name="description" content="A margem em CSS para quem está começando: margin nos quatro lados e com um a quatro valores, as margens que o navegador já põe, centralizar com margin: 0 auto, o colapso de margens entre irmãos e entre pai e filho, margem negativa, margin ou padding, e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">margin</span></h1>
+
+<p class="intro">A margem (<code>margin</code>) é a camada de fora da caixa: o espaço <strong>entre</strong> um elemento e os vizinhos. É ela que separa um parágrafo do outro, afasta o cartão da beirada da tela e, com um truque famoso, <code>margin: 0 auto</code>, centraliza uma caixa na página. Ela também tem um comportamento que surpreende todo mundo: quando duas margens se encontram na vertical, elas <strong>não se somam</strong>. Isso se chama colapso de margens, e esta aula mostra quando acontece e como evitar.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Como dar margem aos quatro lados, a um lado só, e o atalho com um, dois, três ou quatro valores.</li>
+  <li>As margens que o navegador já põe sozinho, e o <code>margin: 0</code>.</li>
+  <li>Como centralizar uma caixa com <code>margin: 0 auto</code>, e por que às vezes não funciona.</li>
+  <li>O <strong>colapso de margens</strong>: entre irmãos e entre pai e filho.</li>
+  <li>A margem negativa, e quando usar margem ou padding.</li>
+  <li>O que acontece quando dá errado, e as mensagens reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Antes, veja <a href="box-model.html">O Modelo de Caixa</a>: a margem é a camada laranja do desenho, por fora da borda. As medidas foram lidas no Chromium, e as mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana.</p>
+
+<hr>
+
+<h2>A ideia: o espaço entre os móveis</h2>
+<p>Na lojinha da Ana, cada prateleira precisa de espaço em volta para as pessoas passarem. Esse espaço não é da prateleira (ela não fica maior), mas ninguém pode pôr nada ali. A margem é isso: um espaço <strong>reservado em volta</strong> da caixa, sempre transparente, que empurra os vizinhos para longe.</p>
+
+<hr>
+
+<h2>1. A primeira margem</h2>
+<p>As três caixas abaixo têm fundo amarelo e borda vermelha, para você ver onde a caixa termina. O fundo da página é cinza-claro. Só a do meio tem margem:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa"&gt;Prateleira 1&lt;/div&gt;
+&lt;div class="caixa com-margem"&gt;Prateleira 2&lt;/div&gt;
+&lt;div class="caixa"&gt;Prateleira 3&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  background-color: lightgray;
+}
+
+.caixa {
+  background-color: lightyellow;
+  border: 2px solid tomato;
+}
+
+.com-margem {
+  margin: 20px;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>margin</dt><dd>A propriedade: a margem, nos quatro lados de uma vez.</dd>
+  <dt>20px</dt><dd>O tamanho: 20 pixels em cima, à direita, embaixo e à esquerda.</dd>
+</dl>
+
+<p>As prateleiras 1 e 3 estão coladas na 2? Não: a 2 se afastou 20 pixels de cada uma, em cima e embaixo, e também 20 pixels das beiradas esquerda e direita. Por isso ela ficou <strong>mais estreita</strong> que as outras: a caixa de bloco ocupa a largura que sobra, e a margem dos dois lados come 40 pixels. Repare que o espaço da margem mostra o cinza da página: a margem é transparente.</p>
+
+<hr>
+
+<h2>2. Um lado só, e o atalho de um a quatro valores</h2>
+<p>Cada lado tem a sua propriedade: <code>margin-top</code> (em cima), <code>margin-right</code> (direita), <code>margin-bottom</code> (embaixo) e <code>margin-left</code> (esquerda). E o atalho <code>margin</code> aceita de um a quatro valores, sempre começando em cima e girando no sentido do relógio:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Em cima</th><th>Direita</th><th>Embaixo</th><th>Esquerda</th></tr>
+<tr><td><code>margin: 20px;</code></td><td>20</td><td>20</td><td>20</td><td>20</td></tr>
+<tr><td><code>margin: 10px 40px;</code></td><td>10</td><td>40</td><td>10</td><td>40</td></tr>
+<tr><td><code>margin: 10px 40px 30px;</code></td><td>10</td><td>40</td><td>30</td><td>40</td></tr>
+<tr><td><code>margin: 10px 20px 30px 40px;</code></td><td>10</td><td>20</td><td>30</td><td>40</td></tr>
+<tr><td><code>margin-left: 40px;</code></td><td>(não muda)</td><td>(não muda)</td><td>(não muda)</td><td>40</td></tr>
+</table>
+</div>
+
+<p>Para lembrar: com dois valores, o primeiro é "em cima e embaixo", o segundo é "os lados". Com três, o do meio vale para os dois lados. O lado que falta copia o lado oposto. O desenho de quatro valores lembra os ponteiros de um relógio: 12, 3, 6 e 9 horas (ou o "TRouBLe": <em>Top, Right, Bottom, Left</em>).</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa m1"&gt;&lt;code&gt;margin: 20px&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa m2"&gt;&lt;code&gt;margin: 10px 40px&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa m3"&gt;&lt;code&gt;margin: 10px 20px 30px 40px&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa m4"&gt;&lt;code&gt;margin-left: 40px&lt;/code&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  background-color: lightgray;
+}
+
+.caixa {
+  background-color: lightyellow;
+  border: 2px solid tomato;
+}
+
+.m1 {
+  margin: 20px;
+}
+
+.m2 {
+  margin: 10px 40px;
+}
+
+.m3 {
+  margin: 10px 20px 30px 40px;
+}
+
+.m4 {
+  margin-left: 40px;
+}
+</pre>
+</div>
+
+<p>Compare as beiradas esquerdas: a primeira caixa começa a 20 pixels da beirada da página (mais os 8 do <code>body</code>, seção 3); as outras três, a 40. E as direitas: 20, 40, 20 e nenhuma margem na última, que vai até a beirada.</p>
+
+<p>No F12, o atalho não aparece na aba <em>Computed</em>: cada lado tem o seu valor, como <code>margin-top: 10px</code> e <code>margin-left: 40px</code>. As missões do guia conferem os lados assim.</p>
+
+<hr>
+
+<h2>3. As margens que o navegador já põe</h2>
+<p>Mesmo sem CSS nenhum, vários elementos já vêm com margem, do estilo padrão do navegador. Por isso o texto de uma página sem CSS não encosta na beirada, e há espaço entre os parágrafos. Valores lidos no Chromium (com a letra de 16 pixels):</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Elemento</th><th>Margem padrão</th></tr>
+<tr><td><code>body</code></td><td><code>8px</code> nos quatro lados</td></tr>
+<tr><td><code>p</code></td><td><code>16px</code> em cima e embaixo (1em: o tamanho da letra)</td></tr>
+<tr><td><code>h1</code></td><td><code>21.44px</code> em cima e embaixo (0,67em de uma letra de 32 pixels)</td></tr>
+<tr><td><code>ul</code>, <code>ol</code></td><td><code>16px</code> em cima e embaixo</td></tr>
+<tr><td><code>div</code>, <code>span</code></td><td>nenhuma</td></tr>
+</table>
+</div>
+
+<p>Muitos sites começam o CSS zerando a margem do <code>body</code>, para o cabeçalho encostar nas beiradas da janela:</p>
+
+<pre class="file" data-file="style.css">body {
+  margin: 0;
+}
+</pre>
+
+<p>O <code>0</code> é o único número que dispensa a unidade: zero pixels, zero centímetros, é tudo nada. A aula <a href="reset.html">Reset e Normalize</a> mostra como os sites zeram ou ajustam todos esses valores de uma vez.</p>
+
+<hr>
+
+<h2>4. Centralizar com <code>margin: 0 auto</code></h2>
+<p>O valor <code>auto</code> ("automático") manda o navegador calcular a margem. Na horizontal, numa caixa de bloco com <strong>largura definida</strong>, ele pega o espaço que sobra na linha e o divide entre as margens que estão em <code>auto</code>. Com as duas em <code>auto</code>, cada uma fica com metade: a caixa vai para o meio.</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;50 minutos · 12 pedaços&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  background-color: lightgray;
+}
+
+.cartao {
+  background-color: lightyellow;
+  width: 250px;
+  margin: 0 auto;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>width: 250px</dt><dd>Obrigatório para o truque: sem largura, a caixa de bloco já ocupa a linha toda, e não sobra espaço para dividir.</dd>
+  <dt>margin: 0 auto</dt><dd>Dois valores: <code>0</code> em cima e embaixo, <code>auto</code> nos lados.</dd>
+</dl>
+
+<p>O cartão fica no meio da página, com o mesmo cinza dos dois lados. Mude a largura da janela: ele continua no meio, porque a conta é refeita. No F12, a aba <em>Computed</em> mostra o resultado da conta em pixels, e não <code>auto</code>.</p>
+
+<p>Esse é o jeito clássico de centralizar o conteúdo de um site: uma caixa com largura máxima, no meio da tela.</p>
+
+<pre class="file" data-file="style.css">.pagina {
+  max-width: 800px;
+  margin: 0 auto;
+}
+</pre>
+
+<p>Com <code>max-width</code> ("largura máxima", aula <a href="width-height.html">Largura e Altura</a>), numa tela grande a página tem 800 pixels e fica no meio; numa tela pequena, ela encolhe e ocupa tudo.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>margin: 0 auto;</code></td><td>Centraliza na horizontal</td></tr>
+<tr><td><code>margin-left: auto;</code></td><td>Todo o espaço vai para a esquerda: a caixa encosta na <strong>direita</strong></td></tr>
+<tr><td><code>margin-right: auto;</code></td><td>Encosta na esquerda (é o que já acontece)</td></tr>
+<tr><td><code>margin: auto 0;</code></td><td>Na vertical, num bloco comum, o <code>auto</code> vale 0: <strong>não</strong> centraliza na altura</td></tr>
+</table>
+</div>
+
+<div class="tip">
+<strong>E para centralizar na vertical?</strong>
+<p>Num bloco comum, a margem <code>auto</code> de cima e de baixo vira zero. Para centralizar na altura, use Flexbox ou Grid: a aula <a href="centralizar.html">Centralizando Qualquer Coisa</a> mostra as formas. E para centralizar o <strong>texto</strong> dentro da caixa, a propriedade é outra: <code>text-align: center</code> (aula <a href="text-align.html">Alinhamento</a>).</p>
+</div>
+
+<div class="tryhtml" data-goal="css:.aviso{width}=300px,src:\.aviso\s*\{[^}]*margin(-left)?:\s*[^;]*auto">
+<p class="try-task"><strong>Missão:</strong> centralize o aviso na página. Ele deve ter <strong>300px</strong> de largura e ficar no meio, com a mesma sobra dos dois lados.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="aviso"&gt;Fechado no feriado de 2 de novembro.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.aviso {
+  background-color: navy;
+  color: white;
+  padding: 12px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.aviso {
+  background-color: navy;
+  color: white;
+  padding: 12px;
+  width: 300px;
+  margin: 16px auto;
+}
+</pre>
+</div>
+
+<p>A solução usa <code>margin: 16px auto</code>, para manter um espaço em cima e embaixo. <code>margin: 0 auto</code> também centraliza, mas cola o aviso no que estiver em volta.</p>
+
+<hr>
+
+<h2>5. O colapso de margens</h2>
+<p>Agora a surpresa. Dois parágrafos, um embaixo do outro: o de cima tem <code>margin-bottom: 30px</code>, e o de baixo, <code>margin-top: 20px</code>. Qual é o espaço entre eles? 50 pixels? Não: <strong>30</strong>.</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="um"&gt;Parágrafo 1: margin-bottom 30px&lt;/p&gt;
+&lt;p class="dois"&gt;Parágrafo 2: margin-top 20px&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">p {
+  background-color: lightyellow;
+  border: 2px solid tomato;
+}
+
+.um {
+  margin-bottom: 30px;
+}
+
+.dois {
+  margin-top: 20px;
+}
+</pre>
+</div>
+
+<p>Quando a margem de baixo de uma caixa encosta na margem de cima da caixa seguinte, as duas se <strong>fundem</strong> numa só, do tamanho da <strong>maior</strong>. Isso se chama colapso de margens (<em>margin collapsing</em>). É como duas pessoas que pedem "um metro de distância": elas ficam a um metro uma da outra, e não a dois. No Chromium, o espaço entre as bordas dos dois parágrafos mediu 30 pixels.</p>
+
+<p>Parece estranho, mas é de propósito: é o que deixa o espaço entre os parágrafos de um texto igual ao espaço entre o título e o primeiro parágrafo, sem você fazer conta nenhuma. As regras:</p>
+
+<ul>
+  <li>Só acontece na <strong>vertical</strong> (em cima e embaixo). Margens dos lados nunca colapsam: 20 + 20 dá 40.</li>
+  <li>Só entre caixas de <strong>bloco</strong> num fluxo normal. Dentro de um Flexbox ou de um Grid (aulas <a href="flexbox.html">Flexbox</a> e <a href="grid.html">Grid</a>), as margens não colapsam.</li>
+  <li>Com uma margem positiva e outra negativa, elas se somam (30 e −10 dão 20).</li>
+</ul>
+
+<h3>O colapso entre pai e filho</h3>
+<p>Este é o caso que mais confunde. A margem de cima do <strong>primeiro filho</strong> pode "vazar" para fora do pai, quando entre eles não há borda, padding nem texto:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Texto antes do cartão.&lt;/p&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  background-color: lightyellow;
+}
+
+h2 {
+  margin-top: 40px;
+}
+</pre>
+</div>
+
+<p>A Ana queria 40 pixels de espaço amarelo em cima do título, <strong>dentro</strong> do cartão. Mas o amarelo começa colado no título, e os 40 pixels aparecem <strong>fora</strong> do cartão, entre o parágrafo e o amarelo. A margem do <code>h2</code> colapsou com a margem do <code>div</code> (que era 0) e virou a margem do cartão inteiro. Foi o que aconteceu, sem você perceber, nas capas com foto da aula <a href="background-image.html">Imagem de Fundo</a>: uma faixa branca em cima da foto, que era a margem do <code>h1</code>.</p>
+
+<p>Três jeitos de consertar, do mais simples ao mais moderno:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Conserto</th><th>Por que funciona</th><th>Quando usar</th></tr>
+<tr><td><code>padding-top: 40px;</code> no pai, e <code>margin-top: 0</code> no filho</td><td>Espaço de dentro é padding, não margem</td><td>Quase sempre: é o que você queria de verdade</td></tr>
+<tr><td><code>padding</code> ou <code>border</code> no pai (até <code>padding: 1px</code>)</td><td>Qualquer padding ou borda separa as duas margens, e elas não se encostam mais</td><td>Quando o cartão já tem padding ou borda (acontece muito)</td></tr>
+<tr><td><code>display: flow-root;</code> no pai</td><td>Cria um "contexto" novo: as margens dos filhos ficam presas dentro do pai</td><td>Quando você não quer mexer no padding nem na borda</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>6. Margem negativa</h2>
+<p>A margem, diferente do padding, aceita valores <strong>negativos</strong>. Uma margem negativa puxa a caixa para fora do lugar dela, por cima da vizinha:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="capa"&gt;&lt;/div&gt;
+&lt;img class="avatar" src="assets/midia/avatar-ana-96.png" alt="Avatar da Ana" width="96" height="96"&gt;
+&lt;h2&gt;Ana Souza&lt;/h2&gt;
+</pre>
+<pre class="script" data-file="style.css">.capa {
+  background-color: tomato;
+  height: 80px;
+}
+
+.avatar {
+  display: block;
+  margin-top: -48px;
+  margin-left: 16px;
+}
+</pre>
+</div>
+
+<p>O avatar sobe 48 pixels (metade da altura dele) e fica metade em cima da faixa tomate, metade fora, como nas páginas de perfil das redes sociais. O <code>display: block</code> é porque a imagem é um elemento em linha, e a margem de cima não funciona em elementos em linha (aula <a href="box-model.html">O Modelo de Caixa</a>, seção 7). Use a margem negativa com cuidado: ela tira a caixa do lugar e pode cobrir texto.</p>
+
+<hr>
+
+<h2>7. Margem ou padding?</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th><code>margin</code></th><th><code>padding</code></th></tr>
+<tr><td>Onde fica</td><td>Fora da borda</td><td>Dentro da borda</td></tr>
+<tr><td>O fundo pinta?</td><td>Não (transparente)</td><td>Sim</td></tr>
+<tr><td>Colapsa?</td><td>Sim, na vertical</td><td>Nunca</td></tr>
+<tr><td>Negativo?</td><td>Pode</td><td>Não pode</td></tr>
+<tr><td><code>auto</code>?</td><td>Pode: centraliza</td><td>Não pode</td></tr>
+<tr><td>Use para</td><td>afastar a caixa <strong>das outras</strong>: espaço entre cartões, entre seções</td><td>afastar o conteúdo <strong>da borda</strong>: o "respiro" dentro de um botão, de um cartão</td></tr>
+</table>
+</div>
+
+<p>Uma pergunta resolve: "o espaço deve ter a cor do fundo da caixa?" Se sim, é padding. Se deve mostrar o que está atrás, é margem.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Sem mensagem: o <code>margin: 0 auto</code> que não centraliza</strong>
+<p><strong>O que aconteceu:</strong> três causas comuns, todas sem mensagem e sem nada riscado no F12:</p>
+<ul>
+  <li><strong>Sem <code>width</code>:</strong> a caixa de bloco já ocupa a linha inteira; não sobra espaço para o <code>auto</code> dividir.</li>
+  <li><strong>Elemento em linha</strong> (<code>span</code>, <code>a</code>, <code>img</code>): o <code>auto</code> nos lados vale 0 para eles. Uma imagem com <code>margin: 0 auto</code> continua na esquerda.</li>
+  <li><strong>Querer centralizar o texto:</strong> o <code>margin: 0 auto</code> move a <strong>caixa</strong>; o texto dentro dela continua alinhado à esquerda.</li>
+</ul>
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;img class="logo" src="assets/midia/logo-lojinha-200.png" alt="Lojinha da Ana" width="200" height="80"&gt;
+&lt;p class="aviso"&gt;Fechado no feriado.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.logo {
+  margin: 0 auto;
+}
+
+.aviso {
+  background-color: lightyellow;
+  margin: 0 auto;
+}
+</pre>
+</div>
+<p>Nenhum dos dois sai da esquerda: o logo é uma imagem (em linha), e o aviso não tem largura (ele já ocupa a linha toda, e o texto fica na esquerda).</p>
+<p><strong>Como consertar:</strong> na imagem, <code>display: block;</code>; no aviso, um <code>width</code> (ou <code>max-width</code>). Para centralizar o texto, <code>text-align: center</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Sem mensagem: o espaço que não somou</strong>
+<p><strong>O que aconteceu:</strong> <code>margin-bottom: 30px</code> num parágrafo e <code>margin-top: 20px</code> no seguinte: espaço de 30, e não de 50. É o colapso (seção 5).</p>
+<p><strong>Como consertar:</strong> não é erro. Para ter 50, ponha 50 numa das duas. Uma regra que evita a confusão: use margem <strong>só embaixo</strong> (<code>margin-bottom</code>) nos elementos do texto, e nunca em cima.</p>
+</div>
+
+<div class="cenario">
+<strong>Sem mensagem: a faixa vazia em cima do cartão</strong>
+<p><strong>O que aconteceu:</strong> a margem de cima do primeiro filho vazou para fora do pai (seção 5): o fundo do cartão começa mais para baixo, e sobra uma faixa sem cor em cima.</p>
+<p><strong>Como consertar:</strong> <code>padding</code> no pai, ou <code>display: flow-root</code>.</p>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Erro de propósito:</strong> as três regras têm erros. Leia os cenários abaixo e conserte.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa um"&gt;um&lt;/div&gt;
+&lt;div class="caixa dois"&gt;dois&lt;/div&gt;
+&lt;div class="caixa tres"&gt;três&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.um {
+  margin: 0 center;
+}
+
+.dois {
+  margin-centre: 20px;
+}
+
+.tres {
+  margin: 20 px;
+}
+
+.caixa {
+  background-color: lightyellow;
+  border: 2px solid tomato;
+  width: 200px;
+}
+</pre>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “margin”: “center” is not a “margin” value.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>margin: 0 center</code>. A ideia era centralizar, mas <code>center</code> não é um tamanho de margem. A declaração é ignorada.</p>
+<pre class="term" data-cwd="~/margem">$ vnu --css style.css
+"file:/home/ana/margem/style.css":2.13-2.18: error: CSS: “margin”: “center” is not a “margin” value.</pre>
+<p><strong>Como consertar:</strong> <code>margin: 0 auto;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “margin-centre”: Property “margin-centre” doesn't exist.</code></strong>
+<p><strong>O que aconteceu:</strong> uma propriedade inventada. Os lados são <code>top</code>, <code>right</code>, <code>bottom</code> e <code>left</code>; não existe "margem do centro".</p>
+<pre class="term" data-cwd="~/margem">$ vnu --css style.css
+"file:/home/ana/margem/style.css":6.18-6.21: error: CSS: “margin-centre”: Property “margin-centre” doesn't exist.</pre>
+<p><strong>Como consertar:</strong> <code>margin</code>, ou um dos quatro lados.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “margin”: only “0” can be a “unit”. You must put a unit after your number.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>20 px</code>, com um espaço entre o número e a unidade. Para o CSS, são duas coisas: o número <code>20</code> (sem unidade) e a palavra <code>px</code>.</p>
+<pre class="term" data-cwd="~/margem">$ vnu --css style.css
+"file:/home/ana/margem/style.css":10.14-10.15: error: CSS: “margin”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<p><strong>Como consertar:</strong> <code>20px</code>, colado.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>margin: 20px;</code></td><td>20 nos quatro lados</td></tr>
+<tr><td><code>margin: 10px 40px;</code></td><td>10 em cima e embaixo, 40 nos lados</td></tr>
+<tr><td><code>margin: 10px 20px 30px 40px;</code></td><td>Em cima, direita, embaixo, esquerda</td></tr>
+<tr><td><code>margin-top</code>, <code>-right</code>, <code>-bottom</code>, <code>-left</code></td><td>Um lado só</td></tr>
+<tr><td><code>margin: 0;</code></td><td>Sem margem (zero dispensa a unidade)</td></tr>
+<tr><td><code>margin: 0 auto;</code></td><td>Centraliza na horizontal uma caixa de bloco com largura</td></tr>
+<tr><td><code>margin-left: auto;</code></td><td>Empurra a caixa para a direita</td></tr>
+<tr><td><code>margin-top: -48px;</code></td><td>Margem negativa: puxa a caixa por cima da vizinha</td></tr>
+<tr><td>Colapso</td><td>Margens verticais que se encostam viram uma só, a maior</td></tr>
+<tr><td><code>display: flow-root;</code></td><td>Impede que a margem do filho vaze para fora do pai</td></tr>
+<tr><td>Herança</td><td>Não é herdada</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Centralizar</h3>
+<p>Complete para centralizar a caixa de 600px:</p>
+<div class="ex-code">.pagina {
+  width: 600px;
+  margin: 0 <input data-answer="auto" aria-label="valor">;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. O colapso</h3>
+<p>Um <code>h2</code> tem <code>margin-bottom: 24px</code> e o <code>p</code> logo abaixo tem <code>margin-top: 16px</code>. Quantos pixels de espaço ficam entre eles?</p>
+<div class="ex-code"><input data-answer="24|24px" aria-label="espaço"> pixels</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. <code>margin: 10px 20px 30px;</code> Quanto vale a margem da esquerda?</p>
+<label><input type="radio" name="q3"> 10px</label>
+<label><input type="radio" name="q3"> 20px</label>
+<label><input type="radio" name="q3"> 30px</label>
+<label><input type="radio" name="q3"> 0</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">4. Por que <code>margin: 0 auto</code> não centraliza um <code>&lt;img&gt;</code>?</p>
+<label><input type="radio" name="q4"> Porque a imagem não tem borda</label>
+<label><input type="radio" name="q4"> Porque faltou o <code>!important</code></label>
+<label><input type="radio" name="q4"> Porque imagem não aceita margem nenhuma</label>
+<label><input type="radio" name="q4"> Porque a imagem é um elemento em linha; precisa de <code>display: block</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Você quer espaço <strong>amarelo</strong> entre o texto e a borda de um cartão de fundo amarelo. Use:</p>
+<label><input type="radio" name="q5"> <code>padding</code></label>
+<label><input type="radio" name="q5"> <code>margin</code></label>
+<label><input type="radio" name="q5"> <code>margin: auto</code></label>
+<label><input type="radio" name="q5"> margem negativa</label>
+</div>
+
+<h3>Missão final: o cardápio centralizado</h3>
+
+<div class="tryhtml" data-goal="css:.cardapio{width}=320px,src:\.cardapio\s*\{[^}]*margin(-left)?:\s*[^;]*auto,css:.cardapio{padding-top}=24px,css:.cardapio h2{margin-top}=0px,css:body{margin-top}=0px">
+<p class="try-task"><strong>Missão:</strong> (1) Zere a margem do <code>body</code>. (2) Centralize o <code>.cardapio</code>, com <strong>320px</strong> de largura. (3) A faixa vazia em cima do título está <strong>fora</strong> do amarelo: troque a margem de cima do <code>h2</code> (deixe 0) por <strong>24px de padding em cima</strong> no <code>.cardapio</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cardapio"&gt;
+  &lt;h2&gt;Cardápio da Padaria&lt;/h2&gt;
+  &lt;p&gt;Pão francês, pão de queijo e sonho.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  background-color: lightgray;
+}
+
+.cardapio {
+  background-color: lightyellow;
+  width: 320px;
+}
+
+.cardapio h2 {
+  margin-top: 24px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  background-color: lightgray;
+  margin: 0;
+}
+
+.cardapio {
+  background-color: lightyellow;
+  width: 320px;
+  margin: 0 auto;
+  padding-top: 24px;
+}
+
+.cardapio h2 {
+  margin-top: 0;
+}
+</pre>
+</div>
+
+<p>Com o padding, o espaço de cima passa a ser amarelo, <strong>dentro</strong> do cardápio, e não há mais margem para colapsar. Com o <code>body</code> sem margem, o cardápio encosta no topo da janela.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>margin</code> é o espaço de fora da caixa: transparente, empurra os vizinhos. Um a quatro valores, no sentido do relógio a partir de cima; ou um lado só com <code>margin-top</code> e companhia.</li>
+  <li>O navegador já põe margens (<code>body</code> 8px, <code>p</code> 1em…). <code>margin: 0</code> zera.</li>
+  <li><code>margin: 0 auto</code> centraliza na horizontal uma caixa <strong>de bloco</strong> com <strong>largura</strong>. Não centraliza na vertical, nem o texto, nem um elemento em linha.</li>
+  <li>Colapso: margens verticais que se encostam viram uma só, a maior. A margem de cima do primeiro filho pode vazar para fora do pai: use padding ou <code>display: flow-root</code>.</li>
+  <li>A margem aceita valores negativos; o padding, não.</li>
+  <li>Espaço com a cor do fundo da caixa: padding. Espaço entre caixas: margem.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
