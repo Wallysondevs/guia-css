@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Media Queries — @media, min-width, max-width e mais | Guia CSS</title>
+<meta name="description" content="Media queries (@media) para quem está começando: aplicar regras de CSS só a partir de uma largura de tela, min-width e max-width, a sintaxe nova com >= e <=, juntar condições com and, vírgula e not, os tipos de mídia (screen, print), outras perguntas (orientation, hover, pointer, prefers-color-scheme), a ordem na cascata e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Media Queries</span></h1>
+
+<p class="intro">Uma <strong>media query</strong> ("consulta à mídia") é uma pergunta que o CSS faz ao navegador: "a tela tem pelo menos 700 pixels de largura?". Se a resposta for sim, as regras de dentro valem; se for não, são ignoradas. É assim que a mesma página mostra uma coluna no celular e três no computador, um menu em lista no celular e em linha no computador. Com a <a href="viewport.html">meta viewport</a> no HTML e as <a href="responsivo.html">larguras fluidas</a>, as media queries completam o design responsivo.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A anatomia de <code>@media (min-width: 700px) { … }</code>.</li>
+  <li><code>min-width</code> ("a partir de") e <code>max-width</code> ("até"), e a escrita nova com <code>&gt;=</code> e <code>&lt;=</code>.</li>
+  <li>Juntar perguntas com <code>and</code>, vírgula e <code>not</code>.</li>
+  <li>Os tipos de mídia (<code>screen</code>, <code>print</code>) e outras perguntas: orientação, mouse ou dedo, tema escuro.</li>
+  <li>Onde escrever e por que a <strong>ordem</strong> importa.</li>
+  <li>Os erros reais: parênteses, espaço depois do <code>and</code>, unidade, chave que falta, nome errado.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador. Os quadros desta aula começam numa largura fixa: use os botões <strong>375</strong>, <strong>768</strong> e <strong>cheia</strong> da barra do quadro para ver as media queries ligando e desligando. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: "se chover, leve o guarda-chuva"</h2>
+<p>Antes de sair, você confere o tempo: <strong>se</strong> estiver chovendo, leva o guarda-chuva; se não, sai sem ele. A roupa é a mesma; o guarda-chuva é o ajuste para aquela condição.</p>
+<p>A media query é o "se" do CSS. A condição é sobre o lugar onde a página está sendo mostrada (a largura da tela, a impressora, o tema escuro do sistema), e o ajuste são as regras de dentro das chaves. O navegador refaz a pergunta o tempo todo: se o leitor gira o celular ou estreita a janela, as regras ligam e desligam na hora.</p>
+
+<hr>
+
+<h2>1. A primeira media query</h2>
+
+<div class="tryhtml" data-largura="375">
+<p class="try-task"><strong>Experimente:</strong> em 375 px, o aviso fica amarelo. Clique em <strong>768</strong>: a tela passou de 600 px, e o aviso fica azul-marinho com letra branca. Volte para <strong>375</strong>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;p class="aviso"&gt;Encomendas até quinta-feira.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.aviso {
+  padding: 1rem;
+  background-color: gold;
+}
+
+@media (min-width: 600px) {
+  .aviso {
+    background-color: navy;
+    color: white;
+  }
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>@media</dt><dd>Uma <strong>regra-arroba</strong> (<em>at-rule</em>): começa com <code>@</code> e não estiliza nada sozinha; ela guarda outras regras.</dd>
+  <dt>(min-width: 600px)</dt><dd>A <strong>pergunta</strong>, sempre entre parênteses: "a largura da tela é de <strong>no mínimo</strong> 600 px?". A largura é a do viewport, a área da janela onde a página é desenhada (no editor, o quadro).</dd>
+  <dt>{</dt><dd>Abre o bloco da media query.</dd>
+  <dt>.aviso { … }</dt><dd>Regras normais, como as de fora, só que dentro do bloco. Repare na indentação: dois espaços a mais.</dd>
+  <dt>}</dt><dd>Fecha o bloco. São duas chaves no fim: a da regra <code>.aviso</code> e a da <code>@media</code>.</dd>
+</dl>
+
+<p>Repare que a regra de fora (amarela) continua valendo em qualquer largura. A de dentro só <strong>acrescenta</strong> por cima, a partir de 600 px: o fundo vira azul-marinho e a letra fica branca; o <code>padding</code> continua o mesmo, porque ninguém o mudou.</p>
+
+<hr>
+
+<h2>2. <code>min-width</code> e <code>max-width</code></h2>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Pergunta</th><th>Quer dizer</th><th>Vale em 375 px?</th><th>Vale em 1024 px?</th></tr>
+<tr><td><code>(min-width: 600px)</code></td><td>largura de <strong>600 px ou mais</strong> ("a partir de")</td><td>Não</td><td>Sim</td></tr>
+<tr><td><code>(max-width: 600px)</code></td><td>largura de <strong>600 px ou menos</strong> ("até")</td><td>Sim</td><td>Não</td></tr>
+<tr><td><code>(min-width: 600px) and (max-width: 899px)</code></td><td>de 600 <strong>até</strong> 899 px</td><td>Não</td><td>Não</td></tr>
+</table>
+</div>
+
+<p>Os dois incluem o número: em exatamente 600 px, <code>min-width: 600px</code> e <code>max-width: 600px</code> valem <strong>ao mesmo tempo</strong>. Por isso, quando usar os dois, faça um terminar um pixel antes de o outro começar (<code>max-width: 599px</code> e <code>min-width: 600px</code>).</p>
+
+<p>Qual dos dois usar como base é a escolha entre "começar pelo celular" (<code>min-width</code>) e "começar pelo computador" (<code>max-width</code>). O guia recomenda o primeiro, e explica por quê na próxima aula, <a href="mobile-first.html">Mobile First</a>.</p>
+
+<h3>A escrita nova: <code>&gt;=</code> e <code>&lt;=</code></h3>
+<p>Desde 2023, todos os navegadores principais também entendem a pergunta escrita como uma conta (Chrome e Edge 104, Firefox 102, Safari 16.4; dados do MDN):</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita clássica</th><th>Escrita nova (<em>range syntax</em>)</th></tr>
+<tr><td><code>(min-width: 600px)</code></td><td><code>(width &gt;= 600px)</code></td></tr>
+<tr><td><code>(max-width: 599px)</code></td><td><code>(width &lt; 600px)</code></td></tr>
+<tr><td><code>(min-width: 600px) and (max-width: 899px)</code></td><td><code>(600px &lt;= width &lt; 900px)</code></td></tr>
+</table>
+</div>
+
+<p>A escrita nova é mais fácil de ler e resolve o problema do "pixel a mais", com o <code>&lt;</code> que não inclui o número. Nos exemplos do guia, usamos a clássica, que você vai ver em quase todo código que existe; as duas funcionam.</p>
+
+<div class="tryhtml" data-largura="768">
+<p class="try-task"><strong>Experimente:</strong> são três faixas, com três cores. O quadro começa em 768 px (verde). Clique em <strong>375</strong> (amarelo) e em <strong>cheia</strong> (azul, se a sua tela tiver espaço para mais de 900 px).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="faixa"&gt;Em que faixa de tela estou?&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.faixa {
+  padding: 1rem;
+  background-color: gold;
+}
+
+@media (600px &lt;= width &lt; 900px) {
+  .faixa {
+    background-color: lightgreen;
+  }
+}
+
+@media (width &gt;= 900px) {
+  .faixa {
+    background-color: lightblue;
+  }
+}
+</pre>
+</div>
+
+<div class="tryhtml" data-largura="768" data-goal="css:h1{font-size}=48px,css:h1{color}=rgb(255, 99, 71),src:@media\s*\(\s*(min-width:\s*700px|width\s*&gt;=\s*700px)\s*\)">
+<p class="try-task"><strong>Missão:</strong> em telas de <strong>700 px ou mais</strong>, o título da Ana fica maior (<code>font-size: 3rem</code>) e da cor <code>tomato</code>. Escreva a media query no fim do <code>style.css</code>. O quadro está em 768 px. Depois clique em <strong>375</strong> e veja o título voltar ao normal.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Doces e salgados de fim de semana.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  font-size: 2rem;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  font-size: 2rem;
+}
+
+@media (min-width: 700px) {
+  h1 {
+    font-size: 3rem;
+    color: tomato;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Juntar perguntas: <code>and</code>, vírgula e <code>not</code></h2>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Quer dizer</th></tr>
+<tr><td><code>@media (min-width: 600px) and (orientation: landscape)</code></td><td>As duas coisas: 600 px ou mais <strong>e</strong> a tela deitada</td></tr>
+<tr><td><code>@media (max-width: 599px), print</code></td><td>Uma <strong>ou</strong> outra: tela estreita, ou impressão (a vírgula é o "ou")</td></tr>
+<tr><td><code>@media not print</code></td><td>Tudo, <strong>menos</strong> a impressão</td></tr>
+</table>
+</div>
+
+<p>Depois do <code>and</code>, sempre um espaço antes do parêntese: <code>and (</code>. Sem o espaço, a media query inteira deixa de valer (veja <a href="#errado">Quando dá errado</a>).</p>
+
+<hr>
+
+<h2>4. Tipos de mídia e outras perguntas</h2>
+<p>Antes da pergunta, pode vir o <strong>tipo de mídia</strong>:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Tipo</th><th>Quando vale</th></tr>
+<tr><td><code>all</code></td><td>Sempre (é o padrão quando você não escreve nenhum)</td></tr>
+<tr><td><code>screen</code></td><td>Telas: computador, celular, tablet, TV</td></tr>
+<tr><td><code>print</code></td><td>Na impressão e no "Salvar como PDF" (aula <a href="impressao.html">CSS para Impressão</a>)</td></tr>
+</table>
+</div>
+
+<p>Por isso você vai ver muito <code>@media screen and (min-width: 600px)</code>. O <code>screen and</code> é opcional: sem ele, a regra também vale na impressão, o que quase sempre é o que você quer.</p>
+
+<p>E a largura não é a única pergunta:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Pergunta</th><th>Vale quando</th><th>Uso típico</th></tr>
+<tr><td><code>(orientation: landscape)</code></td><td>A tela é mais larga que alta (deitada); <code>portrait</code>, em pé</td><td>Aproveitar o celular deitado</td></tr>
+<tr><td><code>(hover: hover)</code></td><td>O aparelho principal consegue "passar por cima" (mouse)</td><td>Efeitos de <code>:hover</code> só onde há mouse</td></tr>
+<tr><td><code>(pointer: coarse)</code></td><td>O apontador principal é impreciso (dedo); <code>fine</code>, mouse</td><td>Botões maiores para o dedo</td></tr>
+<tr><td><code>(prefers-color-scheme: dark)</code></td><td>O sistema do leitor está no tema escuro</td><td>Aula <a href="tema-escuro.html">Tema Escuro</a></td></tr>
+<tr><td><code>(prefers-reduced-motion: reduce)</code></td><td>O leitor pediu menos animação no sistema</td><td>Aula <a href="reduced-motion.html">Menos Movimento</a></td></tr>
+</table>
+</div>
+
+<div class="tryhtml" data-largura="768">
+<p class="try-task"><strong>Experimente:</strong> no computador, com mouse, o botão está com borda fina. Num celular ou tablet (toque), a regra <code>(pointer: coarse)</code> vale e o botão fica bem mais alto, fácil de acertar com o dedo. No quadro, a resposta depende do <strong>seu</strong> aparelho: os botões de largura não mudam o tipo de apontador.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button type="button"&gt;Encomendar&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">button {
+  padding: 0.25rem 0.75rem;
+}
+
+@media (pointer: coarse) {
+  button {
+    padding: 1rem 2rem;
+    font-size: 1.25rem;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>5. Onde escrever, e a ordem</h2>
+<p>Uma media query <strong>não</strong> deixa a regra mais forte. Na <a href="cascata.html">cascata</a>, as regras de dentro de uma <code>@media</code> têm a mesma especificidade das de fora; quando a media query vale e as duas empatam, ganha a que vem <strong>depois</strong> no arquivo. Por isso:</p>
+<ul>
+  <li>Escreva a regra normal <strong>antes</strong> e a media query <strong>depois</strong>.</li>
+  <li>Há dois costumes, e os dois funcionam: as media queries todas no <strong>fim</strong> do arquivo, ou cada uma logo <strong>depois</strong> da regra que ela ajusta (mais fácil de achar).</li>
+  <li>Com o <a href="aninhamento.html">CSS aninhado</a>, dá até para escrever a <code>@media</code> dentro da própria regra.</li>
+</ul>
+
+<p>Também dá para pôr a condição no próprio <code>&lt;link&gt;</code> do HTML: <code>&lt;link rel="stylesheet" href="impressao.css" media="print"&gt;</code>. O arquivo inteiro só vale na impressão. É mais usado para impressão do que para larguras de tela.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Quando usar</th></tr>
+<tr><td><code>@media</code> no fim do <code>style.css</code></td><td>Projetos pequenos; todos os ajustes num lugar</td></tr>
+<tr><td><code>@media</code> logo depois da regra</td><td>Projetos médios e grandes; cada componente com os seus ajustes</td></tr>
+<tr><td><code>&lt;link media="print"&gt;</code></td><td>Um arquivo inteiro só para impressão</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>A media query antes da regra normal: a de fora ganha</strong>
+<div class="tryhtml" data-largura="768">
+<p class="try-task"><strong>Erro de propósito:</strong> em 768 px, o aviso deveria ficar azul-marinho, e fica amarelo. Leve a <code>@media</code> para <strong>depois</strong> da regra <code>.aviso</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="aviso"&gt;Encomendas até quinta-feira.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">@media (min-width: 600px) {
+  .aviso {
+    background-color: navy;
+    color: white;
+  }
+}
+
+.aviso {
+  padding: 1rem;
+  background-color: gold;
+}
+</pre>
+</div>
+<p><strong>O que você vê:</strong> em 768 px, o fundo continua amarelo, mas a letra fica <strong>branca</strong> (quase ilegível no amarelo). O <code>color: white</code> valeu, porque a regra de baixo não mexe na cor da letra; o <code>background-color</code> perdeu.</p>
+<p><strong>Por quê:</strong> as duas regras têm o mesmo seletor e a mesma força. Com empate, ganha a última do arquivo, e a última é a amarela. No F12, a declaração <code>background-color: navy</code> aparece <strong>riscada</strong>. O validador não reclama: não há erro de escrita.</p>
+<p><strong>Como consertar:</strong> regra normal antes, media query depois.</p>
+</div>
+
+<div class="cenario">
+<strong>Sem parênteses: <code>unrecognized media “min-width”</code></strong>
+<pre class="term" data-cwd="~/site">$ cat sem-parenteses.css
+@media min-width: 700px {
+  h1 {
+    color: navy;
+  }
+}
+$ vnu --css sem-parenteses.css
+"file:/home/ana/site/sem-parenteses.css":5.2-6.1: error: CSS: unrecognized media “min-width”.</pre>
+<p><strong>O que significa:</strong> "mídia desconhecida: <code>min-width</code>". Sem os parênteses, o validador (e o navegador) leem <code>min-width</code> como um <strong>tipo</strong> de mídia, como <code>screen</code> ou <code>print</code>, e esse tipo não existe. O navegador ignora o bloco inteiro: o título nunca fica azul-marinho, em largura nenhuma.</p>
+<p><strong>Como consertar:</strong> a pergunta sempre entre parênteses: <code>@media (min-width: 700px)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Sem espaço depois do <code>and</code>: <code>Parse Error</code></strong>
+<pre class="file" data-file="index.html" data-resultado data-largura="768">&lt;style&gt;
+  @media (min-width: 700px) and(max-width: 999px) {
+    h1 {
+      color: navy;
+    }
+  }
+&lt;/style&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+</pre>
+<p><strong>O que você vê:</strong> em 768 px, que está entre 700 e 999, o título continua preto.</p>
+<p><strong>Por quê:</strong> grudado no parêntese, <code>and(</code> é lido como o nome de uma função, que não existe. A media query fica inválida e o navegador a trata como "nunca vale". O validador:</p>
+<pre class="term" data-cwd="~/site">$ vnu --css and.css
+"file:/home/ana/site/and.css":5.2-6.1: error: CSS: Parse Error.</pre>
+<p><strong>Como consertar:</strong> <code>and (max-width: 999px)</code>, com espaço.</p>
+</div>
+
+<div class="cenario">
+<strong>Número sem unidade: <code>only “0” can be a “unit”</code></strong>
+<pre class="term" data-cwd="~/site">$ vnu --css sem-px.css
+"file:/home/ana/site/sem-px.css":1.23-1.23: error: CSS: only “0” can be a “unit”. You must put a unit after your number</pre>
+<p><strong>O que significa:</strong> em <code>@media (min-width: 700)</code>, faltou o <code>px</code>. "Só o 0 pode ficar sem unidade. Você precisa pôr uma unidade depois do número." O navegador ignora o bloco.</p>
+<p><strong>Como consertar:</strong> <code>(min-width: 700px)</code>. Também vale <code>em</code> (<code>43.75em</code>), que acompanha o tamanho de letra que o leitor escolheu no navegador.</p>
+</div>
+
+<div class="cenario">
+<strong>Nome errado: o validador não avisa</strong>
+<p><strong>O que acontece:</strong> com <code>@media (min-widht: 700px)</code> (as letras <code>h</code> e <code>t</code> trocadas), o navegador não conhece a pergunta e trata a media query como "nunca vale". O <code>vnu --css</code> 26.10.12 <strong>não mostra nada</strong> para esse arquivo.</p>
+<p><strong>Como achar:</strong> mude a largura (no quadro, ou arrastando a janela) e confira se o estilo liga. No F12, a regra de dentro de uma media query que não vale nem aparece no painel de estilos do elemento.</p>
+</div>
+
+<div class="cenario">
+<strong>Esqueceu a <code>}</code> da <code>@media</code>: as regras de baixo entram nela</strong>
+<pre class="file" data-file="index.html" data-resultado data-largura="375">&lt;style&gt;
+  @media (min-width: 700px) {
+    h1 {
+      color: navy;
+    }
+
+  p {
+    color: green;
+  }
+&lt;/style&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;p&gt;Encomendas até quinta-feira.&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> em 375 px, o parágrafo fica preto, e não verde. Em telas de 700 px ou mais, ele fica verde.</p>
+<p><strong>Por quê:</strong> a <code>}</code> que fecha a <code>h1</code> foi entendida como o fim da regra, e a da <code>@media</code> nunca veio. A regra do <code>p</code> ficou <strong>dentro</strong> da media query, e só vale a partir de 700 px. O validador:</p>
+<pre class="term" data-cwd="~/site">$ vnu --css chave.css
+"file:/home/ana/site/chave.css":8.2-9.1: error: CSS: Parse Error.</pre>
+<p><strong>Como consertar:</strong> feche a <code>@media</code>. A indentação ajuda a ver: a regra de dentro tem dois espaços a mais, e a <code>}</code> da <code>@media</code> fica na coluna 1.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Vale quando</th></tr>
+<tr><td><code>@media (min-width: 600px) { … }</code></td><td>A largura é de 600 px ou mais</td></tr>
+<tr><td><code>@media (max-width: 599px) { … }</code></td><td>A largura é de 599 px ou menos</td></tr>
+<tr><td><code>@media (width &gt;= 600px)</code></td><td>O mesmo que <code>min-width: 600px</code> (escrita nova)</td></tr>
+<tr><td><code>@media (600px &lt;= width &lt; 900px)</code></td><td>De 600 até 899,99 px</td></tr>
+<tr><td><code>A and B</code> · <code>A, B</code> · <code>not A</code></td><td>Os dois · um ou outro · o contrário</td></tr>
+<tr><td><code>screen</code> · <code>print</code> · <code>all</code></td><td>Telas · impressão · sempre</td></tr>
+<tr><td><code>(orientation: landscape)</code></td><td>Tela deitada</td></tr>
+<tr><td><code>(hover: hover)</code> · <code>(pointer: coarse)</code></td><td>Tem mouse · o apontador é o dedo</td></tr>
+<tr><td><code>(prefers-color-scheme: dark)</code></td><td>Tema escuro no sistema</td></tr>
+<tr><td>Ordem</td><td>A <code>@media</code> não soma força: escreva depois da regra normal</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A regra-arroba</h3>
+<p>Complete o começo da media query:</p>
+<div class="ex-code"><input data-answer="@media" aria-label="regra"> (min-width: 600px) { … }</div>
+</div>
+
+<div class="exercise">
+<h3>2. A partir de</h3>
+<p>Complete para as regras valerem em telas de <strong>800 px ou mais</strong>:</p>
+<div class="ex-code">@media (<input data-answer="min-width" aria-label="pergunta">: 800px) { … }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Impressão</h3>
+<p>Complete o tipo de mídia da impressão:</p>
+<div class="ex-code">@media <input data-answer="print" aria-label="tipo"> { nav { display: none; } }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Em exatamente 600 px de largura, quais destas valem: <code>(min-width: 600px)</code> e <code>(max-width: 600px)</code>?</p>
+<label><input type="radio" name="q4"> Só a <code>min-width</code></label>
+<label><input type="radio" name="q4"> As duas: as duas incluem o 600</label>
+<label><input type="radio" name="q4"> Só a <code>max-width</code></label>
+<label><input type="radio" name="q4"> Nenhuma</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. A Ana escreveu a <code>@media (min-width: 600px) { .aviso { … } }</code> no começo do arquivo e a regra <code>.aviso { … }</code> depois. Numa tela de 800 px, qual vale para a mesma propriedade?</p>
+<label><input type="radio" name="q5"> A da media query: ela é mais forte</label>
+<label><input type="radio" name="q5"> Nenhuma: elas se anulam</label>
+<label><input type="radio" name="q5"> A de fora: empatam na força, e ganha a que vem depois</label>
+<label><input type="radio" name="q5"> Depende do navegador</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. O que há de errado em <code>@media (min-width: 700px) and(max-width: 999px)</code>?</p>
+<label><input type="radio" name="q6"> Falta o espaço depois do <code>and</code>; a media query inteira deixa de valer</label>
+<label><input type="radio" name="q6"> O <code>and</code> não existe em media queries</label>
+<label><input type="radio" name="q6"> Precisa de vírgula no lugar do <code>and</code></label>
+<label><input type="radio" name="q6"> Nada: funciona normalmente</label>
+</div>
+
+<h3>Missão final: a página que só vira três colunas na tela grande</h3>
+
+<div class="tryhtml" data-largura="375" data-goal="css:.colunas{grid-template-columns}=359px,css:h1{font-size}=32px,src:@media\s*\(\s*(min-width:\s*700px|width\s*&gt;=\s*700px)\s*\)\s*\{[\s\S]*grid-template-columns,src:@media[\s\S]*font-size:\s*3rem">
+<p class="try-task"><strong>Missão:</strong> o CSS da Ana foi feito para o computador: no celular (o quadro está em 375 px), as três colunas ficam espremidas e o título enorme. Leve o <code>grid-template-columns</code> e o <code>font-size: 3rem</code> do título para dentro de uma <code>@media (min-width: 700px)</code>, no fim do arquivo. No celular, uma coluna e o título no tamanho normal; clique em <strong>cheia</strong> para ver as três colunas voltarem (se a sua tela for larga).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;div class="colunas"&gt;
+  &lt;p&gt;Bolos caseiros, de cenoura, de fubá e de laranja.&lt;/p&gt;
+  &lt;p&gt;Pão de queijo saindo do forno às oito.&lt;/p&gt;
+  &lt;p&gt;Café coado na hora, com leite ou sem.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  font-size: 3rem;
+}
+
+.colunas {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.colunas {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 700px) {
+  h1 {
+    font-size: 3rem;
+  }
+
+  .colunas {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>@media (pergunta) { regras }</code>: as regras de dentro só valem quando a resposta é sim. O navegador pergunta de novo sempre que a janela muda.</li>
+  <li><code>min-width</code> = "a partir de"; <code>max-width</code> = "até"; os dois incluem o número. Escrita nova: <code>(width &gt;= 600px)</code>, <code>(600px &lt;= width &lt; 900px)</code>.</li>
+  <li><code>and</code> (com espaço antes do parêntese), vírgula (= "ou"), <code>not</code>. Tipos: <code>screen</code>, <code>print</code>, <code>all</code>. Outras perguntas: <code>orientation</code>, <code>hover</code>, <code>pointer</code>, <code>prefers-color-scheme</code>, <code>prefers-reduced-motion</code>.</li>
+  <li>A media query não soma força: escreva-a <strong>depois</strong> da regra normal.</li>
+  <li>Erros: sem parênteses (<code>unrecognized media</code>), <code>and(</code> grudado ou <code>}</code> esquecida (<code>Parse Error</code>), número sem <code>px</code> (<code>only “0” can be a “unit”</code>). Nome errado (<code>min-widht</code>) o validador não vê: teste mudando a largura.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
