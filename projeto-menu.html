@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projeto: Menu Responsivo — do celular ao computador, passo a passo | Guia CSS</title>
+<meta name="description" content="Projeto de CSS passo a passo: o menu de navegação da lojinha da Ana, mobile first. Links empilhados com área de toque grande no celular, lado a lado a partir de 600px com @media, a página atual com aria-current, :hover e :focus-visible, o botão Menu que abre e fecha (o JavaScript só troca o aria-expanded; quem mostra e esconde é o CSS) e os erros comuns.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>Projeto: <span class="hl">Menu Responsivo</span></h1>
+
+<p class="intro">O menu é a primeira coisa que o visitante procura, e o lugar onde o design responsivo mais aparece: no computador, os links cabem lado a lado no topo; no celular, não cabem, e o menu vira uma lista que abre com um botão. Neste projeto você vai construir o menu da lojinha da Ana <strong>começando pelo celular</strong> (<a href="mobile-first.html">mobile first</a>), em seis versões, e conferir cada uma no quadro com a largura de um celular ou de um tablet.</p>
+
+<div class="note">
+<strong>Você vai usar</strong>
+<ul>
+  <li>Listas sem marcador e links com área de toque grande (aula <a href="listas.html">Estilizando Listas</a>).</li>
+  <li><code>@media (min-width: …)</code> e o raciocínio mobile first (aulas <a href="media-queries.html">Media Queries</a> e <a href="mobile-first.html">Mobile First</a>).</li>
+  <li>Flexbox: <code>justify-content: space-between</code>, <code>flex-wrap</code> e <code>flex-basis</code> (aulas <a href="justify-content.html">justify-content</a> e <a href="flex-grow.html">flex-basis</a>).</li>
+  <li>Seletores de atributo: <code>[aria-current="page"]</code> e <code>[aria-expanded="false"]</code> (aula <a href="seletores-atributo.html">Seletores de Atributo</a>).</li>
+  <li>O combinador <code>+</code>, "o irmão logo depois" (aula <a href="combinadores.html">Combinadores</a>).</li>
+</ul>
+</div>
+
+<div class="note">
+<strong>A largura do quadro</strong>
+<p>Cada caixa deste projeto abre com uma largura fixa: <strong>375 px</strong> (um celular) ou <strong>768 px</strong> (um tablet). A página dentro do quadro "enxerga" essa largura, e as media queries reagem a ela. Use os botões <strong>375</strong>, <strong>768</strong> e <strong>cheia</strong> da barra do quadro para trocar e ver o menu mudar. As missões são conferidas na largura com que a caixa abriu.</p>
+</div>
+
+<p>O menu pronto, a versão 6:</p>
+
+<div class="tryhtml" data-largura="375">
+<p class="try-task"><strong>O menu pronto:</strong> no celular (375 px), clique em <strong>Menu</strong> para abrir e fechar a lista. Depois aperte o botão <strong>768</strong> da barra do quadro: o botão some e os links ficam lado a lado.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;a class="topo-logo" href="index.html"&gt;Lojinha da Ana&lt;/a&gt;
+  &lt;button class="topo-botao" type="button" aria-expanded="false" aria-controls="menu"&gt;Menu&lt;/button&gt;
+  &lt;nav class="topo-menu" id="menu" aria-label="Principal"&gt;
+    &lt;ul class="menu-lista"&gt;
+      &lt;li&gt;&lt;a href="index.html" aria-current="page"&gt;Início&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="bolos.html"&gt;Bolos&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="encomendas.html"&gt;Encomendas&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="contato.html"&gt;Contato&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+&lt;main class="conteudo"&gt;
+  &lt;h1&gt;Bolos caseiros&lt;/h1&gt;
+  &lt;p&gt;Feitos sob encomenda, com entrega no bairro.&lt;/p&gt;
+&lt;/main&gt;
+&lt;script src="menu.js"&gt;&lt;/script&gt;
+</pre>
+<pre class="script" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+.topo {
+  padding: 12px 16px;
+  background-color: #7c2d12;
+  color: #ffffff;
+}
+.topo-logo {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.menu-lista {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.menu-lista a {
+  display: block;
+  padding: 12px 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  text-decoration: none;
+}
+.conteudo {
+  padding: 16px;
+}
+
+@media (min-width: 600px) {
+  .topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .menu-lista {
+    display: flex;
+    gap: 4px;
+    margin: 0;
+  }
+  .menu-lista a {
+    border-top: none;
+  }
+}
+
+.menu-lista a:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+.menu-lista a:focus-visible {
+  outline: 3px solid #fde68a;
+  outline-offset: -3px;
+}
+.menu-lista a[aria-current="page"] {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+.topo-menu {
+  flex-basis: 100%;
+}
+.topo-botao {
+  padding: 8px 12px;
+  border: 2px solid #ffffff;
+  border-radius: 6px;
+  background-color: transparent;
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+}
+.topo-botao[aria-expanded="false"] + .topo-menu {
+  display: none;
+}
+
+@media (min-width: 600px) {
+  .topo-botao {
+    display: none;
+  }
+  .topo-menu {
+    flex-basis: auto;
+  }
+  .topo-botao[aria-expanded="false"] + .topo-menu {
+    display: block;
+  }
+}
+</pre>
+<pre class="script" data-file="menu.js">const botao = document.querySelector(".topo-botao");
+
+botao.addEventListener("click", () =&gt; {
+  const aberto = botao.getAttribute("aria-expanded") === "true";
+  botao.setAttribute("aria-expanded", String(!aberto));
+});
+</pre>
+</div>
+
+<hr>
+
+<h2>Versão 1: o HTML</h2>
+<p>O cabeçalho (<code>&lt;header class="topo"&gt;</code>) tem o nome da loja, que é um link para o início, e um <code>&lt;nav&gt;</code> com uma lista de links. Dois detalhes de HTML que o CSS vai aproveitar:</p>
+<ul>
+  <li><code>aria-label="Principal"</code> no <code>&lt;nav&gt;</code> dá um nome ao menu para quem usa leitor de tela.</li>
+  <li><code>aria-current="page"</code> marca o link da <strong>página atual</strong>. O leitor de tela anuncia "página atual", e o CSS vai usar o mesmo atributo para destacá-lo (versão 4). Uma marca só, para as duas coisas.</li>
+</ul>
+
+<div class="tryhtml" data-largura="375">
+<p class="try-task"><strong>Experimente:</strong> sem CSS, o menu é uma lista com marcadores e links azuis sublinhados. Já funciona, e é por isso que o HTML vem primeiro: se o CSS não carregar, o menu continua usável.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;a class="topo-logo" href="index.html"&gt;Lojinha da Ana&lt;/a&gt;
+  &lt;nav class="topo-menu" aria-label="Principal"&gt;
+    &lt;ul class="menu-lista"&gt;
+      &lt;li&gt;&lt;a href="index.html" aria-current="page"&gt;Início&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="bolos.html"&gt;Bolos&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="encomendas.html"&gt;Encomendas&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="contato.html"&gt;Contato&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+&lt;main class="conteudo"&gt;
+  &lt;h1&gt;Bolos caseiros&lt;/h1&gt;
+  &lt;p&gt;Feitos sob encomenda, com entrega no bairro.&lt;/p&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">/* Versão 1: ainda sem estilo */
+</pre>
+</div>
+
+<hr>
+
+<h2>Versão 2: o celular primeiro</h2>
+<p>No celular, a lista fica <strong>empilhada</strong>, um link por linha, ocupando a largura toda. O mais importante aqui é o tamanho do alvo: um dedo é bem maior que a ponta do mouse.</p>
+
+<dl class="anatomy">
+  <dt>body { margin: 0; }</dt><dd>Tira a margem padrão de 8px da página, para a barra do topo encostar nas bordas da tela.</dd>
+  <dt>.menu-lista { list-style: none; padding: 0; }</dt><dd>Sem marcadores e sem o recuo padrão da lista.</dd>
+  <dt>.menu-lista a { display: block; padding: 12px 8px; }</dt><dd>O link vira um bloco da largura toda, com 12px em cima e embaixo. A área de toque fica com 43 pixels de altura no Chromium (conferido), perto dos 44 pixels que as recomendações de acessibilidade sugerem para dedos (aula <a href="acessibilidade.html">Acessibilidade</a>), e o leitor pode tocar em qualquer ponto da linha, não só nas letras.</dd>
+  <dt>border-top: 1px solid rgba(255, 255, 255, 0.3);</dt><dd>Uma linha clarinha separando os links.</dd>
+</dl>
+
+<div class="tryhtml" data-largura="375" data-goal="css:body{margin-top}=0px,css:.topo{background-color}=rgb(124, 45, 18),css:.menu-lista{list-style-type}=none,css:.menu-lista{padding-left}=0px,css:.menu-lista a{display}=block,css:.menu-lista a{padding-top}=12px,css:.menu-lista a{text-decoration-line}=none">
+<p class="try-task"><strong>Missão (versão 2):</strong> estilize para o celular: <code>box-sizing: border-box</code> em tudo; <code>body</code> sem margem e com fonte <code>sans-serif</code>; o <code>.topo</code> com <code>padding: 12px 16px</code>, fundo <code>#7c2d12</code> e letra branca; o <code>.topo-logo</code> branco, <code>1.25rem</code>, negrito, sem sublinhado; a <code>.menu-lista</code> sem marcadores, com <code>margin: 12px 0 0</code> e <code>padding: 0</code>; os links em bloco, com <code>padding: 12px 8px</code>, a linha de cima, letra branca e sem sublinhado; e o <code>.conteudo</code> com <code>padding: 16px</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;a class="topo-logo" href="index.html"&gt;Lojinha da Ana&lt;/a&gt;
+  &lt;nav class="topo-menu" aria-label="Principal"&gt;
+    &lt;ul class="menu-lista"&gt;
+      &lt;li&gt;&lt;a href="index.html" aria-current="page"&gt;Início&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="bolos.html"&gt;Bolos&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="encomendas.html"&gt;Encomendas&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="contato.html"&gt;Contato&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+&lt;main class="conteudo"&gt;
+  &lt;h1&gt;Bolos caseiros&lt;/h1&gt;
+  &lt;p&gt;Feitos sob encomenda, com entrega no bairro.&lt;/p&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">/* Versão 2: o celular primeiro */
+</pre>
+<pre class="solucao" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+.topo {
+  padding: 12px 16px;
+  background-color: #7c2d12;
+  color: #ffffff;
+}
+.topo-logo {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.menu-lista {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.menu-lista a {
+  display: block;
+  padding: 12px 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  text-decoration: none;
+}
+.conteudo {
+  padding: 16px;
+}
+</pre>
+</div>
+
+<p>O resultado no quadro de 375 px: uma barra marrom-escura no topo, com "Lojinha da Ana" em branco e, embaixo, os quatro links em branco, um por linha, separados por linhas finas.</p>
+
+<hr>
+
+<h2>Versão 3: telas largas, com <code>@media</code></h2>
+<p>A partir de 600 px de largura, há espaço para tudo numa linha: o nome à esquerda, os links à direita. Como o estilo do celular é a base, a media query só <strong>acrescenta</strong> o que muda em telas largas (<code>min-width</code>, "no mínimo"):</p>
+
+<dl class="anatomy">
+  <dt>@media (min-width: 600px) { … }</dt><dd>"Quando a janela tiver pelo menos 600 px de largura". O quadro de 375 px não entra; o de 768 px entra.</dd>
+  <dt>.topo { display: flex; justify-content: space-between; align-items: center; }</dt><dd>O nome e o <code>&lt;nav&gt;</code> lado a lado; a sobra de espaço vai para o meio, empurrando cada um para uma ponta; e os dois alinhados pelo centro na vertical.</dd>
+  <dt>.menu-lista { display: flex; gap: 4px; margin: 0; }</dt><dd>Os links da lista também lado a lado, com 4px entre eles.</dd>
+  <dt>.menu-lista a { border-top: none; }</dt><dd>A linha separadora só fazia sentido na lista empilhada.</dd>
+</dl>
+
+<div class="tryhtml" data-largura="768" data-goal="src:@media\s*\(min-width:\s*600px\),css:.topo{display}=flex,css:.topo{justify-content}=space-between,css:.menu-lista{display}=flex,css:.menu-lista a{border-top-style}=none">
+<p class="try-task"><strong>Missão (versão 3):</strong> o quadro está em 768 px. No fim do <code>style.css</code>, escreva a media query <code>(min-width: 600px)</code> com as quatro regras da anatomia. Depois aperte o botão <strong>375</strong> da barra do quadro: o menu volta a ficar empilhado.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;a class="topo-logo" href="index.html"&gt;Lojinha da Ana&lt;/a&gt;
+  &lt;nav class="topo-menu" aria-label="Principal"&gt;
+    &lt;ul class="menu-lista"&gt;
+      &lt;li&gt;&lt;a href="index.html" aria-current="page"&gt;Início&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="bolos.html"&gt;Bolos&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="encomendas.html"&gt;Encomendas&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="contato.html"&gt;Contato&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+&lt;main class="conteudo"&gt;
+  &lt;h1&gt;Bolos caseiros&lt;/h1&gt;
+  &lt;p&gt;Feitos sob encomenda, com entrega no bairro.&lt;/p&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+.topo {
+  padding: 12px 16px;
+  background-color: #7c2d12;
+  color: #ffffff;
+}
+.topo-logo {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.menu-lista {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.menu-lista a {
+  display: block;
+  padding: 12px 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  text-decoration: none;
+}
+.conteudo {
+  padding: 16px;
+}
+
+/* Versão 3: telas largas */
+</pre>
+<pre class="solucao" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+.topo {
+  padding: 12px 16px;
+  background-color: #7c2d12;
+  color: #ffffff;
+}
+.topo-logo {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.menu-lista {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.menu-lista a {
+  display: block;
+  padding: 12px 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  text-decoration: none;
+}
+.conteudo {
+  padding: 16px;
+}
+
+@media (min-width: 600px) {
+  .topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .menu-lista {
+    display: flex;
+    gap: 4px;
+    margin: 0;
+  }
+  .menu-lista a {
+    border-top: none;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Versão 4: a página atual e os estados</h2>
+<p>O visitante precisa saber <strong>onde está</strong> e <strong>onde vai clicar</strong>:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>O que faz</th></tr>
+<tr><td><code>.menu-lista a:hover</code></td><td>Um fundo branco a 15% com o mouse em cima</td></tr>
+<tr><td><code>.menu-lista a:focus-visible</code></td><td>Um contorno amarelo-claro <strong>por dentro</strong> do link (<code>outline-offset: -3px</code>), para não ser cortado pelas bordas da barra</td></tr>
+<tr><td><code>.menu-lista a[aria-current="page"]</code></td><td>O link da página atual em negrito e sublinhado, com o sublinhado 4px abaixo das letras (<code>text-underline-offset</code>)</td></tr>
+</table>
+</div>
+
+<p>Por que <code>[aria-current="page"]</code> e não uma classe <code>.ativo</code>? Porque o atributo já tem de estar lá para o leitor de tela. Estilizar pelo atributo garante que o visual e a acessibilidade nunca fiquem desencontrados: se alguém esquecer o atributo, o destaque também some, e o erro aparece.</p>
+
+<div class="tryhtml" data-largura="768" data-goal="css:.menu-lista a[aria-current='page']{font-weight}=700,css:.menu-lista a[aria-current='page']{text-decoration-line}=underline,src:a:hover\s*\{[^}]*background-color,src:a:focus-visible\s*\{[^}]*outline:">
+<p class="try-task"><strong>Missão (versão 4):</strong> escreva as três regras da tabela, no fim do arquivo. Passe o mouse nos links e use o <kbd>Tab</kbd> dentro do quadro.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;a class="topo-logo" href="index.html"&gt;Lojinha da Ana&lt;/a&gt;
+  &lt;nav class="topo-menu" aria-label="Principal"&gt;
+    &lt;ul class="menu-lista"&gt;
+      &lt;li&gt;&lt;a href="index.html" aria-current="page"&gt;Início&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="bolos.html"&gt;Bolos&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="encomendas.html"&gt;Encomendas&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="contato.html"&gt;Contato&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+&lt;main class="conteudo"&gt;
+  &lt;h1&gt;Bolos caseiros&lt;/h1&gt;
+  &lt;p&gt;Feitos sob encomenda, com entrega no bairro.&lt;/p&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+.topo {
+  padding: 12px 16px;
+  background-color: #7c2d12;
+  color: #ffffff;
+}
+.topo-logo {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.menu-lista {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.menu-lista a {
+  display: block;
+  padding: 12px 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  text-decoration: none;
+}
+.conteudo {
+  padding: 16px;
+}
+
+@media (min-width: 600px) {
+  .topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .menu-lista {
+    display: flex;
+    gap: 4px;
+    margin: 0;
+  }
+  .menu-lista a {
+    border-top: none;
+  }
+}
+
+/* Versão 4: a página atual e os estados */
+</pre>
+<pre class="solucao" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+.topo {
+  padding: 12px 16px;
+  background-color: #7c2d12;
+  color: #ffffff;
+}
+.topo-logo {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.menu-lista {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.menu-lista a {
+  display: block;
+  padding: 12px 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  text-decoration: none;
+}
+.conteudo {
+  padding: 16px;
+}
+
+@media (min-width: 600px) {
+  .topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .menu-lista {
+    display: flex;
+    gap: 4px;
+    margin: 0;
+  }
+  .menu-lista a {
+    border-top: none;
+  }
+}
+
+.menu-lista a:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+.menu-lista a:focus-visible {
+  outline: 3px solid #fde68a;
+  outline-offset: -3px;
+}
+.menu-lista a[aria-current="page"] {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Versão 5: o botão Menu, no celular</h2>
+<p>Com quatro links, a lista empilhada ainda cabe. Com oito, ela empurraria o conteúdo para longe. A solução comum é esconder a lista atrás de um botão <strong>Menu</strong>. O HTML ganha o botão e um arquivo <code>menu.js</code>:</p>
+
+<pre class="file" data-file="index.html (trecho)">&lt;button class="topo-botao" type="button" aria-expanded="false" aria-controls="menu"&gt;Menu&lt;/button&gt;
+&lt;nav class="topo-menu" id="menu" aria-label="Principal"&gt;
+</pre>
+
+<pre class="file" data-file="menu.js">const botao = document.querySelector(".topo-botao");
+
+botao.addEventListener("click", () =&gt; {
+  const aberto = botao.getAttribute("aria-expanded") === "true";
+  botao.setAttribute("aria-expanded", String(!aberto));
+});
+</pre>
+
+<dl class="anatomy">
+  <dt>aria-expanded="false"</dt><dd>Diz ao leitor de tela que o botão controla algo que está <strong>fechado</strong>. Quando abre, vira <code>"true"</code>.</dd>
+  <dt>aria-controls="menu"</dt><dd>Diz <strong>o que</strong> o botão controla: o elemento de <code>id="menu"</code>.</dd>
+  <dt>menu.js</dt><dd>A cada clique, o script troca o <code>aria-expanded</code> de <code>"false"</code> para <code>"true"</code> e vice-versa. <strong>Só isso.</strong> Ele não esconde nem mostra nada.</dd>
+  <dt>.topo-botao[aria-expanded="false"] + .topo-menu { display: none; }</dt><dd>Quem esconde é o CSS: "o <code>.topo-menu</code> que vem <strong>logo depois</strong> (<code>+</code>) de um botão fechado fica escondido". Quando o script troca o atributo para <code>"true"</code>, o seletor deixa de casar e o menu aparece.</dd>
+</dl>
+
+<p>Para o botão ficar à direita do nome, o <code>.topo</code> vira flex também no celular, com <code>flex-wrap: wrap</code>, e o <code>.topo-menu</code> ganha <code>flex-basis: 100%</code>: ele ocupa a linha inteira e "quebra" para baixo do nome e do botão.</p>
+
+<div class="tryhtml" data-largura="375" data-goal="css:.topo-menu{display}=none,css:.topo{flex-wrap}=wrap,css:.topo-menu{flex-basis}=100%,css:.topo-botao{border-top-color}=rgb(255, 255, 255),src:\[aria-expanded=[&quot;']false[&quot;']\]\s*\+\s*\.topo-menu">
+<p class="try-task"><strong>Missão (versão 5):</strong> o quadro está em 375 px e o HTML já tem o botão e o <code>menu.js</code>. No fim do <code>style.css</code>: o <code>.topo</code> em flex com <code>flex-wrap: wrap</code>, <code>justify-content: space-between</code> e <code>align-items: center</code>; o <code>.topo-menu</code> com <code>flex-basis: 100%</code>; o <code>.topo-botao</code> com borda branca de 2px, fundo transparente, letra branca, <code>font: inherit</code> e <code>cursor: pointer</code>; e a regra que esconde o menu quando o botão está fechado. Depois clique no botão para abrir e fechar.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;a class="topo-logo" href="index.html"&gt;Lojinha da Ana&lt;/a&gt;
+  &lt;button class="topo-botao" type="button" aria-expanded="false" aria-controls="menu"&gt;Menu&lt;/button&gt;
+  &lt;nav class="topo-menu" id="menu" aria-label="Principal"&gt;
+    &lt;ul class="menu-lista"&gt;
+      &lt;li&gt;&lt;a href="index.html" aria-current="page"&gt;Início&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="bolos.html"&gt;Bolos&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="encomendas.html"&gt;Encomendas&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="contato.html"&gt;Contato&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+&lt;main class="conteudo"&gt;
+  &lt;h1&gt;Bolos caseiros&lt;/h1&gt;
+  &lt;p&gt;Feitos sob encomenda, com entrega no bairro.&lt;/p&gt;
+&lt;/main&gt;
+&lt;script src="menu.js"&gt;&lt;/script&gt;
+</pre>
+<pre class="script" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+.topo {
+  padding: 12px 16px;
+  background-color: #7c2d12;
+  color: #ffffff;
+}
+.topo-logo {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.menu-lista {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.menu-lista a {
+  display: block;
+  padding: 12px 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  text-decoration: none;
+}
+.conteudo {
+  padding: 16px;
+}
+
+@media (min-width: 600px) {
+  .topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .menu-lista {
+    display: flex;
+    gap: 4px;
+    margin: 0;
+  }
+  .menu-lista a {
+    border-top: none;
+  }
+}
+
+.menu-lista a:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+.menu-lista a:focus-visible {
+  outline: 3px solid #fde68a;
+  outline-offset: -3px;
+}
+.menu-lista a[aria-current="page"] {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* Versão 5: o botão Menu no celular */
+</pre>
+<pre class="script" data-file="menu.js">const botao = document.querySelector(".topo-botao");
+
+botao.addEventListener("click", () =&gt; {
+  const aberto = botao.getAttribute("aria-expanded") === "true";
+  botao.setAttribute("aria-expanded", String(!aberto));
+});
+</pre>
+<pre class="solucao" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+.topo {
+  padding: 12px 16px;
+  background-color: #7c2d12;
+  color: #ffffff;
+}
+.topo-logo {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.menu-lista {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.menu-lista a {
+  display: block;
+  padding: 12px 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  text-decoration: none;
+}
+.conteudo {
+  padding: 16px;
+}
+
+@media (min-width: 600px) {
+  .topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .menu-lista {
+    display: flex;
+    gap: 4px;
+    margin: 0;
+  }
+  .menu-lista a {
+    border-top: none;
+  }
+}
+
+.menu-lista a:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+.menu-lista a:focus-visible {
+  outline: 3px solid #fde68a;
+  outline-offset: -3px;
+}
+.menu-lista a[aria-current="page"] {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+.topo-menu {
+  flex-basis: 100%;
+}
+.topo-botao {
+  padding: 8px 12px;
+  border: 2px solid #ffffff;
+  border-radius: 6px;
+  background-color: transparent;
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+}
+.topo-botao[aria-expanded="false"] + .topo-menu {
+  display: none;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Versão 6: o botão some nas telas largas</h2>
+<p>A versão 5 tem um problema: aperte o botão <strong>768</strong> da barra do quadro da missão anterior. No tablet, o menu também ficou escondido atrás do botão, apesar de haver espaço de sobra. As regras da versão 5 vieram <strong>depois</strong> da media query da versão 3 e valem em qualquer largura. A correção é uma segunda media query, no fim do arquivo, que desfaz o que é só do celular:</p>
+
+<dl class="anatomy">
+  <dt>.topo-botao { display: none; }</dt><dd>Sem botão em telas largas.</dd>
+  <dt>.topo-menu { flex-basis: auto; }</dt><dd>O menu volta a ocupar só o espaço dos links, ao lado do nome.</dd>
+  <dt>.topo-botao[aria-expanded="false"] + .topo-menu { display: block; }</dt><dd>O mesmo seletor da versão 5, com a mesma especificidade, mas <strong>depois</strong> no arquivo: vence o empate e mostra o menu, mesmo com o botão (escondido) "fechado".</dd>
+</dl>
+
+<div class="tryhtml" data-largura="768" data-goal="css:.topo-botao{display}=none,css:.topo-menu{display}=block,css:.menu-lista{display}=flex,nsrc:!important">
+<p class="try-task"><strong>Missão final (versão 6):</strong> o quadro está em 768 px, e o menu sumiu atrás do botão. No fim do <code>style.css</code>, escreva uma nova media query <code>(min-width: 600px)</code> com as três regras da anatomia, sem <code>!important</code>. Depois troque para <strong>375</strong> e confira que o celular continua com o botão.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;a class="topo-logo" href="index.html"&gt;Lojinha da Ana&lt;/a&gt;
+  &lt;button class="topo-botao" type="button" aria-expanded="false" aria-controls="menu"&gt;Menu&lt;/button&gt;
+  &lt;nav class="topo-menu" id="menu" aria-label="Principal"&gt;
+    &lt;ul class="menu-lista"&gt;
+      &lt;li&gt;&lt;a href="index.html" aria-current="page"&gt;Início&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="bolos.html"&gt;Bolos&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="encomendas.html"&gt;Encomendas&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="contato.html"&gt;Contato&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+&lt;main class="conteudo"&gt;
+  &lt;h1&gt;Bolos caseiros&lt;/h1&gt;
+  &lt;p&gt;Feitos sob encomenda, com entrega no bairro.&lt;/p&gt;
+&lt;/main&gt;
+&lt;script src="menu.js"&gt;&lt;/script&gt;
+</pre>
+<pre class="script" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+.topo {
+  padding: 12px 16px;
+  background-color: #7c2d12;
+  color: #ffffff;
+}
+.topo-logo {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.menu-lista {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.menu-lista a {
+  display: block;
+  padding: 12px 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  text-decoration: none;
+}
+.conteudo {
+  padding: 16px;
+}
+
+@media (min-width: 600px) {
+  .topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .menu-lista {
+    display: flex;
+    gap: 4px;
+    margin: 0;
+  }
+  .menu-lista a {
+    border-top: none;
+  }
+}
+
+.menu-lista a:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+.menu-lista a:focus-visible {
+  outline: 3px solid #fde68a;
+  outline-offset: -3px;
+}
+.menu-lista a[aria-current="page"] {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+.topo-menu {
+  flex-basis: 100%;
+}
+.topo-botao {
+  padding: 8px 12px;
+  border: 2px solid #ffffff;
+  border-radius: 6px;
+  background-color: transparent;
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+}
+.topo-botao[aria-expanded="false"] + .topo-menu {
+  display: none;
+}
+
+/* Versão 6: o botão some nas telas largas */
+</pre>
+<pre class="script" data-file="menu.js">const botao = document.querySelector(".topo-botao");
+
+botao.addEventListener("click", () =&gt; {
+  const aberto = botao.getAttribute("aria-expanded") === "true";
+  botao.setAttribute("aria-expanded", String(!aberto));
+});
+</pre>
+<pre class="solucao" data-file="style.css">* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+.topo {
+  padding: 12px 16px;
+  background-color: #7c2d12;
+  color: #ffffff;
+}
+.topo-logo {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.menu-lista {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.menu-lista a {
+  display: block;
+  padding: 12px 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  text-decoration: none;
+}
+.conteudo {
+  padding: 16px;
+}
+
+@media (min-width: 600px) {
+  .topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .menu-lista {
+    display: flex;
+    gap: 4px;
+    margin: 0;
+  }
+  .menu-lista a {
+    border-top: none;
+  }
+}
+
+.menu-lista a:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+.menu-lista a:focus-visible {
+  outline: 3px solid #fde68a;
+  outline-offset: -3px;
+}
+.menu-lista a[aria-current="page"] {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+.topo-menu {
+  flex-basis: 100%;
+}
+.topo-botao {
+  padding: 8px 12px;
+  border: 2px solid #ffffff;
+  border-radius: 6px;
+  background-color: transparent;
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+}
+.topo-botao[aria-expanded="false"] + .topo-menu {
+  display: none;
+}
+
+@media (min-width: 600px) {
+  .topo-botao {
+    display: none;
+  }
+  .topo-menu {
+    flex-basis: auto;
+  }
+  .topo-botao[aria-expanded="false"] + .topo-menu {
+    display: block;
+  }
+}
+</pre>
+</div>
+
+<div class="note">
+<strong>E sem JavaScript?</strong>
+<p>Existe um jeito novo de abrir e fechar sem escrever script: o atributo <code>popover</code> do HTML, com <code>&lt;button popovertarget="menu"&gt;</code>. Ele é <strong>Baseline 2024</strong> no MDN (desde abril de 2024 nas versões atuais dos navegadores principais). Mas o elemento com <code>popover</code> abre por cima da página, numa camada própria, como um balão, e fazer o mesmo elemento virar uma barra comum nas telas largas exige várias regras a mais. Para um menu de site, a versão deste projeto (um script de 5 linhas que só troca um atributo) é a mais simples de entender e de manter.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>A media query de telas largas vem antes, e perde</strong>
+<p>É o erro da versão 5, e o mais comum em CSS responsivo. Uma media query não tem prioridade nenhuma: dentro dela, as regras disputam a cascata como as outras. Se a regra do celular vem <strong>depois</strong>, com a mesma especificidade, ela vence também no computador. <strong>Como achar:</strong> no F12, a regra da media query aparece <strong>riscada</strong>, vencida pela de baixo. <strong>Como consertar:</strong> no mobile first, as media queries <code>min-width</code> vêm <strong>depois</strong> das regras que elas mudam, em ordem crescente de largura.</p>
+</div>
+
+<div class="cenario">
+<strong>O site no celular de verdade aparece minúsculo</strong>
+<p>No editor e no F12 o menu fica perfeito, mas no celular de verdade a página aparece encolhida, com letras pequeníssimas, e a media query de 600 px vale sempre. <strong>Por quê:</strong> faltou a meta viewport no <code>&lt;head&gt;</code>. Sem ela, o celular finge ter uma tela de uns 980 px e encolhe a página (aula <a href="viewport.html">A Meta Viewport</a>). O validador não reclama da falta dela. <strong>Como consertar:</strong> <code>&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O menu não abre: o <code>+</code> não acha o irmão</strong>
+<p>Se o <code>&lt;nav&gt;</code> não vier <strong>logo depois</strong> do botão no HTML (por exemplo, com o logo no meio), o seletor <code>.topo-botao[…] + .topo-menu</code> não casa com nada: o menu nunca é escondido no celular, e clicar no botão não muda nada que se veja. O <code>+</code> pega só o irmão <strong>imediatamente</strong> seguinte. <strong>Como consertar:</strong> mantenha o botão e o <code>&lt;nav&gt;</code> vizinhos, ou use o <code>~</code> ("qualquer irmão depois", aula <a href="combinadores.html">Combinadores</a>).</p>
+</div>
+
+<div class="cenario">
+<strong>Erro de digitação no script</strong>
+<p>Se o <code>menu.js</code> tiver um erro (um <code>querySelector(".topo-botão")</code> com acento, por exemplo), o botão não faz nada, e o menu fica fechado para sempre no celular. O console do quadro mostra o erro do navegador, algo como <code>Cannot read properties of null</code>. É um bom motivo para o menu começar <strong>aberto</strong> se o JavaScript falhar: muitos sites só escondem a lista depois que o script roda (por exemplo, pondo o <code>aria-expanded="false"</code> pelo próprio script).</p>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A partir de 600 pixels</h3>
+<p>Complete a media query do mobile first:</p>
+<div class="ex-code">@media (<input data-answer="min-width" aria-label="condição">: 600px) { … }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Nome e menu nas pontas</h3>
+<p>Complete para jogar a sobra de espaço para o meio:</p>
+<div class="ex-code">.topo { display: flex; justify-content: <input data-answer="space-between" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. A página atual</h3>
+<p>Complete o seletor do link da página atual:</p>
+<div class="ex-code">.menu-lista a[<input data-answer="aria-current=&quot;page&quot;|aria-current='page'|aria-current=page|aria-current" aria-label="atributo">] { font-weight: 700; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. No menu deste projeto, quem esconde e mostra a lista no celular?</p>
+<label><input type="radio" name="q4"> O JavaScript, com <code>style.display = "none"</code></label>
+<label><input type="radio" name="q4"> O CSS, lendo o <code>aria-expanded</code> do botão; o script só troca o atributo</label>
+<label><input type="radio" name="q4"> O HTML sozinho</label>
+<label><input type="radio" name="q4"> A meta viewport</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. Por que os links do celular têm <code>display: block</code> e <code>padding: 12px 8px</code>?</p>
+<label><input type="radio" name="q5"> Para ficarem lado a lado</label>
+<label><input type="radio" name="q5"> Para o validador aceitar</label>
+<label><input type="radio" name="q5"> Para esconder o sublinhado</label>
+<label><input type="radio" name="q5"> Para a área de toque ser a linha inteira e alta o bastante para um dedo</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. As regras do celular vieram depois da media query de telas largas, com a mesma especificidade. O que acontece no computador?</p>
+<label><input type="radio" name="q6"> As regras do celular vencem também no computador: a media query não tem prioridade especial</label>
+<label><input type="radio" name="q6"> A media query sempre vence</label>
+<label><input type="radio" name="q6"> O navegador mostra um erro</label>
+<label><input type="radio" name="q6"> Nenhuma das duas vale</label>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Mobile first: o estilo sem media query é o do celular (lista empilhada, links em bloco com área de toque grande); <code>@media (min-width: 600px)</code> acrescenta o das telas largas.</li>
+  <li>Telas largas: <code>.topo</code> em flex com <code>space-between</code>; a lista em flex com <code>gap</code>.</li>
+  <li><code>[aria-current="page"]</code> destaca a página atual com a mesma marca que o leitor de tela usa; <code>:hover</code> e <code>:focus-visible</code> mostram onde o visitante está.</li>
+  <li>O botão Menu: o script só troca o <code>aria-expanded</code>; o CSS esconde com <code>.topo-botao[aria-expanded="false"] + .topo-menu { display: none; }</code>.</li>
+  <li>A ordem importa: a media query que desfaz o que é do celular vem <strong>depois</strong> das regras do celular.</li>
+  <li>No site de verdade, a meta viewport é obrigatória para as media queries funcionarem no celular.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
