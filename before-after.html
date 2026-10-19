@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS ::before e ::after — conteúdo criado pelo CSS | Guia CSS</title>
+<meta name="description" content="::before e ::after para quem está começando: pseudo-elementos que põem um texto, um símbolo ou um enfeite antes e depois do conteúdo de um elemento, a propriedade content (obrigatória), enfeites com content vazio, acessibilidade, e os erros reais do validador W3C (content sem aspas, aspas sem fechar, ::befor).">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">::before e ::after</span></h1>
+
+<p class="intro">Toda dica do blog da Ana começa com a palavra "Dica:" em negrito, e todo título tem um risquinho laranja embaixo. Ela pode escrever isso no HTML de cada página, uma por uma. Ou pode deixar o CSS pôr esses enfeites sozinho, em todas as páginas de uma vez. Nesta aula você vai criar conteúdo <strong>pelo CSS</strong>, antes e depois do conteúdo de um elemento, com os pseudo-elementos <code>::before</code> e <code>::after</code>.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que é um pseudo-elemento e por que tem dois-pontos duplos.</li>
+  <li><code>::before</code> e <code>::after</code> com a propriedade <code>content</code>, que é obrigatória.</li>
+  <li>Textos, símbolos e o texto de um atributo (<code>attr()</code>) como conteúdo.</li>
+  <li>Enfeites com <code>content: ""</code>: um risco, uma bolinha.</li>
+  <li>O que não colocar ali (acessibilidade) e em quais elementos não funciona.</li>
+  <li>Os erros reais do validador: <code>content</code> sem aspas, aspas sem fechar, <code>::befor</code>.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: o adesivo na caixa</h2>
+<p>Pense numa caixa de presente. O conteúdo é o presente. Mas você pode colar um adesivo na frente ("Frágil!") e um laço atrás. O adesivo e o laço não são o presente, e quem embrulhou pode trocá-los sem abrir a caixa.</p>
+<p><code>::before</code> ("antes") e <code>::after</code> ("depois") são esses adesivos. Eles criam um pedacinho novo <strong>dentro</strong> do elemento, logo antes ou logo depois do conteúdo dele. Esse pedacinho não existe no HTML: só no CSS. Por isso se chama <strong>pseudo-elemento</strong>, um "elemento de mentira".</p>
+
+<div class="tip">
+<strong>Um dois-pontos ou dois?</strong>
+<p>Pseudo-<strong>classe</strong> (um estado: <code>:hover</code>, <code>:first-child</code>) tem <strong>um</strong> dois-pontos. Pseudo-<strong>elemento</strong> (um pedaço novo: <code>::before</code>, <code>::after</code>) tem <strong>dois</strong>. Sites antigos escrevem <code>:before</code>, com um só, e ainda funciona em todos os navegadores (é a escrita do CSS de antes de 2011). Escreva o novo, com dois.</p>
+</div>
+
+<hr>
+
+<h2>1. <code>::before</code>: antes do conteúdo</h2>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque o texto do <code>content</code> por <code>"Atenção: "</code>. Depois tente selecionar o "Dica:" com o mouse no resultado.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="dica"&gt;Peneire a farinha para o bolo crescer mais.&lt;/p&gt;
+&lt;p class="dica"&gt;Unte a forma com manteiga e farinha.&lt;/p&gt;
+&lt;p&gt;Asse por 40 minutos.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.dica::before {
+  content: "Dica: ";
+  font-weight: bold;
+  color: #9a3412;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>.dica</dt><dd>O elemento que recebe o adesivo: os parágrafos com a classe <code>dica</code>.</dd>
+  <dt>::before</dt><dd>Dois-pontos duplos, colados. Cria o pedaço <strong>antes</strong> do conteúdo, ainda dentro do <code>&lt;p&gt;</code>.</dd>
+  <dt>content: "Dica: ";</dt><dd>O que vai no pedaço, <strong>entre aspas</strong>. Sem <code>content</code>, o pseudo-elemento não existe. Repare no espaço depois dos dois-pontos, dentro das aspas: é ele que separa "Dica:" do texto.</dd>
+  <dt>font-weight, color</dt><dd>O pedaço aceita CSS como qualquer elemento: negrito, cor, tamanho, fundo, borda.</dd>
+</dl>
+
+<p>Os dois parágrafos com <code>class="dica"</code> começam com "Dica:" em negrito e laranja-escuro; o terceiro, sem a classe, não. O "Dica:" não dá para selecionar com o mouse nem copiar: ele não está no texto da página, só no desenho.</p>
+
+<p>No F12, aba de elementos, o pedaço aparece como uma linha <code>::before</code> dentro do <code>&lt;p&gt;</code>, antes do texto. Clicando nela, você vê as regras dele.</p>
+
+<div class="tryhtml" data-goal="css:.destaque::before{content}=&quot;★ &quot;">
+<p class="try-task"><strong>Missão:</strong> ponha uma estrela e um espaço (<code>"★ "</code>) antes de cada receita com a classe <code>destaque</code>. Copie a estrela daqui: ★</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul&gt;
+  &lt;li class="destaque"&gt;Bolo de cenoura&lt;/li&gt;
+  &lt;li&gt;Pão de queijo&lt;/li&gt;
+  &lt;li class="destaque"&gt;Pudim de leite&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.destaque {
+  font-weight: bold;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.destaque {
+  font-weight: bold;
+}
+
+.destaque::before {
+  content: "★ ";
+  color: #ca8a04;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. <code>::after</code>: depois do conteúdo</h2>
+<p><code>::after</code> é igual, do outro lado. Um uso clássico: avisar que um link leva para <strong>fora</strong> do site.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> só o link para outro site ganha a seta. Troque a seta por <code>" (outro site)"</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;&lt;a href="receitas.html"&gt;Minhas receitas&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://example.com" class="externo"&gt;Receitas do mundo&lt;/a&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.externo::after {
+  content: " ↗";
+}
+</pre>
+</div>
+
+<p>"Receitas do mundo" termina com uma seta inclinada (↗), que faz parte do link: ela fica sublinhada e é clicável junto com o texto. O link de dentro do site fica sem.</p>
+
+<h3>O texto de um atributo: <code>attr()</code></h3>
+<p>O <code>content</code> também pode mostrar o valor de um atributo do elemento, com a função <code>attr()</code>. Na versão para imprimir da página, por exemplo, é útil escrever o endereço do link depois dele, já que no papel não dá para clicar (aula <a href="impressao.html">CSS para Impressão</a>):</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  a::after {
+    content: " (" attr(href) ")";
+    color: #555;
+  }
+&lt;/style&gt;
+&lt;p&gt;Veja o &lt;a href="https://example.com"&gt;site de exemplo&lt;/a&gt;.&lt;/p&gt;
+</pre>
+
+<p>Depois do texto do link aparece, em cinza, "(https://example.com)", também sublinhado: o pedaço está dentro do <code>&lt;a&gt;</code>, então faz parte do link. O <code>content</code> junta os pedaços em ordem, sem vírgula: o texto <code>" ("</code>, o valor do <code>href</code> e o texto <code>")"</code>.</p>
+
+<hr>
+
+<h2>3. Enfeites: <code>content: ""</code></h2>
+<p>Com <code>content: ""</code> (aspas vazias), o pseudo-elemento existe, mas sem texto. Dando a ele tamanho e cor, ele vira um <strong>enfeite</strong>: um risco, uma bolinha, uma faixa. Como ele começa como um elemento em linha, para ter largura e altura ele precisa de <code>display: block</code> (ou <code>inline-block</code>, aula <a href="display.html">display</a>):</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> mude o <code>width</code> do risco para <code>100%</code>. Depois apague a linha do <code>display: block</code>: o risco some, porque um pedaço em linha e sem texto não tem largura nem altura.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p&gt;A receita mais pedida do blog.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h2::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 4px;
+  margin-top: 6px;
+  background-color: #ea580c;
+}
+</pre>
+</div>
+
+<p>Embaixo de "Bolo de cenoura" aparece um risco laranja, curto (60px) e grosso (4px), afastado 6px do texto. Ele está <strong>dentro</strong> do <code>&lt;h2&gt;</code>, depois do texto: por isso fica embaixo do título, e não embaixo do parágrafo.</p>
+
+<hr>
+
+<h2>4. O que pode ir no <code>content</code></h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Mostra</th></tr>
+<tr><td><code>content: "Dica: ";</code></td><td>Um texto (sempre entre aspas)</td></tr>
+<tr><td><code>content: "★";</code>, <code>content: "→";</code></td><td>Um símbolo ou um emoji (o arquivo precisa estar em UTF-8, como todo o guia)</td></tr>
+<tr><td><code>content: "";</code></td><td>Nada: o pedaço existe, para ser um enfeite com tamanho e cor</td></tr>
+<tr><td><code>content: attr(href);</code></td><td>O valor de um atributo do elemento</td></tr>
+<tr><td><code>content: " (" attr(href) ")";</code></td><td>Vários pedaços juntos, separados por espaço</td></tr>
+<tr><td><code>content: "\201C";</code></td><td>Um caractere pelo código (aqui, a aspa curva “)</td></tr>
+<tr><td><code>content: counter(passo);</code></td><td>Um número que o CSS conta sozinho (os contadores, assunto avançado)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>5. Cuidados</h2>
+
+<h3>Nada importante no <code>content</code></h3>
+<ul>
+  <li>O texto do <code>::before</code> não pode ser selecionado nem copiado, e não é encontrado pelo <kbd>Ctrl</kbd>+<kbd>F</kbd> em todos os navegadores.</li>
+  <li>Leitores de tela tratam esse texto de jeitos diferentes: muitos leem, alguns não. Um "★" pode ser lido pelo nome do símbolo, no meio da frase.</li>
+  <li>Se o CSS não carregar, o texto some.</li>
+</ul>
+<p>A regra: <strong>enfeite no CSS, informação no HTML</strong>. "Dica:", uma seta, um risco: ok no CSS. O preço do bolo ou um aviso de "esgotado": no HTML.</p>
+
+<h3>Elementos que não têm <code>::before</code></h3>
+<p>O pedaço vai <strong>dentro</strong> do elemento, antes ou depois do conteúdo. Elementos que não têm conteúdo, como <code>&lt;img&gt;</code>, <code>&lt;input&gt;</code> e <code>&lt;br&gt;</code>, não mostram <code>::before</code> nem <code>::after</code>. Para enfeitar uma imagem, ponha o pseudo-elemento num elemento em volta dela (um <code>&lt;figure&gt;</code>, por exemplo).</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Esqueceu o <code>content</code>: nada aparece</strong>
+<pre class="file" data-file="style.css · erro de propósito">h2::after {
+  display: block;
+  width: 60px;
+  height: 4px;
+  background-color: #ea580c;
+}
+</pre>
+<p><strong>O que você vê:</strong> o título sem o risco.</p>
+<p><strong>Por quê:</strong> sem <code>content</code>, o <code>::before</code> e o <code>::after</code> não são criados, e as outras propriedades não têm onde agir. No F12, o valor calculado do <code>content</code> é <code>none</code>. O validador não reclama: todas as declarações são válidas.</p>
+<p><strong>Como consertar:</strong> <code>content: "";</code> sempre, mesmo quando o pedaço não tem texto.</p>
+</div>
+
+<div class="cenario">
+<strong>Texto sem aspas: <code>“Dica” is not a “content” value</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.dica::before {
+  content: Dica;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":2.12-2.15: error: CSS: “content”: “Dica” is not a “content” value.</pre>
+<p><strong>O que significa:</strong> "<code>Dica</code> não é um valor de <code>content</code>". Sem aspas, o CSS não sabe que é um texto. A declaração é ignorada e nada aparece. O certo é <code>content: "Dica: ";</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Aspas sem fechar: <code>“content”: Parse Error</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.dica::before {
+  content: "Dica: ;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":2.20-2.20: error: CSS: “content”: Parse Error.</pre>
+<p><strong>O que significa:</strong> "erro de leitura" no fim da linha 2. A aspa aberta não foi fechada; o <code>;</code> ficou dentro do texto, e o texto acabou no fim da linha. A declaração é ignorada. Confira se cada <code>"</code> tem o seu par.</p>
+</div>
+
+<div class="cenario">
+<strong>Nome errado: <code>Unknown pseudo-element or pseudo-class “::befor”</code></strong>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":1.8-1.12: error: CSS: Unknown pseudo-element or pseudo-class “::befor”.</pre>
+<p><strong>O que significa:</strong> "pseudo-elemento ou pseudo-classe desconhecido: <code>::befor</code>", faltou o <code>e</code>. Com um seletor inválido, a <strong>regra inteira</strong> é ignorada.</p>
+</div>
+
+<div class="cenario">
+<strong>Esqueceu o espaço: "Dica:Peneire"</strong>
+<p><strong>O que você vê:</strong> com <code>content: "Dica:";</code>, o texto aparece grudado: "Dica:Peneire a farinha…".</p>
+<p><strong>Por quê:</strong> o pseudo-elemento fica colado no conteúdo. O espaço tem de estar <strong>dentro</strong> das aspas: <code>"Dica: "</code>. (No <code>::after</code>, o espaço vai no começo: <code>" ↗"</code>.)</p>
+</div>
+
+<div class="cenario">
+<strong><code>::before</code> numa imagem</strong>
+<p><strong>O que você vê:</strong> com <code>img::before { content: "Foto: "; }</code>, nada aparece.</p>
+<p><strong>Por quê:</strong> a imagem não tem "conteúdo de dentro" para o pedaço ficar antes. O validador não reclama: o seletor é válido.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>.x::before { content: "…"; }</code></td><td>Cria um pedaço dentro do <code>.x</code>, antes do conteúdo</td></tr>
+<tr><td><code>.x::after { content: "…"; }</code></td><td>Cria um pedaço dentro do <code>.x</code>, depois do conteúdo</td></tr>
+<tr><td><code>content</code></td><td>Obrigatório; texto entre aspas, <code>""</code>, <code>attr()</code></td></tr>
+<tr><td><code>content: ""</code> + <code>display: block</code> + tamanho</td><td>Um enfeite sem texto</td></tr>
+<tr><td><code>:before</code> (um dois-pontos)</td><td>Escrita antiga; funciona, mas use <code>::before</code></td></tr>
+<tr><td>Não funciona em</td><td><code>img</code>, <code>input</code>, <code>br</code> e outros elementos sem conteúdo</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Antes</h3>
+<p>Complete o pseudo-elemento que fica antes do conteúdo:</p>
+<div class="ex-code">.dica<input data-answer="::before" aria-label="pseudo-elemento"> { content: "Dica: "; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. A propriedade obrigatória</h3>
+<p>Complete:</p>
+<div class="ex-code">h2::after { <input data-answer="content" aria-label="propriedade">: ""; display: block; height: 4px; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. O atributo</h3>
+<p>Complete a função que mostra o endereço do link:</p>
+<div class="ex-code">a::after { content: " (" <input data-answer="attr" aria-label="função">(href) ")"; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. A Ana escreveu um <code>h2::after</code> com <code>width</code>, <code>height</code> e <code>background-color</code>, mas nada aparece. O que falta?</p>
+<label><input type="radio" name="q4"> <code>position: absolute</code></label>
+<label><input type="radio" name="q4"> <code>content: ""</code></label>
+<label><input type="radio" name="q4"> Um elemento <code>&lt;after&gt;</code> no HTML</label>
+<label><input type="radio" name="q4"> <code>:hover</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. Onde o texto do <code>p::before</code> aparece?</p>
+<label><input type="radio" name="q5"> Antes do <code>&lt;p&gt;</code>, fora dele</label>
+<label><input type="radio" name="q5"> Numa linha acima do parágrafo, sempre</label>
+<label><input type="radio" name="q5"> No HTML da página, depois que o CSS carrega</label>
+<label><input type="radio" name="q5"> Dentro do <code>&lt;p&gt;</code>, antes do texto dele</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. O que é melhor deixar no HTML, e não no <code>content</code>?</p>
+<label><input type="radio" name="q6"> O preço de um produto</label>
+<label><input type="radio" name="q6"> Uma seta depois de um link externo</label>
+<label><input type="radio" name="q6"> Um risco decorativo embaixo do título</label>
+<label><input type="radio" name="q6"> As aspas curvas de uma citação</label>
+</div>
+
+<h3>Missão final: as dicas do blog</h3>
+
+<div class="tryhtml" data-goal="css:.dica::before{content}=&quot;Dica: &quot;,css:.dica::before{font-weight}=700,css:h2::after{content}=&quot;&quot;,css:h2::after{display}=block,css:h2::after{height}=4px">
+<p class="try-task"><strong>Missão:</strong> (1) cada <code>.dica</code> começa com <code>"Dica: "</code> em negrito (<code>bold</code>); (2) o título <code>h2</code> ganha um risco embaixo com <code>::after</code>: <code>content: ""</code>, <code>display: block</code>, <code>width: 60px</code>, <code>height: 4px</code> e a cor que você quiser.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p class="dica"&gt;Bata as cenouras com o óleo e os ovos.&lt;/p&gt;
+&lt;p&gt;Misture a farinha e o açúcar.&lt;/p&gt;
+&lt;p class="dica"&gt;A cobertura fica melhor com o bolo ainda morno.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h2 {
+  color: #9a3412;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h2 {
+  color: #9a3412;
+}
+
+h2::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 4px;
+  margin-top: 6px;
+  background-color: #ea580c;
+}
+
+.dica::before {
+  content: "Dica: ";
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<p>Com a solução, o título ganha o risco laranja embaixo, e os dois parágrafos de dica começam com "Dica:" em negrito. O parágrafo do meio, sem a classe, fica como está. No HTML, nada mudou.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>::before</code> e <code>::after</code> criam um pedaço <strong>dentro</strong> do elemento, antes ou depois do conteúdo. São pseudo-elementos: dois-pontos duplos.</li>
+  <li><code>content</code> é obrigatório: um texto entre aspas, <code>attr(…)</code>, ou <code>""</code> para um enfeite (que precisa de <code>display: block</code> e tamanho).</li>
+  <li>O pedaço aceita qualquer CSS: cor, negrito, fundo, borda.</li>
+  <li>Enfeite no CSS, informação no HTML: o texto do <code>content</code> não se copia, e os leitores de tela o tratam de jeitos diferentes.</li>
+  <li><code>img</code>, <code>input</code> e <code>br</code> não têm <code>::before</code>/<code>::after</code>.</li>
+  <li>Erros: sem <code>content</code>, nada aparece (sem aviso); <code>content</code> sem aspas, aspas sem fechar e <code>::befor</code> o validador pega.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
