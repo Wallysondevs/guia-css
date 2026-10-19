@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Grid — tabela de consulta das propriedades, valores e funções | Guia CSS</title>
+<meta name="description" content="Referência do CSS Grid: as propriedades do contêiner (grid-template-columns, grid-template-rows, grid-template-areas, grid-auto-flow, gap, alinhamentos) e dos itens (grid-column, grid-row, grid-area, justify-self, align-self), as funções repeat, minmax e fit-content, a unidade fr, auto-fill × auto-fit, valores medidos no navegador, exemplos ao vivo e os erros mais comuns.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Grid</span></h1>
+
+<p class="intro">O <strong>Grid</strong> desenha uma <strong>grade</strong> de linhas e colunas e deixa você pôr cada item na célula que quiser, ou espalhar um item por várias células. É o jeito de montar o esqueleto de uma página (cabeçalho, menu, conteúdo, rodapé) e galerias. Esta página junta todas as propriedades, valores e funções do Grid, com os valores calculados medidos no Chromium e a aula de cada assunto.</p>
+
+<div class="note">
+<strong>Como usar esta página</strong>
+<ul>
+  <li>Como no Flexbox, há as propriedades do <strong>contêiner</strong> (o pai, com <code>display: grid</code>) e as dos <strong>itens</strong> (os filhos diretos).</li>
+  <li>O Grid conta <strong>linhas</strong> (as divisórias), não células: uma grade de 3 colunas tem 4 linhas verticais, numeradas de 1 a 4 (e de -1 a -4, de trás para a frente).</li>
+  <li>Para aprender do começo, vá à aula <a href="grid.html">Introdução ao Grid</a>. Flexbox ou Grid? Veja <a href="flex-ou-grid.html">a comparação</a>.</li>
+</ul>
+</div>
+
+<p>Atalhos: <a href="#ideia">A ideia</a> · <a href="#conteiner">Contêiner</a> · <a href="#trilhas">Tamanhos das trilhas</a> · <a href="#auto">auto-fill × auto-fit</a> · <a href="#areas">Áreas com nome</a> · <a href="#itens">Itens</a> · <a href="#linhas">Linhas e span</a> · <a href="#alinhar">Alinhamento</a> · <a href="#receitas">Receitas</a> · <a href="#errado">Quando dá errado</a></p>
+
+<hr>
+
+<h2 id="ideia">A ideia em uma tela</h2>
+<p>Pense numa forma de gelo, ou na vitrine de doces da padaria, com divisórias. Você decide quantas colunas e linhas a forma tem e de que tamanho. Cada doce vai numa casinha; um bolo grande pode ocupar duas casinhas. As divisórias são as <strong>linhas</strong> do Grid; cada fileira ou coluna de casinhas é uma <strong>trilha</strong> (<em>track</em>).</p>
+<pre class="file" data-file="linhas da grade" data-resultado>&lt;style&gt;
+  .grade {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .grade div {
+    padding: 0.5rem;
+    background-color: lightsteelblue;
+    font-family: monospace;
+  }
+  .grade .bolo {
+    grid-column: 1 / 3;
+    background-color: steelblue;
+    color: white;
+  }
+  .grade .torta {
+    grid-row: span 2;
+    background-color: navy;
+    color: white;
+  }
+&lt;/style&gt;
+&lt;div class="grade"&gt;
+  &lt;div class="bolo"&gt;bolo: grid-column: 1 / 3&lt;/div&gt;
+  &lt;div class="torta"&gt;torta: grid-row: span 2&lt;/div&gt;
+  &lt;div&gt;sonho&lt;/div&gt;
+  &lt;div&gt;broa&lt;/div&gt;
+  &lt;div&gt;pão&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<p>O bolo vai da linha vertical 1 à 3 (duas colunas); a torta ocupa duas linhas de altura; os outros entram sozinhos nas casinhas livres, na ordem do HTML.</p>
+
+<h2 id="conteiner">Propriedades do contêiner (o pai)</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>Exemplo</th><th>Inicial</th><th>O que faz</th><th>Aula</th></tr>
+<tr><td><code>display</code></td><td><code>grid</code> · <code>inline-grid</code></td><td>—</td><td>liga o Grid; os filhos diretos viram itens</td><td><a href="grid.html">Introdução</a></td></tr>
+<tr><td><code>grid-template-columns</code></td><td><code>200px 1fr</code> · <code>repeat(3, 1fr)</code></td><td><code>none</code></td><td>as colunas: quantas e de que largura (uma medida por coluna)</td><td><a href="grid-colunas.html">Colunas</a></td></tr>
+<tr><td><code>grid-template-rows</code></td><td><code>auto 1fr auto</code></td><td><code>none</code></td><td>as linhas: quantas e de que altura</td><td><a href="grid-linhas.html">Linhas</a></td></tr>
+<tr><td><code>grid-template-areas</code></td><td><code>"topo topo" "menu conteudo"</code></td><td><code>none</code></td><td>um "desenho" da grade com nomes; cada texto entre aspas é uma linha (<a href="#areas">veja abaixo</a>)</td><td><a href="grid-areas.html">Áreas com Nome</a></td></tr>
+<tr><td><code>grid-template</code></td><td><code>auto 1fr / 200px 1fr</code></td><td><code>none</code></td><td>atalho: linhas / colunas (e áreas). Difícil de ler; prefira as três separadas.</td><td><a href="grid-areas.html">Áreas com Nome</a></td></tr>
+<tr><td><code>grid-auto-rows</code></td><td><code>minmax(8rem, auto)</code></td><td><code>auto</code></td><td>a altura das linhas <strong>criadas sozinhas</strong> (implícitas), quando há mais itens que casinhas</td><td><a href="grid-linhas.html">Linhas</a></td></tr>
+<tr><td><code>grid-auto-columns</code></td><td><code>10rem</code></td><td><code>auto</code></td><td>a largura das colunas criadas sozinhas</td><td><a href="grid-linhas.html">Linhas</a></td></tr>
+<tr><td><code>grid-auto-flow</code></td><td><code>row</code> · <code>column</code> · <code>row dense</code></td><td><code>row</code></td><td>como os itens sem lugar marcado são distribuídos: linha por linha, coluna por coluna; <code>dense</code> tapa os buracos com itens que vêm depois (muda a ordem visual)</td><td><a href="grid-posicionar.html">Posicionando</a></td></tr>
+<tr><td><code>gap</code>, <code>row-gap</code>, <code>column-gap</code></td><td><code>1rem</code> · <code>1rem 2rem</code></td><td><code>normal</code> (= 0 no grid)</td><td>o espaço entre as trilhas (as "divisórias grossas"); nunca nas bordas</td><td><a href="gap.html">gap</a></td></tr>
+<tr><td><code>justify-items</code></td><td><code>start</code> · <code>end</code> · <code>center</code> · <code>stretch</code></td><td><code>normal</code> (age como <code>stretch</code>)</td><td>alinha cada item <strong>dentro da sua casinha</strong>, na horizontal</td><td><a href="grid-alinhar.html">Alinhando</a></td></tr>
+<tr><td><code>align-items</code></td><td><code>start</code> · <code>end</code> · <code>center</code> · <code>stretch</code> · <code>baseline</code></td><td><code>normal</code> (age como <code>stretch</code>)</td><td>o mesmo, na vertical</td><td><a href="grid-alinhar.html">Alinhando</a></td></tr>
+<tr><td><code>place-items</code></td><td><code>center</code></td><td>—</td><td>atalho: <code>align-items</code> <code>justify-items</code>. <code>place-items: center</code> centraliza tudo em cada casinha.</td><td><a href="centralizar.html">Centralizando</a></td></tr>
+<tr><td><code>justify-content</code></td><td><code>center</code> · <code>space-between</code>…</td><td><code>normal</code></td><td>quando a grade inteira é <strong>menor</strong> que o contêiner, move a grade toda (as colunas) na horizontal</td><td><a href="grid-alinhar.html">Alinhando</a></td></tr>
+<tr><td><code>align-content</code></td><td><code>center</code> · <code>end</code>…</td><td><code>normal</code></td><td>o mesmo, com as linhas, na vertical</td><td><a href="grid-alinhar.html">Alinhando</a></td></tr>
+<tr><td><code>place-content</code></td><td><code>center</code></td><td>—</td><td>atalho dos dois de cima</td><td><a href="grid-alinhar.html">Alinhando</a></td></tr>
+</table>
+</div>
+<div class="note"><strong>Suporte:</strong> o Grid funciona em todos os navegadores atuais desde 2017 (Chrome 57, Firefox 52, Safari 10.1). O <code>subgrid</code> veio depois: Firefox 71, Safari 16, Chrome <strong>117</strong> (aula <a href="subgrid.html">Subgrid</a>).</div>
+
+<h2 id="trilhas">Tamanhos das trilhas: <code>fr</code>, <code>repeat()</code>, <code>minmax()</code>…</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que faz</th><th>Medido no Chromium</th><th>Aula</th></tr>
+<tr><td><code>200px</code>, <code>10rem</code>, <code>25%</code></td><td>tamanho fixo (o <code>%</code> é do contêiner)</td><td>—</td><td><a href="grid-colunas.html">Colunas</a></td></tr>
+<tr><td><code>1fr</code></td><td>uma <strong>fração</strong> do espaço que sobra, depois das trilhas fixas e do <code>gap</code></td><td><code>1fr 2fr</code> em 300px → <code>100px 200px</code>; <code>100px 1fr</code> com <code>column-gap: 20px</code> em 300px → <code>100px 180px</code></td><td><a href="grid-colunas.html">Colunas</a></td></tr>
+<tr><td><code>auto</code></td><td>do tamanho do conteúdo, esticando se sobrar espaço</td><td>—</td><td><a href="grid-colunas.html">Colunas</a></td></tr>
+<tr><td><code>min-content</code></td><td>o mais estreito possível sem vazar: a maior palavra</td><td>—</td><td><a href="grid-colunas.html">Colunas</a></td></tr>
+<tr><td><code>max-content</code></td><td>a largura do conteúdo inteiro numa linha só, sem quebrar</td><td>—</td><td><a href="grid-colunas.html">Colunas</a></td></tr>
+<tr><td><code>fit-content(20rem)</code></td><td>como <code>auto</code>, mas no máximo 20rem</td><td>—</td><td><a href="grid-repeat.html">repeat e minmax</a></td></tr>
+<tr><td><code>repeat(3, 1fr)</code></td><td>repete a trilha: o mesmo que <code>1fr 1fr 1fr</code>. Repete grupos também: <code>repeat(2, 100px 1fr)</code>.</td><td>—</td><td><a href="grid-repeat.html">repeat e minmax</a></td></tr>
+<tr><td><code>minmax(12rem, 1fr)</code></td><td>no mínimo 12rem, no máximo 1fr</td><td>—</td><td><a href="grid-repeat.html">repeat e minmax</a></td></tr>
+<tr><td><code>repeat(auto-fill, minmax(150px, 1fr))</code></td><td>quantas colunas de pelo menos 150px couberem; as que sobram ficam vazias</td><td>2 itens em 600px → <code>150px 150px 150px 150px</code> (itens com 150px)</td><td><a href="grid-repeat.html">repeat e minmax</a></td></tr>
+<tr><td><code>repeat(auto-fit, minmax(150px, 1fr))</code></td><td>o mesmo, mas as colunas vazias <strong>somem</strong> e os itens esticam</td><td>2 itens em 600px → <code>300px 300px 0px 0px</code> (itens com 300px)</td><td><a href="grid-repeat.html">repeat e minmax</a></td></tr>
+<tr><td><code>subgrid</code></td><td>o item que também é grade usa as trilhas do pai, em vez de criar as suas</td><td>—</td><td><a href="subgrid.html">Subgrid</a></td></tr>
+</table>
+</div>
+<p>Repare: no F12, aba <strong>Computed</strong>, o <code>grid-template-columns</code> aparece já <strong>em pixels</strong> (<code>100px 200px</code>), e não como você escreveu (<code>1fr 2fr</code>). O que você escreveu aparece no painel <strong>Styles</strong>.</p>
+
+<h3 id="auto"><code>auto-fill</code> × <code>auto-fit</code> ao vivo</h3>
+<pre class="file" data-file="auto-fill e auto-fit" data-resultado>&lt;style&gt;
+  .g { display: grid; gap: 4px; margin-bottom: 0.5rem; padding: 4px; border: 1px dashed gray; }
+  .fill { grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr)); }
+  .fit  { grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr)); }
+  .g div { padding: 0.5rem; background-color: lightsteelblue; }
+  p { margin: 0.5rem 0 0.25rem; font: bold 0.9rem monospace; }
+&lt;/style&gt;
+&lt;p&gt;auto-fill: as colunas vazias continuam lá&lt;/p&gt;
+&lt;div class="g fill"&gt;&lt;div&gt;pão&lt;/div&gt;&lt;div&gt;bolo&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;auto-fit: as colunas vazias somem e os itens esticam&lt;/p&gt;
+&lt;div class="g fit"&gt;&lt;div&gt;pão&lt;/div&gt;&lt;div&gt;bolo&lt;/div&gt;&lt;/div&gt;
+</pre>
+<p>Com muitos itens (mais do que cabem numa linha), os dois ficam iguais. A diferença só aparece quando sobra lugar, e numa tela estreita (menos de quatro colunas de 6rem) pode nem aparecer.</p>
+
+<h2 id="areas">Áreas com nome (<code>grid-template-areas</code>)</h2>
+<pre class="file" data-file="anatomia">.pagina {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  grid-template-areas:
+    "topo   topo"
+    "menu   conteudo"
+    "rodape rodape";
+}
+.pagina header { grid-area: topo; }</pre>
+<dl class="anatomy">
+  <dt>"topo topo"</dt><dd>Uma linha da grade, com um nome por coluna. Repetir o nome (<code>topo topo</code>) faz a área ocupar as duas colunas.</dd>
+  <dt>"menu conteudo"</dt><dd>Todas as linhas precisam ter o <strong>mesmo número</strong> de colunas, e cada área tem de formar um <strong>retângulo</strong>.</dd>
+  <dt>.</dt><dd>Um ponto (<code>"topo ."</code>) é uma casinha vazia, sem nome.</dd>
+  <dt>grid-area: topo</dt><dd>No item: "vá para a área <code>topo</code>". O nome vai <strong>sem aspas</strong> aqui. Medido: <code>grid-area: topo</code> → <code>grid-row-start</code> e <code>grid-column-start</code> calculados como <code>topo</code>.</dd>
+</dl>
+
+<h2 id="itens">Propriedades dos itens (os filhos diretos)</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>Exemplo</th><th>O que faz</th><th>Aula</th></tr>
+<tr><td><code>grid-column</code></td><td><code>1 / 3</code> · <code>1 / -1</code> · <code>span 2</code></td><td>em que colunas o item fica: linha de início / linha de fim. Atalho de <code>grid-column-start</code> e <code>grid-column-end</code>.</td><td><a href="grid-posicionar.html">Posicionando</a></td></tr>
+<tr><td><code>grid-row</code></td><td><code>2 / 4</code> · <code>span 3</code></td><td>o mesmo, nas linhas. Atalho de <code>grid-row-start</code> e <code>grid-row-end</code>.</td><td><a href="grid-posicionar.html">Posicionando</a></td></tr>
+<tr><td><code>grid-area</code></td><td><code>topo</code> · <code>1 / 1 / 3 / 3</code></td><td>com um nome: vai para a área de <code>grid-template-areas</code>. Com números: linha-início / coluna-início / linha-fim / coluna-fim.</td><td><a href="grid-areas.html">Áreas com Nome</a></td></tr>
+<tr><td><code>justify-self</code></td><td><code>start</code> · <code>center</code> · <code>end</code> · <code>stretch</code></td><td>o <code>justify-items</code> de um item só (horizontal, dentro da casinha)</td><td><a href="grid-alinhar.html">Alinhando</a></td></tr>
+<tr><td><code>align-self</code></td><td><code>start</code> · <code>center</code> · <code>end</code> · <code>stretch</code></td><td>o <code>align-items</code> de um item só (vertical)</td><td><a href="grid-alinhar.html">Alinhando</a></td></tr>
+<tr><td><code>place-self</code></td><td><code>center</code> · <code>start end</code></td><td>atalho: <code>align-self</code> <code>justify-self</code></td><td><a href="grid-alinhar.html">Alinhando</a></td></tr>
+<tr><td><code>order</code></td><td><code>-1</code></td><td>muda a ordem na distribuição automática (só na tela; o <kbd>Tab</kbd> segue o HTML)</td><td><a href="align-self.html">align-self e order</a></td></tr>
+<tr><td><code>z-index</code></td><td><code>1</code></td><td>quando dois itens ocupam a mesma casinha, quem fica por cima</td><td><a href="z-index.html">z-index</a></td></tr>
+</table>
+</div>
+
+<h3 id="linhas">Linhas, números negativos e <code>span</code> (medido no Chromium)</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você escreve</th><th>Calculado (start, end)</th><th>Significa</th></tr>
+<tr><td><code>grid-column: 1 / 3</code></td><td><code>1</code>, <code>3</code></td><td>da linha 1 até a linha 3: duas colunas</td></tr>
+<tr><td><code>grid-column: 1 / -1</code></td><td><code>1</code>, <code>-1</code></td><td>da primeira à última linha: a largura toda, quantas colunas houver</td></tr>
+<tr><td><code>grid-column: span 2</code></td><td><code>span 2</code>, <code>auto</code></td><td>ocupa duas colunas, a partir de onde ele cair</td></tr>
+<tr><td><code>grid-column: 2</code></td><td><code>2</code>, <code>auto</code></td><td>só a coluna 2</td></tr>
+<tr><td><code>grid-row: 1 / span 3</code></td><td><code>1</code>, <code>span 3</code></td><td>começa na linha 1 e ocupa três</td></tr>
+</table>
+</div>
+<p>Os números negativos contam de trás para a frente, mas só as linhas que você definiu no <code>grid-template-…</code>: as trilhas criadas sozinhas (implícitas) ficam de fora.</p>
+
+<h2 id="alinhar">Alinhamento: quem move o quê</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th>Horizontal (eixo das linhas de texto)</th><th>Vertical</th><th>Atalho</th></tr>
+<tr><td>todos os itens, dentro das casinhas (no pai)</td><td><code>justify-items</code></td><td><code>align-items</code></td><td><code>place-items</code></td></tr>
+<tr><td>um item, dentro da casinha dele</td><td><code>justify-self</code></td><td><code>align-self</code></td><td><code>place-self</code></td></tr>
+<tr><td>a grade inteira, dentro do contêiner (quando sobra espaço)</td><td><code>justify-content</code></td><td><code>align-content</code></td><td><code>place-content</code></td></tr>
+</table>
+</div>
+<p>Regra para lembrar: <strong>justify</strong> = na direção do texto (horizontal, em português); <strong>align</strong> = a outra. <strong>-items</strong> no pai, <strong>-self</strong> no filho, <strong>-content</strong> para a grade toda.</p>
+
+<h2 id="receitas">Receitas prontas</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quero…</th><th>CSS</th><th>Aula</th></tr>
+<tr><td>3 colunas iguais</td><td><code>display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;</code></td><td><a href="grid-colunas.html">Colunas</a></td></tr>
+<tr><td>galeria que se adapta à tela, sem media query</td><td><code>grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));</code></td><td><a href="grid-repeat.html">repeat e minmax</a>, <a href="projeto-galeria.html">Projeto Galeria</a></td></tr>
+<tr><td>menu lateral fixo + conteúdo</td><td><code>grid-template-columns: 15rem 1fr;</code></td><td><a href="grid-colunas.html">Colunas</a></td></tr>
+<tr><td>cabeçalho, conteúdo e rodapé no fim da tela</td><td><code>min-height: 100dvh; grid-template-rows: auto 1fr auto;</code></td><td><a href="grid-linhas.html">Linhas</a></td></tr>
+<tr><td>o esqueleto da página com nomes</td><td><code>grid-template-areas</code> + <code>grid-area</code> nos filhos</td><td><a href="grid-areas.html">Áreas com Nome</a>, <a href="projeto-blog.html">Projeto Blog</a></td></tr>
+<tr><td>centralizar uma coisa só</td><td><code>display: grid; place-items: center;</code></td><td><a href="centralizar.html">Centralizando</a></td></tr>
+<tr><td>um item da largura toda</td><td>no item: <code>grid-column: 1 / -1;</code></td><td><a href="grid-posicionar.html">Posicionando</a></td></tr>
+<tr><td>mudar o esqueleto no celular</td><td>outro <code>grid-template-areas</code> dentro de um <code>@media</code></td><td><a href="mobile-first.html">Mobile First</a></td></tr>
+</table>
+</div>
+
+<h2 id="experimente">Experimente</h2>
+<p>O esqueleto do blog da Ana, com áreas de nome. Troque a ordem das palavras no <code>grid-template-areas</code> (ponha o <code>menu</code> à direita, por exemplo), mude a largura da primeira coluna, ou apague o <code>grid-template-areas</code> e veja os itens voltarem para a distribuição automática:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;header&gt;Blog da Ana&lt;/header&gt;
+  &lt;nav&gt;Receitas&lt;br&gt;Dicas&lt;br&gt;Contato&lt;/nav&gt;
+  &lt;main&gt;Hoje: bolo de fubá com goiabada.&lt;/main&gt;
+  &lt;footer&gt;© Ana&lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  grid-template-rows: auto 12rem auto;
+  grid-template-areas:
+    "topo   topo"
+    "menu   conteudo"
+    "rodape rodape";
+  gap: 0.5rem;
+}
+
+.pagina &gt; * {
+  padding: 0.5rem;
+  background-color: lavender;
+}
+
+.pagina header { grid-area: topo; background-color: plum; }
+.pagina nav    { grid-area: menu; }
+.pagina main   { grid-area: conteudo; background-color: white; border: 1px solid plum; }
+.pagina footer { grid-area: rodape; }
+</pre>
+</div>
+
+<h2 id="errado">Quando dá errado</h2>
+<div class="cenario">
+<strong>As áreas que não formam um retângulo (e o validador não avisa)</strong>
+<pre class="file" data-file="style.css · erro de propósito">.pagina {
+  display: grid;
+  grid-template-areas:
+    "topo topo"
+    "menu";
+}</pre>
+<p><strong>O que a Ana vê</strong> (os quatro itens têm <code>grid-area: topo</code>, <code>menu</code>, <code>conteudo</code> e <code>rodape</code>): o layout desmonta de um jeito estranho. No Chromium, os quatro itens foram parar <strong>na mesma casinha</strong>, um em cima do outro, e só o último (o rodapé) aparece; o cabeçalho, o menu e o conteúdo ficaram escondidos embaixo dele.</p>
+<p><strong>Por quê:</strong> a segunda linha tem <strong>uma</strong> coluna e a primeira, <strong>duas</strong>. Todas as linhas precisam ter o mesmo número de nomes, e cada área tem de ser um retângulo (<code>"a b a"</code> também é inválido). O navegador descarta a declaração inteira: medido, o <code>grid-template-areas</code> calculado ficou <code>none</code>. Sem as áreas, os nomes <code>topo</code>, <code>menu</code>… não apontam para lugar nenhum, e o navegador cria linhas extras com esses nomes, todas no mesmo ponto: os itens se empilham ali.</p>
+<p><strong>O validador W3C (vnu 26.10.12) não deu nenhuma mensagem</strong> para esse arquivo. Aqui, quem mostra o problema é o F12: no painel <strong>Styles</strong>, a declaração aparece riscada, com o ícone de aviso. O Chrome também tem uma camada de "grid" que desenha as linhas e os nomes das áreas sobre a página: clique no selo <strong>grid</strong> ao lado do elemento, na aba <strong>Elements</strong>.</p>
+<p><strong>Como resolver:</strong> complete a linha (<code>"menu conteudo"</code>) ou use um ponto para a casinha vazia (<code>"menu ."</code>).</p>
+</div>
+
+<div class="cenario">
+<strong>Vírgula, traço e espaço no lugar errado</strong>
+<pre class="term" data-cwd="~/ref/grid">$ vnu --css virgula.css
+"file:/home/ana/ref/grid/virgula.css":3.38-3.38: error: CSS: “grid-template-columns”: “ ” is an incorrect operator.
+$ vnu --css virgula2.css
+"file:/home/ana/ref/grid/virgula2.css":3.31-3.33: error: CSS: “grid-template-columns”: “,” is an incorrect operator.
+$ vnu --css traco.css
+"file:/home/ana/ref/grid/traco.css":2.22-2.22: error: CSS: Parse Error.
+"file:/home/ana/ref/grid/traco.css":3.2-4.1: error: CSS: Parse Error.
+$ vnu --css espaco.css
+"file:/home/ana/ref/grid/espaco.css":3.31-3.33: error: CSS: “grid-template-columns”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Arquivo</th><th>Errado</th><th>Certo</th><th>A mensagem</th></tr>
+<tr><td><code>virgula.css</code></td><td><code>repeat(3 1fr)</code></td><td><code>repeat(3, 1fr)</code></td><td><em>“ ” is an incorrect operator</em>: "o espaço é um operador errado"; ali tinha de vir a vírgula.</td></tr>
+<tr><td><code>virgula2.css</code></td><td><code>1fr, 1fr</code></td><td><code>1fr 1fr</code></td><td>as trilhas são separadas por <strong>espaço</strong>, sem vírgula</td></tr>
+<tr><td><code>traco.css</code></td><td><code>grid-column: 1 - 3</code></td><td><code>grid-column: 1 / 3</code></td><td>a separação é a <strong>barra</strong>. O <em>Parse Error</em> ("erro de leitura") atrapalha até a linha de baixo.</td></tr>
+<tr><td><code>espaco.css</code></td><td><code>1 fr</code></td><td><code>1fr</code></td><td>número e unidade grudados</td></tr>
+</table>
+</div>
+<p>Em todos os casos, o navegador ignora a declaração: sem colunas definidas, a grade fica com uma coluna só. Medido: com <code>repeat(3 1fr)</code>, o <code>grid-template-columns</code> calculado ficou <code>none</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Outras armadilhas</strong>
+<ul>
+  <li><strong>Neto não é item:</strong> só os filhos diretos do contêiner se encaixam na grade. Um <code>&lt;ul&gt;</code> dentro do grid é <em>um</em> item; os <code>&lt;li&gt;</code> dele, não (a não ser com <a href="subgrid.html"><code>subgrid</code></a>).</li>
+  <li><strong>Aspas no <code>grid-area</code>:</strong> nos itens, o nome vai sem aspas (<code>grid-area: topo</code>); as aspas são só no <code>grid-template-areas</code>.</li>
+  <li><strong><code>1fr</code> que estoura:</strong> uma coluna <code>1fr</code> não fica menor que o conteúdo (uma imagem larga, uma palavra enorme). Use <code>minmax(0, 1fr)</code>.</li>
+  <li><strong><code>auto-fit</code> sem <code>minmax()</code>:</strong> <code>repeat(auto-fit, 1fr)</code> é inválido; o navegador precisa de um tamanho mínimo para saber quantas colunas cabem.</li>
+</ul>
+</div>
+
+<h2>Missão</h2>
+<div class="tryhtml" data-goal="css:.galeria{display}=grid,src:grid-template-columns:\s*(repeat\(\s*3\s*\,\s*1fr\s*\)|1fr\s+1fr\s+1fr)\s*;,css:.destaque{grid-column-start}=span 2">
+<p class="try-task"><strong>Missão:</strong> transforme a vitrine numa grade de <strong>3 colunas iguais</strong> (use <code>repeat()</code> e <code>fr</code>) e faça o bolo em destaque ocupar <strong>duas colunas</strong> com <code>span</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="galeria"&gt;
+  &lt;div class="destaque"&gt;Bolo de cenoura (o mais pedido!)&lt;/div&gt;
+  &lt;div&gt;Sonho&lt;/div&gt;
+  &lt;div&gt;Broa&lt;/div&gt;
+  &lt;div&gt;Pão de queijo&lt;/div&gt;
+  &lt;div&gt;Brigadeiro&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria {
+  gap: 0.5rem;
+}
+
+.galeria div {
+  padding: 1rem;
+  background-color: bisque;
+}
+
+.destaque {
+  font-weight: bold;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.galeria div {
+  padding: 1rem;
+  background-color: bisque;
+}
+
+.destaque {
+  grid-column: span 2;
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Contêiner: <code>display: grid</code>, <code>grid-template-columns</code>, <code>grid-template-rows</code>, <code>grid-template-areas</code>, <code>gap</code>, <code>grid-auto-rows</code>, <code>grid-auto-flow</code>.</li>
+  <li>Trilhas: <code>fr</code> (fração do que sobra), <code>repeat()</code>, <code>minmax()</code>, <code>auto-fill</code> (mantém colunas vazias) × <code>auto-fit</code> (as vazias somem).</li>
+  <li>Itens: <code>grid-column</code> e <code>grid-row</code> (linha-início / linha-fim, <code>span N</code>, <code>1 / -1</code>), <code>grid-area</code>.</li>
+  <li>Alinhar: <code>-items</code> no pai, <code>-self</code> no item, <code>-content</code> a grade toda; <code>justify</code> na horizontal, <code>align</code> na vertical.</li>
+  <li>Áreas: mesmo número de colunas em cada linha e áreas retangulares. O <code>vnu</code> não avisa: confira no F12.</li>
+  <li>Trilhas separadas por espaço; posições separadas por <code>/</code>; <code>repeat(3, 1fr)</code> com vírgula.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
