@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS flex-wrap — quebrando a linha do Flexbox | Guia CSS</title>
+<meta name="description" content="flex-wrap para quem está começando no Flexbox: por que os itens se espremem numa linha só, como deixá-los descer para a linha de baixo com wrap, os valores nowrap, wrap e wrap-reverse lado a lado, o atalho flex-flow, align-content e os erros mais comuns.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">flex-wrap</span></h1>
+
+<p class="intro">A Ana pôs os produtos da lojinha numa fila com <code>display: flex</code>. Com três produtos, ficou lindo. Com cinco, os cartões ficaram espremidos, o texto quebrou em pedacinhos e o último cartão saiu para fora da caixa. É que o Flexbox, sozinho, põe <strong>tudo numa linha só</strong>, custe o que custar. Nesta aula você vai conhecer a propriedade <code>flex-wrap</code> (<em>wrap</em> = "embrulhar", "quebrar a linha"), que deixa os itens descerem para a linha de baixo quando não cabem mais.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Por que, sem <code>flex-wrap</code>, os itens encolhem e chegam a vazar da caixa.</li>
+  <li>Como escrever <code>flex-wrap: wrap</code>, parte por parte, e onde ele vai (no pai, não nos itens).</li>
+  <li>Os três valores, <code>nowrap</code>, <code>wrap</code> e <code>wrap-reverse</code>, desenhados lado a lado.</li>
+  <li>O atalho <code>flex-flow</code>, que junta a direção e a quebra numa linha.</li>
+  <li>O que o <code>align-content</code> faz com as várias linhas que aparecem.</li>
+  <li>Por que às vezes o <code>wrap</code> "não faz nada", e as mensagens reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="flexbox.html">Introdução ao Flexbox</a> (o que é o "pai flex" e os "itens") e <a href="flex-direction.html">Direção (flex-direction)</a>. Os exemplos com resultado são desenhados agora pelo <strong>seu</strong> navegador. As mensagens do validador saíram do validador W3C (<code>vnu</code>, o mesmo do validator.w3.org), na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: a prateleira que enche</h2>
+<p>Pense numa prateleira de padaria. A Ana vai colocando os potes de doce lado a lado. Uma hora a prateleira acaba. Ela tem duas escolhas:</p>
+<ol class="passo">
+  <li><strong>Apertar tudo</strong> na mesma prateleira, encostando um pote no outro, até que algum fique pendurado para fora. É o que o Flexbox faz por padrão (<code>nowrap</code>, "não quebrar").</li>
+  <li><strong>Começar a prateleira de baixo</strong> com os potes que não couberam. É o <code>flex-wrap: wrap</code>.</li>
+</ol>
+<p>No Flexbox, cada "prateleira" se chama <strong>linha flex</strong> (<em>flex line</em>). Sem <code>flex-wrap</code>, só existe uma. Com <code>wrap</code>, o navegador abre quantas linhas precisar.</p>
+
+<hr>
+
+<h2>1. O problema: tudo numa linha só</h2>
+<p>Cinco produtos, cada um com <code>width: 120px</code> (largura de 120 pixels), numa vitrine de 320 pixels. A conta não fecha: só os cartões somam mais de 600 pixels. Veja o que o navegador faz:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;div class="produto"&gt;Bolo de cenoura&lt;/div&gt;
+  &lt;div class="produto"&gt;Brigadeiro&lt;/div&gt;
+  &lt;div class="produto"&gt;Pão de mel&lt;/div&gt;
+  &lt;div class="produto"&gt;Torta de limão&lt;/div&gt;
+  &lt;div class="produto"&gt;Cookies&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.vitrine {
+  display: flex;
+  width: 320px;
+  border: 2px dashed gray;
+}
+
+.produto {
+  width: 120px;
+  margin: 4px;
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<p>Duas coisas aconteceram, e as duas são o Flexbox tentando caber numa linha só:</p>
+<ul>
+  <li>Os cartões <strong>encolheram</strong>: nenhum ficou com 120 pixels. Os itens flex podem encolher para caber (aula <a href="flex-grow.html">Crescer e Encolher</a>), e o texto quebra em várias linhas: "Pão / de / mel".</li>
+  <li>Mesmo assim, <strong>não coube</strong>: um item não encolhe menos que a sua palavra mais comprida ("Brigadeiro", "Cookies"). O último cartão ficou com um pedaço para fora da borda tracejada. (Se a largura da sua tela for pequena, o vazamento é ainda maior.)</li>
+</ul>
+<p>Esse é o comportamento padrão: <code>flex-wrap: nowrap</code>. Você não escreveu nada, e mesmo assim ele está lá.</p>
+
+<hr>
+
+<h2>2. A solução: <code>flex-wrap: wrap</code></h2>
+<p>Uma linha a mais no <strong>pai</strong> (a <code>.vitrine</code>) resolve:</p>
+
+<pre class="file" data-file="style.css">.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+}</pre>
+
+<dl class="anatomy">
+  <dt>.vitrine</dt><dd>O seletor: o <strong>pai flex</strong>, o elemento que tem o <code>display: flex</code>. O <code>flex-wrap</code> é uma propriedade do pai, porque é ele que decide quantas linhas existem. Escrito num item, não faz nada.</dd>
+  <dt>flex-wrap</dt><dd>A propriedade. <em>Wrap</em> é "quebrar a linha", como o "quebra automática de texto" de um editor de texto.</dd>
+  <dt>:</dt><dd>Separa a propriedade do valor.</dd>
+  <dt>wrap</dt><dd>O valor: "pode quebrar". Quando o próximo item não cabe, ele desce para uma nova linha.</dd>
+  <dt>;</dt><dd>Fecha a declaração. Esquecer o <code>;</code> estraga esta linha e a de baixo (veja <a href="#errado">Quando dá errado</a>).</dd>
+</dl>
+
+<p>Com o <code>wrap</code>, cada cartão volta a ter os seus 120 pixels (mais o <code>padding</code>), e os que não cabem descem:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;div class="produto"&gt;Bolo de cenoura&lt;/div&gt;
+  &lt;div class="produto"&gt;Brigadeiro&lt;/div&gt;
+  &lt;div class="produto"&gt;Pão de mel&lt;/div&gt;
+  &lt;div class="produto"&gt;Torta de limão&lt;/div&gt;
+  &lt;div class="produto"&gt;Cookies&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  width: 320px;
+  border: 2px dashed gray;
+}
+
+.produto {
+  width: 120px;
+  margin: 4px;
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<p>Agora são três linhas: dois cartões, dois cartões e o "Cookies" sozinho na última. Nada vaza. Mude o <code>width: 320px</code> da vitrine para <code>480px</code> e veja os cartões subirem: cabem três por linha. Quem decide quantos cabem é a <strong>largura que sobra</strong>, e não um número que você escreve.</p>
+
+<div class="tip">
+<strong>A última linha fica "manca"</strong>
+<p>Repare que o "Cookies" ficou sozinho à esquerda, com um buraco ao lado. É normal: cada linha é arrumada separadamente, e o item não sabe o tamanho dos de cima. Se você quer que ele cresça e ocupe a sobra, isso é o <code>flex-grow</code> (aula <a href="flex-grow.html">Crescer e Encolher</a>). Se quer colunas certinhas, alinhadas nas duas direções, isso é Grid (aula <a href="grid.html">Introdução ao Grid</a>).</p>
+</div>
+
+<h3>Experimente: a vitrine que quebra</h3>
+<div class="tryhtml" data-goal="css:.vitrine{flex-wrap}=wrap">
+<p class="try-task"><strong>Missão:</strong> os seis sabores de sorvete estão espremidos numa linha. Faça a <code>.vitrine</code> quebrar a linha quando eles não couberem.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;div class="sabor"&gt;Morango&lt;/div&gt;
+  &lt;div class="sabor"&gt;Chocolate&lt;/div&gt;
+  &lt;div class="sabor"&gt;Flocos&lt;/div&gt;
+  &lt;div class="sabor"&gt;Limão&lt;/div&gt;
+  &lt;div class="sabor"&gt;Coco&lt;/div&gt;
+  &lt;div class="sabor"&gt;Doce de leite&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.vitrine {
+  display: flex;
+  width: 300px;
+  border: 2px dashed gray;
+}
+
+.sabor {
+  width: 110px;
+  margin: 4px;
+  padding: 8px;
+  background-color: navy;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  width: 300px;
+  border: 2px dashed gray;
+}
+
+.sabor {
+  width: 110px;
+  margin: 4px;
+  padding: 8px;
+  background-color: navy;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Os três valores lado a lado</h2>
+<p>O <code>flex-wrap</code> aceita três valores. Abaixo, a mesma vitrine três vezes, uma com cada valor (o nome está escrito em cima de cada uma):</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;nowrap&lt;/p&gt;
+&lt;div class="vitrine nowrap"&gt;
+  &lt;div class="produto"&gt;1. Bolo&lt;/div&gt;
+  &lt;div class="produto"&gt;2. Brigadeiro&lt;/div&gt;
+  &lt;div class="produto"&gt;3. Pão de mel&lt;/div&gt;
+  &lt;div class="produto"&gt;4. Cookies&lt;/div&gt;
+  &lt;div class="produto"&gt;5. Sonho&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;wrap&lt;/p&gt;
+&lt;div class="vitrine wrap"&gt;
+  &lt;div class="produto"&gt;1. Bolo&lt;/div&gt;
+  &lt;div class="produto"&gt;2. Brigadeiro&lt;/div&gt;
+  &lt;div class="produto"&gt;3. Pão de mel&lt;/div&gt;
+  &lt;div class="produto"&gt;4. Cookies&lt;/div&gt;
+  &lt;div class="produto"&gt;5. Sonho&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;wrap-reverse&lt;/p&gt;
+&lt;div class="vitrine wrap-reverse"&gt;
+  &lt;div class="produto"&gt;1. Bolo&lt;/div&gt;
+  &lt;div class="produto"&gt;2. Brigadeiro&lt;/div&gt;
+  &lt;div class="produto"&gt;3. Pão de mel&lt;/div&gt;
+  &lt;div class="produto"&gt;4. Cookies&lt;/div&gt;
+  &lt;div class="produto"&gt;5. Sonho&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">p {
+  font-family: monospace;
+}
+
+.vitrine {
+  display: flex;
+  width: 320px;
+  border: 2px dashed gray;
+}
+
+.produto {
+  width: 120px;
+  margin: 4px;
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+
+.nowrap {
+  flex-wrap: nowrap;
+}
+
+.wrap {
+  flex-wrap: wrap;
+}
+
+.wrap-reverse {
+  flex-wrap: wrap-reverse;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que faz</th><th>No exemplo</th></tr>
+<tr><td><code>nowrap</code></td><td><strong>Padrão.</strong> Uma linha só: os itens encolhem e, se mesmo assim não couberem, vazam.</td><td>Os cinco espremidos numa linha</td></tr>
+<tr><td><code>wrap</code></td><td>Quebra: os itens que não cabem descem para uma nova linha, <strong>embaixo</strong>.</td><td>1 e 2 em cima, 3 e 4 no meio, 5 embaixo</td></tr>
+<tr><td><code>wrap-reverse</code></td><td>Quebra também, mas as linhas novas vão para <strong>cima</strong>: a primeira linha fica no pé da caixa.</td><td>1 e 2 embaixo, 3 e 4 no meio, 5 em cima</td></tr>
+</table>
+</div>
+
+<p>O <code>wrap-reverse</code> é raro. A ordem dos itens <strong>dentro</strong> de cada linha não muda (1 continua à esquerda do 2); só a ordem das linhas é que se inverte. No dia a dia, você vai usar <code>wrap</code> quase sempre, e <code>nowrap</code> quando quiser garantir uma linha só (um menu que deve rolar para o lado, por exemplo).</p>
+
+<hr>
+
+<h2>4. O atalho <code>flex-flow</code></h2>
+<p>A direção (<code>flex-direction</code>) e a quebra (<code>flex-wrap</code>) andam tanto juntas que existe um atalho para as duas: <code>flex-flow</code> (<em>flow</em> = "fluxo"). Estas duas regras fazem exatamente a mesma coisa:</p>
+
+<pre class="file" data-file="style.css">/* jeito longo */
+.vitrine {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+/* atalho */
+.vitrine {
+  display: flex;
+  flex-flow: row wrap;
+}</pre>
+
+<dl class="anatomy">
+  <dt>flex-flow</dt><dd>O atalho: aceita uma direção, uma quebra, ou as duas, separadas por <strong>espaço</strong> (sem vírgula).</dd>
+  <dt>row</dt><dd>A direção: <code>row</code>, <code>column</code>, <code>row-reverse</code> ou <code>column-reverse</code>.</dd>
+  <dt>wrap</dt><dd>A quebra: <code>nowrap</code>, <code>wrap</code> ou <code>wrap-reverse</code>.</dd>
+</dl>
+
+<p>Quem fica de fora volta ao padrão: <code>flex-flow: wrap</code> é o mesmo que <code>row wrap</code>. Como todo atalho, ele <strong>apaga</strong> o que veio antes: um <code>flex-wrap: wrap</code> escrito acima de um <code>flex-flow: column</code> volta para <code>nowrap</code>. Na aba Computed do F12 e no <code>getComputedStyle</code>, o que aparece é a propriedade longa: <code>flex-wrap</code> vale <code>wrap</code>, e <code>flex-direction</code> vale <code>row</code>.</p>
+
+<hr>
+
+<h2>5. Várias linhas: o <code>align-content</code></h2>
+<p>Com o <code>wrap</code>, aparece algo que não existia: <strong>várias linhas</strong>. E se a vitrine for mais alta do que as linhas precisam? Quem decide o que fazer com a altura que sobra é o <code>align-content</code> ("alinhar o conteúdo"), que arruma as <strong>linhas</strong> dentro do pai. Veja a mesma vitrine com 200 pixels de altura, sem e com <code>align-content: flex-start</code>:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;sem align-content&lt;/p&gt;
+&lt;div class="vitrine"&gt;
+  &lt;div class="produto"&gt;Bolo&lt;/div&gt;
+  &lt;div class="produto"&gt;Brigadeiro&lt;/div&gt;
+  &lt;div class="produto"&gt;Pão de mel&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;align-content: flex-start&lt;/p&gt;
+&lt;div class="vitrine no-topo"&gt;
+  &lt;div class="produto"&gt;Bolo&lt;/div&gt;
+  &lt;div class="produto"&gt;Brigadeiro&lt;/div&gt;
+  &lt;div class="produto"&gt;Pão de mel&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">p {
+  font-family: monospace;
+}
+
+.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  width: 320px;
+  height: 200px;
+  border: 2px dashed gray;
+}
+
+.no-topo {
+  align-content: flex-start;
+}
+
+.produto {
+  width: 120px;
+  margin: 4px;
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<p>Na primeira vitrine, as duas linhas <strong>dividiram</strong> a altura que sobrava, e os cartões esticaram até ficarem altos e vazios por baixo do texto. Na segunda, as linhas ficaram juntas no topo, cada uma com a altura do seu conteúdo, e a sobra ficou embaixo. O <code>align-content</code> aceita os mesmos valores que você conhece do <code>justify-content</code> (<code>flex-start</code>, <code>center</code>, <code>flex-end</code>, <code>space-between</code>…), mas só funciona quando há quebra de linha: com <code>nowrap</code>, só existe uma linha, e não há o que arrumar.</p>
+
+<div class="note">
+<strong><code>align-items</code> × <code>align-content</code></strong>
+<p>Os nomes confundem. O <code>align-items</code> (aula <a href="align-items.html">Alinhando na Coluna</a>) alinha cada item <strong>dentro da sua linha</strong>. O <code>align-content</code> arruma <strong>as linhas</strong> dentro do pai. Pense nas prateleiras: um arruma os potes em cada prateleira; o outro decide onde ficam as prateleiras no armário.</p>
+</div>
+
+<hr>
+
+<h2>6. Quebrando em coluna</h2>
+<p>O <code>wrap</code> também funciona com <code>flex-direction: column</code>: os itens descem um embaixo do outro e, quando a altura acaba, começam uma <strong>nova coluna</strong> ao lado. Mas para isso o pai precisa de uma <strong>altura</strong> definida. Sem altura, a caixa simplesmente cresce para baixo e nunca "acaba":</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;div class="produto"&gt;Bolo&lt;/div&gt;
+  &lt;div class="produto"&gt;Brigadeiro&lt;/div&gt;
+  &lt;div class="produto"&gt;Pão de mel&lt;/div&gt;
+  &lt;div class="produto"&gt;Cookies&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.vitrine {
+  display: flex;
+  flex-flow: column wrap;
+  width: 320px;
+  height: 130px;
+  border: 2px dashed gray;
+}
+
+.produto {
+  width: 120px;
+  margin: 4px;
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<p>Bolo, Brigadeiro e Pão de mel enchem a primeira coluna; o Cookies começa a segunda. Apague a linha do <code>height</code> e veja: os quatro ficam numa coluna só. Na prática, quebrar em colunas é bem menos comum do que em linhas; para colunas de verdade, o Grid costuma ser melhor.</p>
+
+<hr>
+
+<h2>7. Formas de fazer a mesma coisa</h2>
+<p>"Cartões que se ajeitam conforme a largura da tela" tem mais de uma solução. O <code>flex-wrap</code> é uma delas:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Como fica</th><th>Quando usar</th></tr>
+<tr><td><code>display: flex</code> (sem <code>wrap</code>)</td><td>Uma linha só; os itens encolhem</td><td>Poucos itens que <strong>sempre</strong> cabem: o menu com 3 links, o cabeçalho com logo e botão</td></tr>
+<tr><td><code>display: flex</code> + <code>flex-wrap: wrap</code></td><td>Quantos couberem por linha; cada linha é independente</td><td>Etiquetas, botões, fotos de tamanhos diferentes, uma lista de "tags" que pode crescer</td></tr>
+<tr><td><code>display: grid</code> com <code>repeat(auto-fit, …)</code></td><td>Colunas iguais, alinhadas de cima a baixo</td><td>Galerias e grades de produtos, quando a última linha também deve ficar alinhada (aula <a href="grid-repeat.html">repeat, minmax e auto-fit</a>)</td></tr>
+<tr><td><code>flex</code> + <code>@media</code></td><td>Você escolhe o layout para cada largura de tela</td><td>Quando a mudança é grande (de coluna para linha, por exemplo): aula <a href="media-queries.html">Media Queries</a></td></tr>
+<tr><td><code>float</code> ou <code>display: inline-block</code></td><td>Itens lado a lado que quebram como texto</td><td>O jeito antigo: você vai encontrar em sites velhos, mas hoje o <code>flex-wrap</code> faz melhor (aula <a href="float.html">float</a>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>CSS quase nunca mostra mensagem de erro: o navegador ignora em silêncio o que não entende, e a página fica como estava. Os casos abaixo são os mais comuns com <code>flex-wrap</code>.</p>
+
+<div class="cenario">
+<strong>O <code>flex-wrap</code> foi parar no item</strong>
+<p><strong>O que aconteceu:</strong> a Ana escreveu o <code>flex-wrap</code> na regra dos cartões, e não na da vitrine:</p>
+<pre class="file" data-file="style.css · erro de propósito">.vitrine {
+  display: flex;
+}
+
+.produto {
+  flex-wrap: wrap;
+}</pre>
+<p><strong>O que você vê:</strong> nada muda; os cartões continuam espremidos numa linha. A declaração é válida (o validador não reclama), mas o <code>flex-wrap</code> só tem efeito num elemento com <code>display: flex</code>, e o cartão não é um pai flex. No F12, na aba Elements (Elementos), clique num cartão: o painel Styles (Estilos) mostra o <code>flex-wrap: wrap</code> ali, aplicado ao lugar errado.</p>
+<p><strong>Como consertar:</strong> mova a linha para a regra do pai (<code>.vitrine</code>). A regra para lembrar: <code>flex-wrap</code>, <code>flex-direction</code>, <code>justify-content</code> e <code>align-items</code> vão no <strong>pai</strong>.</p>
+</div>
+
+<div class="cenario">
+<strong>Sem <code>display: flex</code>, o <code>flex-wrap</code> não faz nada</strong>
+<p><strong>O que aconteceu:</strong> a regra tem <code>flex-wrap: wrap</code>, mas o <code>display: flex</code> foi apagado (ou está escrito errado, como <code>display: flexbox</code>).</p>
+<p><strong>O que você vê:</strong> os cartões voltam a ficar um embaixo do outro, cada um na sua linha, como qualquer <code>div</code>. Parece que o <code>wrap</code> "quebrou demais", mas na verdade não há Flexbox nenhum: os <code>div</code> são blocos, e blocos sempre começam numa linha nova.</p>
+<p><strong>Como consertar:</strong> confira o <code>display: flex</code> no mesmo elemento.</p>
+</div>
+
+<div class="cenario">
+<strong>"O <code>wrap</code> não quebra"</strong>
+<p><strong>O que aconteceu:</strong> a Ana pôs <code>flex-wrap: wrap</code>, mas os cartões continuam numa linha só. Nesse caso, os cartões não têm <code>width</code>: cada um tem só a largura do seu texto curto ("Bolo", "Brigadeiro", "Pão de mel").</p>
+<p><strong>O que você vê:</strong> os três numa linha, com espaço de sobra à direita. Não é erro: eles <strong>cabem</strong>. O <code>wrap</code> só quebra quando o próximo item não cabe. Diminua a largura da vitrine (ou ponha mais itens) e a quebra aparece.</p>
+<p><strong>Como consertar:</strong> se você quer um número certo de itens por linha, dê uma largura aos itens (<code>width</code> ou <code>flex-basis</code>, aula <a href="flex-grow.html">Crescer e Encolher</a>), ou use Grid.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “flex-wrap”: “true” is not a “flex-wrap” value.</code></strong>
+<p><strong>O que aconteceu:</strong> a Ana pensou em "ligar" a quebra, como um interruptor: <code>flex-wrap: true;</code>. Ou inventou um valor parecido, como <code>wrapped</code>.</p>
+<pre class="term" data-cwd="~/flex">$ vnu --css quebra.css
+"file:/home/ana/flex/quebra.css":3.14-3.17: error: CSS: “flex-wrap”: “true” is not a “flex-wrap” value.
+$ vnu --css quebra2.css
+"file:/home/ana/flex/quebra2.css":3.14-3.20: error: CSS: “flex-wrap”: “wrapped” is not a “flex-wrap” value.</pre>
+<p>"<code>true</code> não é um valor de <code>flex-wrap</code>." O <code>3.14-3.17</code> é a linha 3, da coluna 14 à 17. No navegador, a declaração é <strong>ignorada</strong>: vale o padrão, <code>nowrap</code>, e os cartões continuam espremidos. No F12, ela aparece riscada, com um ícone de aviso.</p>
+<p><strong>Como consertar:</strong> os valores são só <code>nowrap</code>, <code>wrap</code> e <code>wrap-reverse</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Quebra em coluna que não quebra</strong>
+<p><strong>O que aconteceu:</strong> <code>flex-flow: column wrap</code>, mas a vitrine não tem <code>height</code>.</p>
+<p><strong>O que você vê:</strong> todos os itens numa coluna só, e a caixa cada vez mais comprida. Sem uma altura, a coluna nunca "acaba", então nunca há motivo para começar outra.</p>
+<p><strong>Como consertar:</strong> dê uma altura ao pai (<code>height</code> ou <code>max-height</code>), como no exemplo da seção 6.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>flex-wrap: nowrap;</code></td><td>Padrão: uma linha só; os itens encolhem e podem vazar</td></tr>
+<tr><td><code>flex-wrap: wrap;</code></td><td>Os itens que não cabem descem para uma nova linha</td></tr>
+<tr><td><code>flex-wrap: wrap-reverse;</code></td><td>Quebra, mas as linhas novas ficam em cima</td></tr>
+<tr><td><code>flex-flow: row wrap;</code></td><td>Atalho para <code>flex-direction</code> + <code>flex-wrap</code></td></tr>
+<tr><td><code>align-content: flex-start;</code></td><td>Com várias linhas, junta as linhas no começo do pai (só funciona com quebra)</td></tr>
+<tr><td>Onde vai</td><td>No <strong>pai</strong>, junto do <code>display: flex</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Deixar quebrar</h3>
+<p>Complete para os itens descerem para a linha de baixo quando não couberem:</p>
+<div class="ex-code">.vitrine { display: flex; flex-wrap: <input data-answer="wrap" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. O atalho</h3>
+<p>Complete o atalho que deixa a direção em linha e liga a quebra:</p>
+<div class="ex-code">.vitrine { display: flex; <input data-answer="flex-flow" aria-label="propriedade">: row wrap; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. Sem escrever nenhum <code>flex-wrap</code>, o que acontece com itens flex que não cabem na largura do pai?</p>
+<label><input type="radio" name="q3"> Descem sozinhos para a linha de baixo</label>
+<label><input type="radio" name="q3"> Encolhem para caber e, se mesmo assim não couberem, vazam do pai</label>
+<label><input type="radio" name="q3"> Somem da tela</label>
+<label><input type="radio" name="q3"> O navegador mostra um erro</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. A Ana escreveu <code>.produto { flex-wrap: wrap; }</code>, e <code>.vitrine</code> tem <code>display: flex</code>. Por que nada mudou?</p>
+<label><input type="radio" name="q4"> Porque <code>wrap</code> não é um valor válido</label>
+<label><input type="radio" name="q4"> Porque faltou o <code>flex-flow</code></label>
+<label><input type="radio" name="q4"> Porque o <code>flex-wrap</code> vai no pai (<code>.vitrine</code>), e não nos itens</label>
+<label><input type="radio" name="q4"> Porque os cartões precisam de <code>display: block</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Para que serve o <code>align-content</code>?</p>
+<label><input type="radio" name="q5"> Arrumar as linhas flex dentro do pai, quando há quebra e sobra espaço</label>
+<label><input type="radio" name="q5"> Alinhar o texto dentro de cada item</label>
+<label><input type="radio" name="q5"> Fazer os itens quebrarem de linha</label>
+<label><input type="radio" name="q5"> Mudar a ordem dos itens</label>
+</div>
+
+<h3>Missão final: a prateleira de etiquetas</h3>
+
+<div class="tryhtml" data-goal="css:.etiquetas{flex-wrap}=wrap,css:.etiquetas{align-content}=flex-start,src:flex-flow:\s*row\s+wrap">
+<p class="try-task"><strong>Missão:</strong> o blog da Ana tem uma caixa de etiquetas com altura fixa. (1) Use o atalho <code>flex-flow: row wrap</code> para as etiquetas quebrarem a linha. (2) Junte as linhas no topo da caixa com <code>align-content: flex-start</code>, para elas não esticarem.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="etiquetas"&gt;
+  &lt;span class="etiqueta"&gt;bolos&lt;/span&gt;
+  &lt;span class="etiqueta"&gt;doces de festa&lt;/span&gt;
+  &lt;span class="etiqueta"&gt;sem glúten&lt;/span&gt;
+  &lt;span class="etiqueta"&gt;receitas rápidas&lt;/span&gt;
+  &lt;span class="etiqueta"&gt;chocolate&lt;/span&gt;
+  &lt;span class="etiqueta"&gt;pães&lt;/span&gt;
+  &lt;span class="etiqueta"&gt;salgados&lt;/span&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.etiquetas {
+  display: flex;
+  width: 260px;
+  height: 180px;
+  border: 2px solid navy;
+  font-family: sans-serif;
+}
+
+.etiqueta {
+  margin: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background-color: lightyellow;
+  border: 1px solid orange;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.etiquetas {
+  display: flex;
+  flex-flow: row wrap;
+  align-content: flex-start;
+  width: 260px;
+  height: 180px;
+  border: 2px solid navy;
+  font-family: sans-serif;
+}
+
+.etiqueta {
+  margin: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background-color: lightyellow;
+  border: 1px solid orange;
+}
+</pre>
+</div>
+
+<p>Experimente trocar <code>flex-start</code> por <code>center</code> ou <code>space-between</code> e veja as linhas se moverem dentro da caixa.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Por padrão (<code>flex-wrap: nowrap</code>), o Flexbox põe tudo numa linha só: os itens encolhem e, se não couberem, vazam.</li>
+  <li><code>flex-wrap: wrap</code>, escrito no <strong>pai</strong>, deixa os itens que não cabem descerem para uma nova linha. <code>wrap-reverse</code> empilha as linhas para cima.</li>
+  <li>Cada linha é arrumada sozinha: a última pode ficar "manca". Para colunas alinhadas, use Grid.</li>
+  <li><code>flex-flow: row wrap</code> é o atalho para <code>flex-direction</code> + <code>flex-wrap</code>.</li>
+  <li>Com várias linhas, <code>align-content</code> decide onde elas ficam no pai.</li>
+  <li>O <code>wrap</code> só quebra quando o item não cabe; em coluna, o pai precisa de altura. Valores inventados (<code>true</code>, <code>wrapped</code>) são ignorados, e o validador avisa.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
