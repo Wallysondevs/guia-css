@@ -1,0 +1,1799 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Projeto: Tabela de Preços — cartões de planos lado a lado, com botão no pé e plano em destaque | Guia CSS</title>
+<meta name="description" content="Projeto do Guia CSS: a tabela de preços do Clube do Bolo em seis versões, com cartões, Grid de colunas automáticas, Flexbox em coluna para alinhar os botões, lista com ✓ feita com ::before e um selo de destaque posicionado com absolute e transform.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Projeto: Tabela de Preços</span></h1>
+
+<p class="intro">A Lojinha da Ana lançou o <strong>Clube do Bolo</strong>: um bolo por mês na porta de casa, em três planos. Toda loja on-line tem uma página assim: três cartões lado a lado, cada um com o nome do plano, o preço grande, o que vem incluído e um botão "Assinar"; o plano que a loja quer vender mais aparece em destaque, com um selo. Neste projeto você monta essa página em <strong>seis versões</strong>, e resolve o problema clássico dela: os botões em alturas diferentes.</p>
+
+<div class="note">
+<strong>Você vai aprender (juntando o que já viu)</strong>
+<ul>
+  <li>A desenhar um cartão: fundo, borda, cantos arredondados, sombra e um preço que chama a atenção.</li>
+  <li>A pôr os cartões lado a lado com Grid, <strong>com a mesma altura</strong>, e empilhados no celular, sem media query.</li>
+  <li>A empurrar o botão para o pé do cartão com Flexbox em coluna e <code>margin-top: auto</code>.</li>
+  <li>A trocar as bolinhas da lista por um ✓ verde com <code>::before</code>.</li>
+  <li>A pendurar um selo "Mais pedido" na borda do cartão com <code>position: absolute</code> e <code>transform</code>.</li>
+</ul>
+</div>
+
+<p>As descrições do resultado foram conferidas em fotos do Chromium, nos quadros de 768 px (tablet) e 375 px (celular): são os botões <strong>768</strong> e <strong>375</strong> da barra de cada caixa; <strong>cheia</strong> volta à largura toda. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>O que vamos construir</h2>
+<p>Pense na vitrine de uma padaria com três bandejas: cada uma com uma plaquinha de preço do mesmo tamanho, na mesma altura, e a bandeja da promoção com uma fita vermelha por cima. Se as plaquinhas ficassem em alturas diferentes, a vitrine pareceria bagunçada, mesmo com os bolos certos.</p>
+
+<p>No fim, num quadro de 768 px, os três planos ("Fatia", "Família" e "Festa") ficam lado a lado em cartões brancos de mesma altura; o do meio tem borda laranja, uma sombra alaranjada e o selo "MAIS PEDIDO" montado em cima da borda; as listas têm ✓ verdes e linhas finas separando os itens; os três botões laranja ficam alinhados no pé dos cartões. No celular, os cartões ficam um embaixo do outro.</p>
+
+<h3>O HTML (é o mesmo em todas as versões)</h3>
+<p>Cada plano é uma <code>&lt;section&gt;</code> com título, preço, lista e um link com cara de botão. Repare que as listas têm tamanhos diferentes (2, 3 e 4 itens): é isso que vai desalinhar os botões. O plano do meio tem a classe <code>destaque</code> e um parágrafo <code>selo</code>. O logo usa <code>srcset</code> para mandar a versão de 400 px às telas de alta densidade (<a href="https://wallysondevs.github.io/guia-html/">Guia HTML</a>).</p>
+
+<pre class="file" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" srcset="assets/midia/logo-lojinha-400.png 2x" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;h1&gt;Clube do Bolo&lt;/h1&gt;
+  &lt;p class="chamada"&gt;Bolo fresquinho da Lojinha da Ana, todo mês, na sua porta. Escolha o seu plano:&lt;/p&gt;
+  &lt;div class="planos"&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Fatia&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 39&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo pequeno por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Fatia&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano destaque"&gt;
+      &lt;p class="selo"&gt;Mais pedido&lt;/p&gt;
+      &lt;h2&gt;Família&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 99&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;4 bolos médios por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Família&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Festa&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 189&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo de festa por mês&lt;/li&gt;
+        &lt;li&gt;Sabor e decoração à escolha&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+        &lt;li&gt;Velas e topo de bolo&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Festa&lt;/a&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+</pre>
+
+<p>O texto de cada link diz o plano ("Assinar o Fatia", e não só "Assinar"): quem usa leitor de tela costuma ouvir a lista de links da página, fora do contexto, e três "Assinar" iguais não ajudariam. Com o <code>style.css</code> vazio, tudo aparece em sequência, na letra serifada padrão, com os links azuis sublinhados.</p>
+
+<hr>
+
+<h2 id="versao1">Versão 1 · Base: fundo, fonte e o cabeçalho centralizado</h2>
+
+<pre class="file" data-file="style.css (versão 1)">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1e293b;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto;
+}
+
+h1,
+.chamada {
+  text-align: center;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>box-sizing</code> e <code>body</code></dt>
+  <dd>O chão de sempre, com um fundo creme (<code>#fdf6ec</code>) para os cartões brancos se destacarem depois. Aula: <a href="box-sizing.html">box-sizing</a>.</dd>
+  <dt><code>.pagina</code></dt>
+  <dd>Até 64rem (1024 px), centralizada: espaço para três cartões. Aula: <a href="centralizar.html">Centralizando</a>.</dd>
+  <dt><code>.logo { display: block; margin: 0 auto; }</code></dt>
+  <dd>Uma imagem é em linha; como bloco, com margens <code>auto</code>, ela vai para o meio. Aula: <a href="display.html">display</a>.</dd>
+  <dt><code>h1, .chamada { text-align: center; }</code></dt>
+  <dd>Um seletor em grupo: só o título e a frase de chamada ficam centralizados. Texto de lista centralizado é difícil de ler, então o resto fica à esquerda. Aulas: <a href="seletor-grupo.html">Agrupando Seletores</a> e <a href="text-align.html">text-align</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> fundo creme, letra sem serifa, o logo da lojinha e o título "Clube do Bolo" no meio, a frase de chamada centralizada embaixo. Os planos continuam em sequência, alinhados à esquerda.</p>
+
+<h3>Experimente: a versão 1</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" srcset="assets/midia/logo-lojinha-400.png 2x" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;h1&gt;Clube do Bolo&lt;/h1&gt;
+  &lt;p class="chamada"&gt;Bolo fresquinho da Lojinha da Ana, todo mês, na sua porta. Escolha o seu plano:&lt;/p&gt;
+  &lt;div class="planos"&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Fatia&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 39&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo pequeno por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Fatia&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano destaque"&gt;
+      &lt;p class="selo"&gt;Mais pedido&lt;/p&gt;
+      &lt;h2&gt;Família&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 99&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;4 bolos médios por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Família&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Festa&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 189&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo de festa por mês&lt;/li&gt;
+        &lt;li&gt;Sabor e decoração à escolha&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+        &lt;li&gt;Velas e topo de bolo&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Festa&lt;/a&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1e293b;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto;
+}
+
+h1,
+.chamada {
+  text-align: center;
+}
+</pre>
+</div>
+
+<h3>Missão 1</h3>
+<div class="tryhtml" data-goal="css:body{background-color}=rgb(253, 246, 236),css:h1{text-align}=center,css:.chamada{text-align}=center">
+<p class="try-task"><strong>Missão:</strong> pinte o fundo da página de <code>#fdf6ec</code> e centralize o título e a <code>.chamada</code>, com <strong>uma</strong> regra só para os dois.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Clube do Bolo&lt;/h1&gt;
+  &lt;p class="chamada"&gt;Bolo fresquinho da Lojinha da Ana, todo mês, na sua porta.&lt;/p&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background-color: #fdf6ec;
+}
+
+h1,
+.chamada {
+  text-align: center;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao2">Versão 2 · O cartão</h2>
+<p>Cada plano vira um cartão branco. Os cartões já ficam numa grade, por enquanto de <strong>uma coluna só</strong>: é o jeito mais simples de pôr um espaço igual entre eles.</p>
+
+<pre class="file" data-file="style.css (versão 2: o que entra)">
+.planos {
+  display: grid;
+  gap: 1rem;
+}
+
+.plano {
+  padding: 1.5rem;
+  background-color: #fff;
+  border: 1px solid #e7d8c5;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+}
+
+.plano h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #9a3412;
+}
+
+.preco {
+  margin: 0.5rem 0 1rem;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.preco span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #64748b;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>.planos { display: grid; gap: 1rem; }</code></dt>
+  <dd>Uma grade sem colunas definidas tem uma coluna; o <code>gap</code> separa os cartões em 16 px, sem margem sobrando antes do primeiro nem depois do último. Aula: <a href="gap.html">gap</a>.</dd>
+  <dt><code>padding</code>, <code>background-color</code>, <code>border</code>, <code>border-radius</code></dt>
+  <dd>24 px de respiro por dentro, fundo branco, borda bege de 1 px, cantos de 12 px. Aulas: <a href="padding.html">padding</a> e <a href="border-radius.html">border-radius</a>.</dd>
+  <dt><code>box-shadow: 0 4px 12px rgb(0 0 0 / 0.08)</code></dt>
+  <dd>Uma sombra quase invisível, 4 px para baixo: o cartão parece um pouco acima do fundo. Aula: <a href="box-shadow.html">Sombra</a>.</dd>
+  <dt><code>.preco</code> e <code>.preco span</code></dt>
+  <dd>O preço em 2.25rem (36 px), extranegrito (<code>800</code>), com <code>line-height: 1</code> para não sobrar espaço em volta; o "/mês" volta ao tamanho normal, sem negrito e cinza. Aulas: <a href="font-size.html">font-size</a> e <a href="font-weight.html">font-weight</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 768 px, três cartões brancos, de cantos arredondados, um embaixo do outro, da largura toda (736 px). O nome do plano fica marrom-alaranjado, o preço grande e escuro com o "/mês" pequeno e cinza ao lado. No cartão do meio, o "Mais pedido" ainda é um parágrafo comum, acima de "Família".</p>
+
+<h3>Experimente: a versão 2</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" srcset="assets/midia/logo-lojinha-400.png 2x" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;h1&gt;Clube do Bolo&lt;/h1&gt;
+  &lt;p class="chamada"&gt;Bolo fresquinho da Lojinha da Ana, todo mês, na sua porta. Escolha o seu plano:&lt;/p&gt;
+  &lt;div class="planos"&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Fatia&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 39&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo pequeno por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Fatia&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano destaque"&gt;
+      &lt;p class="selo"&gt;Mais pedido&lt;/p&gt;
+      &lt;h2&gt;Família&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 99&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;4 bolos médios por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Família&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Festa&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 189&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo de festa por mês&lt;/li&gt;
+        &lt;li&gt;Sabor e decoração à escolha&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+        &lt;li&gt;Velas e topo de bolo&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Festa&lt;/a&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1e293b;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto;
+}
+
+h1,
+.chamada {
+  text-align: center;
+}
+
+.planos {
+  display: grid;
+  gap: 1rem;
+}
+
+.plano {
+  padding: 1.5rem;
+  background-color: #fff;
+  border: 1px solid #e7d8c5;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+}
+
+.plano h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #9a3412;
+}
+
+.preco {
+  margin: 0.5rem 0 1rem;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.preco span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #64748b;
+}
+</pre>
+</div>
+
+<h3>Missão 2</h3>
+<div class="tryhtml" data-goal="css:.plano{background-color}=rgb(255, 255, 255),css:.plano{padding-top}=24px,css:.plano{border-top-left-radius}=12px">
+<p class="try-task"><strong>Missão:</strong> transforme o <code>.plano</code> num cartão: fundo branco, <code>1.5rem</code> de preenchimento e cantos de <code>12px</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;section class="plano"&gt;
+  &lt;h2&gt;Fatia&lt;/h2&gt;
+  &lt;p class="preco"&gt;R$ 39&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+  &lt;ul&gt;
+    &lt;li&gt;1 bolo pequeno por mês&lt;/li&gt;
+    &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;a class="botao" href="#assinar"&gt;Assinar o Fatia&lt;/a&gt;
+&lt;/section&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+  background-color: #fdf6ec;
+}
+
+.plano {
+  border: 1px solid #e7d8c5;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+  background-color: #fdf6ec;
+}
+
+.plano {
+  padding: 1.5rem;
+  background-color: #fff;
+  border: 1px solid #e7d8c5;
+  border-radius: 12px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao3">Versão 3 · Lado a lado, com a mesma altura</h2>
+<p>Uma linha só de CSS: as colunas automáticas, como na <a href="projeto-galeria.html">galeria</a>.</p>
+
+<pre class="file" data-file="style.css (versão 3: o que entra)">
+.planos {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>repeat(auto-fit, minmax(13rem, 1fr))</code></dt>
+  <dd>Quantas colunas de no mínimo 13rem (208 px) couberem, repartindo a sobra. No quadro de 768 px, a grade tem 736 px: cabem três (3 × 208 + 2 × 16 = 656). No de 375 px, a grade tem 343 px: cabe uma, e os cartões ficam empilhados como na versão 2. Aula: <a href="grid-repeat.html">repeat, minmax e auto-fit</a>.</dd>
+  <dt>A mesma altura, de graça</dt>
+  <dd>Os itens de uma linha do Grid <strong>esticam</strong> até a altura do mais alto (é o <code>align-items: stretch</code>, o padrão). Por isso os três cartões ficam com a altura do "Festa", que tem a lista mais comprida. Aula: <a href="grid-alinhar.html">Alinhando no Grid</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 768 px, três cartões lado a lado, com 235 px de largura e a mesma altura. Mas veja os links "Assinar": no "Fatia", ele fica logo depois da lista curta, lá no alto; no "Família", um pouco mais abaixo (por causa do "Mais pedido" e da lista de 3 itens); no "Festa", quase no pé. A vitrine ficou com as plaquinhas desencontradas.</p>
+
+<h3>Experimente: a versão 3</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" srcset="assets/midia/logo-lojinha-400.png 2x" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;h1&gt;Clube do Bolo&lt;/h1&gt;
+  &lt;p class="chamada"&gt;Bolo fresquinho da Lojinha da Ana, todo mês, na sua porta. Escolha o seu plano:&lt;/p&gt;
+  &lt;div class="planos"&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Fatia&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 39&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo pequeno por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Fatia&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano destaque"&gt;
+      &lt;p class="selo"&gt;Mais pedido&lt;/p&gt;
+      &lt;h2&gt;Família&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 99&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;4 bolos médios por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Família&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Festa&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 189&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo de festa por mês&lt;/li&gt;
+        &lt;li&gt;Sabor e decoração à escolha&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+        &lt;li&gt;Velas e topo de bolo&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Festa&lt;/a&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1e293b;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto;
+}
+
+h1,
+.chamada {
+  text-align: center;
+}
+
+.planos {
+  display: grid;
+  gap: 1rem;
+}
+
+.plano {
+  padding: 1.5rem;
+  background-color: #fff;
+  border: 1px solid #e7d8c5;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+}
+
+.plano h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #9a3412;
+}
+
+.preco {
+  margin: 0.5rem 0 1rem;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.preco span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #64748b;
+}
+
+.planos {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+</pre>
+</div>
+
+<p>Brinque: clique em 375 na barra do quadro e veja os cartões voltarem a empilhar. Troque <code>13rem</code> por <code>20rem</code>: no quadro de 768 px, cabem só dois por linha, e o "Festa" desce sozinho e fica com a largura toda (é o <code>auto-fit</code> com <code>1fr</code>).</p>
+
+<h3>Missão 3</h3>
+<div class="tryhtml" data-largura="768" data-goal="src:\.planos\s*\{[^}]*grid-template-columns:\s*repeat\(\s*auto-(fit|fill)\s*\,\s*minmax\(\s*13rem\s*\,\s*1fr\s*\)\s*\)">
+<p class="try-task"><strong>Missão:</strong> ponha os cartões lado a lado: no <code>.planos</code>, colunas automáticas de no mínimo <code>13rem</code>, repartindo a sobra (<code>1fr</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" srcset="assets/midia/logo-lojinha-400.png 2x" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;h1&gt;Clube do Bolo&lt;/h1&gt;
+  &lt;p class="chamada"&gt;Bolo fresquinho da Lojinha da Ana, todo mês, na sua porta. Escolha o seu plano:&lt;/p&gt;
+  &lt;div class="planos"&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Fatia&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 39&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo pequeno por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Fatia&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano destaque"&gt;
+      &lt;p class="selo"&gt;Mais pedido&lt;/p&gt;
+      &lt;h2&gt;Família&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 99&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;4 bolos médios por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Família&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Festa&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 189&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo de festa por mês&lt;/li&gt;
+        &lt;li&gt;Sabor e decoração à escolha&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+        &lt;li&gt;Velas e topo de bolo&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Festa&lt;/a&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1e293b;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto;
+}
+
+h1,
+.chamada {
+  text-align: center;
+}
+
+.planos {
+  display: grid;
+  gap: 1rem;
+}
+
+.plano {
+  padding: 1.5rem;
+  background-color: #fff;
+  border: 1px solid #e7d8c5;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+}
+
+.plano h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #9a3412;
+}
+
+.preco {
+  margin: 0.5rem 0 1rem;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.preco span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #64748b;
+}
+</pre>
+<pre class="solucao" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1e293b;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto;
+}
+
+h1,
+.chamada {
+  text-align: center;
+}
+
+.planos {
+  display: grid;
+  gap: 1rem;
+}
+
+.plano {
+  padding: 1.5rem;
+  background-color: #fff;
+  border: 1px solid #e7d8c5;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+}
+
+.plano h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #9a3412;
+}
+
+.preco {
+  margin: 0.5rem 0 1rem;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.preco span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #64748b;
+}
+
+.planos {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao4">Versão 4 · O botão no pé do cartão</h2>
+<p>O cartão já tem a altura certa; falta o botão ir para o fundo dele. O truque: o cartão vira uma coluna Flexbox, e o botão ganha uma margem de cima "elástica", que come todo o espaço livre.</p>
+
+<pre class="file" data-file="style.css (versão 4: o que entra)">
+.plano {
+  display: flex;
+  flex-direction: column;
+}
+
+.botao {
+  margin-top: auto;
+  padding: 0.75rem 0.5rem;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.botao:hover {
+  background-color: #9a3412;
+}
+
+.botao:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 3px;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>.plano { display: flex; flex-direction: column; }</code></dt>
+  <dd>Os filhos do cartão (título, preço, lista, botão) ficam um embaixo do outro, como antes, mas agora como itens flex. Aulas: <a href="flexbox.html">Flexbox</a> e <a href="flex-direction.html">flex-direction</a>.</dd>
+  <dt><code>.botao { margin-top: auto; }</code></dt>
+  <dd>Num item flex, a margem <code>auto</code> ocupa todo o espaço que sobra na direção do eixo. Como o eixo é vertical, a margem de cima cresce e empurra o botão para o pé. No quadro de 768 px, essa margem calculada fica em 96 px no "Fatia" e em 0 px no "Festa", o cartão mais alto, que não tem sobra. Aula: <a href="centralizar.html">Centralizando</a>.</dd>
+  <dt>O botão</dt>
+  <dd>Fundo laranja-escuro, letra branca em negrito, cantos de 8 px, sem sublinhado. Como item flex, o link vira bloco e ocupa a largura do cartão, sem precisar de <code>display: block</code>. Aula: <a href="botoes.html">Estilizando Botões</a>.</dd>
+  <dt><code>:hover</code> e <code>:focus-visible</code></dt>
+  <dd>Com o mouse em cima, o fundo escurece (<code>#9a3412</code>). Com o foco do teclado, aparece um contorno azul de 3 px, afastado 3 px do botão. Aulas: <a href="hover-focus.html">Estados</a> e <a href="outline.html">Contorno</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 768 px, os três botões laranja ficam alinhados no pé dos cartões, na mesma altura, da largura do cartão, com "Assinar o Fatia", "Assinar o Família" e "Assinar o Festa" centralizados em branco. Entre a lista curta do "Fatia" e o botão sobra um espaço branco: é a margem automática.</p>
+
+<h3>Experimente: a versão 4</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" srcset="assets/midia/logo-lojinha-400.png 2x" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;h1&gt;Clube do Bolo&lt;/h1&gt;
+  &lt;p class="chamada"&gt;Bolo fresquinho da Lojinha da Ana, todo mês, na sua porta. Escolha o seu plano:&lt;/p&gt;
+  &lt;div class="planos"&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Fatia&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 39&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo pequeno por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Fatia&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano destaque"&gt;
+      &lt;p class="selo"&gt;Mais pedido&lt;/p&gt;
+      &lt;h2&gt;Família&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 99&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;4 bolos médios por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Família&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Festa&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 189&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo de festa por mês&lt;/li&gt;
+        &lt;li&gt;Sabor e decoração à escolha&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+        &lt;li&gt;Velas e topo de bolo&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Festa&lt;/a&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1e293b;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto;
+}
+
+h1,
+.chamada {
+  text-align: center;
+}
+
+.planos {
+  display: grid;
+  gap: 1rem;
+}
+
+.plano {
+  padding: 1.5rem;
+  background-color: #fff;
+  border: 1px solid #e7d8c5;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+}
+
+.plano h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #9a3412;
+}
+
+.preco {
+  margin: 0.5rem 0 1rem;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.preco span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #64748b;
+}
+
+.planos {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.plano {
+  display: flex;
+  flex-direction: column;
+}
+
+.botao {
+  margin-top: auto;
+  padding: 0.75rem 0.5rem;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.botao:hover {
+  background-color: #9a3412;
+}
+
+.botao:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 3px;
+}
+</pre>
+</div>
+
+<p>Brinque: passe o mouse nos botões; clique no quadro e use <kbd>Tab</kbd> para ver o contorno azul. Troque <code>margin-top: auto</code> por <code>margin-bottom: auto</code> e veja o botão grudar na lista de novo.</p>
+
+<h3>Missão 4</h3>
+<div class="tryhtml" data-largura="768" data-goal="css:.plano{display}=flex,css:.plano{flex-direction}=column,src:\.botao\s*\{[^}]*margin-top:\s*auto">
+<p class="try-task"><strong>Missão:</strong> os botões estão desalinhados. Transforme o <code>.plano</code> numa coluna Flexbox e empurre o <code>.botao</code> para o pé com uma margem automática.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" srcset="assets/midia/logo-lojinha-400.png 2x" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;h1&gt;Clube do Bolo&lt;/h1&gt;
+  &lt;p class="chamada"&gt;Bolo fresquinho da Lojinha da Ana, todo mês, na sua porta. Escolha o seu plano:&lt;/p&gt;
+  &lt;div class="planos"&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Fatia&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 39&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo pequeno por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Fatia&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano destaque"&gt;
+      &lt;p class="selo"&gt;Mais pedido&lt;/p&gt;
+      &lt;h2&gt;Família&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 99&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;4 bolos médios por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Família&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Festa&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 189&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo de festa por mês&lt;/li&gt;
+        &lt;li&gt;Sabor e decoração à escolha&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+        &lt;li&gt;Velas e topo de bolo&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Festa&lt;/a&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1e293b;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto;
+}
+
+h1,
+.chamada {
+  text-align: center;
+}
+
+.planos {
+  display: grid;
+  gap: 1rem;
+}
+
+.plano {
+  padding: 1.5rem;
+  background-color: #fff;
+  border: 1px solid #e7d8c5;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+}
+
+.plano h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #9a3412;
+}
+
+.preco {
+  margin: 0.5rem 0 1rem;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.preco span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #64748b;
+}
+
+.planos {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.botao {
+  padding: 0.75rem 0.5rem;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+</pre>
+<pre class="solucao" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1e293b;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto;
+}
+
+h1,
+.chamada {
+  text-align: center;
+}
+
+.planos {
+  display: grid;
+  gap: 1rem;
+}
+
+.plano {
+  padding: 1.5rem;
+  background-color: #fff;
+  border: 1px solid #e7d8c5;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+}
+
+.plano h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #9a3412;
+}
+
+.preco {
+  margin: 0.5rem 0 1rem;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.preco span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #64748b;
+}
+
+.planos {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.plano {
+  display: flex;
+  flex-direction: column;
+}
+
+.botao {
+  margin-top: auto;
+  padding: 0.75rem 0.5rem;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao5">Versão 5 · A lista com ✓</h2>
+<p>Nas tabelas de preço, cada vantagem ganha um "certinho". Não precisa de imagem: o próprio CSS escreve o ✓ antes de cada item.</p>
+
+<pre class="file" data-file="style.css (versão 5: o que entra)">
+.plano ul {
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.plano li {
+  padding: 0.5rem 0;
+  border-top: 1px solid #f1e6d8;
+}
+
+.plano li::before {
+  content: "✓ ";
+  font-weight: 700;
+  color: #15803d;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>list-style: none</code>, <code>padding: 0</code></dt>
+  <dd>Tira as bolinhas e o recuo de 40 px da lista. Aula: <a href="listas.html">Estilizando Listas</a>.</dd>
+  <dt><code>.plano li { border-top: 1px solid #f1e6d8; }</code></dt>
+  <dd>Uma linha bege fininha em cima de cada item, separando as vantagens como numa tabela.</dd>
+  <dt><code>li::before { content: "✓ "; }</code></dt>
+  <dd>O <code>::before</code> cria uma "caixinha" no começo de cada item, com o texto do <code>content</code> (entre aspas: é um texto). Ganha negrito e verde. Sem o <code>content</code>, o <code>::before</code> não aparece. Aula: <a href="before-after.html">::before e ::after</a>.</dd>
+</dl>
+
+<div class="note"><strong>E o leitor de tela?</strong> O conteúdo do <code>::before</code> costuma ser lido junto com o item ("marca de verificação, Entrega grátis"). Aqui não atrapalha. Para um ícone puramente decorativo, o CSS moderno aceita um texto alternativo depois de uma barra, <code>content: "✓" / "";</code> (alternativa vazia), mas o suporte chegou há pouco em alguns navegadores: veja <a href="acessibilidade.html">CSS e Acessibilidade</a>.</div>
+
+<p><strong>O que muda na tela:</strong> as bolinhas somem; cada vantagem começa com um ✓ verde em negrito e fica entre linhas bege fininhas, alinhada à esquerda do cartão. As listas ficam um pouco mais altas (8 px de respiro em cima e embaixo de cada item), e os botões continuam alinhados no pé.</p>
+
+<h3>Experimente: a versão 5</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" srcset="assets/midia/logo-lojinha-400.png 2x" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;h1&gt;Clube do Bolo&lt;/h1&gt;
+  &lt;p class="chamada"&gt;Bolo fresquinho da Lojinha da Ana, todo mês, na sua porta. Escolha o seu plano:&lt;/p&gt;
+  &lt;div class="planos"&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Fatia&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 39&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo pequeno por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Fatia&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano destaque"&gt;
+      &lt;p class="selo"&gt;Mais pedido&lt;/p&gt;
+      &lt;h2&gt;Família&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 99&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;4 bolos médios por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Família&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Festa&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 189&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo de festa por mês&lt;/li&gt;
+        &lt;li&gt;Sabor e decoração à escolha&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+        &lt;li&gt;Velas e topo de bolo&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Festa&lt;/a&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1e293b;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto;
+}
+
+h1,
+.chamada {
+  text-align: center;
+}
+
+.planos {
+  display: grid;
+  gap: 1rem;
+}
+
+.plano {
+  padding: 1.5rem;
+  background-color: #fff;
+  border: 1px solid #e7d8c5;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+}
+
+.plano h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #9a3412;
+}
+
+.preco {
+  margin: 0.5rem 0 1rem;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.preco span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #64748b;
+}
+
+.planos {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.plano {
+  display: flex;
+  flex-direction: column;
+}
+
+.botao {
+  margin-top: auto;
+  padding: 0.75rem 0.5rem;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.botao:hover {
+  background-color: #9a3412;
+}
+
+.botao:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 3px;
+}
+
+.plano ul {
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.plano li {
+  padding: 0.5rem 0;
+  border-top: 1px solid #f1e6d8;
+}
+
+.plano li::before {
+  content: "✓ ";
+  font-weight: 700;
+  color: #15803d;
+}
+</pre>
+</div>
+
+<p>Brinque: troque o <code>"✓ "</code> por <code>"🎂 "</code> ou por <code>"+ "</code>. Apague a linha do <code>content</code> e veja os ✓ sumirem.</p>
+
+<h3>Missão 5</h3>
+<div class="tryhtml" data-goal="css:.plano li::before{content}=&quot;✓ &quot;,css:.plano li::before{color}=rgb(21, 128, 61)">
+<p class="try-task"><strong>Missão:</strong> ponha um <code>"✓ "</code> (o ✓ e um espaço) antes de cada item da lista, na cor <code>#15803d</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;section class="plano"&gt;
+  &lt;h2&gt;Fatia&lt;/h2&gt;
+  &lt;p class="preco"&gt;R$ 39&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+  &lt;ul&gt;
+    &lt;li&gt;1 bolo pequeno por mês&lt;/li&gt;
+    &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;a class="botao" href="#assinar"&gt;Assinar o Fatia&lt;/a&gt;
+&lt;/section&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+
+.plano ul {
+  padding: 0;
+  list-style: none;
+}
+
+.plano li {
+  padding: 0.5rem 0;
+  border-top: 1px solid #f1e6d8;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+
+.plano ul {
+  padding: 0;
+  list-style: none;
+}
+
+.plano li {
+  padding: 0.5rem 0;
+  border-top: 1px solid #f1e6d8;
+}
+
+.plano li::before {
+  content: "✓ ";
+  font-weight: 700;
+  color: #15803d;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao6">Versão 6 · O plano em destaque, com selo</h2>
+<p>O plano Família ganha borda laranja, sombra alaranjada e o selo "Mais pedido" pendurado no meio da borda de cima, metade para fora do cartão.</p>
+
+<pre class="file" data-file="style.css (versão 6: o que entra)">
+.plano {
+  position: relative;
+}
+
+.destaque {
+  border: 2px solid #c2410c;
+  box-shadow: 0 8px 24px rgb(194 65 12 / 0.25);
+}
+
+.selo {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background-color: #c2410c;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>.plano { position: relative; }</code></dt>
+  <dd>Faz de cada cartão a referência para o selo. Aula: <a href="position-relative.html">position: relative</a>.</dd>
+  <dt><code>.destaque</code></dt>
+  <dd>Borda de 2 px laranja-escura e uma sombra maior, alaranjada (<code>rgb(194 65 12 / 0.25)</code>, o mesmo laranja com 25%). Vem depois do <code>.plano</code> no arquivo, com a mesma especificidade: ganha a disputa pela borda e pela sombra. Aula: <a href="cascata.html">A Cascata</a>.</dd>
+  <dt><code>.selo { position: absolute; top: 0; left: 50%; }</code></dt>
+  <dd>O selo sai do fluxo (o "Família" sobe para o lugar dele) e põe o seu canto de cima à esquerda na borda de cima do cartão, no meio da largura. Aula: <a href="position-absolute.html">position: absolute</a>.</dd>
+  <dt><code>transform: translate(-50%, -50%)</code></dt>
+  <dd>Volta o selo metade da <strong>largura dele</strong> para a esquerda e metade da <strong>altura dele</strong> para cima: o centro do selo fica exatamente sobre a borda, no meio. Os <code>%</code> do <code>translate</code> são do próprio elemento, e os do <code>left</code>, do cartão. Aula: <a href="transform.html">transform</a>.</dd>
+  <dt><code>border-radius: 999px</code> e <code>white-space: nowrap</code></dt>
+  <dd>Um raio maior que a altura deixa as pontas totalmente redondas (uma "pílula"). O <code>nowrap</code> impede o selo de quebrar em duas linhas (veja "Quando dá errado").</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 768 px, o cartão "Família" fica com a borda laranja e uma sombra alaranjada suave em volta; a pílula laranja "MAIS PEDIDO", em letras brancas pequenas, aparece centralizada sobre a borda de cima, metade dentro e metade fora do cartão. Os três cartões continuam com a mesma altura e os botões alinhados. No quadro de 375 px, o selo fica pendurado do mesmo jeito sobre o segundo cartão, no vão entre ele e o primeiro.</p>
+
+<h3>Experimente: a versão 6 (a página completa)</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" srcset="assets/midia/logo-lojinha-400.png 2x" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;h1&gt;Clube do Bolo&lt;/h1&gt;
+  &lt;p class="chamada"&gt;Bolo fresquinho da Lojinha da Ana, todo mês, na sua porta. Escolha o seu plano:&lt;/p&gt;
+  &lt;div class="planos"&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Fatia&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 39&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo pequeno por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Fatia&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano destaque"&gt;
+      &lt;p class="selo"&gt;Mais pedido&lt;/p&gt;
+      &lt;h2&gt;Família&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 99&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;4 bolos médios por mês&lt;/li&gt;
+        &lt;li&gt;Sabores do cardápio&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Família&lt;/a&gt;
+    &lt;/section&gt;
+    &lt;section class="plano"&gt;
+      &lt;h2&gt;Festa&lt;/h2&gt;
+      &lt;p class="preco"&gt;R$ 189&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;1 bolo de festa por mês&lt;/li&gt;
+        &lt;li&gt;Sabor e decoração à escolha&lt;/li&gt;
+        &lt;li&gt;Entrega grátis&lt;/li&gt;
+        &lt;li&gt;Velas e topo de bolo&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;a class="botao" href="#assinar"&gt;Assinar o Festa&lt;/a&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1e293b;
+  background-color: #fdf6ec;
+}
+
+.pagina {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto;
+}
+
+h1,
+.chamada {
+  text-align: center;
+}
+
+.planos {
+  display: grid;
+  gap: 1rem;
+}
+
+.plano {
+  padding: 1.5rem;
+  background-color: #fff;
+  border: 1px solid #e7d8c5;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+}
+
+.plano h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #9a3412;
+}
+
+.preco {
+  margin: 0.5rem 0 1rem;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.preco span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #64748b;
+}
+
+.planos {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.plano {
+  display: flex;
+  flex-direction: column;
+}
+
+.botao {
+  margin-top: auto;
+  padding: 0.75rem 0.5rem;
+  border-radius: 8px;
+  background-color: #c2410c;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.botao:hover {
+  background-color: #9a3412;
+}
+
+.botao:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 3px;
+}
+
+.plano ul {
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.plano li {
+  padding: 0.5rem 0;
+  border-top: 1px solid #f1e6d8;
+}
+
+.plano li::before {
+  content: "✓ ";
+  font-weight: 700;
+  color: #15803d;
+}
+
+.plano {
+  position: relative;
+}
+
+.destaque {
+  border: 2px solid #c2410c;
+  box-shadow: 0 8px 24px rgb(194 65 12 / 0.25);
+}
+
+.selo {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background-color: #c2410c;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+</pre>
+</div>
+
+<p>Brinque: ponha a classe <code>destaque</code> (e o selo) no plano Festa. Troque <code>translate(-50%, -50%)</code> por <code>translate(-50%, 0)</code> e veja o selo entrar todo no cartão.</p>
+
+<h3>Missão 6</h3>
+<div class="tryhtml" data-goal="css:.plano{position}=relative,css:.selo{position}=absolute,css:.selo{top}=0px,src:translate\(\s*-50%\s*\,\s*-50%\s*\),css:.destaque{border-top-width}=2px,css:.destaque{border-top-color}=rgb(194, 65, 12)">
+<p class="try-task"><strong>Missão:</strong> pendure o <code>.selo</code> no meio da borda de cima do cartão, metade para fora (<code>absolute</code>, <code>top: 0</code>, <code>left: 50%</code> e o <code>translate</code> certo), e dê ao <code>.destaque</code> uma borda de <code>2px</code> contínua, cor <code>#c2410c</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;section class="plano destaque"&gt;
+  &lt;p class="selo"&gt;Mais pedido&lt;/p&gt;
+  &lt;h2&gt;Família&lt;/h2&gt;
+  &lt;p class="preco"&gt;R$ 99&lt;span&gt;/mês&lt;/span&gt;&lt;/p&gt;
+  &lt;a class="botao" href="#assinar"&gt;Assinar o Família&lt;/a&gt;
+&lt;/section&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  padding: 2rem;
+  font-family: system-ui, sans-serif;
+}
+
+.plano {
+  padding: 1.5rem;
+  border: 1px solid #e7d8c5;
+  border-radius: 12px;
+}
+
+.selo {
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background-color: #c2410c;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  padding: 2rem;
+  font-family: system-ui, sans-serif;
+}
+
+.plano {
+  position: relative;
+  padding: 1.5rem;
+  border: 1px solid #e7d8c5;
+  border-radius: 12px;
+}
+
+.destaque {
+  border: 2px solid #c2410c;
+}
+
+.selo {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background-color: #c2410c;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Formas diferentes de fazer as mesmas coisas</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Para</th><th>Usamos</th><th>Também daria</th><th>Quando preferir a outra</th></tr></thead>
+<tbody>
+<tr><td>Cartões lado a lado</td><td>Grid com <code>auto-fit</code></td><td>Flexbox com <code>flex-wrap: wrap</code> e <code>flex: 1 1 13rem</code></td><td>Dá quase no mesmo com três cartões; com cinco, o Flexbox deixa os da última linha mais largos. Veja <a href="flex-ou-grid.html">Flexbox ou Grid?</a>.</td></tr>
+<tr><td>Botão no pé</td><td><code>display: flex; flex-direction: column</code> + <code>margin-top: auto</code></td><td><code>display: grid; grid-template-rows: auto auto 1fr auto</code> no cartão</td><td>Quando o cartão já é uma grade por outros motivos.</td></tr>
+<tr><td>Títulos, preços e listas alinhados entre os cartões</td><td>Não alinhamos (só o botão)</td><td><a href="subgrid.html">Subgrid</a>: as linhas de dentro de cada cartão seguem as linhas da grade de fora</td><td>Quando o título ou o preço também precisam ficar na mesma altura nos três cartões.</td></tr>
+<tr><td>O ✓</td><td><code>li::before</code> com <code>content</code></td><td><code>li::marker { content: "✓ "; }</code>, ou uma imagem com <code>list-style-image</code></td><td>O <code>content</code> no <code>::marker</code> ainda não funciona em todos os navegadores (o Safari tem suporte parcial ao <code>::marker</code>, segundo o caniuse.com); a imagem serve para um ícone desenhado.</td></tr>
+<tr><td>Comparar muitos recursos</td><td>Cartões</td><td>Uma <code>&lt;table&gt;</code> de verdade, com os planos nas colunas</td><td>Quando são 10 recursos e a pessoa quer comparar linha a linha. Veja <a href="tabelas.html">Estilizando Tabelas</a>.</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<h2>Quando dá errado</h2>
+
+<div class="cenario">
+<h3>O <code>margin-top: auto</code> não desce o botão</h3>
+<pre class="file" data-file="style.css · erro de propósito">.botao {
+  margin-top: auto;
+  padding: 0.75rem 0.5rem;
+  background-color: #c2410c;
+}
+/* faltou o .plano { display: flex; flex-direction: column; } */
+</pre>
+<p><strong>O que você vê:</strong> no quadro de 768 px, os botões ficam logo depois de cada lista, em três alturas diferentes, e encolhem para o tamanho do texto. <strong>Por quê:</strong> a margem <code>auto</code> só "come o espaço livre" na vertical dentro de um contêiner flex (ou grid). Fora dele, o link é um elemento em linha, e margem de cima em elemento em linha não faz nada: o estilo calculado do <code>margin-top</code> fica <code>auto</code>, sem virar pixels. O CSS é válido, então o validador não reclama.</p>
+</div>
+
+<div class="cenario">
+<h3>O selo vai parar no topo da página</h3>
+<p>Sem o <code>.plano { position: relative; }</code>:</p>
+<p><strong>O que você vê:</strong> o cartão "Família" fica sem selo, e a pílula "MAIS PEDIDO" aparece no alto da página, centralizada, metade cortada pela borda de cima do quadro, acima do logo. <strong>Por quê:</strong> um elemento <code>absolute</code> se posiciona em relação ao ancestral posicionado mais próximo; sem nenhum, a referência é a página, e o <code>top: 0</code> com o <code>translate(-50%, -50%)</code> o põe metade acima do topo dela. O validador não acusa nada.</p>
+</div>
+
+<div class="cenario">
+<h3>O selo quebra em duas linhas</h3>
+<p>Sem o <code>white-space: nowrap</code>, no quadro de 768 px:</p>
+<p><strong>O que você vê:</strong> a pílula fica alta e estreita, com "MAIS" numa linha e "PEDIDO" na outra (115 × 44 px, em vez de uma linha só). <strong>Por quê:</strong> um elemento <code>absolute</code> sem largura definida fica do tamanho do conteúdo, mas só até o espaço que sobra entre o <code>left</code> e a borda direita da referência. Com <code>left: 50%</code>, sobra só metade do cartão menos o preenchimento, e o texto quebra antes do <code>translate</code> puxá-lo de volta. O <code>nowrap</code> (ou um <code>width: max-content</code>) resolve.</p>
+</div>
+
+<div class="cenario">
+<h3>Os ✓ não aparecem</h3>
+<pre class="file" data-file="style.css · erro de propósito">.plano li::before {
+  content: ✓;
+  color: #15803d;
+}
+</pre>
+<p><strong>O que você vê:</strong> as listas sem marcador nenhum, só as linhas bege. <strong>Por quê:</strong> o texto do <code>content</code> precisa de aspas. Sem elas, a declaração é inválida, e um <code>::before</code> sem <code>content</code> válido não existe (o estilo calculado do <code>content</code> fica <code>none</code>). O validador:</p>
+<pre class="term" data-cwd="~/clube">$ vnu --css style.css
+"file:/home/ana/clube/style.css":2.12-2.12: error: CSS: “content”: “✓” is not a “content” value.</pre>
+<p>"O ✓ não é um valor de <code>content</code>": com aspas, <code>"✓"</code>, ele é.</p>
+</div>
+
+<hr>
+
+<h2>Referência: o que o projeto usou</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Versão</th><th>Propriedades</th><th>Aulas</th></tr></thead>
+<tbody>
+<tr><td>1 · Base</td><td><code>background-color</code>, <code>display: block</code> + <code>margin: 0 auto</code>, <code>text-align</code></td><td><a href="seletor-grupo.html">Agrupando Seletores</a></td></tr>
+<tr><td>2 · Cartão</td><td><code>display: grid</code>, <code>gap</code>, <code>padding</code>, <code>border</code>, <code>border-radius</code>, <code>box-shadow</code>, <code>font-size</code>, <code>font-weight</code></td><td><a href="box-model.html">O Modelo de Caixa</a></td></tr>
+<tr><td>3 · Lado a lado</td><td><code>grid-template-columns</code>, <code>repeat()</code>, <code>auto-fit</code>, <code>minmax()</code></td><td><a href="grid-repeat.html">repeat e minmax</a></td></tr>
+<tr><td>4 · Botão no pé</td><td><code>display: flex</code>, <code>flex-direction</code>, <code>margin-top: auto</code>, <code>:hover</code>, <code>:focus-visible</code>, <code>outline</code></td><td><a href="flex-direction.html">flex-direction</a>, <a href="botoes.html">Botões</a></td></tr>
+<tr><td>5 · Lista com ✓</td><td><code>list-style</code>, <code>border-top</code>, <code>::before</code>, <code>content</code></td><td><a href="before-after.html">::before e ::after</a></td></tr>
+<tr><td>6 · Destaque</td><td><code>position</code>, <code>top</code>/<code>left</code>, <code>transform: translate()</code>, <code>white-space</code></td><td><a href="position-absolute.html">position: absolute</a>, <a href="transform.html">transform</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Desafios extras</h2>
+<ul>
+  <li>Ponha as cores (laranja, creme, verde) em variáveis no <code>:root</code> e crie um tema escuro (<a href="variaveis.html">Variáveis</a>, <a href="tema-escuro.html">Tema Escuro</a>).</li>
+  <li>Alinhe também os preços e as listas entre os cartões com <a href="subgrid.html">subgrid</a>.</li>
+  <li>Faça o cartão subir 4 px no <code>:hover</code>, com transição, e respeite quem prefere menos movimento.</li>
+</ul>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Empurrar para o pé</h3>
+<p>Num cartão com <code>display: flex; flex-direction: column</code>, complete para o botão ir para o fundo:</p>
+<div class="ex-code">.botao { margin-top: <input data-answer="auto" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Centralizar o selo sobre a borda</h3>
+<p>Complete o <code>transform</code> que puxa o selo metade da largura dele para a esquerda e metade da altura para cima:</p>
+<div class="ex-code">transform: translate(<input data-answer="-50%" aria-label="x">, <input data-answer="-50%" aria-label="y">);</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. Por que os três cartões da versão 3 ficaram com a mesma altura, sem nenhuma regra de altura?</p>
+<label><input type="radio" name="q3"> Porque o <code>gap</code> iguala as alturas</label>
+<label><input type="radio" name="q3"> Porque os itens de uma linha do Grid esticam até a altura do mais alto (<code>stretch</code>)</label>
+<label><input type="radio" name="q3"> Porque o <code>border-radius</code> é igual nos três</label>
+<label><input type="radio" name="q3"> Porque o <code>minmax</code> define a altura</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">4. O selo com <code>position: absolute</code> apareceu no topo da página, e não no cartão. O que falta?</p>
+<label><input type="radio" name="q4"> <code>position: relative</code> no cartão</label>
+<label><input type="radio" name="q4"> <code>z-index: 10</code> no selo</label>
+<label><input type="radio" name="q4"> <code>display: flex</code> no selo</label>
+<label><input type="radio" name="q4"> Trocar <code>top: 0</code> por <code>margin-top: 0</code></label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Qual destas declarações faz aparecer um ✓ antes de cada item?</p>
+<label><input type="radio" name="q5"> <code>li::before { content: ✓; }</code></label>
+<label><input type="radio" name="q5"> <code>li::before { color: green; }</code></label>
+<label><input type="radio" name="q5"> <code>li::before { content: "✓ "; }</code></label>
+<label><input type="radio" name="q5"> <code>li { content: "✓ "; }</code></label>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Cartão = <code>padding</code> + fundo + <code>border</code> + <code>border-radius</code> + <code>box-shadow</code>; o preço grande com <code>line-height: 1</code>.</li>
+  <li><code>repeat(auto-fit, minmax(13rem, 1fr))</code> põe os cartões lado a lado quando cabem e empilha no celular; o Grid estica os cartões de uma linha até a mesma altura.</li>
+  <li>Botões alinhados no pé: o cartão vira <code>flex</code> em <code>column</code>, e o botão ganha <code>margin-top: auto</code>.</li>
+  <li>Marcadores próprios com <code>li::before { content: "✓ "; }</code>: o texto do <code>content</code> vai entre aspas.</li>
+  <li>Selo na borda: <code>position: relative</code> no cartão, <code>absolute; top: 0; left: 50%</code> no selo, <code>transform: translate(-50%, -50%)</code> para centralizar, <code>white-space: nowrap</code> para não quebrar.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
