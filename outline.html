@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS outline — o contorno que não ocupa espaço e o foco visível | Guia CSS</title>
+<meta name="description" content="A propriedade outline do CSS para quem nunca escreveu CSS: o contorno desenhado por fora da borda sem ocupar espaço, outline × border lado a lado, os estilos, outline-offset, o anel de foco do teclado com :focus-visible, por que nunca usar outline: none sem substituto, o truque de depuração e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">outline</span></h1>
+
+<p class="intro">Aperte <kbd>Tab</kbd> numa página qualquer: um contorno aparece em volta do link ou botão escolhido. Esse contorno é um <code>outline</code> ("contorno"), uma linha parecida com a borda, mas com uma diferença importante: ela <strong>não ocupa espaço</strong>, e nada na página se mexe quando ela aparece. Nesta aula você vai desenhar contornos, afastá-los da caixa com <code>outline-offset</code>, criar um foco bonito e visível para os botões da Ana e entender por que apagar o foco é um dos erros de acessibilidade mais comuns da web.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O <code>outline</code> e as suas três partes: espessura, estilo e cor.</li>
+  <li>As diferenças entre <code>outline</code> e <code>border</code>, lado a lado.</li>
+  <li><code>outline-offset</code>: o contorno afastado (ou para dentro) da caixa.</li>
+  <li>O anel de foco: <code>:focus</code>, <code>:focus-visible</code> e por que nunca apagar o foco sem pôr outro no lugar.</li>
+  <li>Um truque para enxergar todas as caixas da página sem mexer no layout.</li>
+  <li>Os erros reais do validador, e os dois que ele não pega.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: o círculo de caneta na foto</h2>
+<p>Pegue uma foto impressa de um grupo de amigos e circule uma pessoa com caneta. O círculo passa <strong>por cima</strong> da foto: ninguém foi empurrado para o lado para dar lugar à tinta. Se o círculo for grande, ele até invade o rosto do vizinho.</p>
+<p>A <code>border</code> é a moldura: faz parte da caixa e ocupa espaço. O <code>outline</code> é o círculo de caneta: desenhado por cima, em volta da caixa, <strong>sem empurrar nada</strong>.</p>
+
+<hr>
+
+<h2>1. O primeiro contorno</h2>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .destaque {
+    outline: 3px solid darkorange;
+    padding: 8px;
+    max-width: 300px;
+  }
+&lt;/style&gt;
+&lt;p class="destaque"&gt;Receita da semana: torta de limão.&lt;/p&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>outline:</dt><dd>O atalho do contorno, com as mesmas três partes da <a href="border.html">borda</a>.</dd>
+  <dt>3px</dt><dd>A espessura (<code>outline-width</code>). Aceita <code>thin</code>, <code>medium</code> e <code>thick</code>, como a borda.</dd>
+  <dt>solid</dt><dd>O estilo (<code>outline-style</code>). Como na borda, é obrigatório: o valor inicial é <code>none</code>.</dd>
+  <dt>darkorange</dt><dd>A cor (<code>outline-color</code>). Sem ela, o contorno usa a cor do texto.</dd>
+</dl>
+
+<p>Na tela, parece uma borda comum. As diferenças aparecem quando há vizinhos por perto.</p>
+
+<hr>
+
+<h2>2. <code>outline</code> × <code>border</code></h2>
+<p>Duas fileiras de três caixas. Na de cima, a caixa do meio ganhou uma <strong>borda</strong> de 8px; na de baixo, um <strong>contorno</strong> de 8px:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .item {
+    display: inline-block;
+    width: 90px;
+    padding: 10px;
+    margin: 4px;
+    background-color: lightblue;
+    font-family: monospace;
+  }
+  .com-border  { border: 8px solid crimson; }
+  .com-outline { outline: 8px solid crimson; }
+&lt;/style&gt;
+&lt;div&gt;
+  &lt;span class="item"&gt;vizinho&lt;/span&gt;&lt;span class="item com-border"&gt;border&lt;/span&gt;&lt;span class="item"&gt;vizinho&lt;/span&gt;
+&lt;/div&gt;
+&lt;div&gt;
+  &lt;span class="item"&gt;vizinho&lt;/span&gt;&lt;span class="item com-outline"&gt;outline&lt;/span&gt;&lt;span class="item"&gt;vizinho&lt;/span&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Na fileira de cima, a borda <strong>aumentou a caixa</strong> e empurrou o vizinho da direita. Na de baixo, as três caixas ficaram nos mesmos lugares de sempre, e o contorno vermelho passou <strong>por cima</strong> da margem e encostou nos vizinhos.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th><code>border</code></th><th><code>outline</code></th></tr>
+<tr><td>Ocupa espaço?</td><td>Sim: aumenta a caixa e empurra os vizinhos</td><td>Não: é desenhado por cima</td></tr>
+<tr><td>Um lado só?</td><td>Sim (<code>border-top</code>…)</td><td>Não: sempre os quatro lados, iguais</td></tr>
+<tr><td>Afastar da caixa?</td><td>Não</td><td>Sim, com <code>outline-offset</code></td></tr>
+<tr><td>Segue o <code>border-radius</code>?</td><td>Sim</td><td>Sim, nos navegadores atuais (todos os principais desde 2023)</td></tr>
+<tr><td>Uso principal</td><td>Decoração permanente: molduras, separadores</td><td>Foco do teclado e destaques temporários</td></tr>
+</table>
+</div>
+
+<p>Como não ocupa espaço, o <code>outline</code> pode aparecer e sumir (no foco, ao passar o mouse) sem fazer a página "tremer".</p>
+
+<hr>
+
+<h2>3. Os estilos lado a lado</h2>
+<p>O <code>outline-style</code> aceita quase os mesmos valores da borda, mais o <code>auto</code>. Cada caixa usa um, com 5px de espessura:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .o {
+    display: inline-block;
+    width: 90px;
+    padding: 10px 4px;
+    margin: 14px;
+    text-align: center;
+    font-family: monospace;
+    background-color: azure;
+    outline-width: 5px;
+    outline-color: teal;
+  }
+&lt;/style&gt;
+&lt;div class="o" style="outline-style: solid"&gt;solid&lt;/div&gt;
+&lt;div class="o" style="outline-style: dashed"&gt;dashed&lt;/div&gt;
+&lt;div class="o" style="outline-style: dotted"&gt;dotted&lt;/div&gt;
+&lt;div class="o" style="outline-style: double"&gt;double&lt;/div&gt;
+&lt;div class="o" style="outline-style: groove"&gt;groove&lt;/div&gt;
+&lt;div class="o" style="outline-style: ridge"&gt;ridge&lt;/div&gt;
+&lt;div class="o" style="outline-style: inset"&gt;inset&lt;/div&gt;
+&lt;div class="o" style="outline-style: outset"&gt;outset&lt;/div&gt;
+&lt;div class="o" style="outline-style: auto"&gt;auto&lt;/div&gt;
+</pre>
+
+<ul>
+  <li><code>auto</code> desenha o contorno <strong>do jeito do navegador</strong>, como o anel de foco padrão dele. A aparência muda de navegador para navegador.</li>
+  <li><code>hidden</code>, que existe na borda, <strong>não</strong> vale no contorno (veja <a href="#errado">Quando dá errado</a>).</li>
+</ul>
+
+<hr>
+
+<h2>4. <code>outline-offset</code>: afastar o contorno</h2>
+<p>O <code>outline-offset</code> ("deslocamento do contorno") é a distância entre o contorno e a borda da caixa. Positivo afasta para fora; negativo puxa para dentro:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .botao {
+    display: inline-block;
+    margin: 16px;
+    padding: 10px 18px;
+    background-color: darkgreen;
+    color: white;
+    border-radius: 8px;
+    outline: 3px solid darkorange;
+    font-family: monospace;
+  }
+&lt;/style&gt;
+&lt;span class="botao" style="outline-offset: 0"&gt;offset 0&lt;/span&gt;
+&lt;span class="botao" style="outline-offset: 4px"&gt;offset 4px&lt;/span&gt;
+&lt;span class="botao" style="outline-offset: -6px"&gt;offset -6px&lt;/span&gt;
+</pre>
+
+<p>Com <code>4px</code>, aparece uma faixa branca entre o botão e o contorno: o contorno fica nítido mesmo quando tem uma cor parecida com a do botão. Com <code>-6px</code>, o contorno fica <strong>dentro</strong> do botão verde. Repare também que os cantos do contorno acompanham o <code>border-radius</code> do botão.</p>
+
+<hr>
+
+<h2>5. O anel de foco</h2>
+<p>Quem navega pelo teclado (pessoas que não usam mouse, por escolha ou necessidade) precisa saber <strong>onde está</strong>. A cada <kbd>Tab</kbd>, um link, botão ou campo recebe o <strong>foco</strong>, e o navegador desenha um contorno em volta dele. Esse anel é um <code>outline</code>.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> clique no espaço em branco do resultado e aperte <kbd>Tab</kbd> algumas vezes. Veja o anel de foco padrão do seu navegador passar pelos links e pelo botão. Depois, clique com o mouse num link: em muitos navegadores, o anel <strong>não</strong> aparece no clique, só no teclado.</p>
+<pre class="script" data-file="index.html">&lt;p&gt;&lt;a href="#bolo"&gt;Bolo de cenoura&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="#pao"&gt;Pão de queijo&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;button type="button"&gt;Encomendar&lt;/button&gt;&lt;/p&gt;
+</pre>
+</div>
+
+<h3><code>:focus</code> e <code>:focus-visible</code></h3>
+<p>Para trocar o anel padrão por um seu, você escreve o contorno numa regra com uma <strong>pseudo-classe</strong> (um "estado" do elemento, que vem depois de dois-pontos; elas têm aula própria, <a href="hover-focus.html">Estados: :hover, :focus e :active</a>):</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Pseudo-classe</th><th>Vale quando…</th></tr>
+<tr><td><code>:focus</code></td><td>o elemento tem o foco, por qualquer caminho: <kbd>Tab</kbd>, clique, toque</td></tr>
+<tr><td><code>:focus-visible</code></td><td>o elemento tem o foco <strong>e</strong> o navegador acha que o anel deve aparecer: no teclado, sim; no clique do mouse num link ou botão, normalmente não; num campo de texto, sempre</td></tr>
+</table>
+</div>
+
+<pre class="file" data-file="style.css">.botao:focus-visible {
+  outline: 3px solid darkorange;
+  outline-offset: 3px;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>.botao:focus-visible</dt><dd>"Os elementos com a classe <code>botao</code>, quando estão com o foco visível."</dd>
+  <dt>outline: 3px solid darkorange;</dt><dd>O seu anel, no lugar do padrão do navegador.</dd>
+  <dt>outline-offset: 3px;</dt><dd>Um respiro entre o botão e o anel.</dd>
+</dl>
+
+<p>Prefira <code>:focus-visible</code>: quem usa teclado vê o anel, e quem clica com o mouse não vê um contorno "estranho" depois de cada clique. Ele funciona em todos os navegadores atuais (desde 2022).</p>
+
+<div class="warning">
+<strong>Nunca apague o foco sem pôr outro no lugar</strong>
+<p>Muitos sites escrevem <code>outline: none</code> (ou <code>outline: 0</code>) para sumir com o anel "feio". Para quem usa o teclado, é como apagar o cursor do mouse: a pessoa não sabe mais onde está. As regras de acessibilidade da web (WCAG) exigem um foco visível. Se não gostou do anel padrão, <strong>troque</strong> por um seu com <code>:focus-visible</code>; não apague.</p>
+</div>
+
+<div class="tryhtml" data-goal="foco:.botao{outline-style}=solid,foco:.botao{outline-width}=3px,foco:.botao{outline-offset}=3px,foco:.botao{outline-color}=rgb(255\, 140\, 0)">
+<p class="try-task"><strong>Missão:</strong> o botão "Encomendar" está com o foco apagado (<code>outline: none</code>): quem usa teclado não o enxerga. Troque essa regra por um anel de <strong>3px</strong>, contínuo, na cor <code>darkorange</code>, afastado <strong>3px</strong> do botão. Depois, clique no espaço em branco do resultado e chegue no botão com <kbd>Tab</kbd> para conferir.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Bolo de cenoura: R$ 35&lt;/p&gt;
+&lt;a class="botao" href="#encomendar"&gt;Encomendar&lt;/a&gt;
+</pre>
+<pre class="script" data-file="style.css">.botao {
+  display: inline-block;
+  background-color: darkgreen;
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+}
+
+.botao:focus-visible {
+  outline: none;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.botao {
+  display: inline-block;
+  background-color: darkgreen;
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+}
+
+.botao:focus-visible {
+  outline: 3px solid darkorange;
+  outline-offset: 3px;
+}
+</pre>
+</div>
+
+<p>Se você clicar no botão com o mouse, o anel provavelmente não aparece, e a missão pede para você usar o <kbd>Tab</kbd>: é o <code>:focus-visible</code> fazendo o trabalho dele.</p>
+
+<hr>
+
+<h2>6. Um truque: enxergar todas as caixas</h2>
+<p>Quando o layout está estranho e você não sabe qual caixa está onde, ponha um contorno em <strong>tudo</strong>. Como o <code>outline</code> não ocupa espaço, nada se mexe: você vê as caixas exatamente onde estão.</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  * {
+    outline: 1px solid red;
+  }
+&lt;/style&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p&gt;Fofinho, com &lt;strong&gt;cobertura de chocolate&lt;/strong&gt;.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;3 cenouras&lt;/li&gt;
+  &lt;li&gt;4 ovos&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+<p>Aparecem as caixas do <code>&lt;h2&gt;</code>, do <code>&lt;p&gt;</code> e da lista indo de ponta a ponta (são blocos), o <code>&lt;strong&gt;</code> só em volta das palavras (é em linha), e até o <code>&lt;body&gt;</code> e o <code>&lt;html&gt;</code>, por fora de tudo. Com <code>border</code> no lugar de <code>outline</code>, cada caixa cresceria 2px e o layout mudaria. Lembre de apagar a regra depois. (O F12 faz algo parecido quando você passa o mouse sobre um elemento na aba <em>Elements</em>: aula <a href="devtools.html">DevTools</a>.)</p>
+
+<hr>
+
+<h2>7. Formas de escrever e qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Quando usar</th></tr>
+<tr><td><code>outline: 3px solid darkorange;</code></td><td>O atalho, com as três partes. É o jeito comum.</td></tr>
+<tr><td><code>outline-color: navy;</code></td><td>Trocar só uma parte (também existem <code>outline-width</code> e <code>outline-style</code>).</td></tr>
+<tr><td><code>outline-offset: 3px;</code></td><td>Separar o anel do elemento, para ele ficar nítido.</td></tr>
+<tr><td><code>:focus-visible { outline: … }</code></td><td>O anel de foco do seu site. O uso mais importante do <code>outline</code>.</td></tr>
+<tr><td><code>* { outline: 1px solid red; }</code></td><td>Depurar o layout, por alguns minutos.</td></tr>
+<tr><td><code>outline: none;</code></td><td>Só junto de um substituto visível para o foco (outro <code>outline</code>, uma <code>box-shadow</code>, uma borda que muda de cor).</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Como em todo o CSS, a declaração inválida é ignorada em silêncio e aparece <strong>riscada</strong> no F12. Os dois primeiros casos, porém, são CSS válido: o validador não ajuda.</p>
+
+<div class="cenario">
+<strong>Contorno sem estilo: nada aparece (e o validador não reclama)</strong>
+<pre class="term" data-cwd="~/site">$ cat o1.css
+a:focus {
+  outline: 2px red;
+}
+$ vnu --css o1.css
+$</pre>
+<p><strong>O que você vê:</strong> nenhum contorno, nem no foco.</p>
+<p><strong>Por quê:</strong> o mesmo caso da <a href="border.html">borda</a>: faltou o estilo, que volta ao inicial, <code>none</code>. O calculado no Chromium do guia fica <code>outline-style: none</code> (curiosamente, o <code>outline-width</code> continua <code>2px</code>, diferente da borda, mas sem estilo nada é desenhado).</p>
+<p><strong>Como consertar:</strong> <code>outline: 2px solid red;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>outline: none</code> no foco: o leitor de teclado se perde</strong>
+<pre class="term" data-cwd="~/site">$ cat o2.css
+a:focus {
+  outline: none;
+}
+$ vnu --css o2.css
+$</pre>
+<p><strong>O que você vê:</strong> com o mouse, nada de diferente. Com <kbd>Tab</kbd>, o foco anda pela página, mas <strong>nenhum contorno aparece</strong>: não dá para saber qual link vai abrir com <kbd>Enter</kbd>.</p>
+<p><strong>O que o validador diz:</strong> nada. O CSS é válido; o problema é de acessibilidade. Ferramentas de acessibilidade (como o Lighthouse, no F12 do Chrome) ajudam a encontrar esse tipo de problema.</p>
+<p><strong>Como consertar:</strong> apague a regra (volta o anel padrão) ou troque por um anel seu, como na missão da seção 5.</p>
+</div>
+
+<div class="cenario">
+<strong>Um lado só ou cantos: <code>Property “outline-top” doesn't exist</code></strong>
+<pre class="term" data-cwd="~/site">$ vnu --css o3.css
+"file:/home/ana/site/o3.css":2.26-2.28: error: CSS: “outline-top”: Property “outline-top” doesn't exist.
+$ vnu --css o5.css
+"file:/home/ana/site/o5.css":2.19-2.21: error: CSS: “outline-radius”: Property “outline-radius” doesn't exist.</pre>
+<p><strong>O que significa:</strong> "a propriedade não existe". O contorno não tem lados separados (para um lado só, use a <code>border</code>) nem cantos próprios: os cantos vêm do <code>border-radius</code> do elemento.</p>
+</div>
+
+<div class="cenario">
+<strong>Valores que a borda aceita e o contorno não</strong>
+<pre class="term" data-cwd="~/site">$ vnu --css o4.css
+"file:/home/ana/site/o4.css":2.26-2.29: error: CSS: “outline”: Too many values or values are not recognized.
+$ vnu --css o7.css
+"file:/home/ana/site/o7.css":2.19-2.21: error: CSS: “outline-width”: “-2px” negative values are not allowed.
+$ vnu --css o8.css
+"file:/home/ana/site/o8.css":2.18-2.23: error: CSS: “outline-style”: “hidden” is not a “outline-style” value.</pre>
+<p>Em ordem: duas cores (<code>outline: 3px solid red blue</code>) são "valores demais", e o contorno não aceita uma cor por lado; espessura negativa "não é permitida" (o <code>outline-offset</code> negativo, sim, é válido); e "<code>hidden</code> não é um valor de <code>outline-style</code>". Nos três casos, o navegador ignora a declaração.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>Valores</th><th>Inicial</th></tr>
+<tr><td><code>outline</code></td><td>espessura estilo cor (ordem livre)</td><td><code>medium none auto</code></td></tr>
+<tr><td><code>outline-width</code></td><td><code>thin</code>, <code>medium</code>, <code>thick</code> ou tamanho ≥ 0</td><td><code>medium</code></td></tr>
+<tr><td><code>outline-style</code></td><td><code>none</code>, <code>auto</code>, <code>solid</code>, <code>dashed</code>, <code>dotted</code>, <code>double</code>, <code>groove</code>, <code>ridge</code>, <code>inset</code>, <code>outset</code></td><td><code>none</code></td></tr>
+<tr><td><code>outline-color</code></td><td>qualquer cor</td><td><code>auto</code> (na prática, a cor do texto)</td></tr>
+<tr><td><code>outline-offset</code></td><td>um tamanho, positivo ou negativo</td><td><code>0</code></td></tr>
+<tr><td>Ocupa espaço?</td><td colspan="2">Não. Sempre os quatro lados iguais; segue o <code>border-radius</code>.</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O afastamento</h3>
+<p>Complete para o contorno ficar 4px afastado da caixa:</p>
+<div class="ex-code">.botao { <input data-answer="outline-offset" aria-label="propriedade">: 4px; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. O foco do teclado</h3>
+<p>Complete a pseudo-classe que vale quando o foco deve ser mostrado (como no <kbd>Tab</kbd>):</p>
+<div class="ex-code">.botao:<input data-answer="focus-visible" aria-label="pseudo-classe"> { outline: 3px solid navy; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. A parte que falta</h3>
+<p>A Ana escreveu <code>outline: 2px navy;</code> e nada apareceu. Complete com um estilo de linha contínua:</p>
+<div class="ex-code">outline: 2px <input data-answer="solid" aria-label="estilo"> navy;</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Qual a principal diferença entre <code>outline</code> e <code>border</code>?</p>
+<label><input type="radio" name="q4"> O outline só aceita a cor preta</label>
+<label><input type="radio" name="q4"> O outline não ocupa espaço: não empurra os vizinhos</label>
+<label><input type="radio" name="q4"> O outline só funciona em links</label>
+<label><input type="radio" name="q4"> A border não segue o <code>border-radius</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. O que fazer se o anel de foco padrão não combina com o site?</p>
+<label><input type="radio" name="q5"> <code>outline: none</code> em todos os links</label>
+<label><input type="radio" name="q5"> Nada: o anel não pode ser mudado</label>
+<label><input type="radio" name="q5"> Usar <code>outline-top</code> para mostrar só uma linha</label>
+<label><input type="radio" name="q5"> Trocar por um anel próprio com <code>:focus-visible</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Por que <code>* { outline: 1px solid red; }</code> é melhor que <code>* { border: 1px solid red; }</code> para depurar o layout?</p>
+<label><input type="radio" name="q6"> Porque o outline não muda o tamanho de nenhuma caixa</label>
+<label><input type="radio" name="q6"> Porque a border não funciona com <code>*</code></label>
+<label><input type="radio" name="q6"> Porque o outline só aparece no F12</label>
+<label><input type="radio" name="q6"> Não há diferença</label>
+</div>
+
+<h3>Missão final: o foco dos campos</h3>
+
+<div class="tryhtml" data-goal="foco:.campo{outline-style}=solid,foco:.campo{outline-width}=2px,foco:.campo{outline-color}=rgb(0\, 0\, 128),foco:.campo{outline-offset}=2px,css:.aviso{outline-style}=dashed,css:.aviso{outline-offset}=-6px">
+<p class="try-task"><strong>Missão:</strong> (1) Quando o campo de nome (<code>.campo</code>) receber o foco, ele deve ganhar um contorno <strong>contínuo</strong> de <strong>2px</strong> na cor <code>navy</code>, afastado <strong>2px</strong>: use <code>:focus-visible</code>. (2) O <code>.aviso</code> ganha um contorno <strong>tracejado</strong> de 2px na cor <code>crimson</code>, puxado <strong>6px para dentro</strong> (<code>outline-offset</code> negativo). Para conferir o item 1, clique dentro do campo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="aviso"&gt;Encomendas só até quinta-feira.&lt;/p&gt;
+&lt;form&gt;
+  &lt;label for="nome"&gt;Seu nome&lt;/label&gt;
+  &lt;input class="campo" type="text" id="nome" name="nome"&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">.aviso {
+  background-color: mistyrose;
+  padding: 16px;
+}
+
+.campo {
+  padding: 6px;
+  border: 1px solid gray;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.aviso {
+  background-color: mistyrose;
+  padding: 16px;
+  outline: 2px dashed crimson;
+  outline-offset: -6px;
+}
+
+.campo {
+  padding: 6px;
+  border: 1px solid gray;
+}
+
+.campo:focus-visible {
+  outline: 2px solid navy;
+  outline-offset: 2px;
+}
+</pre>
+</div>
+
+<p>Num campo de texto, o <code>:focus-visible</code> vale também no clique do mouse: o navegador sabe que você vai digitar ali e precisa ver onde está.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>outline</code> é um contorno com espessura, estilo e cor, como a borda, mas desenhado <strong>por cima</strong>: não ocupa espaço nem empurra nada.</li>
+  <li>Sempre os quatro lados iguais; não existe <code>outline-top</code>. Os cantos seguem o <code>border-radius</code>.</li>
+  <li><code>outline-offset</code> afasta o contorno (positivo) ou o puxa para dentro (negativo).</li>
+  <li>O anel de foco do teclado é um outline. Personalize com <code>:focus-visible</code>; <strong>nunca</strong> apague com <code>outline: none</code> sem pôr outro no lugar.</li>
+  <li>Truque: <code>* { outline: 1px solid red; }</code> mostra todas as caixas sem mexer no layout.</li>
+  <li>Erros: sem estilo, nada aparece (e o validador não avisa); <code>outline-top</code>, <code>outline-radius</code>, duas cores, <code>hidden</code> e espessura negativa são ignorados.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
