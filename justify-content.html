@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS justify-content — alinhar e distribuir os itens na linha | Guia CSS</title>
+<meta name="description" content="justify-content em CSS para quem está começando: flex-start, flex-end, center, space-between, space-around e space-evenly lado a lado, o espaço que sobra, o logo à esquerda e o menu à direita, o margin-left: auto, o justify-content numa coluna e as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">justify-content</span></h1>
+
+<p class="intro">Os itens de um pai flex começam todos encostados à esquerda, e o espaço que sobra fica à direita. Mas e se você quiser os botões no meio? O logo numa ponta e o menu na outra? Os ícones espalhados por igual? Quem decide o que fazer com o espaço que sobra é o <code>justify-content</code> ("justificar o conteúdo", como o "justificado" de um editor de texto). Nesta aula você vai ver os seis valores lado a lado, montar o cabeçalho da lojinha da Ana e a barra de ícones de um celular, e entender quando o <code>justify-content</code> parece não fazer nada.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A ideia do <strong>espaço que sobra</strong> na direção principal.</li>
+  <li>Os valores <code>flex-start</code>, <code>flex-end</code>, <code>center</code>, <code>space-between</code>, <code>space-around</code> e <code>space-evenly</code>, lado a lado.</li>
+  <li>O cabeçalho clássico: logo numa ponta, menu na outra.</li>
+  <li>O truque do <code>margin-left: auto</code> para empurrar um item só.</li>
+  <li>O que muda quando o pai está em coluna.</li>
+  <li>Por que, às vezes, nada acontece, e as mensagens reais do validador.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="flexbox.html">Introdução ao Flexbox</a> e <a href="flex-direction.html">Direção (flex-direction)</a>. Os resultados são desenhados pelo <strong>seu</strong> navegador; os números em pixels do texto foram medidos no Chromium. As mensagens do validador saíram do validador W3C (<code>vnu</code>), na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: o espaço que sobra na prateleira</h2>
+<p>A prateleira tem 1 metro; os três potes, juntos, ocupam 40 centímetros. Sobram 60. A Ana pode deixar os potes juntos num canto e a sobra no outro, juntos no meio com a sobra dividida nas pontas, ou espalhados, com a sobra entre eles. O <code>justify-content</code> é essa decisão: ele <strong>não muda o tamanho dos itens</strong>, só distribui o espaço que sobra <strong>na direção principal</strong> (deitada, numa fila em linha).</p>
+
+<hr>
+
+<h2>1. Os valores, lado a lado</h2>
+<p>Cada caixa tem os mesmos três itens; só muda o <code>justify-content</code> do pai, escrito no alto de cada uma:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .caixa { margin-bottom: 10px; padding: 4px; border: 2px dashed gray; font-family: sans-serif; }
+  .caixa p { margin: 0 0 4px; font-weight: bold; }
+  .pai { display: flex; background-color: linen; }
+  .item { padding: 8px 16px; background-color: tomato; color: white; border: 1px solid white; }
+&lt;/style&gt;
+&lt;div class="caixa"&gt;&lt;p&gt;justify-content: flex-start (o padrão)&lt;/p&gt;
+  &lt;div class="pai" style="justify-content: flex-start"&gt;&lt;div class="item"&gt;1&lt;/div&gt;&lt;div class="item"&gt;2&lt;/div&gt;&lt;div class="item"&gt;3&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class="caixa"&gt;&lt;p&gt;justify-content: flex-end&lt;/p&gt;
+  &lt;div class="pai" style="justify-content: flex-end"&gt;&lt;div class="item"&gt;1&lt;/div&gt;&lt;div class="item"&gt;2&lt;/div&gt;&lt;div class="item"&gt;3&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class="caixa"&gt;&lt;p&gt;justify-content: center&lt;/p&gt;
+  &lt;div class="pai" style="justify-content: center"&gt;&lt;div class="item"&gt;1&lt;/div&gt;&lt;div class="item"&gt;2&lt;/div&gt;&lt;div class="item"&gt;3&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class="caixa"&gt;&lt;p&gt;justify-content: space-between&lt;/p&gt;
+  &lt;div class="pai" style="justify-content: space-between"&gt;&lt;div class="item"&gt;1&lt;/div&gt;&lt;div class="item"&gt;2&lt;/div&gt;&lt;div class="item"&gt;3&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class="caixa"&gt;&lt;p&gt;justify-content: space-around&lt;/p&gt;
+  &lt;div class="pai" style="justify-content: space-around"&gt;&lt;div class="item"&gt;1&lt;/div&gt;&lt;div class="item"&gt;2&lt;/div&gt;&lt;div class="item"&gt;3&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class="caixa"&gt;&lt;p&gt;justify-content: space-evenly&lt;/p&gt;
+  &lt;div class="pai" style="justify-content: space-evenly"&gt;&lt;div class="item"&gt;1&lt;/div&gt;&lt;div class="item"&gt;2&lt;/div&gt;&lt;div class="item"&gt;3&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+</pre>
+
+<p>Neste resultado, o CSS de cada caixa está no atributo <code>style</code> só para caber tudo num exemplo; no seu site, use classes num <code>style.css</code>. As medidas, conferidas no Chromium, numa caixa de cerca de 730&nbsp;px:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>Em português</th><th>O que faz com a sobra</th></tr>
+<tr><td><code>flex-start</code> (o padrão)</td><td>"início"</td><td>Toda no fim: os itens juntos no começo da linha (à esquerda)</td></tr>
+<tr><td><code>flex-end</code></td><td>"fim"</td><td>Toda no começo: os itens juntos no fim (à direita), <strong>na mesma ordem</strong> 1, 2, 3</td></tr>
+<tr><td><code>center</code></td><td>"centro"</td><td>Metade em cada ponta: os itens juntos no meio</td></tr>
+<tr><td><code>space-between</code></td><td>"espaço entre"</td><td>Só <strong>entre</strong> os itens: o primeiro encosta numa ponta, o último na outra</td></tr>
+<tr><td><code>space-around</code></td><td>"espaço em volta"</td><td>Um pedaço igual de cada lado de cada item: nas pontas fica <strong>meio</strong> vão, porque entre dois itens os pedaços se somam</td></tr>
+<tr><td><code>space-evenly</code></td><td>"espaço por igual"</td><td>Vãos <strong>todos iguais</strong>, inclusive nas pontas</td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque <code>center</code> pelos outros cinco valores e observe os botões. Depois apague um dos botões e repita com <code>space-between</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="botoes"&gt;
+  &lt;a class="botao" href="bolos.html"&gt;Bolos&lt;/a&gt;
+  &lt;a class="botao" href="doces.html"&gt;Doces&lt;/a&gt;
+  &lt;a class="botao" href="contato.html"&gt;Encomendar&lt;/a&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.botoes {
+  display: flex;
+  justify-content: center;
+  padding: 8px;
+  background-color: linen;
+}
+
+.botao {
+  margin: 4px;
+  padding: 8px 16px;
+  background-color: seagreen;
+  color: white;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>justify-content</dt><dd>Vai no <strong>pai</strong> flex, junto com o <code>display: flex</code>, e vale para todos os itens de uma vez.</dd>
+  <dt>center</dt><dd>O valor: o que fazer com o espaço que sobra na direção principal.</dd>
+</dl>
+
+<hr>
+
+<h2>2. O cabeçalho clássico: logo e menu</h2>
+<p>Quase todo site tem um cabeçalho com o logo numa ponta e o menu na outra. Com <code>space-between</code> e dois itens, é exatamente isso: o primeiro encosta à esquerda, o último à direita, e o espaço todo fica entre eles.</p>
+
+<div class="tryhtml" data-goal="css:.topo{display}=flex,css:.topo{justify-content}=space-between">
+<p class="try-task"><strong>Missão:</strong> no cabeçalho da Lojinha da Ana, deixe o nome à esquerda e o menu à direita, com o espaço que sobra entre os dois.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;strong&gt;Lojinha da Ana&lt;/strong&gt;
+  &lt;nav&gt;
+    &lt;a href="bolos.html"&gt;Bolos&lt;/a&gt; ·
+    &lt;a href="doces.html"&gt;Doces&lt;/a&gt; ·
+    &lt;a href="contato.html"&gt;Contato&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+</pre>
+<pre class="script" data-file="style.css">.topo {
+  display: flex;
+  padding: 12px;
+  background-color: navy;
+  color: white;
+}
+
+.topo a {
+  color: white;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.topo {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  background-color: navy;
+  color: white;
+}
+
+.topo a {
+  color: white;
+}
+</pre>
+</div>
+
+<h3>Outra forma: <code>margin-left: auto</code> num item</h3>
+<p>E se forem três itens (logo, menu e um botão de carrinho), e só o carrinho deve ir para a direita? O <code>space-between</code> espalharia os três. Num item flex, uma margem <code>auto</code> <strong>engole todo o espaço que sobra</strong> daquele lado. Um <code>margin-left: auto</code> no carrinho o empurra para a ponta direita, e os outros ficam juntos à esquerda:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o carrinho foi para a direita sozinho. Mova o <code>margin-left: auto</code> para o <code>.menu</code> e veja o menu e o carrinho irem juntos para a direita.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;strong class="logo"&gt;Lojinha da Ana&lt;/strong&gt;
+  &lt;span class="menu"&gt;Bolos · Doces&lt;/span&gt;
+  &lt;span class="carrinho"&gt;Carrinho (2)&lt;/span&gt;
+&lt;/header&gt;
+</pre>
+<pre class="script" data-file="style.css">.topo {
+  display: flex;
+  padding: 12px;
+  background-color: navy;
+  color: white;
+}
+
+.menu {
+  margin-left: 24px;
+}
+
+.carrinho {
+  margin-left: auto;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Para</th><th>Use</th></tr>
+<tr><td>Todos os itens juntos num lugar (início, meio, fim)</td><td><code>justify-content: flex-start</code> / <code>center</code> / <code>flex-end</code></td></tr>
+<tr><td>Dois itens, um em cada ponta</td><td><code>justify-content: space-between</code></td></tr>
+<tr><td>Vários itens espalhados com vãos iguais</td><td><code>space-evenly</code> (ou <code>space-around</code>, com meio vão nas pontas)</td></tr>
+<tr><td>Um item só (ou um grupo) empurrado para uma ponta</td><td><code>margin-left: auto</code> no item</td></tr>
+<tr><td>Um vão fixo entre os itens, sem espalhar</td><td><code>gap</code> (aula <a href="gap.html">gap</a>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>3. Os outros nomes: <code>start</code>, <code>end</code>, <code>left</code>, <code>right</code></h2>
+<p>Você vai encontrar também <code>justify-content: start</code> e <code>end</code>. Num Flexbox comum, em linha, eles dão o mesmo resultado que <code>flex-start</code> e <code>flex-end</code>. A diferença aparece com o <code>reverse</code>: o <code>flex-start</code> segue o começo da fila (que, no <code>row-reverse</code>, fica à direita), e o <code>start</code> segue o começo da escrita (à esquerda, em português). Existem ainda <code>left</code> e <code>right</code>. No dia a dia, os <code>flex-</code> são os mais usados em Flexbox, e são os desta aula.</p>
+
+<hr>
+
+<h2>4. Numa coluna, o <code>justify-content</code> é vertical</h2>
+<p>O <code>justify-content</code> trabalha sempre na direção <strong>principal</strong>. Com <code>flex-direction: column</code> (aula <a href="flex-direction.html">Direção</a>), a principal é em pé, e ele distribui os itens de cima para baixo. Mas só há sobra para distribuir se o pai for <strong>mais alto</strong> que os itens: sem uma altura, a coluna fica do tamanho exato do conteúdo, e nada muda.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o pai tem 220&nbsp;px de altura, e o <code>space-between</code> põe o título em cima, o preço embaixo e o texto no meio. Apague o <code>height</code> e veja os três se juntarem em cima: sem sobra, não há o que distribuir.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="cartao"&gt;
+  &lt;h2&gt;Torta de limão&lt;/h2&gt;
+  &lt;p&gt;Base crocante e merengue.&lt;/p&gt;
+  &lt;p class="preco"&gt;R$ 60,00&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 220px;
+  width: 220px;
+  padding: 0 12px;
+  border: 2px solid peru;
+  background-color: linen;
+}
+
+.preco {
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Nada muda: não sobra espaço</strong>
+<p><strong>O que o leitor vê:</strong> troca o valor do <code>justify-content</code>, e os itens não se mexem.</p>
+<p><strong>Por quê:</strong> o <code>justify-content</code> só distribui o espaço que <strong>sobra</strong>. Se os itens já ocupam a linha toda (porque o texto é longo, ou porque um item tem <code>flex-grow</code>, aula <a href="flex-grow.html">Crescer e Encolher</a>), não há o que distribuir. O mesmo vale para uma coluna sem altura (seção 4).</p>
+<p><strong>Como achar:</strong> no F12, passe o mouse sobre o pai: o navegador destaca os itens e o espaço livre. Se não houver espaço livre, o problema não é o <code>justify-content</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Esqueceu o <code>display: flex</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.botoes {
+  justify-content: center;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> os botões continuam à esquerda.</p>
+<p><strong>Por quê:</strong> o <code>justify-content</code> só vale num pai flex (ou grid). A declaração é válida, então o validador não reclama e o F12 não a risca. Para centralizar um texto ou botões em linha sem Flexbox, a propriedade é outra: <code>text-align: center</code> (aula <a href="text-align.html">text-align</a>).</p>
+<p><strong>Como consertar:</strong> <code>display: flex;</code> no mesmo elemento.</p>
+</div>
+
+<div class="cenario">
+<strong>Valor escrito errado: <code>“spaced-between” is not a “justify-content” value</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.topo {
+  display: flex;
+  justify-content: spaced-between;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.20-3.33: error: CSS: “justify-content”: “spaced-between” is not a “justify-content” value.</pre>
+<p><strong>O que o leitor vê:</strong> os itens juntos à esquerda (o padrão); a declaração foi ignorada e aparece riscada no F12.</p>
+<p><strong>Como consertar:</strong> <code>space-between</code>, sem o "d".</p>
+</div>
+
+<div class="cenario">
+<strong><code>“middle” is not a “justify-content” value</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.botoes {
+  display: flex;
+  justify-content: middle;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.20-3.25: error: CSS: “justify-content”: “middle” is not a “justify-content” value.</pre>
+<p><strong>Como consertar:</strong> "meio", em CSS, é <code>center</code>. O <code>middle</code> só existe em outra propriedade, o <code>vertical-align</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>justify-content: flex-start;</code></td><td>O padrão: itens juntos no começo</td></tr>
+<tr><td><code>justify-content: flex-end;</code></td><td>Itens juntos no fim, na mesma ordem</td></tr>
+<tr><td><code>justify-content: center;</code></td><td>Itens juntos no meio</td></tr>
+<tr><td><code>justify-content: space-between;</code></td><td>Pontas encostadas, sobra entre os itens</td></tr>
+<tr><td><code>justify-content: space-around;</code></td><td>Sobra em volta de cada item (meio vão nas pontas)</td></tr>
+<tr><td><code>justify-content: space-evenly;</code></td><td>Todos os vãos iguais, pontas inclusive</td></tr>
+<tr><td><code>margin-left: auto;</code> num item</td><td>Empurra esse item (e os seguintes) para a direita</td></tr>
+<tr><td>Em coluna</td><td>Distribui de cima para baixo; precisa de altura sobrando</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. No meio</h3>
+<p>Complete para os itens ficarem juntos no meio da linha:</p>
+<div class="ex-code">.botoes { display: flex; justify-content: <input data-answer="center" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Uma ponta e a outra</h3>
+<p>Complete para o logo ficar à esquerda e o menu à direita:</p>
+<div class="ex-code">.topo { display: flex; justify-content: <input data-answer="space-between" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Vãos iguais</h3>
+<p>Complete para todos os vãos, inclusive os das pontas, ficarem iguais:</p>
+<div class="ex-code">.icones { display: flex; justify-content: <input data-answer="space-evenly" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">4. Com <code>justify-content: flex-end</code>, em que ordem os itens 1, 2, 3 aparecem?</p>
+<label><input type="radio" name="q4"> 3, 2, 1, à direita</label>
+<label><input type="radio" name="q4"> 1, 2, 3, à esquerda</label>
+<label><input type="radio" name="q4"> 1, 2, 3, espalhados</label>
+<label><input type="radio" name="q4"> 1, 2, 3, juntos à direita</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Qual a diferença entre <code>space-around</code> e <code>space-evenly</code>?</p>
+<label><input type="radio" name="q5"> Nenhuma</label>
+<label><input type="radio" name="q5"> No <code>space-around</code>, as pontas têm metade do vão entre os itens; no <code>space-evenly</code>, todos os vãos são iguais</label>
+<label><input type="radio" name="q5"> O <code>space-evenly</code> não deixa espaço nas pontas</label>
+<label><input type="radio" name="q5"> O <code>space-around</code> só funciona em coluna</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">6. Num cabeçalho flex com logo, menu e carrinho, como mandar só o carrinho para a direita?</p>
+<label><input type="radio" name="q6"> <code>justify-content: space-between</code> no pai</label>
+<label><input type="radio" name="q6"> <code>justify-content: flex-end</code> no carrinho</label>
+<label><input type="radio" name="q6"> <code>margin-left: auto</code> no carrinho</label>
+<label><input type="radio" name="q6"> <code>float: right</code> no carrinho</label>
+</div>
+
+<h3>Missão final: a barra de ícones do celular</h3>
+
+<div class="tryhtml" data-goal="css:.barra{display}=flex,css:.barra{justify-content}=space-evenly">
+<p class="try-task"><strong>Missão:</strong> a barra de navegação de baixo, na versão para celular do site, tem quatro atalhos. Ponha-os lado a lado com Flexbox e distribua-os com <strong>vãos todos iguais</strong>, inclusive nas pontas.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav class="barra"&gt;
+  &lt;a href="index.html"&gt;Início&lt;/a&gt;
+  &lt;a href="busca.html"&gt;Busca&lt;/a&gt;
+  &lt;a href="favoritos.html"&gt;Favoritos&lt;/a&gt;
+  &lt;a href="perfil.html"&gt;Perfil&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+<pre class="script" data-file="style.css">.barra {
+  padding: 12px 0;
+  background-color: darkslateblue;
+}
+
+.barra a {
+  color: white;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.barra {
+  display: flex;
+  justify-content: space-evenly;
+  padding: 12px 0;
+  background-color: darkslateblue;
+}
+
+.barra a {
+  color: white;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>justify-content</code> vai no pai flex e distribui o <strong>espaço que sobra</strong> na direção principal. Ele não muda o tamanho dos itens.</li>
+  <li>Juntos num lugar: <code>flex-start</code> (padrão), <code>center</code>, <code>flex-end</code>. Espalhados: <code>space-between</code> (pontas encostadas), <code>space-around</code> (meio vão nas pontas), <code>space-evenly</code> (vãos iguais).</li>
+  <li>Logo e menu nas pontas: <code>space-between</code>. Um item só para a direita: <code>margin-left: auto</code> nele.</li>
+  <li>Em coluna, ele distribui de cima para baixo, e só se o pai tiver altura sobrando.</li>
+  <li>Sem <code>display: flex</code> ou sem sobra, nada muda. Valores como <code>spaced-between</code> e <code>middle</code>, o validador recusa.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
