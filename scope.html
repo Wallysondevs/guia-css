@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Escopo — @scope, :scope e o limite to | Guia CSS</title>
+<meta name="description" content="Escopo em CSS (@scope) para quem está começando: regras que valem só dentro de um componente, :scope para o próprio elemento, o limite to () que deixa um buraco no meio, a proximidade que decide entre tema claro e escuro, @scope dentro de um style, o suporte recente e os erros reais do validador.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Escopo</span></h1>
+
+<p class="intro">No blog da Ana, cada receita é um cartão: título, foto, texto e, no fim, a área de comentários dos leitores. A regra "os parágrafos da receita são grandes e cor de tomate" acaba pegando também os parágrafos dos comentários, que estão <strong>dentro</strong> do cartão. O <code>@scope</code> ("escopo", o alcance de uma regra) resolve isso: ele diz <strong>onde começa</strong> e <strong>onde termina</strong> a área em que um grupo de regras vale.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A ideia de escopo: regras que valem "da porta para dentro" de um componente.</li>
+  <li>Como escrever <code>@scope (.receita) { … }</code> e estilizar o próprio componente com <code>:scope</code>.</li>
+  <li>O limite <code>to (…)</code>, que deixa um "buraco" onde as regras não entram.</li>
+  <li>A <strong>proximidade</strong>: o escopo mais próximo vence, como no tema claro dentro do escuro.</li>
+  <li><code>@scope</code> dentro de um <code>&lt;style&gt;</code> no meio da página.</li>
+  <li>O que é recente no suporte dos navegadores e os erros mais comuns.</li>
+</ul>
+</div>
+
+<p>Antes, é preciso ter visto <a href="combinadores.html">Descendente, Filho e Irmãos</a>, <a href="especificidade.html">Especificidade</a> e <a href="heranca.html">Herança</a>; ajuda ter visto <a href="aninhamento.html">CSS Aninhado</a> e <a href="layer.html">@layer</a>. Os resultados são desenhados agora pelo seu navegador, e as mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<div class="warning">
+<p><strong>Recurso recente.</strong> O <code>@scope</code> funciona no Chrome e no Edge desde a versão 118 (2023), no Safari desde a 17.4 (2024), mas no Firefox só a partir da 146 (dezembro de 2025). O MDN o marca como <em>Baseline 2026</em>: funciona nos navegadores atuais, mas não em aparelhos e navegadores mais antigos. Num navegador sem suporte, o bloco <code>@scope</code> inteiro é ignorado. Veja na seção 7 como lidar com isso.</p>
+</div>
+
+<hr>
+
+<h2>A ideia: as regras da casa</h2>
+<p>A casa da Ana tem regras: "tire o sapato", "fale baixo depois das 22h". Elas valem da porta para dentro; na calçada, não. Esse é o <strong>escopo</strong> das regras: o lugar onde elas valem.</p>
+
+<p>E pode haver uma exceção: "menos no quarto do Pedro, que lá o quarto é dele". As regras da casa valem na sala, na cozinha, no corredor, mas não entram no quarto. É um escopo com um buraco no meio, como uma rosquinha.</p>
+
+<p>O <code>@scope</code> faz as duas coisas no CSS: diz a "porta" (o elemento onde as regras começam a valer) e, se você quiser, o "quarto" (onde elas param).</p>
+
+<hr>
+
+<h2>1. O primeiro escopo</h2>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  @scope (.receita) {
+    h2 {
+      color: tomato;
+    }
+
+    p {
+      font-size: 1.1rem;
+    }
+  }
+&lt;/style&gt;
+&lt;article class="receita"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Massa fofinha e cobertura de chocolate.&lt;/p&gt;
+&lt;/article&gt;
+&lt;h2&gt;Outras receitas&lt;/h2&gt;
+&lt;p&gt;Em breve, a torta de limão.&lt;/p&gt;
+</pre>
+
+<p>Dentro do <code>.receita</code>, o título ficou <code>tomato</code> e o parágrafo, um pouco maior. Fora dele, o "Outras receitas" continua preto, e o parágrafo, no tamanho normal.</p>
+
+<dl class="anatomy">
+  <dt>@scope</dt><dd>Uma regra @, como <code>@media</code> e <code>@layer</code>. <em>Scope</em> = "escopo", "alcance".</dd>
+  <dt>(.receita)</dt><dd>A <strong>raiz</strong> do escopo, entre parênteses: um seletor qualquer. As regras de dentro valem só nos elementos que estão dentro de um <code>.receita</code>. Os parênteses são obrigatórios.</dd>
+  <dt>{ h2 { … } p { … } }</dt><dd>As regras do escopo, com seletores normais. O <code>h2</code> daqui quer dizer "um <code>h2</code> dentro da raiz".</dd>
+</dl>
+
+<p>Até aqui, dá no mesmo que escrever <code>.receita h2</code> e <code>.receita p</code>, com uma diferença na <a href="especificidade.html">especificidade</a>: dentro do <code>@scope</code>, o <code>h2</code> pesa só como um elemento (0, 0, 1), porque o escopo não acrescenta nada ao seletor. Já o <code>.receita h2</code> pesa uma classe e um elemento (0, 1, 1). O <code>@scope</code> mostra o seu valor nas próximas seções: o limite e a proximidade.</p>
+
+<h3>O próprio componente: :scope</h3>
+<p>Para estilizar a raiz (o próprio <code>.receita</code>), use o seletor <code>:scope</code> dentro do bloco:</p>
+
+<pre class="file" data-file="style.css">@scope (.receita) {
+  :scope {
+    border: 2px solid tomato;
+    padding: 16px;
+  }
+
+  h2 {
+    margin-top: 0;
+  }
+}
+</pre>
+
+<p>O <code>:scope</code> quer dizer "a raiz deste escopo". Ele pesa como uma classe (0, 1, 0). Um seletor sem nada na frente, como o <code>h2</code>, vale só para os elementos <strong>dentro</strong> da raiz, nunca para ela mesma. Também dá para escrever <code>&amp;</code> no lugar de <code>:scope</code>, como no <a href="aninhamento.html">CSS aninhado</a>; o guia usa <code>:scope</code>, mais claro.</p>
+
+<hr>
+
+<h2>2. O limite: to (…)</h2>
+<p>Agora o problema da Ana. Os comentários ficam dentro do cartão da receita, e ela não quer que as regras da receita entrem neles. Depois da raiz, escreva <code>to</code> ("até") e o <strong>limite</strong>, também entre parênteses:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  @scope (.receita) to (.comentarios) {
+    :scope {
+      border: 2px solid tomato;
+      padding: 0 16px;
+      font-family: sans-serif;
+    }
+
+    p {
+      color: tomato;
+      font-size: 1.2rem;
+    }
+  }
+
+  .comentarios {
+    background-color: whitesmoke;
+    padding: 8px;
+  }
+&lt;/style&gt;
+&lt;article class="receita"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Bata os ovos, a cenoura e o óleo no liquidificador.&lt;/p&gt;
+  &lt;div class="comentarios"&gt;
+    &lt;p&gt;Fiz e ficou ótimo! (Bia)&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/article&gt;
+</pre>
+
+<p>O parágrafo da receita ficou <code>tomato</code> e maior. O comentário da Bia, dentro do quadro cinza-claro, continua preto e no tamanho normal, mesmo estando dentro do <code>.receita</code>: ele está no "buraco".</p>
+
+<dl class="anatomy">
+  <dt>@scope (.receita)</dt><dd>A raiz: onde o escopo começa. A raiz <strong>faz parte</strong> do escopo (o <code>:scope</code> a alcança).</dd>
+  <dt>to</dt><dd>"Até".</dd>
+  <dt>(.comentarios)</dt><dd>O limite: onde o escopo termina. O limite <strong>não faz parte</strong> do escopo, e nada dentro dele também. É o buraco da rosquinha: em inglês, isso é chamado de <em>donut scope</em>, "escopo rosquinha".</dd>
+</dl>
+
+<p>Sem o <code>@scope</code>, para fazer isso você precisaria de um seletor que dissesse "um <code>p</code> dentro de <code>.receita</code>, mas não dentro de <code>.comentarios</code>", algo como <code>.receita p:not(.comentarios p)</code>: difícil de ler e com uma especificidade alta.</p>
+
+<div class="tryhtml" data-goal="css:.comentarios p{color}=rgb(0, 0, 0),css:.receita &gt; p{color}=rgb(255, 99, 71),src:@scope\s*\(\.receita\)\s*to\s*\(\.comentarios\)">
+<p class="try-task"><strong>Missão:</strong> o comentário do leitor também ficou <code>tomato</code>. Ponha um limite no escopo, com <code>to (.comentarios)</code>, para que as regras da receita não entrem nos comentários.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="receita"&gt;
+  &lt;h2&gt;Torta de limão&lt;/h2&gt;
+  &lt;p&gt;Misture o leite condensado com o suco de limão.&lt;/p&gt;
+  &lt;section class="comentarios"&gt;
+    &lt;h3&gt;Comentários&lt;/h3&gt;
+    &lt;p&gt;Ficou azedinha na medida! (Caio)&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">@scope (.receita) {
+  p {
+    color: tomato;
+  }
+}
+
+.comentarios {
+  background-color: whitesmoke;
+  padding: 8px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">@scope (.receita) to (.comentarios) {
+  p {
+    color: tomato;
+  }
+}
+
+.comentarios {
+  background-color: whitesmoke;
+  padding: 8px;
+}
+</pre>
+</div>
+
+<div class="note">
+<p><strong>A herança atravessa o limite.</strong> O limite impede que os <strong>seletores</strong> do escopo alcancem os elementos do buraco. Mas propriedades herdadas (aula <a href="heranca.html">Herança</a>), como <code>color</code> e <code>font-family</code>, passam de pai para filho normalmente. Se o <code>:scope</code> tiver <code>color: navy</code>, o <code>.comentarios</code> herda o <code>navy</code> do pai, e os parágrafos de dentro dele também (conferido no Chromium). Se não quiser isso, dê ao <code>.comentarios</code> a cor dele.</p>
+</div>
+
+<hr>
+
+<h2>3. A proximidade: o escopo mais perto vence</h2>
+<p>Este é o problema que só o <code>@scope</code> resolve bem. O site da Ana tem um tema claro e um escuro, e às vezes um cartão claro aparece <strong>dentro</strong> de uma área escura, que está dentro de uma página clara. Com seletores comuns, quem vence é a regra que vem <strong>depois</strong> no arquivo, e não a mais próxima:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .claro {
+    background-color: white;
+    padding: 8px;
+  }
+  .escuro {
+    background-color: #222;
+    padding: 8px;
+  }
+  .claro p {
+    color: #222;
+  }
+  .escuro p {
+    color: white;
+  }
+&lt;/style&gt;
+&lt;div class="claro"&gt;
+  &lt;p&gt;Página clara&lt;/p&gt;
+  &lt;div class="escuro"&gt;
+    &lt;p&gt;Área escura&lt;/p&gt;
+    &lt;div class="claro"&gt;
+      &lt;p&gt;Cartão claro dentro da área escura&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<p>A última faixa, branca, parece vazia: o texto "Cartão claro dentro da área escura" está lá, mas em branco sobre branco. O <code>p</code> do cartão está dentro de um <code>.claro</code> e também dentro de um <code>.escuro</code> (mais acima). As duas regras valem para ele, com a mesma especificidade (0, 1, 1), e a do <code>.escuro</code>, que vem depois no arquivo, vence.</p>
+
+<p>Agora com <code>@scope</code>:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  @scope (.claro) {
+    :scope {
+      background-color: white;
+      padding: 8px;
+    }
+    p {
+      color: #222;
+    }
+  }
+  @scope (.escuro) {
+    :scope {
+      background-color: #222;
+      padding: 8px;
+    }
+    p {
+      color: white;
+    }
+  }
+&lt;/style&gt;
+&lt;div class="claro"&gt;
+  &lt;p&gt;Página clara&lt;/p&gt;
+  &lt;div class="escuro"&gt;
+    &lt;p&gt;Área escura&lt;/p&gt;
+    &lt;div class="claro"&gt;
+      &lt;p&gt;Cartão claro dentro da área escura&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Agora o texto do cartão aparece, escuro sobre branco. Entre dois escopos que alcançam o mesmo elemento, o navegador conta quantos "degraus" há do elemento até cada raiz: do <code>p</code> do cartão até o <code>.claro</code> de dentro é um degrau; até o <code>.escuro</code>, dois. O escopo mais próximo vence, não importa a ordem no arquivo. Isso se chama <strong>proximidade de escopo</strong>.</p>
+
+<h3>Onde a proximidade entra na cascata</h3>
+<ol class="passo">
+  <li>Importância (<code>!important</code>).</li>
+  <li>Camada (<a href="layer.html"><code>@layer</code></a>).</li>
+  <li>Especificidade.</li>
+  <li><strong>Proximidade de escopo</strong> (a novidade).</li>
+  <li>Ordem no código.</li>
+</ol>
+
+<p>Repare que a proximidade vem <strong>depois</strong> da especificidade: ela só desempata regras com a mesma especificidade. Uma regra comum mais específica, como <code>.escuro p</code> (0, 1, 1), vence o <code>p</code> de um escopo (0, 0, 1), por mais perto que o escopo esteja. E ela vem <strong>antes</strong> da ordem no código: uma regra de escopo vence uma regra comum de mesma especificidade escrita depois dela (no Chromium, <code>@scope (.c) { p { font-weight: bold; } }</code> ganhou de um <code>p { font-weight: normal; }</code> que vinha depois).</p>
+
+<hr>
+
+<h2>4. @scope dentro de um &lt;style&gt; no meio da página</h2>
+<p>Um <code>&lt;style&gt;</code> pode ficar dentro do <code>&lt;body&gt;</code>, no meio do HTML. Se ele tiver um <code>@scope</code> <strong>sem raiz</strong>, a raiz é o elemento pai do <code>&lt;style&gt;</code>:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;section&gt;
+  &lt;style&gt;
+    @scope {
+      p {
+        color: purple;
+      }
+    }
+  &lt;/style&gt;
+  &lt;h2&gt;Dica da semana&lt;/h2&gt;
+  &lt;p&gt;Peneire a farinha para o bolo ficar mais fofo.&lt;/p&gt;
+&lt;/section&gt;
+&lt;p&gt;Este parágrafo está fora da seção.&lt;/p&gt;
+</pre>
+
+<p>Só o parágrafo da seção fica roxo; o de fora, não. É útil num pedaço de página que vem pronto de outro lugar (um bloco de anúncio, um trecho gerado por um sistema), que traz o próprio CSS sem afetar o resto. No site que você mesmo escreve, prefira o arquivo <code>style.css</code> com <code>@scope (.classe)</code>.</p>
+
+<hr>
+
+<h2>5. Formas diferentes de limitar um estilo</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Exemplo</th><th>Quando usar</th></tr>
+<tr><td>Seletor descendente</td><td><code>.receita p { }</code></td><td>O caso simples, sem buraco e sem temas aninhados. Funciona em todos os navegadores.</td></tr>
+<tr><td>Uma classe própria em cada parte (o jeito <a href="bem.html">BEM</a>)</td><td><code>.receita__texto { }</code></td><td>Projetos grandes: cada elemento tem nome, e nenhum seletor "vaza". Dá mais trabalho no HTML.</td></tr>
+<tr><td>CSS aninhado</td><td><code>.receita { p { } }</code></td><td>Agrupar as regras de um componente. É só outra forma de escrever <code>.receita p</code>: não cria limite nem proximidade.</td></tr>
+<tr><td><code>@scope</code></td><td><code>@scope (.receita) to (.comentarios) { p { } }</code></td><td>Quando precisa de um limite (o buraco) ou de proximidade (temas e componentes uns dentro dos outros), nos navegadores atuais.</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>6. Quem ainda não entende @scope</h2>
+<p>Um navegador sem suporte ignora o bloco <code>@scope</code> inteiro, com todas as regras de dentro: o componente fica sem aqueles estilos. Para o seu site continuar usável, escreva antes o estilo básico com seletores comuns (<code>.receita p { … }</code>), que todos entendem, e use o <code>@scope</code> só para o refinamento: o limite e a proximidade. Quem tem um navegador antigo vê uma versão mais simples, mas legível.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong><code>error: CSS: Parse Error.</code> — faltaram os parênteses</strong>
+<p><strong>O que aconteceu:</strong> <code>@scope .receita { … }</code>, com o seletor da raiz sem parênteses.</p>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  @scope .receita {
+    p {
+      color: tomato;
+    }
+  }
+&lt;/style&gt;
+&lt;div class="receita"&gt;
+  &lt;p&gt;Bata os ovos com o açúcar.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<p>O parágrafo continua preto: o bloco inteiro foi ignorado.</p>
+<pre class="term" data-cwd="~/escopo">$ vnu --css sem-parenteses.css
+"file:/home/ana/escopo/sem-parenteses.css":5.2-6.1: error: CSS: Parse Error.</pre>
+<p>"Erro de leitura", apontando para o fim do bloco, e não para a linha 1, onde está o erro.</p>
+<p><strong>Como consertar:</strong> <code>@scope (.receita) { … }</code>. A raiz e o limite vão sempre entre parênteses.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: Parse Error.</code> — <code>until</code> no lugar de <code>to</code></strong>
+<p><strong>O que aconteceu:</strong> <code>@scope (.receita) until (.comentarios)</code>. "Until" também quer dizer "até", mas a palavra do CSS é <code>to</code>.</p>
+<pre class="term" data-cwd="~/escopo">$ vnu --css until.css
+"file:/home/ana/escopo/until.css":5.2-6.1: error: CSS: Parse Error.</pre>
+<p>O bloco inteiro é ignorado.</p>
+<p><strong>Como consertar:</strong> <code>@scope (.receita) to (.comentarios)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>A regra do escopo perdeu para uma regra comum</strong>
+<p><strong>O que aconteceu:</strong> a Ana tem <code>@scope (.cartao) { p { color: green; } }</code> e, em outro lugar do arquivo, um antigo <code>.cartao p { color: blue; }</code>. Os parágrafos ficaram azuis. O <code>p</code> do escopo pesa (0, 0, 1); o <code>.cartao p</code>, (0, 1, 1). A especificidade vem antes da proximidade. O validador não reclama: não há erro.</p>
+<p><strong>Como consertar:</strong> tire a regra antiga, ou escreva a do escopo com <code>:scope p</code>, que pesa (0, 1, 1) e, empatada na especificidade, vence pela proximidade.</p>
+</div>
+
+<div class="cenario">
+<strong>O limite "não funcionou" para a cor</strong>
+<p><strong>O que aconteceu:</strong> <code>@scope (.receita) to (.comentarios) { :scope { color: navy; } }</code>, e os comentários ficaram azul-marinho também. O seletor não os alcançou, mas o <code>color</code> é herdado: o <code>.comentarios</code> pegou a cor do pai.</p>
+<p><strong>Como consertar:</strong> dê ao <code>.comentarios</code> a cor que você quer (<code>.comentarios { color: black; }</code>), ou ponha a cor nos elementos de texto (<code>p</code>, <code>h2</code>) do escopo, em vez de no <code>:scope</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>No celular de um leitor, o cartão perdeu todo o estilo</strong>
+<p><strong>O que aconteceu:</strong> todo o visual do cartão estava dentro de um <code>@scope</code>, e o navegador do leitor é anterior ao suporte (por exemplo, um Firefox anterior à versão 146). O navegador ignorou o bloco inteiro.</p>
+<p><strong>Como consertar:</strong> o estilo básico com seletores comuns, e o <code>@scope</code> só para o que precisa dele (seção 6).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Código</th><th>O que faz</th></tr>
+<tr><td><code>@scope (.a) { p { } }</code></td><td>Os <code>p</code> dentro de um <code>.a</code>; o <code>p</code> pesa (0, 0, 1)</td></tr>
+<tr><td><code>:scope { }</code> (dentro do bloco)</td><td>A própria raiz; pesa como uma classe</td></tr>
+<tr><td><code>@scope (.a) to (.b) { }</code></td><td>Dentro de <code>.a</code>, menos o <code>.b</code> e o que está dentro dele</td></tr>
+<tr><td><code>&lt;style&gt; @scope { … } &lt;/style&gt;</code></td><td>Sem raiz, dentro de um <code>&lt;style&gt;</code> no corpo: a raiz é o pai do <code>&lt;style&gt;</code></td></tr>
+<tr><td>Proximidade</td><td>Entre escopos com a mesma especificidade, o de raiz mais próxima vence</td></tr>
+<tr><td>Cascata</td><td>importância → camada → especificidade → proximidade → ordem</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O limite</h3>
+<p>Complete com a palavra que separa a raiz do limite:</p>
+<div class="ex-code">@scope (.cartao) <input data-answer="to" aria-label="palavra"> (.rodape) { … }</div>
+</div>
+
+<div class="exercise">
+<h3>2. A própria raiz</h3>
+<p>Complete com o seletor que estiliza o próprio <code>.cartao</code>, dentro do escopo:</p>
+<div class="ex-code">@scope (.cartao) { <input data-answer=":scope|&amp;" aria-label="seletor"> { padding: 16px; } }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. Com <code>@scope (.receita) to (.comentarios) { p { color: tomato; } }</code>, quais parágrafos ficam <code>tomato</code>?</p>
+<label><input type="radio" name="q3"> Todos os da página</label>
+<label><input type="radio" name="q3"> Só os de dentro de <code>.comentarios</code></label>
+<label><input type="radio" name="q3"> Os de dentro de <code>.receita</code>, menos os de dentro de <code>.comentarios</code></label>
+<label><input type="radio" name="q3"> Nenhum: falta o <code>:scope</code></label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Um <code>p</code> está dentro de um <code>.claro</code> que está dentro de um <code>.escuro</code>. Há <code>@scope (.claro) { p { … } }</code> e <code>@scope (.escuro) { p { … } }</code>, este por último no arquivo. Qual vence?</p>
+<label><input type="radio" name="q4"> O do <code>.escuro</code>, porque vem por último</label>
+<label><input type="radio" name="q4"> O do <code>.claro</code>, porque a raiz dele está mais perto do <code>p</code></label>
+<label><input type="radio" name="q4"> Nenhum: os dois se anulam</label>
+<label><input type="radio" name="q4"> O do <code>.escuro</code>, porque está mais acima na árvore</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Qual vem primeiro na decisão da cascata?</p>
+<label><input type="radio" name="q5"> A especificidade, antes da proximidade de escopo</label>
+<label><input type="radio" name="q5"> A proximidade de escopo, antes das camadas</label>
+<label><input type="radio" name="q5"> A ordem no código, antes da proximidade</label>
+<label><input type="radio" name="q5"> A proximidade, antes do <code>!important</code></label>
+</div>
+
+<h3>Missão final: o cartão claro na área escura</h3>
+
+<div class="tryhtml" data-goal="css:.escuro .claro p{color}=rgb(34, 34, 34),css:.escuro &gt; p{color}=rgb(255, 255, 255),src:@scope\s*\(\.claro\),src:@scope\s*\(\.escuro\)">
+<p class="try-task"><strong>Missão:</strong> o texto do cartão claro, dentro da área escura, sumiu (branco sobre branco). Reescreva as regras <code>.claro p</code> e <code>.escuro p</code> como dois escopos, <code>@scope (.claro)</code> e <code>@scope (.escuro)</code>, para que vença o tema mais próximo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="claro"&gt;
+  &lt;p&gt;Blog da Ana&lt;/p&gt;
+  &lt;div class="escuro"&gt;
+    &lt;p&gt;Receitas da madrugada&lt;/p&gt;
+    &lt;div class="claro"&gt;
+      &lt;p&gt;Brigadeiro de panela: 15 minutos.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.claro {
+  background-color: white;
+  padding: 12px;
+}
+
+.escuro {
+  background-color: #222;
+  padding: 12px;
+}
+
+.claro p {
+  color: #222;
+}
+
+.escuro p {
+  color: white;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.claro {
+  background-color: white;
+  padding: 12px;
+}
+
+.escuro {
+  background-color: #222;
+  padding: 12px;
+}
+
+@scope (.claro) {
+  p {
+    color: #222;
+  }
+}
+
+@scope (.escuro) {
+  p {
+    color: white;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>@scope (raiz) { … }</code>: as regras de dentro só valem dentro da raiz. Os seletores sem nada na frente pesam só o que são (<code>p</code> = 0, 0, 1). <code>:scope</code> é a própria raiz.</li>
+  <li><code>@scope (raiz) to (limite)</code>: um escopo com buraco; o limite e o que está dentro dele ficam de fora. A herança (<code>color</code>, <code>font-family</code>) atravessa o limite.</li>
+  <li>Proximidade: entre escopos empatados na especificidade, vence o de raiz mais próxima. Cascata: importância → camada → especificidade → proximidade → ordem.</li>
+  <li>Num <code>&lt;style&gt;</code> no meio da página, <code>@scope { }</code> sem raiz vale para o pai do <code>&lt;style&gt;</code>.</li>
+  <li>Recente: Chrome/Edge 118, Safari 17.4, Firefox 146 (Baseline 2026). Sem suporte, o bloco inteiro é ignorado: deixe o básico fora do <code>@scope</code>.</li>
+  <li>Sem parênteses ou com <code>until</code>, o validador dá <code>Parse Error</code> e o navegador ignora o bloco.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
