@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Esconder — display: none, visibility e opacity | Guia CSS</title>
+<meta name="description" content="Como esconder elementos com CSS, para quem nunca escreveu CSS: display: none (some e libera o espaço), visibility: hidden (some e guarda o lugar), opacity: 0 (invisível, mas clicável), o atributo hidden do HTML, o texto só para leitor de tela e os erros reais: hidden que não esconde por causa do display: flex, filho que reaparece e a mensagem do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Esconder</span></h1>
+
+<p class="intro">Um aviso que só aparece depois, a resposta de um enigma que o leitor revela, um menu que abre no celular: muitas vezes uma parte da página precisa ficar escondida. O CSS tem três jeitos principais de esconder, e eles <strong>não</strong> são iguais: um libera o espaço, outro guarda o lugar, e o terceiro deixa a coisa invisível, mas ainda clicável. Nesta aula você vai ver os três lado a lado e escolher o certo para cada caso.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li><code>display: none</code>: some e os vizinhos ocupam o lugar.</li>
+  <li><code>visibility: hidden</code>: some, mas o lugar fica reservado.</li>
+  <li><code>opacity: 0</code>: invisível, mas ainda ocupa espaço e recebe cliques.</li>
+  <li>O que cada um faz com o teclado e com o leitor de tela.</li>
+  <li>O atributo <code>hidden</code> do HTML e a classe "só para leitor de tela".</li>
+  <li>Os erros: o <code>hidden</code> que não esconde, o filho que reaparece e o validador W3C.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador. Mostrar e esconder com um clique precisa de JavaScript, que fica para o Guia JavaScript; aqui você aprende o lado do CSS, que é o que o JavaScript liga e desliga.</p>
+
+<hr>
+
+<h2>A ideia: tirar a cadeira ou só a pessoa</h2>
+<p>Imagine uma fileira de cadeiras num auditório, com uma pessoa em cada uma:</p>
+<ul>
+  <li><strong>Tirar a cadeira</strong> da fileira: as outras se aproximam e fecham o buraco. É o <code>display: none</code>.</li>
+  <li><strong>A pessoa sai</strong>, mas a cadeira fica: sobra um lugar vazio. É o <code>visibility: hidden</code>.</li>
+  <li><strong>A pessoa veste uma capa de invisibilidade</strong>: ninguém a vê, mas ela continua sentada, e quem esbarrar nela sente. É o <code>opacity: 0</code>.</li>
+</ul>
+
+<hr>
+
+<h2>1. Os três lado a lado</h2>
+<p>Cada fileira tem três caixas, e a do meio está escondida de um jeito diferente:</p>
+
+<pre class="file" data-file="tres-jeitos.html" data-resultado>&lt;style&gt;
+  .caixa {
+    display: inline-block;
+    width: 80px;
+    height: 50px;
+    margin: 4px;
+    background-color: #e8ecff;
+    border: 2px solid navy;
+    text-align: center;
+  }
+  .sem-display { display: none; }
+  .invisivel   { visibility: hidden; }
+  .transparente { opacity: 0; }
+&lt;/style&gt;
+&lt;p&gt;display: none&lt;/p&gt;
+&lt;div&gt;&lt;span class="caixa"&gt;1&lt;/span&gt;&lt;span class="caixa sem-display"&gt;2&lt;/span&gt;&lt;span class="caixa"&gt;3&lt;/span&gt;&lt;/div&gt;
+&lt;p&gt;visibility: hidden&lt;/p&gt;
+&lt;div&gt;&lt;span class="caixa"&gt;1&lt;/span&gt;&lt;span class="caixa invisivel"&gt;2&lt;/span&gt;&lt;span class="caixa"&gt;3&lt;/span&gt;&lt;/div&gt;
+&lt;p&gt;opacity: 0&lt;/p&gt;
+&lt;div&gt;&lt;span class="caixa"&gt;1&lt;/span&gt;&lt;span class="caixa transparente"&gt;2&lt;/span&gt;&lt;span class="caixa"&gt;3&lt;/span&gt;&lt;/div&gt;
+</pre>
+
+<p>Repare:</p>
+<ul>
+  <li>Com <code>display: none</code>, a caixa 3 encosta na 1: o lugar da 2 sumiu.</li>
+  <li>Com <code>visibility: hidden</code> e com <code>opacity: 0</code>, fica um <strong>buraco</strong> do tamanho da caixa 2 entre a 1 e a 3. Na tela, as duas fileiras parecem iguais; a diferença está no que você não vê (seção 4).</li>
+</ul>
+
+<hr>
+
+<h2>2. <code>display: none</code>: some de verdade</h2>
+<p>O valor <code>none</code> do <code>display</code> (aula <a href="display.html">display</a>) diz ao navegador: "não desenhe esta caixa". O elemento continua no HTML, mas na página é como se não existisse: não ocupa espaço, não recebe clique, não recebe foco do <kbd>Tab</kbd> e o leitor de tela não o lê. Os filhos somem junto.</p>
+
+<div class="tryhtml" data-goal="css:.aviso{display}=none">
+<p class="try-task"><strong>Missão:</strong> o aviso de "Promoção encerrada" não vale mais. Esconda-o com CSS, sem apagar do HTML, de um jeito que o texto de baixo suba e ocupe o lugar.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;p class="aviso"&gt;Promoção encerrada!&lt;/p&gt;
+&lt;p&gt;Bolos sob encomenda, com 2 dias de antecedência.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.aviso {
+  padding: 10px;
+  background-color: gold;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.aviso {
+  display: none;
+  padding: 10px;
+  background-color: gold;
+}
+</pre>
+</div>
+
+<p>É o jeito mais usado: um menu fechado, uma aba que não está escolhida, uma mensagem que só aparece em outra situação. Quando o JavaScript quer mostrar o elemento de novo, ele troca o <code>none</code> pelo <code>display</code> normal (<code>block</code>, <code>flex</code>…), ou tira a classe que tinha o <code>none</code>.</p>
+
+<hr>
+
+<h2>3. <code>visibility: hidden</code>: guarda o lugar</h2>
+<p>A propriedade <code>visibility</code> ("visibilidade") tem dois valores do dia a dia: <code>visible</code> (o padrão) e <code>hidden</code> ("escondido"). Escondido, o elemento não aparece, não recebe clique nem foco e o leitor de tela não o lê, mas <strong>o espaço dele continua reservado</strong>. Use quando a página não pode "pular" ao mostrar e esconder: uma resposta que vai aparecer no mesmo lugar, um aviso que não deve empurrar o resto.</p>
+
+<div class="tryhtml" data-goal="css:.resposta{visibility}=hidden,css:.resposta{display}=block">
+<p class="try-task"><strong>Missão:</strong> esconda a resposta do enigma, mas sem que o "Próximo enigma" suba: o lugar da resposta deve continuar vazio, esperando.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Enigma da cozinha&lt;/h2&gt;
+&lt;p&gt;O que é, o que é: quanto mais quente, mais fresco?&lt;/p&gt;
+&lt;p class="resposta"&gt;O pão!&lt;/p&gt;
+&lt;p&gt;Próximo enigma →&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.resposta {
+  font-weight: bold;
+  color: tomato;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.resposta {
+  visibility: hidden;
+  font-weight: bold;
+  color: tomato;
+}
+</pre>
+</div>
+
+<p>Existe ainda o valor <code>collapse</code>, pensado para linhas e colunas de tabela: numa linha (<code>&lt;tr&gt;</code>), ele some com a linha sem desalinhar as colunas. Fora de tabelas, ele age como <code>hidden</code>.</p>
+
+<hr>
+
+<h2>4. <code>opacity: 0</code>: invisível, mas presente</h2>
+<p>A propriedade <code>opacity</code> ("opacidade"; aula <a href="opacity.html">Transparência</a>) vai de <code>1</code> (opaco) a <code>0</code> (totalmente transparente). Com <code>0</code>, o elemento fica invisível, mas <strong>continua lá</strong> para todo o resto: ocupa espaço, recebe cliques, recebe foco do <kbd>Tab</kbd> e o leitor de tela o lê.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> clique no espaço vazio entre "Antes" e "Depois": o botão invisível responde (o console do quadro mostra a mensagem). Troque o <code>opacity: 0</code> por <code>visibility: hidden</code> e clique de novo: nada acontece.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Antes&lt;/p&gt;
+&lt;button class="fantasma" onclick="console.log('Clicou no botão invisível!')"&gt;Comprar&lt;/button&gt;
+&lt;p&gt;Depois&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.fantasma {
+  opacity: 0;
+  padding: 16px 32px;
+}
+</pre>
+</div>
+
+<p>O <code>opacity: 0</code> sozinho quase nunca é o jeito certo de esconder. Ele aparece em <strong>animações</strong>: o elemento vai de <code>0</code> a <code>1</code> aos poucos, surgindo devagar (aula <a href="transition.html">Transições</a>), coisa que <code>display</code> e <code>visibility</code> não fazem sozinhos, porque mudam de uma vez.</p>
+
+<h3>A comparação completa</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th><code>display: none</code></th><th><code>visibility: hidden</code></th><th><code>opacity: 0</code></th></tr>
+<tr><td>Aparece na tela?</td><td>Não</td><td>Não</td><td>Não</td></tr>
+<tr><td>Ocupa espaço?</td><td>Não</td><td><strong>Sim</strong></td><td><strong>Sim</strong></td></tr>
+<tr><td>Recebe clique?</td><td>Não</td><td>Não</td><td><strong>Sim</strong></td></tr>
+<tr><td>Recebe foco do <kbd>Tab</kbd>?</td><td>Não</td><td>Não</td><td><strong>Sim</strong></td></tr>
+<tr><td>O leitor de tela lê?</td><td>Não</td><td>Não</td><td><strong>Sim</strong></td></tr>
+<tr><td>Um filho pode reaparecer?</td><td>Não</td><td>Sim, com <code>visibility: visible</code></td><td>Não</td></tr>
+<tr><td>Bom para</td><td>Esconder de vez: menus fechados, abas, avisos</td><td>Esconder guardando o lugar</td><td>Animar o aparecer e o sumir</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>5. O atributo <code>hidden</code> do HTML</h2>
+<p>O HTML também sabe esconder: o atributo <code>hidden</code> (aula <a href="https://wallysondevs.github.io/guia-html/atributos-globais.html">Atributos Globais do Guia HTML</a>). Por dentro, ele funciona com CSS: o navegador tem a regra <code>[hidden] { display: none; }</code> na folha de estilos dele.</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;p&gt;Este parágrafo aparece.&lt;/p&gt;
+&lt;p hidden&gt;Este tem hidden e não aparece.&lt;/p&gt;
+&lt;p&gt;Este também aparece.&lt;/p&gt;
+</pre>
+
+<p>Use o <code>hidden</code> quando esconder faz parte do <strong>conteúdo</strong> ("esta parte ainda não vale"), e o CSS quando é questão de <strong>aparência</strong> ("no celular, este menu fica fechado"). E cuidado: por ser uma regra fraca do navegador, qualquer <code>display</code> seu passa por cima dela (veja <a href="#errado">Quando dá errado</a>).</p>
+
+<hr>
+
+<h2>6. Escondido para os olhos, presente para o leitor de tela</h2>
+<p>Às vezes é o contrário: um texto deve ser <strong>lido</strong> pelo leitor de tela, mas não aparecer. Por exemplo, um botão de ícone "🛒" precisa de um nome, como "Carrinho". Nenhum dos três jeitos serve: <code>display: none</code> e <code>visibility: hidden</code> também escondem do leitor de tela, e <code>opacity: 0</code> continua ocupando espaço. A solução é uma classe pronta, usada há anos em sites de todo o mundo:</p>
+
+<pre class="file" data-file="style.css">.so-leitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+</pre>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .so-leitor {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+&lt;/style&gt;
+&lt;button&gt;🛒 &lt;span class="so-leitor"&gt;Carrinho&lt;/span&gt;&lt;/button&gt;
+</pre>
+
+<p>Na tela, o botão mostra só o carrinho; o leitor de tela anuncia "🛒 Carrinho, botão" (o texto exato depende do leitor). A classe encolhe o texto para 1×1 pixel, tira-o do fluxo (<code>position: absolute</code>, aula <a href="position-absolute.html">position: absolute</a>) e recorta o que sobrar (<code>overflow</code>, aula <a href="overflow.html">O que Transborda</a>; <code>clip-path</code>, aula <a href="clip-path.html">Recortes</a>). Você não precisa entender cada linha agora: copie a classe inteira quando precisar. Muitos sites a chamam de <code>sr-only</code> ou <code>visually-hidden</code>.</p>
+
+<hr>
+
+<h2>7. Qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quero</th><th>Use</th></tr>
+<tr><td>Esconder de todo mundo, e o resto ocupa o lugar</td><td><code>display: none</code> (ou o atributo <code>hidden</code>)</td></tr>
+<tr><td>Esconder de todo mundo, guardando o lugar</td><td><code>visibility: hidden</code></td></tr>
+<tr><td>Fazer aparecer ou sumir com animação</td><td><code>opacity</code> (de <code>0</code> a <code>1</code>), junto com <code>visibility</code> para não ficar clicável</td></tr>
+<tr><td>Esconder dos olhos, mas não do leitor de tela</td><td>A classe <code>.so-leitor</code></td></tr>
+<tr><td>Esconder só no celular, ou só no computador</td><td><code>display: none</code> dentro de uma <code>@media</code> (aula <a href="media-queries.html">Media Queries</a>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>O <code>hidden</code> não esconde: o elemento tem <code>display: flex</code></strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .cartao {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    background-color: gold;
+  }
+&lt;/style&gt;
+&lt;div class="cartao" hidden&gt;Cupom de 10%: BOLO10&lt;/div&gt;
+&lt;p&gt;O cupom acima deveria estar escondido.&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> o cartão dourado aparece, mesmo com <code>hidden</code>.</p>
+<p><strong>Por quê:</strong> o <code>hidden</code> funciona pela regra <code>[hidden] { display: none; }</code> do <strong>navegador</strong>. O seu CSS sempre vence o do navegador na cascata (aula <a href="cascata.html">A Cascata</a>), e o seu <code>.cartao</code> diz <code>display: flex</code>. O F12 confirma: na aba <em>Computed</em>, o <code>display</code> do cartão é <code>flex</code>. Nenhum validador avisa: o HTML e o CSS estão corretos, cada um sozinho.</p>
+<p><strong>Como consertar:</strong> diga no seu CSS o que fazer quando o cartão tiver <code>hidden</code>:</p>
+<pre class="file" data-file="style.css">.cartao[hidden] {
+  display: none;
+}
+</pre>
+<p>O seletor <code>.cartao[hidden]</code> (uma classe e um atributo) é mais específico que <code>.cartao</code> e vence (aula <a href="especificidade.html">Especificidade</a>). Muitos sites põem uma regra geral, <code>[hidden] { display: none; }</code>, no começo do CSS.</p>
+</div>
+
+<div class="cenario">
+<strong>O pai está escondido, mas um filho aparece</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .rodape { visibility: hidden; }
+  .destaque { visibility: visible; }
+&lt;/style&gt;
+&lt;p class="rodape"&gt;Texto do rodapé com um &lt;strong class="destaque"&gt;destaque&lt;/strong&gt; no meio.&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> só a palavra "destaque", sozinha, no meio de um espaço vazio.</p>
+<p><strong>Por quê:</strong> o <code>visibility</code> é <strong>herdado</strong> (aula <a href="heranca.html">Herança</a>): o filho fica <code>hidden</code> porque o pai está. Mas, se outra regra disser <code>visible</code> para o filho, ele volta a aparecer. Com <code>display: none</code> no pai isso não acontece: a caixa do pai não existe, e nada de dentro pode ser desenhado.</p>
+<p><strong>Como consertar:</strong> para esconder um bloco inteiro, com tudo o que tem dentro, prefira <code>display: none</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>visibility: none</code>: o valor não existe</strong>
+<pre class="file" data-file="style.css · erro de propósito">.aviso {
+  visibility: none;
+}
+</pre>
+<p><strong>O que você vê:</strong> o aviso continua aparecendo. No F12, a declaração aparece riscada no painel <em>Styles</em>, com um ícone de aviso.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":2.15-2.18: error: CSS: “visibility”: “none” is not a “visibility” value.</pre>
+<p><strong>O que significa:</strong> "<code>none</code> não é um valor de <code>visibility</code>". É a mistura mais comum: <code>none</code> é do <code>display</code>, e <code>hidden</code> é do <code>visibility</code>. O contrário, <code>display: hidden</code>, também não existe, e o validador diz <code>“hidden” is not a “display” value</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Escondeu com <code>opacity: 0</code>, e o teclado ainda chega lá</strong>
+<p><strong>O que acontece:</strong> um menu escondido com <code>opacity: 0</code> continua recebendo o foco. Quem navega com <kbd>Tab</kbd> some de vista: o foco vai parar em links invisíveis, e o leitor de tela lê itens que ninguém vê. Experimente na caixa da seção 4: clique antes de "Antes" e aperte <kbd>Tab</kbd>; o foco vai para o botão invisível.</p>
+<p><strong>Como consertar:</strong> se é para esconder de verdade, use <code>display: none</code> ou <code>visibility: hidden</code>. Se precisa da animação do <code>opacity</code>, junte <code>visibility: hidden</code> no estado escondido.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>display: none;</code></td><td>Some, libera o espaço, sem clique, foco nem leitor de tela</td></tr>
+<tr><td><code>visibility: hidden;</code></td><td>Some e guarda o espaço; sem clique, foco nem leitor de tela; é herdado</td></tr>
+<tr><td><code>visibility: visible;</code></td><td>O padrão; faz um filho reaparecer dentro de um pai <code>hidden</code></td></tr>
+<tr><td><code>visibility: collapse;</code></td><td>Some com linhas e colunas de tabela</td></tr>
+<tr><td><code>opacity: 0;</code></td><td>Invisível, mas ocupa espaço, recebe clique, foco e é lido</td></tr>
+<tr><td><code>&lt;p hidden&gt;</code></td><td>Atributo do HTML: <code>display: none</code> que o seu <code>display</code> pode desfazer</td></tr>
+<tr><td><code>.cartao[hidden] { display: none; }</code></td><td>Faz o <code>hidden</code> voltar a funcionar</td></tr>
+<tr><td><code>.so-leitor { … }</code></td><td>Esconde dos olhos, mas não do leitor de tela</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Sumir e liberar o espaço</h3>
+<p>Complete o valor:</p>
+<div class="ex-code">.menu { display: <input data-answer="none" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Sumir e guardar o lugar</h3>
+<p>Complete a propriedade:</p>
+<div class="ex-code">.resposta { <input data-answer="visibility" aria-label="propriedade">: hidden; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Totalmente transparente</h3>
+<p>Complete o número:</p>
+<div class="ex-code">.fantasma { opacity: <input data-answer="0" aria-label="número">; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Qual jeito de esconder deixa o elemento clicável?</p>
+<label><input type="radio" name="q4"> <code>display: none</code></label>
+<label><input type="radio" name="q4"> <code>visibility: hidden</code></label>
+<label><input type="radio" name="q4"> <code>opacity: 0</code></label>
+<label><input type="radio" name="q4"> Nenhum</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. A Ana pôs <code>hidden</code> num <code>&lt;div class="cartao"&gt;</code>, mas ele continua aparecendo. O CSS dela tem <code>.cartao { display: grid; }</code>. Por quê?</p>
+<label><input type="radio" name="q5"> O <code>hidden</code> só funciona em <code>&lt;p&gt;</code></label>
+<label><input type="radio" name="q5"> O <code>hidden</code> é um <code>display: none</code> do navegador, e o <code>display: grid</code> dela vence</label>
+<label><input type="radio" name="q5"> Faltou escrever <code>hidden="true"</code></label>
+<label><input type="radio" name="q5"> O <code>grid</code> não existe</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Qual dos três o leitor de tela ainda lê?</p>
+<label><input type="radio" name="q6"> <code>opacity: 0</code></label>
+<label><input type="radio" name="q6"> <code>display: none</code></label>
+<label><input type="radio" name="q6"> <code>visibility: hidden</code></label>
+<label><input type="radio" name="q6"> Todos</label>
+</div>
+
+<h3>Missão final: a página da lojinha</h3>
+
+<div class="tryhtml" data-goal="css:.anuncio{display}=none,css:.cartao[hidden]{display}=none,css:.cartao:not([hidden]){display}=flex,css:.resposta{visibility}=hidden,css:.resposta{display}=block">
+<p class="try-task"><strong>Missão:</strong> (1) esconda o anúncio velho, liberando o espaço; (2) o cupom com <code>hidden</code> está aparecendo: faça o <code>hidden</code> funcionar, sem mexer no HTML e sem estragar o cupom que não tem <code>hidden</code>; (3) esconda a resposta do enigma guardando o lugar dela.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;p class="anuncio"&gt;Feira de setembro: venha nos visitar!&lt;/p&gt;
+&lt;div class="cartao"&gt;Cupom de 5%: ANA5&lt;/div&gt;
+&lt;div class="cartao" hidden&gt;Cupom de 10%: BOLO10&lt;/div&gt;
+&lt;h2&gt;Enigma da semana&lt;/h2&gt;
+&lt;p&gt;Quanto mais quente, mais fresco. O que é?&lt;/p&gt;
+&lt;p class="resposta"&gt;O pão!&lt;/p&gt;
+&lt;p&gt;A resposta sai no sábado.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.anuncio {
+  background-color: #e8ecff;
+}
+
+.cartao {
+  display: flex;
+  margin-bottom: 8px;
+  padding: 10px;
+  background-color: gold;
+}
+
+.resposta {
+  color: tomato;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.anuncio {
+  display: none;
+  background-color: #e8ecff;
+}
+
+.cartao {
+  display: flex;
+  margin-bottom: 8px;
+  padding: 10px;
+  background-color: gold;
+}
+
+.cartao[hidden] {
+  display: none;
+}
+
+.resposta {
+  visibility: hidden;
+  color: tomato;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>display: none</code>: o elemento some e o espaço é liberado; sem clique, sem foco, sem leitor de tela. É o jeito mais usado.</li>
+  <li><code>visibility: hidden</code>: some, mas guarda o lugar; também sem clique, foco e leitor de tela. É herdado, e um filho com <code>visible</code> reaparece.</li>
+  <li><code>opacity: 0</code>: só fica invisível; continua ocupando espaço, recebendo clique e foco e sendo lido. Serve para animações.</li>
+  <li>O atributo <code>hidden</code> é um <code>display: none</code> do navegador: um <code>display</code> seu o desfaz; <code>.cartao[hidden] { display: none; }</code> conserta.</li>
+  <li>Para esconder só dos olhos, a classe <code>.so-leitor</code>.</li>
+  <li>Não troque os valores: <code>display: none</code> e <code>visibility: hidden</code>; <code>visibility: none</code> e <code>display: hidden</code> não existem.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
