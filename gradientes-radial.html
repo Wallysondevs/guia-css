@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS radial-gradient e conic-gradient — degradês radiais e cônicos | Guia CSS</title>
+<meta name="description" content="Degradês radiais e cônicos em CSS para quem está começando: radial-gradient com círculo, elipse, tamanho e posição; bolinhas e alvo com repeating-radial-gradient; conic-gradient com from e at, gráfico de pizza e tabuleiro de xadrez; qual degradê usar e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Degradês Radiais e Cônicos</span></h1>
+
+<p class="intro">Na aula <a href="gradientes.html">Degradês</a>, as cores andavam em linha reta, de um lado para o outro. Há mais dois jeitos de espalhar as cores. No <strong>radial</strong> (<code>radial-gradient()</code>), elas saem de um ponto e se espalham em círculos, como a luz de uma lanterna na parede ou a onda de uma pedra na água. No <strong>cônico</strong> (<code>conic-gradient()</code>), elas giram em volta de um ponto, como os ponteiros do relógio: é o jeito de desenhar um gráfico de pizza sem imagem nenhuma.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Como fazer um degradê radial: elipse ou círculo, tamanho e posição do centro (<code>at</code>).</li>
+  <li>Como fazer bolinhas e um alvo, com cortes secos e <code>repeating-radial-gradient()</code>.</li>
+  <li>Como fazer um degradê cônico: de onde ele começa (<code>from</code>) e onde fica o centro.</li>
+  <li>Como desenhar um gráfico de pizza e um tabuleiro de xadrez.</li>
+  <li>Qual dos três degradês usar, e os erros reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Tudo o que você viu na aula de degradê linear continua valendo: o degradê é uma <strong>imagem</strong>, vai no <code>background-image</code>, as cores vão separadas por vírgula, e as paradas (<code>gold 30%</code>) dizem onde cada cor está pura. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana.</p>
+
+<hr>
+
+<h2>A ideia: lanterna e relógio</h2>
+<p>Aponte uma lanterna para a parede: no centro, a luz é forte; em volta, ela vai enfraquecendo em anéis. Isso é o <strong>radial</strong>: a cor muda conforme você se <strong>afasta</strong> do centro. Agora olhe um relógio: o ponteiro gira em volta do centro, passando pelo 12, pelo 3, pelo 6, pelo 9. Isso é o <strong>cônico</strong>: a cor muda conforme você <strong>gira</strong> em volta do centro.</p>
+
+<hr>
+
+<h2>1. O primeiro degradê radial</h2>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa"&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  background-image: radial-gradient(gold, tomato);
+  width: 300px;
+  height: 150px;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>radial-gradient(</dt><dd>A função do degradê radial (de <em>radius</em>, "raio").</dd>
+  <dt>gold</dt><dd>A primeira cor fica no <strong>centro</strong>.</dd>
+  <dt>tomato</dt><dd>A última cor fica na <strong>borda</strong>, e continua até os cantos.</dd>
+</dl>
+
+<p>O amarelo-ouro está no meio da caixa, e o tomate aparece nos cantos. Repare no formato da mancha amarela: ela é <strong>achatada</strong>, mais larga do que alta. Sem dizer a forma, o degradê radial é uma <strong>elipse</strong> (uma "bola achatada") com a proporção da caixa: numa caixa de 300×150, ela é duas vezes mais larga que alta.</p>
+
+<hr>
+
+<h2>2. Forma, tamanho e centro</h2>
+<p>Antes das cores, você pode dizer três coisas, nesta ordem e <strong>sem vírgula entre elas</strong>: a forma, o tamanho e o centro (depois de <code>at</code>, "em"). Só depois vem a vírgula e as cores. As caixas abaixo têm as mesmas cores; o que muda está escrito dentro de cada uma:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa r1"&gt;&lt;code&gt;(nada)&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa r2"&gt;&lt;code&gt;circle&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa r3"&gt;&lt;code&gt;circle at top left&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa r4"&gt;&lt;code&gt;circle closest-side&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa r5"&gt;&lt;code&gt;40px 20px at center&lt;/code&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  width: 300px;
+  height: 150px;
+  border: 1px solid gray;
+  margin-bottom: 8px;
+}
+
+.caixa code {
+  background-color: white;
+}
+
+.r1 {
+  background-image: radial-gradient(gold, tomato);
+}
+
+.r2 {
+  background-image: radial-gradient(circle, gold, tomato);
+}
+
+.r3 {
+  background-image: radial-gradient(circle at top left, gold, tomato);
+}
+
+.r4 {
+  background-image: radial-gradient(circle closest-side, gold, tomato);
+}
+
+.r5 {
+  background-image: radial-gradient(40px 20px at center, gold, tomato);
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que você vê</th></tr>
+<tr><td>(nada)</td><td>Elipse achatada no centro; o tomate aparece em todas as beiradas e nos cantos (a forma inicial é <code>ellipse</code>)</td></tr>
+<tr><td><code>circle</code></td><td>O amarelo forma uma mancha redonda no centro. Como o círculo vai até os cantos, em cima e embaixo ainda é laranja; o tomate só aparece nas laterais e nos cantos</td></tr>
+<tr><td><code>circle at top left</code></td><td>O centro do círculo está no canto de cima, à esquerda; o amarelo começa ali e vira tomate no canto oposto</td></tr>
+<tr><td><code>circle closest-side</code></td><td>Um círculo menor: o tomate chega quando o círculo encosta no lado <strong>mais perto</strong> (em cima e embaixo). Fora dele, tudo tomate</td></tr>
+<tr><td><code>40px 20px at center</code></td><td>Uma elipse pequena, de 40 pixels de raio na largura e 20 na altura, e tomate em volta</td></tr>
+</table>
+</div>
+
+<h3>As partes, uma por uma</h3>
+<dl class="anatomy">
+  <dt>circle | ellipse</dt><dd>A forma: <code>circle</code> ("círculo") ou <code>ellipse</code> ("elipse", a inicial).</dd>
+  <dt>closest-side | farthest-corner | …</dt><dd>O tamanho, com palavras: até onde vai a última cor. <code>closest-side</code> ("lado mais perto"), <code>farthest-side</code> ("lado mais longe"), <code>closest-corner</code> ("canto mais perto") e <code>farthest-corner</code> ("canto mais longe", o inicial).</dd>
+  <dt>40px | 40px 20px</dt><dd>O tamanho com números: um raio para o círculo, dois (largura e altura) para a elipse. O círculo não aceita porcentagem.</dd>
+  <dt>at top left | at 30% 40%</dt><dd>O centro, como no <code>background-position</code> (aula <a href="background-posicao.html">Repetição e Posição</a>): palavras, porcentagens ou pixels. O inicial é <code>at center</code>.</dd>
+</dl>
+
+<p>No valor calculado, o navegador tira o que é igual ao inicial: <code>radial-gradient(circle at center, gold, darkorange)</code> e <code>radial-gradient(circle farthest-corner at 50% 50%, gold, darkorange)</code> são guardados os dois como <code>radial-gradient(circle, rgb(255, 215, 0), rgb(255, 140, 0))</code> (lido no Chromium).</p>
+
+<div class="tryhtml" data-goal="css:.selo{background-image}=radial-gradient(circle, rgb(255, 215, 0), rgb(255, 140, 0))">
+<p class="try-task"><strong>Missão:</strong> o selo de promoção está com um degradê <strong>linear</strong>. Troque por um degradê <strong>radial em círculo</strong>, com <code>gold</code> no centro e <code>darkorange</code> na borda.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="selo"&gt;-10%&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.selo {
+  background-image: linear-gradient(gold, darkorange);
+  width: 120px;
+  height: 120px;
+  line-height: 120px;
+  text-align: center;
+  font-size: 2rem;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.selo {
+  background-image: radial-gradient(circle, gold, darkorange);
+  width: 120px;
+  height: 120px;
+  line-height: 120px;
+  text-align: center;
+  font-size: 2rem;
+}
+</pre>
+</div>
+
+<p>O selo é quadrado. Para ficar redondo de verdade, falta o <code>border-radius: 50%;</code>, da aula <a href="border-radius.html">Cantos Arredondados</a>. Experimente acrescentar.</p>
+
+<hr>
+
+<h2>3. Bolinhas e alvo</h2>
+<p>Com paradas, o radial faz desenhos. Duas cores na mesma parada (ou quase) dão um <strong>corte seco</strong>: em vez de uma mancha que se esfuma, um círculo de borda nítida.</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa bolinhas"&gt;&lt;/div&gt;
+&lt;div class="caixa alvo"&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  width: 300px;
+  height: 150px;
+  margin-bottom: 8px;
+}
+
+.bolinhas {
+  background-color: tomato;
+  background-image: radial-gradient(circle, white 25%, transparent 26%);
+  background-size: 30px 30px;
+}
+
+.alvo {
+  background-image: repeating-radial-gradient(circle, tomato 0 10px, gold 10px 20px);
+}
+</pre>
+</div>
+
+<ul>
+  <li><strong>Bolinhas:</strong> o degradê é branco até 25% e transparente a partir de 26%: um círculo branco com o resto transparente (o tomate da cor aparece por trás). Com <code>background-size: 30px 30px</code> (aula <a href="background-size.html">Tamanho do Fundo</a>), o desenho fica em quadradinhos de 30 pixels e se repete: um tecido de bolinhas. A diferença de 1% entre as paradas deixa a beirada da bolinha um pouco mais macia.</li>
+  <li><strong>Alvo:</strong> o <code>repeating-radial-gradient()</code> repete as paradas para fora: anéis de 10 pixels, tomate e ouro, a partir do centro.</li>
+</ul>
+
+<hr>
+
+<h2>4. O degradê cônico</h2>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa c1"&gt;&lt;code&gt;tomato, gold, tomato&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa c2"&gt;&lt;code&gt;from 90deg at 30% 40%&lt;/code&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  width: 300px;
+  height: 150px;
+  border: 1px solid gray;
+  margin-bottom: 8px;
+}
+
+.caixa code {
+  background-color: white;
+}
+
+.c1 {
+  background-image: conic-gradient(tomato, gold, tomato);
+}
+
+.c2 {
+  background-image: conic-gradient(from 90deg at 30% 40%, tomato 0 25%, gold 25% 60%, seagreen 60%);
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>conic-gradient(</dt><dd>A função do degradê cônico (de "cone": visto de cima, um cone de papel colorido teria esse desenho).</dd>
+  <dt>tomato, gold, tomato</dt><dd>As cores, em volta do centro, no sentido do relógio. A primeira fica no "12 horas", em cima. Na caixa <code>c1</code>, o tomate está em cima, o ouro embaixo (no "6 horas"), e o tomate volta em cima. Começar e terminar com a mesma cor evita uma emenda seca no 12.</dd>
+  <dt>from 90deg</dt><dd>De onde a volta começa ("a partir de 90 graus"): <code>90deg</code> é o "3 horas", à direita. Os graus são os mesmos do <code>linear-gradient</code>.</dd>
+  <dt>at 30% 40%</dt><dd>O centro da volta, como no radial.</dd>
+  <dt>tomato 0 25%</dt><dd>No cônico, as paradas são <strong>pedaços da volta</strong>: 25% é um quarto do círculo. Também dá para usar graus (<code>90deg</code> é um quarto).</dd>
+</dl>
+
+<p>Na caixa <code>c2</code>, o centro está um pouco acima e à esquerda do meio. A volta começa à direita (o <code>from 90deg</code>): o tomate vai do "3" ao "6" horas (o quarto de baixo, à direita), o ouro do "6" até um pouco depois do "9", e o verde ocupa o resto, em cima. Todos os cortes são secos.</p>
+
+<hr>
+
+<h2>5. Gráfico de pizza e xadrez</h2>
+<p>Dois usos clássicos do cônico. Um gráfico de pizza: as vendas da lojinha da Ana na semana, metade bolo, 30% pão de queijo e 20% torta. E um tabuleiro de xadrez, que o editor de imagens usa para mostrar "aqui é transparente":</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pizza"&gt;&lt;/div&gt;
+&lt;p&gt;Bolo (tomate) 50%, pão de queijo (ouro) 30%, torta (verde) 20%.&lt;/p&gt;
+&lt;div class="xadrez"&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pizza {
+  background-image: conic-gradient(tomato 0 50%, gold 50% 80%, seagreen 80%);
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+}
+
+.xadrez {
+  background-image: repeating-conic-gradient(lightgray 0 25%, white 0 50%);
+  background-size: 40px 40px;
+  height: 120px;
+}
+</pre>
+</div>
+
+<ul>
+  <li><strong>Pizza:</strong> três fatias com cortes secos, começando no "12 horas": tomate na metade da direita, ouro, depois verde. O <code>border-radius: 50%</code> arredonda a caixa quadrada até virar um círculo (aula <a href="border-radius.html">Cantos Arredondados</a>).</li>
+  <li><strong>Xadrez:</strong> o padrão de 25% cinza, 25% branco se repete na volta, e dá quatro quadrantes alternados. Com <code>background-size: 40px 40px</code>, cada quadradinho tem 20 pixels.</li>
+</ul>
+
+<div class="warning">
+<strong>Gráfico de pizza e acessibilidade</strong>
+<p>Para o leitor de tela, um fundo não existe: a pizza acima não diz nada a quem não a vê. Por isso o exemplo tem o parágrafo com os números. Num site de verdade, os dados vão em texto ou numa tabela; o desenho é um complemento. E não dependa só da cor: quem não distingue vermelho de verde não separa as fatias tomate e verde.</p>
+</div>
+
+<hr>
+
+<h2>Qual degradê usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Degradê</th><th>As cores mudam…</th><th>Bom para</th></tr>
+<tr><td><code>linear-gradient()</code></td><td>em linha reta, de um lado para o outro</td><td>faixas, botões, escurecer uma foto por cima, listras</td></tr>
+<tr><td><code>radial-gradient()</code></td><td>do centro para fora, em anéis</td><td>brilho e luz, selos, bolinhas, um "holofote" num ponto</td></tr>
+<tr><td><code>conic-gradient()</code></td><td>em volta do centro, como o relógio</td><td>gráfico de pizza, roda de cores, xadrez</td></tr>
+<tr><td><code>repeating-…</code></td><td>repetindo as paradas</td><td>listras, alvo, padrões</td></tr>
+</table>
+</div>
+
+<div class="note">
+<strong>Suporte</strong>
+<p>O <code>radial-gradient()</code> funciona em todos os navegadores há mais de dez anos. O <code>conic-gradient()</code> é mais novo, mas também já funciona no Chrome, no Edge, no Firefox e no Safari de hoje (no Firefox, desde a versão 83, de 2020; dados de compatibilidade do MDN). Como no linear, ponha um <code>background-color</code> de reserva para navegadores muito antigos.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Erro de propósito:</strong> as quatro caixas deviam ter degradês. Todas ficaram sem fundo, só com a borda cinza. Leia os cenários e conserte.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa um"&gt;um&lt;/div&gt;
+&lt;div class="caixa dois"&gt;dois&lt;/div&gt;
+&lt;div class="caixa tres"&gt;três&lt;/div&gt;
+&lt;div class="caixa quatro"&gt;quatro&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  height: 80px;
+  border: 1px solid gray;
+}
+
+.um {
+  background-image: radial-gradient(circle, at top, gold, tomato);
+}
+
+.dois {
+  background-image: radial-gradient(at top left circle, gold, tomato);
+}
+
+.tres {
+  background-image: conic-gradient(from 90, tomato, gold);
+}
+
+.quatro {
+  background-image: radial-gradient(circle 50%, gold, tomato);
+}
+</pre>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-image”: “at” is not a “color” value.</code></strong>
+<p><strong>O que aconteceu:</strong> uma vírgula entre a forma e o centro: <code>circle, at top</code>. A vírgula avisa "acabou a forma, agora vêm as cores", e o navegador tenta ler <code>at top</code> como uma cor.</p>
+<pre class="term" data-cwd="~/radial">$ vnu --css style.css
+"file:/home/ana/radial/style.css":7.65-7.65: error: CSS: “background-image”: “at” is not a “color” value.</pre>
+<p>"<code>at</code> não é um valor de cor."</p>
+<p><strong>Como consertar:</strong> forma, tamanho e centro ficam juntos, só com espaços: <code>radial-gradient(circle at top, gold, tomato)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-image”: “top left circle” is not a “radial-gradient” value.</code></strong>
+<p><strong>O que aconteceu:</strong> a ordem trocada: o centro (<code>at top left</code>) antes da forma. O <code>at</code> e a posição vêm sempre <strong>por último</strong>, antes da vírgula.</p>
+<pre class="term" data-cwd="~/radial">$ vnu --css style.css
+"file:/home/ana/radial/style.css":11.69-11.69: error: CSS: “background-image”: “top left circle” is not a “radial-gradient” value.</pre>
+<p><strong>Como consertar:</strong> <code>radial-gradient(circle at top left, gold, tomato)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-image”: only “0” can be a “unit”. You must put a unit after your number.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>from 90</code>, sem o <code>deg</code>. Como no linear, o ângulo leva a unidade.</p>
+<pre class="term" data-cwd="~/radial">$ vnu --css style.css
+"file:/home/ana/radial/style.css":15.57-15.57: error: CSS: “background-image”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<p>"Você precisa pôr uma unidade depois do número."</p>
+<p><strong>Como consertar:</strong> <code>from 90deg</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-image”: “circle 50%” is not a “radial-gradient” value.</code></strong>
+<p><strong>O que aconteceu:</strong> o círculo com o tamanho em porcentagem. Porcentagem de quê, da largura ou da altura? Como a caixa não é quadrada, o círculo não sabe, e por isso não aceita <code>%</code>.</p>
+<pre class="term" data-cwd="~/radial">$ vnu --css style.css
+"file:/home/ana/radial/style.css":19.61-19.61: error: CSS: “background-image”: “circle 50%” is not a “radial-gradient” value.</pre>
+<p><strong>Como consertar:</strong> um tamanho fixo (<code>circle 60px</code>), uma palavra (<code>circle closest-side</code>), ou uma elipse com duas porcentagens (<code>50% 50%</code>).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>radial-gradient(gold, tomato)</code></td><td>Elipse no centro, com a proporção da caixa</td></tr>
+<tr><td><code>radial-gradient(circle, …)</code></td><td>Círculo</td></tr>
+<tr><td><code>radial-gradient(circle at top left, …)</code></td><td>Centro em outro lugar (como no <code>background-position</code>)</td></tr>
+<tr><td><code>radial-gradient(circle closest-side, …)</code></td><td>Tamanho com palavra: até o lado mais perto (inicial: <code>farthest-corner</code>)</td></tr>
+<tr><td><code>radial-gradient(60px, …)</code> / <code>(40px 20px, …)</code></td><td>Raio do círculo / raios da elipse</td></tr>
+<tr><td><code>radial-gradient(circle, white 25%, transparent 26%)</code></td><td>Um círculo de borda nítida (com <code>background-size</code>: bolinhas)</td></tr>
+<tr><td><code>repeating-radial-gradient(circle, tomato 0 10px, gold 10px 20px)</code></td><td>Anéis: alvo</td></tr>
+<tr><td><code>conic-gradient(tomato, gold, tomato)</code></td><td>Cores em volta do centro, a partir do "12 horas"</td></tr>
+<tr><td><code>conic-gradient(from 90deg at 30% 40%, …)</code></td><td>Outro começo e outro centro</td></tr>
+<tr><td><code>conic-gradient(tomato 0 50%, gold 50% 80%, seagreen 80%)</code></td><td>Fatias: gráfico de pizza</td></tr>
+<tr><td><code>repeating-conic-gradient(lightgray 0 25%, white 0 50%)</code></td><td>Xadrez (com <code>background-size</code>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Círculo</h3>
+<p>Complete para o degradê radial ser um círculo:</p>
+<div class="ex-code">.brilho {
+  background-image: radial-gradient(<input data-answer="circle" aria-label="forma">, white, gold);
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. A palavra do centro</h3>
+<p>Complete com a palavra que vem antes da posição do centro:</p>
+<div class="ex-code">.brilho {
+  background-image: radial-gradient(circle <input data-answer="at" aria-label="palavra"> top right, white, gold);
+}</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. Sem dizer a forma, que formato tem um <code>radial-gradient</code> numa caixa de 300×150?</p>
+<label><input type="radio" name="q3"> Um círculo perfeito</label>
+<label><input type="radio" name="q3"> Uma elipse, mais larga do que alta</label>
+<label><input type="radio" name="q3"> Um quadrado</label>
+<label><input type="radio" name="q3"> Uma linha reta, como no linear</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Qual degradê desenha um gráfico de pizza?</p>
+<label><input type="radio" name="q4"> <code>linear-gradient()</code></label>
+<label><input type="radio" name="q4"> <code>radial-gradient()</code></label>
+<label><input type="radio" name="q4"> <code>conic-gradient()</code></label>
+<label><input type="radio" name="q4"> <code>repeating-radial-gradient()</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Onde começa a primeira cor de <code>conic-gradient(tomato, gold)</code>, sem <code>from</code>?</p>
+<label><input type="radio" name="q5"> Em cima, no "12 horas"</label>
+<label><input type="radio" name="q5"> À direita, no "3 horas"</label>
+<label><input type="radio" name="q5"> No centro da caixa, indo para fora</label>
+<label><input type="radio" name="q5"> No canto de cima, à esquerda</label>
+</div>
+
+<h3>Missão final: o painel de vendas</h3>
+
+<div class="tryhtml" data-goal="src:\.pizza\s*\{[^}]*background-image:\s*conic-gradient\(\s*tomato[^;]*50%[^;]*seagreen\s+50%,src:\.luz\s*\{[^}]*background-image:\s*radial-gradient\(\s*circle\s+at\s+top\s+left\s*\,,nsrc:circle\s*\,\s*at">
+<p class="try-task"><strong>Missão:</strong> (1) A <code>.pizza</code> deve mostrar metade <code>tomato</code> e metade <code>seagreen</code>, com corte seco no meio (um <code>conic-gradient</code>, tomate primeiro). (2) A <code>.luz</code> tem um erro: conserte para o brilho ser um <strong>círculo</strong> com centro no canto de cima, à esquerda.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="luz"&gt;
+  &lt;h2&gt;Vendas da semana&lt;/h2&gt;
+  &lt;div class="pizza"&gt;&lt;/div&gt;
+  &lt;p&gt;Bolo de cenoura (tomate): 50%. Pão de queijo (verde): 50%.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.luz {
+  background-color: lightyellow;
+  background-image: radial-gradient(circle, at top left, white, lightyellow);
+  padding: 16px;
+}
+
+.pizza {
+  background-color: tomato;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.luz {
+  background-color: lightyellow;
+  background-image: radial-gradient(circle at top left, white, lightyellow);
+  padding: 16px;
+}
+
+.pizza {
+  background-color: tomato;
+  background-image: conic-gradient(tomato 0 50%, seagreen 50%);
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+}
+</pre>
+</div>
+
+<p>Na <code>.luz</code>, a vírgula depois de <code>circle</code> fazia o navegador ler <code>at top left</code> como cor. Na pizza, <code>tomato 0 50%, seagreen 50%</code> (ou <code>tomato 50%, seagreen 50%</code>, que dá o mesmo desenho) pinta a metade da direita de tomate e a da esquerda de verde.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>radial-gradient()</code>: as cores saem do centro para fora. Forma (<code>circle</code> ou <code>ellipse</code>, a inicial), tamanho (palavras como <code>closest-side</code>, ou raios) e centro (<code>at …</code>) vêm antes das cores, sem vírgula entre si.</li>
+  <li>Cortes secos fazem círculos nítidos; com <code>background-size</code>, bolinhas. <code>repeating-radial-gradient()</code> faz anéis.</li>
+  <li><code>conic-gradient()</code>: as cores giram em volta do centro, a partir do "12 horas". <code>from 90deg</code> muda o começo, <code>at</code> muda o centro, e as paradas são pedaços da volta (<code>25%</code> = um quarto).</li>
+  <li>Gráfico de pizza: <code>conic-gradient</code> com cortes secos + <code>border-radius: 50%</code>, e os números também em texto.</li>
+  <li>Erros comuns: vírgula entre <code>circle</code> e <code>at</code>, <code>at</code> antes da forma, ângulo sem <code>deg</code>, círculo com <code>%</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
