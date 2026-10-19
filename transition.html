@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Transições — transition, duração, ritmo e atraso | Guia CSS</title>
+<meta name="description" content="Transições em CSS para quem está começando: a propriedade transition e as suas partes (propriedade, duração, ritmo e atraso), onde escrever, várias propriedades ao mesmo tempo, ease, linear, ease-in, ease-out e steps medidos de verdade, o que dá e o que não dá para animar e os erros mais comuns.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Transições</span></h1>
+
+<p class="intro">Na aula <a href="hover-focus.html">:hover e :focus</a>, o botão mudava de cor quando o mouse passava. Mas a mudança era um "pulo": num instante azul, no outro laranja. Com <code>transition</code> ("transição"), o navegador faz a mudança <strong>aos poucos</strong>, em alguns décimos de segundo. É um detalhe pequeno que deixa o site com cara de acabado.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A diferença entre "pular" e "passar" de um estado para outro.</li>
+  <li>As quatro partes de <code>transition</code>: qual propriedade, quanto tempo, em que ritmo e depois de quanto tempo.</li>
+  <li>Por que a <code>transition</code> fica na regra normal, e não no <code>:hover</code>.</li>
+  <li>Como fazer várias propriedades ao mesmo tempo, e por que evitar o <code>all</code>.</li>
+  <li>Os ritmos <code>ease</code>, <code>linear</code>, <code>ease-in</code>, <code>ease-out</code> e <code>steps()</code>, medidos de verdade.</li>
+  <li>O que dá e o que não dá para fazer passar aos poucos, e os erros mais comuns.</li>
+</ul>
+</div>
+
+<p>Antes, veja <a href="hover-focus.html">:hover e :focus</a> (os estados) e <a href="transform.html">transform</a>. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana. Os valores calculados e as posições no meio do movimento foram medidos no Chromium.</p>
+
+<hr>
+
+<h2>A ideia: o interruptor e o dimmer</h2>
+<p>Na sala da Ana há dois jeitos de acender a luz. O interruptor comum: clique, e a sala passa do escuro ao claro de uma vez. E o <em>dimmer</em>, aquele botão de girar: a luz vai aumentando devagar até o máximo.</p>
+<p>Sem <code>transition</code>, o CSS é o interruptor: quando um estado muda (o mouse entrou, o campo ganhou foco, uma classe foi posta), os valores novos valem <strong>na hora</strong>. Com <code>transition</code>, o CSS vira o dimmer: o navegador desenha os valores intermediários, quadro a quadro, até chegar ao novo.</p>
+<p>Você não escreve os passos do meio. Você só diz <strong>o começo</strong> (a regra normal), <strong>o fim</strong> (a regra do <code>:hover</code>, por exemplo) e <strong>quanto tempo</strong> levar. O navegador calcula o resto.</p>
+
+<hr>
+
+<h2>1. Antes e depois</h2>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> passe o mouse nos dois botões, devagar, e depois tire. O primeiro pula de cor; o segundo muda aos poucos, na ida e na volta.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button type="button" class="botao"&gt;Sem transition&lt;/button&gt;
+&lt;button type="button" class="botao suave"&gt;Com transition&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">.botao {
+  background-color: #1d4ed8;
+  color: white;
+  border: 0;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.botao:hover {
+  background-color: #c2410c;
+}
+
+.suave {
+  transition: background-color 0.4s;
+}
+</pre>
+</div>
+
+<p>Só uma linha de diferença: <code>transition: background-color 0.4s;</code>. Quando o mouse entra, a cor de fundo leva 0,4 segundo para ir do azul ao laranja, passando pelos tons do meio. Quando sai, leva o mesmo tempo para voltar.</p>
+
+<hr>
+
+<h2>2. As partes de <code>transition</code></h2>
+
+<pre class="file" data-file="style.css">.botao {
+  transition: background-color 0.3s ease-out 0.1s;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>transition:</dt><dd>A propriedade, no elemento que vai mudar.</dd>
+  <dt>background-color</dt><dd><strong>Qual</strong> propriedade fazer passar aos poucos (<code>transition-property</code>). As outras continuam pulando.</dd>
+  <dt>0.3s</dt><dd><strong>Quanto tempo</strong> (<code>transition-duration</code>): <code>s</code> são segundos, <code>ms</code> são milésimos (<code>300ms</code> = <code>0.3s</code>). Para botões e links, entre <code>0.15s</code> e <code>0.3s</code> fica natural; mais que meio segundo começa a parecer lento.</dd>
+  <dt>ease-out</dt><dd><strong>Em que ritmo</strong> (<code>transition-timing-function</code>): começa rápido e termina devagar. Sem ele, o padrão é <code>ease</code>. A seção 5 mostra todos.</dd>
+  <dt>0.1s</dt><dd><strong>Depois de quanto tempo</strong> começar (<code>transition-delay</code>, "atraso"). Sem ele, <code>0s</code>: começa na hora.</dd>
+</dl>
+
+<p>A regra dos dois tempos: o <strong>primeiro</strong> tempo que aparece é sempre a duração; o <strong>segundo</strong>, o atraso. A ordem do resto pode variar, mas escreva sempre nesta ordem: propriedade, duração, ritmo, atraso.</p>
+
+<h3>As propriedades longas</h3>
+<p>O <code>transition</code> é um atalho para quatro propriedades. Elas aparecem separadas na aba Computed do F12, e são as que você confere lá. Conferido no Chromium:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você escreve</th><th>Propriedade longa</th><th>Valor calculado</th></tr>
+<tr><td rowspan="4"><code>transition: background-color 0.3s;</code></td><td><code>transition-property</code></td><td><code>background-color</code></td></tr>
+<tr><td><code>transition-duration</code></td><td><code>0.3s</code></td></tr>
+<tr><td><code>transition-timing-function</code></td><td><code>ease</code> (o padrão)</td></tr>
+<tr><td><code>transition-delay</code></td><td><code>0s</code> (o padrão)</td></tr>
+<tr><td><code>transition: transform 200ms;</code></td><td><code>transition-duration</code></td><td><code>0.2s</code> (os <code>ms</code> viram segundos)</td></tr>
+</table>
+</div>
+
+<div class="tryhtml" data-goal="css:.link{transition-property}=color,css:.link{transition-duration}=0.25s,hover:.link{color}=rgb(194, 65, 12)">
+<p class="try-task"><strong>Missão:</strong> os links do cardápio já mudam de cor no hover, mas aos pulos. Faça a cor (<code>color</code>) mudar em <strong>0.25s</strong>. Depois passe o mouse para conferir.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a class="link" href="#paes"&gt;Pães&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a class="link" href="#bolos"&gt;Bolos&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a class="link" href="#doces"&gt;Doces&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.link {
+  color: #1d4ed8;
+}
+
+.link:hover {
+  color: #c2410c;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.link {
+  color: #1d4ed8;
+  transition: color 0.25s;
+}
+
+.link:hover {
+  color: #c2410c;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Onde escrever: na regra normal, e não no <code>:hover</code></h2>
+<p>A <code>transition</code> vale quando o elemento <strong>está</strong> com ela. Se você a coloca só no <code>:hover</code>, ela só existe enquanto o mouse está em cima:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> passe o mouse e tire, nos dois cartões. No primeiro, a ida é suave e a volta é um pulo. No segundo, os dois sentidos são suaves.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao errado"&gt;transition no :hover&lt;/div&gt;
+&lt;div class="cartao certo"&gt;transition na regra normal&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  background-color: #fffaf3;
+  border: 2px solid #c2410c;
+  padding: 16px;
+  margin: 10px;
+  max-width: 260px;
+}
+
+.cartao:hover {
+  background-color: #c2410c;
+  color: white;
+}
+
+.errado:hover {
+  transition: background-color 0.6s, color 0.6s;
+}
+
+.certo {
+  transition: background-color 0.6s, color 0.6s;
+}
+</pre>
+</div>
+
+<p>Quando o mouse sai do primeiro cartão, o <code>:hover</code> deixa de valer, e a <code>transition</code> vai embora junto: a volta acontece sem transição. Por isso, escreva a <code>transition</code> na regra <strong>normal</strong> do elemento: ela vale para ir e para voltar. (Às vezes um sentido só é de propósito, por exemplo um menu que abre suave e fecha na hora. Aí, sim, cada estado ganha a sua.)</p>
+
+<hr>
+
+<h2>4. Várias propriedades ao mesmo tempo</h2>
+<p>Para fazer passar mais de uma propriedade, separe-as com <strong>vírgula</strong>, cada uma com o seu tempo:</p>
+
+<pre class="file" data-file="style.css">.cartao {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.cartao:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgb(0 0 0 / 20%);
+}
+</pre>
+
+<p>Esse é o efeito clássico de "cartão que levanta": ele sobe 4 px e a sombra cresce, os dois juntos, em 0,2 segundo.</p>
+
+<h3>E o <code>all</code>?</h3>
+<p>Existe um atalho: <code>transition: all 0.3s;</code> faz passar aos poucos <strong>todas</strong> as propriedades que mudarem. É prático, mas tem dois problemas: propriedades que você não queria animar (uma borda, um tamanho de fonte que muda na <code>@media</code>) passam a deslizar também; e o navegador precisa vigiar tudo. Prefira dizer quais propriedades são.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> passe o mouse no cartão. Depois mude os tempos (<code>0.2s</code> para <code>1s</code>) e tente dar um tempo diferente para cada propriedade.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="200" height="150"&gt;
+  &lt;p&gt;Bolo de cenoura&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  display: inline-block;
+  margin: 16px;
+  padding: 10px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.cartao:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgb(0 0 0 / 20%);
+}
+
+.cartao img {
+  display: block;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>5. O ritmo: <code>ease</code>, <code>linear</code>, <code>ease-in</code>…</h2>
+<p>A duração diz quanto tempo; o ritmo (a <em>timing function</em>, "função de tempo") diz <strong>como</strong> o movimento se distribui nesse tempo. Um carro que sai do sinal não vai de 0 a 60 num instante: acelera, anda, freia. O ritmo é isso.</p>
+
+<p>Para medir de verdade, seis caixas fizeram a mesma viagem de 300 px para a direita, em 2 segundos, cada uma com um ritmo. A tabela mostra onde cada uma estava em três momentos (medido no Chromium):</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Ritmo</th><th>Depois de 0,5 s</th><th>Depois de 1 s (metade)</th><th>Depois de 1,5 s</th><th>Como é</th></tr>
+<tr><td><code>linear</code></td><td>75 px</td><td>150 px</td><td>225 px</td><td>velocidade sempre igual, como uma esteira</td></tr>
+<tr><td><code>ease</code> (o padrão)</td><td>123 px</td><td>241 px</td><td>288 px</td><td>arranca rápido e freia longamente no fim</td></tr>
+<tr><td><code>ease-in</code></td><td>28 px</td><td>95 px</td><td>187 px</td><td>começa devagar e acelera ("entra" suave)</td></tr>
+<tr><td><code>ease-out</code></td><td>113 px</td><td>205 px</td><td>272 px</td><td>começa rápido e freia ("sai" suave)</td></tr>
+<tr><td><code>ease-in-out</code></td><td>39 px</td><td>150 px</td><td>261 px</td><td>devagar nas duas pontas, rápido no meio</td></tr>
+<tr><td><code>steps(4)</code></td><td>75 px</td><td>150 px</td><td>225 px</td><td>não desliza: dá 4 pulos de 75 px, como um relógio de ponteiro</td></tr>
+</table>
+</div>
+
+<p>Repare: na metade do tempo, a caixa <code>ease</code> já percorreu 80% do caminho, e a <code>ease-in</code>, só um terço. Todas chegam juntas aos 300 px no fim dos 2 segundos. Veja no seu navegador:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> passe o mouse na pista e deixe parado até as caixas chegarem; depois tire o mouse e veja a volta. Troque o <code>2s</code> por <code>0.3s</code>: em tempos curtos, a diferença entre os ritmos fica sutil, mas ainda se sente.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pista"&gt;
+  &lt;div class="caixa" style="transition-timing-function: linear"&gt;linear&lt;/div&gt;
+  &lt;div class="caixa" style="transition-timing-function: ease"&gt;ease&lt;/div&gt;
+  &lt;div class="caixa" style="transition-timing-function: ease-in"&gt;ease-in&lt;/div&gt;
+  &lt;div class="caixa" style="transition-timing-function: ease-out"&gt;ease-out&lt;/div&gt;
+  &lt;div class="caixa" style="transition-timing-function: ease-in-out"&gt;ease-in-out&lt;/div&gt;
+  &lt;div class="caixa" style="transition-timing-function: steps(4)"&gt;steps(4)&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pista {
+  border: 1px solid #ccc;
+  padding: 6px;
+  max-width: 420px;
+}
+
+.caixa {
+  width: 100px;
+  margin: 4px 0;
+  padding: 4px;
+  background-color: #c2410c;
+  color: white;
+  font-family: monospace;
+  transition: transform 2s;
+}
+
+.pista:hover .caixa {
+  transform: translateX(300px);
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quando usar</th><th>Ritmo</th></tr>
+<tr><td>algo que <strong>aparece</strong> ou responde ao mouse (botão, menu abrindo)</td><td><code>ease-out</code>: a resposta é imediata e assenta suave</td></tr>
+<tr><td>algo que <strong>sai</strong> da tela</td><td><code>ease-in</code>: começa calmo e "vai embora"</td></tr>
+<tr><td>algo que vai de um lugar a outro na tela</td><td><code>ease-in-out</code> ou <code>ease</code></td></tr>
+<tr><td>mudança de cor, barra de progresso, rotação contínua</td><td><code>linear</code></td></tr>
+<tr><td>efeito "quadro a quadro" (relógio, máquina de escrever)</td><td><code>steps(n)</code></td></tr>
+</table>
+</div>
+
+<p>Para um ritmo sob medida existe <code>cubic-bezier(x1, y1, x2, y2)</code>, uma curva definida por quatro números. Ninguém escreve esses números de cabeça: o F12 do Chrome e do Firefox tem um editor de curvas, que aparece ao clicar no ícone ao lado do ritmo, na aba Styles. Um exemplo que "passa do ponto e volta", como uma mola: <code>cubic-bezier(0.3, 1.5, 0.7, 1)</code>.</p>
+
+<hr>
+
+<h2>6. O atraso</h2>
+<p>O atraso (<code>transition-delay</code>) espera antes de começar. Um uso clássico: um submenu que não fecha no instante em que o mouse escapa por um pixel. Outro: fazer os itens de uma lista chegarem um depois do outro, cada um com um atraso maior:</p>
+
+<pre class="file" data-file="style.css">.item:nth-child(1) { transition-delay: 0s; }
+.item:nth-child(2) { transition-delay: 0.1s; }
+.item:nth-child(3) { transition-delay: 0.2s; }
+</pre>
+
+<p>O <code>:nth-child()</code> é da aula <a href="nth-child.html">:nth-child</a>. Cuidado com atrasos longos em coisas que a pessoa clica: mais que uns 0,3 s parece que o site travou.</p>
+
+<hr>
+
+<h2>7. O que dá para fazer passar aos poucos</h2>
+<p>A transição precisa calcular os valores <strong>do meio</strong>. Só funciona com propriedades que têm "meio":</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Funciona</th><th>Não funciona (pula de uma vez)</th></tr>
+<tr><td>cores (<code>color</code>, <code>background-color</code>, <code>border-color</code>): o meio entre azul e laranja existe</td><td><code>display</code>: não existe meio entre <code>none</code> e <code>block</code></td></tr>
+<tr><td>tamanhos e distâncias (<code>width</code>, <code>padding</code>, <code>margin</code>, <code>font-size</code>)</td><td><code>font-family</code>, <code>text-align</code>, <code>position</code>: são escolhas, não números</td></tr>
+<tr><td><code>transform</code> e <code>opacity</code></td><td><code>height: auto</code>: o navegador não calcula o meio entre <code>0</code> e "o que couber"</td></tr>
+<tr><td><code>box-shadow</code>, <code>border-radius</code>, <code>filter</code></td><td><code>background-image</code> com degradês diferentes</td></tr>
+</table>
+</div>
+
+<div class="tip">
+<strong>Prefira <code>transform</code> e <code>opacity</code></strong>
+<p>Mudar <code>width</code>, <code>margin</code> ou <code>top</code> obriga o navegador a recalcular a página inteira em cada quadro da transição, porque os vizinhos podem se mexer. Mudar <code>transform</code> e <code>opacity</code> não mexe em nada em volta (a ideia do adesivo, da aula <a href="transform.html">transform</a>). Para "crescer", use <code>scale</code>; para "aparecer", <code>opacity</code>. Fica mais liso, principalmente no celular. A aula <a href="performance.html">CSS Rápido</a> conta mais.</p>
+</div>
+
+<div class="note">
+<strong>Novidade: <code>display</code> com transição</strong>
+<p>Uma propriedade nova, <code>transition-behavior: allow-discrete</code>, deixa o <code>display: none</code> esperar o fim de uma transição de <code>opacity</code> antes de sumir. Ela funciona no Chrome e no Edge desde a versão 117, no Safari desde a 17.4 e no Firefox desde a 129, este com suporte parcial (segundo o MDN). O validador do laboratório (<code>vnu</code> 26.10.12) ainda não a conhece e diz <code>Property “transition-behavior” doesn't exist</code>. Por enquanto, para fazer algo "sumir" suave, o jeito que funciona em todos é transicionar a <code>opacity</code> (e a <code>visibility</code>, aula <a href="esconder.html">Escondendo</a>).</p>
+</div>
+
+<hr>
+
+<h2>Formas de fazer, e qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Quando usar</th></tr>
+<tr><td><code>transition: background-color 0.3s;</code></td><td>o normal: uma propriedade, dita pelo nome</td></tr>
+<tr><td><code>transition: transform 0.2s, opacity 0.2s;</code></td><td>várias propriedades, cada uma com o seu tempo</td></tr>
+<tr><td><code>transition: all 0.3s;</code></td><td>testes rápidos; no site de verdade, prefira os nomes</td></tr>
+<tr><td>as longas (<code>transition-duration: 0.5s;</code>…)</td><td>para mudar só uma parte, por exemplo um atraso diferente em cada item</td></tr>
+<tr><td><a href="animation.html">animation</a> com <code>@keyframes</code></td><td>quando o movimento tem várias etapas, se repete ou começa sozinho, sem uma mudança de estado</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>A volta é um pulo</strong>
+<p><strong>O que aconteceu:</strong> a <code>transition</code> foi escrita só dentro do <code>:hover</code>. Ela vale só enquanto o mouse está em cima; na volta, já não existe. Veja o primeiro cartão da seção 3.</p>
+<p><strong>Como consertar:</strong> passe a <code>transition</code> para a regra normal do elemento.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “transition”: “300” is not a “transition” value.</code></strong>
+<p><strong>O que aconteceu:</strong> o tempo ficou sem unidade: <code>transition: background-color 300;</code>.</p>
+<pre class="term" data-cwd="~/trans">$ vnu --css semunid.css
+"file:/home/ana/trans/semunid.css":2.32-2.34: error: CSS: “transition”: “300” is not a “transition” value.</pre>
+<p>"300 não é um valor de <code>transition</code>." Sem <code>s</code> ou <code>ms</code>, o navegador não sabe se são 300 segundos ou 300 milésimos, e ignora a declaração inteira: a cor volta a pular.</p>
+<p><strong>Como consertar:</strong> <code>300ms</code> ou <code>0.3s</code>. Do mesmo jeito, um ritmo inventado (<code>transition: background-color 0.3s devagar;</code>) dá <code>“devagar” is not a “transition” value</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: Parse Error.</code></strong>
+<p><strong>O que aconteceu:</strong> ponto e vírgula no lugar da vírgula entre as propriedades: <code>transition: background-color 0.3s; color 0.3s;</code>.</p>
+<pre class="term" data-cwd="~/trans">$ vnu --css pontovirg.css
+"file:/home/ana/trans/pontovirg.css":2.44-2.47: error: CSS: “color”: Parse Error.</pre>
+<p>O <code>;</code> encerra a declaração. A primeira parte (<code>transition: background-color 0.3s;</code>) funciona sozinha. O que sobra, <code>color 0.3s;</code>, parece uma declaração sem os dois-pontos, e o navegador a descarta. Resultado: o fundo muda suave e a cor do texto pula.</p>
+<p><strong>Como consertar:</strong> vírgula: <code>transition: background-color 0.3s, color 0.3s;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Nada desliza, e o validador não reclama</strong>
+<p><strong>O que aconteceu:</strong> o nome da propriedade foi digitado errado: <code>transition: backgroud-color 0.3s;</code> (faltou o <code>n</code>).</p>
+<pre class="term" data-cwd="~/trans">$ vnu --css typo.css
+$ </pre>
+<p>O validador não reclama, porque o <code>transition-property</code> aceita qualquer nome (pode ser uma propriedade nova, que ele ainda não conhece). O navegador também aceita: na aba Computed aparece <code>transition-property: backgroud-color</code>, sem risco nenhum. Mas nenhuma propriedade tem esse nome, então nada desliza.</p>
+<p><strong>Como consertar:</strong> confira o nome letra por letra, ou copie da regra do <code>:hover</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Tentou fazer o <code>display</code> ou o <code>height: auto</code> deslizar</strong>
+<p><strong>O que aconteceu:</strong> <code>transition: display 0.3s;</code> para um menu que aparece, ou <code>transition: height 0.3s;</code> indo de <code>0</code> para <code>auto</code>. Os dois mudam de uma vez, como se não houvesse <code>transition</code> (veja a seção 7).</p>
+<p><strong>Como consertar:</strong> para aparecer e sumir, transicione a <code>opacity</code> (e talvez um <code>transform</code>). Para abrir uma caixa, use um <code>max-height</code> com um valor fixo grande o bastante, ou o <code>&lt;details&gt;</code> do HTML.</p>
+</div>
+
+<div class="cenario">
+<strong>A transição demora para começar</strong>
+<p><strong>O que aconteceu:</strong> <code>transition: color 1s 2s;</code>. Dois tempos: o primeiro é a duração (1 s), o segundo é o <strong>atraso</strong> (2 s). A cor espera 2 segundos parada e só então muda. Na aba Computed: <code>transition-duration: 1s</code> e <code>transition-delay: 2s</code>.</p>
+<p><strong>Como consertar:</strong> se não queria atraso, deixe um tempo só.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>transition: propriedade duração ritmo atraso;</code></td><td>O atalho completo</td></tr>
+<tr><td><code>transition: color 0.3s;</code></td><td>A cor muda em 0,3 s (ritmo <code>ease</code>, sem atraso)</td></tr>
+<tr><td><code>transition: transform 0.2s, opacity 0.2s;</code></td><td>Várias, separadas por vírgula</td></tr>
+<tr><td><code>transition-property</code></td><td>Quais propriedades (<code>all</code> = todas)</td></tr>
+<tr><td><code>transition-duration</code></td><td>Quanto tempo (<code>s</code> ou <code>ms</code>)</td></tr>
+<tr><td><code>transition-timing-function</code></td><td>Ritmo: <code>ease</code>, <code>linear</code>, <code>ease-in</code>, <code>ease-out</code>, <code>ease-in-out</code>, <code>steps(n)</code>, <code>cubic-bezier(…)</code></td></tr>
+<tr><td><code>transition-delay</code></td><td>Espera antes de começar</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Meio segundo</h3>
+<p>Complete para a cor de fundo mudar em meio segundo:</p>
+<div class="ex-code">transition: background-color <input data-answer="0.5s|500ms|.5s" aria-label="duração">;</div>
+</div>
+
+<div class="exercise">
+<h3>2. Duas propriedades</h3>
+<p>Complete com o separador entre as duas:</p>
+<div class="ex-code">transition: transform 0.2s<input data-answer="," aria-label="separador"> opacity 0.2s;</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. O botão muda de cor suave quando o mouse entra, mas pula quando o mouse sai. Onde está a <code>transition</code>?</p>
+<label><input type="radio" name="q3"> Na regra normal do botão</label>
+<label><input type="radio" name="q3"> Só na regra do <code>:hover</code></label>
+<label><input type="radio" name="q3"> Num arquivo separado</label>
+<label><input type="radio" name="q3"> Em lugar nenhum</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Em <code>transition: opacity 0.4s 1s;</code>, o que é o <code>1s</code>?</p>
+<label><input type="radio" name="q4"> A duração</label>
+<label><input type="radio" name="q4"> O ritmo</label>
+<label><input type="radio" name="q4"> O atraso: espera 1 segundo antes de começar</label>
+<label><input type="radio" name="q4"> Um erro</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Qual destas propriedades <strong>não</strong> passa aos poucos com <code>transition</code>?</p>
+<label><input type="radio" name="q5"> <code>display</code></label>
+<label><input type="radio" name="q5"> <code>opacity</code></label>
+<label><input type="radio" name="q5"> <code>background-color</code></label>
+<label><input type="radio" name="q5"> <code>transform</code></label>
+</div>
+
+<h3>Missão final: o botão "Comprar"</h3>
+
+<div class="tryhtml" data-goal="css:.botao{transition-property}=background-color\, transform,css:.botao{transition-duration}=0.2s\, 0.2s,css:.botao{transition-timing-function}=ease-out\, ease-out,hover:.botao{transform}=matrix(1.05\, 0\, 0\, 1.05\, 0\, 0),hover:.botao{background-color}=rgb(154, 52, 18),nsrc:\ball\b">
+<p class="try-task"><strong>Missão:</strong> (1) No hover, o botão deve ficar <code>#9a3412</code> e crescer 5% (<code>transform: scale(1.05)</code>). (2) Faça o <code>background-color</code> e o <code>transform</code> mudarem em <strong>0.2s</strong>, com ritmo <code>ease-out</code>, nesta ordem. Sem <code>all</code>. Passe o mouse para conferir.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button type="button" class="botao"&gt;Comprar&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">.botao {
+  background-color: #c2410c;
+  color: white;
+  border: 0;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 1rem;
+  margin: 12px;
+}
+
+.botao:hover {
+}
+</pre>
+<pre class="solucao" data-file="style.css">.botao {
+  background-color: #c2410c;
+  color: white;
+  border: 0;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 1rem;
+  margin: 12px;
+  transition: background-color 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.botao:hover {
+  background-color: #9a3412;
+  transform: scale(1.05);
+}
+</pre>
+</div>
+
+<p>E aquele cartão que vira, da aula <a href="transform-3d.html">Transformações em 3D</a>? Ponha <code>transition: transform 0.6s;</code> no <code>.cartao</code>, e ele passa a girar devagar.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>transition</code> faz a mudança de um estado para outro acontecer <strong>aos poucos</strong>: você dá o começo, o fim e o tempo; o navegador desenha o meio.</li>
+  <li>As partes: propriedade, duração, ritmo e atraso. O primeiro tempo é a duração; o segundo, o atraso.</li>
+  <li>Escreva na regra <strong>normal</strong> do elemento, para valer na ida e na volta.</li>
+  <li>Várias propriedades vão separadas por vírgula. Evite o <code>all</code>.</li>
+  <li>Ritmos: <code>ease</code> (padrão), <code>linear</code>, <code>ease-in</code>, <code>ease-out</code>, <code>ease-in-out</code>, <code>steps(n)</code>.</li>
+  <li>Só desliza o que tem "meio": cores, tamanhos, <code>transform</code>, <code>opacity</code>. <code>display</code> e <code>height: auto</code>, não. Prefira <code>transform</code> e <code>opacity</code>.</li>
+  <li>Erros comuns: tempo sem unidade, <code>;</code> no lugar da vírgula, nome da propriedade errado (o validador não pega), <code>transition</code> só no <code>:hover</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
