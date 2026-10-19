@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Tema Escuro — prefers-color-scheme, color-scheme e light-dark() | Guia CSS</title>
+<meta name="description" content="Tema escuro em CSS para quem está começando: a media query prefers-color-scheme, as variáveis que trocam de valor, a propriedade color-scheme, a função light-dark(), um botão para trocar o tema e os erros mais comuns, com o resultado desenhado no seu navegador.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Tema Escuro</span></h1>
+
+<p class="intro">Muita gente deixa o celular e o computador no <strong>modo escuro</strong>: fundo escuro, letras claras, menos luz nos olhos à noite. O navegador sabe qual modo a pessoa escolheu e conta isso ao CSS. Nesta aula, o site de receitas da Ana vai ganhar uma versão escura que liga sozinha, sem você reescrever as regras: só as <strong>cores</strong> mudam.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A media query <code>@media (prefers-color-scheme: dark)</code>: "se a pessoa prefere o escuro…".</li>
+  <li>O jeito organizado: guardar as cores em <strong>variáveis</strong> e trocar só as variáveis.</li>
+  <li>A propriedade <code>color-scheme</code>, que avisa o navegador para escurecer as peças dele (campos, botões, barra de rolagem).</li>
+  <li>A função <code>light-dark(claro, escuro)</code>: as duas cores numa linha só.</li>
+  <li>Um botão "trocar tema" para quem quer escolher diferente do sistema.</li>
+  <li>Como ver a versão escura no editor do guia, e os erros que deixam o texto invisível.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="variaveis.html">Variáveis</a> (o <code>var(--nome)</code>) e <a href="media-queries.html">Media Queries</a> (o <code>@media</code>). As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: a mesma casa, de dia e de noite</h2>
+<p>Pense na cozinha da Ana. De dia, a janela aberta ilumina tudo. À noite, ela acende uma luz mais fraca e amarelada. A cozinha é a mesma: os armários, a mesa e o fogão continuam no lugar. Só a <strong>luz</strong> muda.</p>
+<p>No site é igual. O tema escuro <strong>não</strong> é outro site e nem outro arquivo CSS. As margens, as fontes, o layout continuam iguais. Só trocam as <strong>cores</strong>: o fundo, o texto, os links, as bordas. Por isso o segredo de um bom tema escuro é deixar as cores <strong>num lugar só</strong>, fácil de trocar.</p>
+
+<ol class="passo">
+  <li>A pessoa escolhe o modo escuro nas configurações do sistema (Windows, macOS, Android, iPhone, Linux) ou do navegador.</li>
+  <li>O navegador guarda essa preferência e a mostra ao CSS como uma <strong>característica da tela</strong>, igual à largura.</li>
+  <li>O seu CSS pergunta, com <code>@media</code>: "a pessoa prefere escuro?". Se sim, as regras de dentro valem.</li>
+</ol>
+
+<hr>
+
+<h2>1. A pergunta: <code>prefers-color-scheme</code></h2>
+<p>Na aula <a href="media-queries.html">Media Queries</a>, o <code>@media</code> perguntava a largura da tela. Aqui ele pergunta a <strong>preferência de cores</strong>:</p>
+
+<pre class="file" data-file="style.css">body {
+  background-color: #fffaf3;
+  color: #2b2118;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1e1b18;
+    color: #f3ead9;
+  }
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>body { … }</dt><dd>As cores de sempre, do tema claro: fundo creme, letra marrom-escura. Valem para todo mundo.</dd>
+  <dt>@media</dt><dd>"Para o tipo de tela…". Abre uma pergunta.</dd>
+  <dt>(prefers-color-scheme: dark)</dt><dd>A pergunta, sempre entre parênteses. <code>prefers-color-scheme</code> = "prefere o esquema de cores"; <code>dark</code> = "escuro". A resposta é sim quando a pessoa escolheu o modo escuro.</dd>
+  <dt>{ body { … } }</dt><dd>As regras de dentro só valem quando a resposta é sim. Elas vêm <strong>depois</strong> das cores claras e têm o mesmo seletor: pela <a href="cascata.html">cascata</a>, quem vem depois vence.</dd>
+</dl>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>Quando a resposta é sim</th></tr>
+<tr><td><code>dark</code></td><td>a pessoa prefere o tema escuro</td></tr>
+<tr><td><code>light</code></td><td>a pessoa prefere o tema claro, <strong>ou não escolheu nada</strong></td></tr>
+</table>
+</div>
+
+<p>Na prática, quase todo mundo escreve só o bloco <code>dark</code>: o claro fica como as regras normais, fora do <code>@media</code>. Assim, um navegador muito antigo, que não entende a pergunta, mostra o tema claro, que funciona.</p>
+
+<h3>Como ver a versão escura aqui no guia</h3>
+<p>Experimente a caixa abaixo. Você provavelmente vai ver o tema <strong>claro</strong>, mesmo que o seu sistema esteja no modo escuro. Não é erro no seu CSS:</p>
+
+<div class="warning">
+<strong>O quadro do editor é sempre "de dia"</strong>
+<p>O editor do guia desenha cada exemplo como uma folha branca, avisando ao navegador que o quadro é claro. Os navegadores atuais (Chrome, Edge e Firefox) respeitam esse aviso: <strong>dentro do quadro, a resposta de <code>prefers-color-scheme: dark</code> é "não"</strong>, mesmo com o seu sistema no modo escuro (conferido no Chromium). O botão de tema do guia (o sol e a lua lá em cima) também não muda os quadros: ele troca as cores do guia, e não a preferência do seu sistema. Para ver a versão escura do seu código:</p>
+<ul>
+  <li><strong>↗ (abrir numa aba nova)</strong>: a aba nova segue a preferência do seu sistema. Deixe o sistema no modo escuro e clique em ↗.</li>
+  <li><strong>F12</strong>: as ferramentas do desenvolvedor sabem <strong>fingir</strong> a preferência, para a página inteira e todos os quadros. No Chrome e no Edge, abra o F12, aperte <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>, digite <code>prefers-color-scheme</code> e escolha a opção com <code>dark</code>. No Firefox, a aba Inspetor tem, no painel de regras, um botão de sol e um de lua. (Os nomes exatos dos menus mudam com a versão do navegador.)</li>
+</ul>
+<p>As seções 3 e 4 mostram também um jeito de pôr o claro e o escuro <strong>lado a lado</strong>, sem fingir nada.</p>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> esta página tem o tema claro e o escuro. Abra-a com ↗ com o seu sistema no modo escuro (ou finja o escuro no F12) e veja as cores trocarem. Depois, mude as cores do bloco <code>@media</code> e confira de novo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura, pão de queijo e torta de limão.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  background-color: #fffaf3;
+  color: #2b2118;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1e1b18;
+    color: #f3ead9;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. O jeito organizado: variáveis que mudam de valor</h2>
+<p>Um site de verdade tem cor em muitos lugares: o fundo, o texto, os títulos, os links, as bordas dos cartões, os botões. Repetir cada regra dentro do <code>@media</code> dá trabalho e é fácil esquecer uma. A solução é guardar as cores em <a href="variaveis.html">variáveis</a> e, no tema escuro, trocar <strong>só as variáveis</strong>:</p>
+
+<pre class="file" data-file="style.css">:root {
+  --fundo: #fffaf3;
+  --texto: #2b2118;
+  --destaque: #c2410c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo: #1e1b18;
+    --texto: #f3ead9;
+    --destaque: #fb923c;
+  }
+}
+
+body {
+  background-color: var(--fundo);
+  color: var(--texto);
+}
+
+h1,
+a {
+  color: var(--destaque);
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>:root { --fundo: …; }</dt><dd>As cores do tema claro, com nome. <code>:root</code> é a raiz da página (o <code>&lt;html&gt;</code>): dali, as variáveis valem para todos os elementos.</dd>
+  <dt>@media (…dark) { :root { … } }</dt><dd>No escuro, as <strong>mesmas variáveis</strong> ganham outros valores. Nenhuma regra do site é repetida.</dd>
+  <dt>color: var(--texto);</dt><dd>As regras do site usam só os nomes. Elas não sabem (nem precisam saber) qual tema está ligado.</dd>
+</dl>
+
+<p>Repare na cor de destaque: no claro, um laranja-escuro (<code>#c2410c</code>); no escuro, um laranja <strong>mais claro</strong> (<code>#fb923c</code>). O laranja-escuro em cima do fundo escuro ficaria apagado, difícil de ler. No tema escuro, as cores de destaque costumam ficar mais claras e menos "berrantes".</p>
+
+<div class="tryhtml" data-goal="src:@media\s*\(\s*prefers-color-scheme\s*:\s*dark\s*\)\s*\{\s*:root\s*\{[^}]*--fundo\s*:[^}]*--texto\s*:,css:body{background-color}=rgb(255, 250, 243)">
+<p class="try-task"><strong>Missão:</strong> as cores já estão em variáveis. Acrescente, depois do <code>:root</code>, um bloco <code>@media (prefers-color-scheme: dark)</code> com um <code>:root</code> dentro que mude <code>--fundo</code> para <code>#1e1b18</code> e <code>--texto</code> para <code>#f3ead9</code> (nesta ordem). O quadro vai continuar claro: confira o escuro com ↗ ou com o F12.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Hoje tem bolo de cenoura com cobertura de chocolate.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --fundo: #fffaf3;
+  --texto: #2b2118;
+}
+
+body {
+  background-color: var(--fundo);
+  color: var(--texto);
+}
+</pre>
+<pre class="solucao" data-file="style.css">:root {
+  --fundo: #fffaf3;
+  --texto: #2b2118;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo: #1e1b18;
+    --texto: #f3ead9;
+  }
+}
+
+body {
+  background-color: var(--fundo);
+  color: var(--texto);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. <code>color-scheme</code>: avisando o navegador</h2>
+<p>O seu CSS pinta o fundo e o texto. Mas uma página tem peças que <strong>o navegador</strong> desenha: o campo de texto, a caixa de seleção, o botão sem estilo, a barra de rolagem. Sem aviso, elas continuam claras, e o resultado é um campo branco brilhando no meio do site escuro.</p>
+<p>A propriedade <code>color-scheme</code> ("esquema de cores") é esse aviso: ela diz em quais esquemas a página (ou um pedaço dela) sabe ser desenhada. Veja dois quadrados com o <strong>mesmo</strong> HTML, um com <code>color-scheme: light</code> e o outro com <code>color-scheme: dark</code>:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .claro { color-scheme: light; }
+  .escuro { color-scheme: dark; }
+  div { padding: 12px; margin-bottom: 8px; border: 1px solid gray; }
+&lt;/style&gt;
+&lt;div class="claro"&gt;
+  &lt;p&gt;color-scheme: light&lt;/p&gt;
+  &lt;input type="text" value="Bolo de cenoura" aria-label="Receita"&gt;
+  &lt;select aria-label="Tamanho"&gt;&lt;option&gt;Forma média&lt;/option&gt;&lt;/select&gt;
+  &lt;button&gt;Salvar&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="escuro"&gt;
+  &lt;p&gt;color-scheme: dark&lt;/p&gt;
+  &lt;input type="text" value="Bolo de cenoura" aria-label="Receita"&gt;
+  &lt;select aria-label="Tamanho"&gt;&lt;option&gt;Forma média&lt;/option&gt;&lt;/select&gt;
+  &lt;button&gt;Salvar&lt;/button&gt;
+&lt;/div&gt;
+</pre>
+
+<p>No segundo quadrado, o navegador desenhou o campo, a lista e o botão com fundo escuro e letras claras. Mas repare: o <strong>fundo do próprio quadrado</strong> e o texto do parágrafo continuaram iguais aos do primeiro. O <code>color-scheme</code> num elemento muda as peças do navegador, e não as cores que são suas. (Na raiz da página, <code>:root</code>, ele muda também o fundo e o texto padrão da página toda.)</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que diz ao navegador</th></tr>
+<tr><td><code>normal</code></td><td>o padrão: "não sei nada de esquemas" (desenha claro)</td></tr>
+<tr><td><code>light</code></td><td>"eu só sei ser claro"</td></tr>
+<tr><td><code>dark</code></td><td>"eu só sei ser escuro"</td></tr>
+<tr><td><code>light dark</code></td><td>"sei ser os dois; siga a preferência da pessoa". É o que você quer num site com tema escuro</td></tr>
+</table>
+</div>
+
+<p>Num site com os dois temas, escreva no <code>:root</code>:</p>
+<pre class="file" data-file="style.css">:root {
+  color-scheme: light dark;
+}
+</pre>
+<p>Há também a versão em HTML, uma <code>&lt;meta&gt;</code> no <code>&lt;head&gt;</code>: <code>&lt;meta name="color-scheme" content="light dark"&gt;</code>. Ela tem uma vantagem: o navegador a lê <strong>antes</strong> de baixar o CSS, e a página não "pisca" branca ao abrir no modo escuro. Pode usar as duas.</p>
+
+<hr>
+
+<h2>4. <code>light-dark()</code>: as duas cores numa linha</h2>
+<p>A função <code>light-dark()</code> recebe duas cores: a primeira para o esquema claro, a segunda para o escuro. O navegador escolhe uma delas conforme o <code>color-scheme</code> <strong>do elemento</strong>:</p>
+
+<pre class="file" data-file="style.css">:root {
+  color-scheme: light dark;
+}
+
+body {
+  background-color: light-dark(#fffaf3, #1e1b18);
+  color: light-dark(#2b2118, #f3ead9);
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>color-scheme: light dark;</dt><dd><strong>Obrigatório.</strong> Sem ele, o esquema é sempre o claro e a função sempre escolhe a primeira cor.</dd>
+  <dt>light-dark(</dt><dd>"claro-escuro": a função.</dd>
+  <dt>#fffaf3,</dt><dd>A cor do esquema claro (vem primeiro).</dd>
+  <dt>#1e1b18)</dt><dd>A cor do esquema escuro.</dd>
+</dl>
+
+<p>Com <code>color-scheme: light dark</code> na raiz, a página segue a preferência da pessoa, sem nenhum <code>@media</code>. E como a função olha o <code>color-scheme</code> do próprio elemento, dá para forçar um pedaço da página a ficar escuro. É assim que o claro e o escuro aparecem lado a lado, aqui no quadro:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o mesmo cartão duas vezes; o segundo tem <code>color-scheme: dark</code>. Troque as cores dentro do <code>light-dark()</code> e veja cada cartão pegar a sua. Depois apague a linha <code>color-scheme: dark;</code> do <code>.noite</code>: os dois ficam iguais.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Massa fofinha e &lt;a href="#cobertura"&gt;cobertura de chocolate&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="cartao noite"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Massa fofinha e &lt;a href="#cobertura"&gt;cobertura de chocolate&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  background-color: light-dark(#fffaf3, #1e1b18);
+  color: light-dark(#2b2118, #f3ead9);
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+}
+
+.cartao a {
+  color: light-dark(#c2410c, #fb923c);
+}
+
+.noite {
+  color-scheme: dark;
+}
+</pre>
+</div>
+
+<div class="note">
+<strong>Suporte</strong>
+<p><code>light-dark()</code> é recente: funciona no Chrome e no Edge desde a versão 123, no Firefox desde a 120 e no Safari desde a 17.5 (todos de 2024, segundo o MDN). Num navegador mais velho, a declaração inteira é ignorada. Se o seu público pode ter aparelhos antigos, escreva antes uma linha simples, que serve de reserva: <code>color: #2b2118;</code> e, embaixo, <code>color: light-dark(#2b2118, #f3ead9);</code>. Quem não entende a segunda fica com a primeira. A <code>@media (prefers-color-scheme)</code> e o <code>color-scheme</code> funcionam em todos os navegadores atuais.</p>
+</div>
+
+<div class="tryhtml" data-goal="src:\.noite\s*\{[^}]*color-scheme\s*:\s*dark,css:.noite{background-color}=rgb(30, 27, 24),css:.noite{color}=rgb(243, 234, 217),css:.cartao{background-color}=rgb(255, 250, 243)">
+<p class="try-task"><strong>Missão:</strong> o cartão de baixo devia ser a versão noturna, mas está igual ao de cima. Use <code>light-dark()</code> no <code>.cartao</code>: fundo <code>#fffaf3</code> no claro e <code>#1e1b18</code> no escuro; texto <code>#2b2118</code> no claro e <code>#f3ead9</code> no escuro. Depois, dê <code>color-scheme: dark</code> ao <code>.noite</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;&lt;p&gt;Pão de queijo: 40 minutos.&lt;/p&gt;&lt;/div&gt;
+&lt;div class="cartao noite"&gt;&lt;p&gt;Pão de queijo: 40 minutos.&lt;/p&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  background-color: #fffaf3;
+  color: #2b2118;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+}
+
+.noite {
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  background-color: light-dark(#fffaf3, #1e1b18);
+  color: light-dark(#2b2118, #f3ead9);
+  padding: 12px 16px;
+  margin-bottom: 12px;
+}
+
+.noite {
+  color-scheme: dark;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>5. Um botão para trocar o tema</h2>
+<p>A preferência do sistema é um bom começo, mas há quem use o sistema escuro e queira ler um site claro (ou o contrário). Por isso muitos sites, inclusive este guia, têm um botão de tema. O CSS para isso é pequeno: uma classe na raiz que muda o <code>color-scheme</code>. Com as cores em <code>light-dark()</code>, só isso já troca tudo:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> clique no botão algumas vezes. O <code>onclick</code> põe e tira a classe <code>escuro</code> do <code>&lt;html&gt;</code> (o JavaScript é assunto de outro guia; aqui, só repare no CSS).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button type="button" onclick="document.documentElement.classList.toggle('escuro')"&gt;Trocar tema&lt;/button&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Escolha uma receita e mãos à obra.&lt;/p&gt;
+&lt;input type="search" placeholder="Buscar receita" aria-label="Buscar receita"&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  color-scheme: light;
+}
+
+:root.escuro {
+  color-scheme: dark;
+}
+
+body {
+  background-color: light-dark(#fffaf3, #1e1b18);
+  color: light-dark(#2b2118, #f3ead9);
+}
+
+h1 {
+  color: light-dark(#c2410c, #fb923c);
+}
+</pre>
+</div>
+
+<p>Repare que o campo de busca e o próprio botão também escurecem: é o <code>color-scheme</code> trabalhando. Num site de verdade, o botão começa no tema do sistema e guarda a escolha da pessoa para a próxima visita. Essa parte é JavaScript.</p>
+
+<hr>
+
+<h2>6. Cuidados com as cores do escuro</h2>
+<p>Tema escuro não é "inverter as cores". Algumas dicas que deixam a leitura confortável:</p>
+<ul>
+  <li><strong>Fuja do preto puro com branco puro.</strong> <code>#000</code> com <code>#fff</code> tem contraste tão forte que as letras parecem "vibrar". Um fundo quase preto (<code>#1e1b18</code>) e um texto quase branco (<code>#f3ead9</code>) cansam menos.</li>
+  <li><strong>Cores de destaque mais claras.</strong> O laranja-escuro do tema claro some no fundo escuro. Use uma versão mais clara da mesma cor.</li>
+  <li><strong>Confira o contraste</strong> nos dois temas. A aula <a href="acessibilidade.html">CSS e Acessibilidade</a> mostra como medir. No escuro é fácil errar para menos (um cinza-escuro sobre preto).</li>
+  <li><strong>Sombras quase não aparecem</strong> num fundo escuro. Para separar um cartão do fundo, use um fundo um pouco mais claro ou uma borda.</li>
+</ul>
+
+<hr>
+
+<h2>Formas de fazer, e qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Como é</th><th>Quando usar</th></tr>
+<tr><td><code>@media (prefers-color-scheme: dark)</code> repetindo regras</td><td>cada regra com cor ganha uma cópia escura</td><td>páginas pequenas, com duas ou três cores</td></tr>
+<tr><td><code>@media</code> + variáveis</td><td>no escuro, só as variáveis mudam</td><td>o jeito mais comum; funciona em todos os navegadores atuais</td></tr>
+<tr><td><code>color-scheme: light dark</code> + <code>light-dark()</code></td><td>as duas cores na mesma linha, sem <code>@media</code></td><td>sites novos; facilita o botão de tema (seção 5). Navegadores de 2024 em diante</td></tr>
+<tr><td><code>color-scheme</code> sozinho</td><td>só as peças do navegador mudam</td><td>sempre, junto com qualquer uma das formas acima</td></tr>
+<tr><td>uma classe na raiz (<code>:root.escuro</code>)</td><td>um botão escolhe o tema</td><td>quando a pessoa deve poder escolher diferente do sistema</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong><code>error: CSS: “escuro” is not a “prefers-color-scheme” value</code></strong>
+<p><strong>O que aconteceu:</strong> o valor foi escrito em português: <code>@media (prefers-color-scheme: escuro)</code>.</p>
+<pre class="term" data-cwd="~/tema">$ vnu --css escuro.css
+"file:/home/ana/tema/escuro.css":1.37-1.37: error: CSS: “escuro” is not a “prefers-color-scheme” value</pre>
+<p>"<code>escuro</code> não é um valor de <code>prefers-color-scheme</code>." O navegador não reclama: a pergunta nunca tem resposta "sim", e o tema escuro nunca liga.</p>
+<p><strong>Como consertar:</strong> os valores são em inglês: <code>dark</code> ou <code>light</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: unrecognized media “prefers-color-scheme”.</code></strong>
+<p><strong>O que aconteceu:</strong> faltaram os parênteses: <code>@media prefers-color-scheme: dark { … }</code>.</p>
+<pre class="term" data-cwd="~/tema">$ vnu --css semparen.css
+"file:/home/ana/tema/semparen.css":5.2-6.1: error: CSS: unrecognized media “prefers-color-scheme”.</pre>
+<p>"Mídia não reconhecida." Sem parênteses, o validador acha que <code>prefers-color-scheme</code> é um <strong>tipo</strong> de mídia, como <code>screen</code> ou <code>print</code>. O navegador descarta o bloco inteiro. Com <code>=</code> no lugar de <code>:</code> (<code>(prefers-color-scheme = dark)</code>), a mensagem é <code>“=” is not a “prefers-color-scheme” value</code>, seguida de um <code>Parse Error</code>.</p>
+<p><strong>Como consertar:</strong> <code>@media (prefers-color-scheme: dark)</code>: parênteses e dois-pontos.</p>
+</div>
+
+<div class="cenario">
+<strong>O tema escuro nunca aparece (e o validador não reclama)</strong>
+<p><strong>O que aconteceu:</strong> o bloco escuro veio <strong>antes</strong> das cores claras:</p>
+<pre class="file" data-file="style.css · erro de propósito">@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo: #1e1b18;
+  }
+}
+
+:root {
+  --fundo: #fffaf3;
+}
+</pre>
+<p>Os dois blocos têm o mesmo seletor (<code>:root</code>) e a mesma especificidade. Pela <a href="cascata.html">cascata</a>, vence o que vem <strong>por último</strong>: o claro. O <code>@media</code> não dá prioridade nenhuma; ele só liga ou desliga as regras de dentro. No F12, com o escuro fingido, a aba de estilos mostra o <code>--fundo: #1e1b18</code> riscado.</p>
+<p><strong>Como consertar:</strong> o bloco <code>@media</code> sempre <strong>depois</strong> das cores claras.</p>
+</div>
+
+<div class="cenario">
+<strong>O texto sumiu no tema escuro</strong>
+<p><strong>O que aconteceu:</strong> o bloco escuro trocou o fundo e esqueceu o texto: <code>body { background-color: #1e1b18; }</code>. O texto continua com a cor do tema claro, marrom-escuro sobre quase preto. Veja (o cartão está forçado no escuro, como na seção 4):</p>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .cartao { color: #2b2118; padding: 8px 16px; }
+  .noite { background-color: #1e1b18; }
+&lt;/style&gt;
+&lt;div class="cartao noite"&gt;
+  &lt;p&gt;Torta de limão: 1 hora de geladeira.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<p>O texto está lá (selecione com o mouse e ele aparece), mas quase não se lê.</p>
+<p><strong>Como consertar:</strong> no tema escuro, troque sempre os <strong>pares</strong>: fundo e texto juntos. Com variáveis (seção 2) ou <code>light-dark()</code> (seção 4), fica difícil esquecer.</p>
+</div>
+
+<div class="cenario">
+<strong><code>light-dark()</code> sempre escolhe a primeira cor</strong>
+<p><strong>O que aconteceu:</strong> a página usa <code>light-dark()</code>, mas ninguém escreveu <code>color-scheme</code>. Sem ele, o esquema é <code>normal</code>, que o navegador desenha como claro: a função escolhe a primeira cor até no modo escuro do sistema. O validador não percebe, porque o código está certo; falta uma linha.</p>
+<p><strong>Como consertar:</strong> <code>:root { color-scheme: light dark; }</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>color-scheme: escuro</code> não faz nada (e o validador aceita)</strong>
+<p><strong>O que aconteceu:</strong> o valor em português, de novo, agora na propriedade. Aqui o validador fica quieto:</p>
+<pre class="term" data-cwd="~/tema">$ vnu --css cs.css
+$ </pre>
+<p>Por uma regra curiosa: o <code>color-scheme</code> aceita nomes inventados, reservados para esquemas futuros. O navegador guarda <code>escuro</code>, não conhece esse esquema e desenha tudo claro. No F12, a aba Computed (Calculado) mostra <code>color-scheme: escuro</code>, sem risco nenhum, e mesmo assim nada escurece.</p>
+<p><strong>Como consertar:</strong> <code>light</code>, <code>dark</code> ou <code>light dark</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>@media (prefers-color-scheme: dark) { … }</code></td><td>Regras que valem quando a pessoa prefere o tema escuro</td></tr>
+<tr><td><code>@media (prefers-color-scheme: light) { … }</code></td><td>Quando prefere o claro ou não escolheu nada</td></tr>
+<tr><td><code>:root { --fundo: …; }</code> + <code>var(--fundo)</code></td><td>Cores com nome, trocadas só num lugar</td></tr>
+<tr><td><code>color-scheme: light dark;</code></td><td>"Sei ser claro e escuro": as peças do navegador seguem a preferência</td></tr>
+<tr><td><code>color-scheme: dark;</code></td><td>Força o esquema escuro naquele elemento (e nos filhos)</td></tr>
+<tr><td><code>&lt;meta name="color-scheme" content="light dark"&gt;</code></td><td>O mesmo aviso, no HTML, lido antes do CSS</td></tr>
+<tr><td><code>light-dark(cor-clara, cor-escura)</code></td><td>Escolhe a cor conforme o <code>color-scheme</code> do elemento</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A pergunta do tema escuro</h3>
+<p>Complete a media query:</p>
+<div class="ex-code">@media (<input data-answer="prefers-color-scheme" aria-label="característica">: <input data-answer="dark" aria-label="valor">) { … }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Os dois esquemas</h3>
+<p>Complete para dizer ao navegador que a página sabe ser clara e escura:</p>
+<div class="ex-code">:root { color-scheme: <input data-answer="light dark" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. O seu sistema está no modo escuro, mas a caixa "Experimente" deste guia mostra o tema claro do seu código. Por quê?</p>
+<label><input type="radio" name="q3"> O <code>@media</code> só funciona em celulares</label>
+<label><input type="radio" name="q3"> O quadro do editor é desenhado como claro, e o navegador responde "não" à pergunta <code>dark</code> dentro dele</label>
+<label><input type="radio" name="q3"> Faltou <code>!important</code> nas cores escuras</label>
+<label><input type="radio" name="q3"> O tema escuro só aparece depois de publicar o site</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Qual destas linhas pinta o fundo de <code>#fffaf3</code> no claro e <code>#1e1b18</code> no escuro (com <code>color-scheme: light dark</code> na raiz)?</p>
+<label><input type="radio" name="q4"> <code>background-color: light-dark(#1e1b18, #fffaf3);</code></label>
+<label><input type="radio" name="q4"> <code>background-color: dark-light(#fffaf3, #1e1b18);</code></label>
+<label><input type="radio" name="q4"> <code>background-color: light-dark(#fffaf3, #1e1b18);</code></label>
+<label><input type="radio" name="q4"> <code>background-color: #fffaf3 #1e1b18;</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. O bloco <code>@media (prefers-color-scheme: dark)</code> está no começo do arquivo, e as cores claras, com o mesmo seletor, no fim. O que acontece no modo escuro?</p>
+<label><input type="radio" name="q5"> Nada muda: as cores claras vêm depois e vencem</label>
+<label><input type="radio" name="q5"> O escuro vence, porque o <code>@media</code> tem prioridade</label>
+<label><input type="radio" name="q5"> O navegador mostra um erro na página</label>
+<label><input type="radio" name="q5"> As duas cores se misturam</label>
+</div>
+
+<h3>Missão final: o cardápio da padaria nos dois temas</h3>
+
+<div class="tryhtml" data-goal="css:html{color-scheme}=light dark,src:--fundo\s*:\s*light-dark\(\s*#fffaf3\s*\,\s*#1e1b18\s*\),src:--texto\s*:\s*light-dark\(\s*#2b2118\s*\,\s*#f3ead9\s*\),css:.noite h1{color}=rgb(251, 146, 60),css:.noite{background-color}=rgb(30, 27, 24),css:.cardapio h1{color}=rgb(194, 65, 12),nsrc:!important">
+<p class="try-task"><strong>Missão:</strong> o cardápio está com as cores fixas. (1) Diga no <code>:root</code> que a página sabe ser clara e escura. (2) Troque o valor das três variáveis por <code>light-dark()</code>: <code>--fundo</code> com <code>#fffaf3</code> e <code>#1e1b18</code>; <code>--texto</code> com <code>#2b2118</code> e <code>#f3ead9</code>; <code>--destaque</code> com <code>#c2410c</code> e <code>#fb923c</code>. (3) Faça o <code>.noite</code> usar o esquema escuro, para ver os dois lado a lado.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;section class="cardapio"&gt;
+  &lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+  &lt;p&gt;Pão francês, pão de queijo e sonho.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section class="cardapio noite"&gt;
+  &lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+  &lt;p&gt;Pão francês, pão de queijo e sonho.&lt;/p&gt;
+&lt;/section&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --fundo: #fffaf3;
+  --texto: #2b2118;
+  --destaque: #c2410c;
+}
+
+.cardapio {
+  background-color: var(--fundo);
+  color: var(--texto);
+  padding: 8px 16px;
+  margin-bottom: 12px;
+}
+
+.cardapio h1 {
+  color: var(--destaque);
+}
+
+.noite {
+}
+</pre>
+<pre class="solucao" data-file="style.css">:root {
+  color-scheme: light dark;
+  --fundo: light-dark(#fffaf3, #1e1b18);
+  --texto: light-dark(#2b2118, #f3ead9);
+  --destaque: light-dark(#c2410c, #fb923c);
+}
+
+.cardapio {
+  background-color: var(--fundo);
+  color: var(--texto);
+  padding: 8px 16px;
+  margin-bottom: 12px;
+}
+
+.cardapio h1 {
+  color: var(--destaque);
+}
+
+.noite {
+  color-scheme: dark;
+}
+</pre>
+</div>
+
+<p>Repare num detalhe: as variáveis foram definidas no <code>:root</code>, mas o <code>light-dark()</code> é decidido em <strong>cada elemento</strong> que usa a variável. Por isso o <code>.noite</code>, com <code>color-scheme: dark</code>, pega as cores escuras, e o outro cardápio, as claras. Abra com ↗ com o sistema no modo escuro: os dois cardápios ficam escuros.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O tema escuro troca só as <strong>cores</strong>; o layout continua igual.</li>
+  <li><code>@media (prefers-color-scheme: dark) { … }</code> liga regras quando a pessoa prefere o escuro. Escreva o claro como regra normal e o bloco escuro <strong>depois</strong>.</li>
+  <li>Guarde as cores em variáveis no <code>:root</code> e, no escuro, troque só as variáveis.</li>
+  <li><code>color-scheme: light dark</code> no <code>:root</code> faz o navegador escurecer as peças dele (campos, botões, barra de rolagem) e o fundo padrão.</li>
+  <li><code>light-dark(claro, escuro)</code> escolhe a cor pelo <code>color-scheme</code> do elemento: precisa do <code>color-scheme</code>, e é de 2024.</li>
+  <li>Nas caixas deste guia, o quadro responde sempre "claro": veja o escuro com ↗, fingindo no F12, ou forçando <code>color-scheme: dark</code> num pedaço.</li>
+  <li>Erros comuns: valor em português (<code>escuro</code>), falta de parênteses, bloco escuro antes do claro, trocar o fundo e esquecer o texto.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
