@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Tamanho da Letra — font-size com px, rem, em e % | Guia CSS</title>
+<meta name="description" content="A propriedade font-size do CSS para quem nunca escreveu CSS: o tamanho padrão de 16px, os tamanhos lado a lado, px, rem, em e %, por que o em vai crescendo dentro de listas, por que rem respeita a escolha do leitor, os tamanhos dos títulos, as palavras small e large, e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Tamanho da Letra (font-size)</span></h1>
+
+<p class="intro">Letra pequena demais cansa; letra grande demais vira cartaz. A propriedade <code>font-size</code> ("tamanho da fonte") decide o tamanho do texto. O difícil não é a propriedade: é escolher a <strong>unidade</strong>. Você pode escrever <code>24px</code>, <code>1.5rem</code>, <code>1.5em</code> ou <code>150%</code>, e as quatro podem dar o mesmo tamanho hoje e tamanhos diferentes amanhã. Nesta aula você vê cada uma desenhada e descobre por que o guia usa <code>rem</code>.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O tamanho padrão do texto (16px) e os tamanhos lado a lado.</li>
+  <li>As unidades <code>px</code>, <code>rem</code>, <code>em</code> e <code>%</code>, e o valor calculado em <code>px</code> que o navegador guarda.</li>
+  <li>Por que o <code>em</code> "cresce sozinho" dentro de listas, e o <code>rem</code> não.</li>
+  <li>Por que <code>rem</code> respeita quem aumentou a letra no navegador, e <code>px</code> não.</li>
+  <li>Os tamanhos padrão dos títulos <code>h1</code> a <code>h6</code> e as palavras <code>small</code>, <code>large</code>…</li>
+  <li>Os erros: número sem unidade, espaço antes do <code>px</code>, vírgula no decimal.</li>
+</ul>
+</div>
+
+<p>Os quadros "Resultado" e as caixas "Experimente" são desenhados agora pelo <strong>seu</strong> navegador. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: a régua e a receita</h2>
+<p>Numa receita, "200 gramas de farinha" é uma medida fixa. Já "meia xícara a mais do que a receita base" depende da receita base: se a base dobrar, a meia xícara a mais também muda. No CSS, o <code>px</code> é a medida fixa; o <code>rem</code>, o <code>em</code> e o <code>%</code> são medidas <strong>relativas</strong>: "uma vez e meia o tamanho de referência". O segredo é saber qual é a referência de cada uma.</p>
+
+<hr>
+
+<h2>1. O tamanho padrão e os primeiros tamanhos</h2>
+<p>Sem nenhum CSS, o texto normal dos navegadores tem <strong>16 pixels</strong> de altura (o <code>px</code>, "pixel", é a unidade de medida da tela). A partir daí:</p>
+
+<pre class="file" data-file="tamanhos.html" data-resultado>&lt;style&gt;
+  .p12 { font-size: 12px; }
+  .p16 { font-size: 16px; }
+  .p20 { font-size: 20px; }
+  .p24 { font-size: 24px; }
+  .p32 { font-size: 32px; }
+&lt;/style&gt;
+&lt;p class="p12"&gt;12px: letra miúda, de rodapé&lt;/p&gt;
+&lt;p class="p16"&gt;16px: o tamanho padrão do texto&lt;/p&gt;
+&lt;p class="p20"&gt;20px: texto grande&lt;/p&gt;
+&lt;p class="p24"&gt;24px: subtítulo&lt;/p&gt;
+&lt;p class="p32"&gt;32px: o tamanho padrão de um h1&lt;/p&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>font-size</dt><dd>A propriedade: o tamanho da letra.</dd>
+  <dt>20</dt><dd>O número.</dd>
+  <dt>px</dt><dd>A unidade, <strong>colada</strong> no número (sem espaço). Sem unidade, a declaração não vale (veja "Quando dá errado").</dd>
+</dl>
+
+<p>Repare que a linha de <code>12px</code> já cansa os olhos. Para o texto principal de um site, <strong>16px é o mínimo</strong> recomendado; muitos sites usam 17 ou 18px.</p>
+
+<hr>
+
+<h2>2. <code>rem</code>: relativo à raiz</h2>
+<p><code>rem</code> quer dizer <em>root em</em>, "o em da raiz". A raiz é o elemento <code>&lt;html&gt;</code>, cujo tamanho padrão é 16px. Então <code>1rem</code> = 16px, <code>1.5rem</code> = 24px, <code>2rem</code> = 32px:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p class="destaque"&gt;Bolo de cenoura: pronto em 50 minutos.&lt;/p&gt;
+&lt;p&gt;Texto normal, sem regra própria.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  font-size: 2.5rem;
+}
+
+.destaque {
+  font-size: 1.25rem;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você escreve</th><th>Conta</th><th>Valor calculado</th></tr>
+<tr><td><code>0.875rem</code></td><td>0,875 × 16</td><td><code>14px</code></td></tr>
+<tr><td><code>1rem</code></td><td>1 × 16</td><td><code>16px</code></td></tr>
+<tr><td><code>1.125rem</code></td><td>1,125 × 16</td><td><code>18px</code></td></tr>
+<tr><td><code>1.25rem</code></td><td>1,25 × 16</td><td><code>20px</code></td></tr>
+<tr><td><code>1.5rem</code></td><td>1,5 × 16</td><td><code>24px</code></td></tr>
+<tr><td><code>2.5rem</code></td><td>2,5 × 16</td><td><code>40px</code></td></tr>
+</table>
+</div>
+
+<p>O valor calculado (o que aparece no F12, aba <em>Computed</em>) é sempre em <code>px</code>: o navegador faz a conta e guarda o resultado. Escreva o decimal com <strong>ponto</strong>: <code>1.25rem</code>.</p>
+
+<h3>Por que <code>rem</code> e não <code>px</code>: a escolha do leitor</h3>
+<p>Muita gente, principalmente quem enxerga pouco, aumenta o tamanho da letra nas configurações do navegador (no Chrome: Configurações › Aparência › Tamanho da fonte; descrição ilustrativa, o caminho muda entre versões). Essa escolha muda o tamanho da raiz: de 16px para 20px, por exemplo. Aí:</p>
+<ul>
+  <li>um texto com <code>1.25rem</code> passa de 20px para 25px: acompanha a escolha do leitor;</li>
+  <li>um texto com <code>20px</code> continua com 20px: <strong>ignora</strong> a escolha.</li>
+</ul>
+<p>Por isso, para tamanhos de letra, o guia usa <code>rem</code>. (O zoom do navegador, Ctrl e +, aumenta tudo, com <code>px</code> ou sem; a configuração de fonte, não.)</p>
+
+<div class="tryhtml" data-goal="css:h1{font-size}=40px,css:p{font-size}=18px,src:font-size:\s*2\.5rem,src:font-size:\s*1\.125rem">
+<p class="try-task"><strong>Missão:</strong> usando <code>rem</code>, deixe o título com <code>2.5rem</code> (40px) e os parágrafos com <code>1.125rem</code> (18px).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;p&gt;Pão francês quentinho às 7h e às 17h.&lt;/p&gt;
+&lt;p&gt;Encomendas pelo telefone.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: hsl(12 73% 45%);
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: hsl(12 73% 45%);
+  font-size: 2.5rem;
+}
+
+p {
+  font-size: 1.125rem;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. <code>em</code> e <code>%</code>: relativos ao pai</h2>
+<p>O <code>em</code> e o <code>%</code> também multiplicam, mas a referência é o tamanho da letra do <strong>pai</strong> (o elemento de fora). <code>1.5em</code> = <code>150%</code> = uma vez e meia a letra do pai.</p>
+
+<pre class="file" data-file="em.html" data-resultado>&lt;style&gt;
+  .cartao {
+    font-size: 20px;
+  }
+  .cartao .nota {
+    font-size: 0.8em; /* 0,8 × 20px */
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;
+  &lt;p&gt;Texto do cartão: 20px.&lt;/p&gt;
+  &lt;p class="nota"&gt;Nota: 0.8em do cartão = 16px.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p class="nota"&gt;Fora do cartão, sem regra: 16px.&lt;/p&gt;
+</pre>
+
+<p>Isso parece prático, e às vezes é: aumente o <code>.cartao</code> e a nota aumenta junto, na proporção. O problema aparece quando um elemento fica dentro de outro igual.</p>
+
+<h3>O <code>em</code> que cresce sozinho</h3>
+<pre class="file" data-file="em-cresce.html" data-resultado>&lt;style&gt;
+  li {
+    font-size: 1.2em;
+  }
+&lt;/style&gt;
+&lt;ul&gt;
+  &lt;li&gt;Bolos
+    &lt;ul&gt;
+      &lt;li&gt;Bolos de frutas
+        &lt;ul&gt;
+          &lt;li&gt;Bolo de banana&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+<p>A intenção era "itens de lista um pouco maiores". Mas cada <code>li</code> é 1,2 vez o <code>li</code> de fora: 19.2px, depois 23.04px, depois 27.648px. Quanto mais fundo, maior a letra. Com <code>1.2rem</code>, os três teriam 19.2px, porque a referência é sempre a raiz. Use <code>em</code> só quando você <strong>quer</strong> acompanhar o pai (como um ícone do tamanho do texto em volta).</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Unidade</th><th>Relativa a</th><th>Quando usar</th></tr>
+<tr><td><code>px</code></td><td>Nada: fixa</td><td>Bordas e detalhes finos; evite para o tamanho da letra</td></tr>
+<tr><td><code>rem</code></td><td>A letra da raiz (<code>&lt;html&gt;</code>, 16px por padrão)</td><td><strong>Tamanhos de letra</strong>, no dia a dia</td></tr>
+<tr><td><code>em</code></td><td>A letra do pai</td><td>Quando algo deve acompanhar o texto em volta</td></tr>
+<tr><td><code>%</code></td><td>A letra do pai (igual ao <code>em</code>: <code>150%</code> = <code>1.5em</code>)</td><td>Raro em <code>font-size</code>; você vai ver em código antigo</td></tr>
+</table>
+</div>
+<p>A aula <a href="unidades.html">Unidades: px, em, rem e %</a> mostra essas unidades em outras propriedades (margem, largura).</p>
+
+<hr>
+
+<h2>4. Os tamanhos padrão dos títulos</h2>
+<p>Os títulos já vêm com tamanhos do navegador, todos em <code>em</code> (relativos ao pai):</p>
+
+<pre class="file" data-file="titulos.html" data-resultado>&lt;h1&gt;h1: 2em (32px)&lt;/h1&gt;
+&lt;h2&gt;h2: 1.5em (24px)&lt;/h2&gt;
+&lt;h3&gt;h3: 1.17em (18.72px)&lt;/h3&gt;
+&lt;h4&gt;h4: 1em (16px)&lt;/h4&gt;
+&lt;h5&gt;h5: 0.83em (13.28px)&lt;/h5&gt;
+&lt;h6&gt;h6: 0.67em (10.72px)&lt;/h6&gt;
+&lt;p&gt;p: 16px&lt;/p&gt;
+</pre>
+
+<p>Repare que o <code>h5</code> e o <code>h6</code> ficam <strong>menores</strong> que o texto normal. Se o tamanho não combina com o seu site, troque com <code>font-size</code>, mas nunca escolha <code>h4</code> ou <code>h5</code> "porque o tamanho é bom": o nível do título diz a estrutura da página (aula de títulos do <a href="https://wallysondevs.github.io/guia-html/">Guia HTML</a>), e o tamanho é com o CSS.</p>
+
+<hr>
+
+<h2>5. As palavras: <code>small</code>, <code>large</code>…</h2>
+<p>O <code>font-size</code> também aceita palavras, que valem tamanhos fixos (relativos ao padrão do leitor):</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Palavra</th><th>Valor calculado (com o padrão de 16px)</th></tr>
+<tr><td><code>xx-small</code></td><td><code>9px</code></td></tr>
+<tr><td><code>x-small</code></td><td><code>10px</code></td></tr>
+<tr><td><code>small</code></td><td><code>13px</code></td></tr>
+<tr><td><code>medium</code></td><td><code>16px</code> (o padrão)</td></tr>
+<tr><td><code>large</code></td><td><code>18px</code></td></tr>
+<tr><td><code>x-large</code></td><td><code>24px</code></td></tr>
+<tr><td><code>xx-large</code></td><td><code>32px</code></td></tr>
+<tr><td><code>smaller</code> / <code>larger</code></td><td>Um degrau menor / maior que o pai</td></tr>
+</table>
+</div>
+<p>Funcionam, mas os saltos são grandes e o número exato muda de navegador para navegador. Para controle, use <code>rem</code>.</p>
+
+<hr>
+
+<h2>6. Herança: escolha no <code>body</code></h2>
+<p>O <code>font-size</code> é herdado, como a <code>font-family</code>. Um tamanho no <code>body</code> vale para todo o texto que não tem regra própria. E os títulos, que usam <code>em</code>, crescem junto:</p>
+
+<pre class="file" data-file="heranca.html" data-resultado>&lt;style&gt;
+  body {
+    font-size: 1.125rem; /* 18px */
+  }
+&lt;/style&gt;
+&lt;h1&gt;Título: 2em do body = 36px&lt;/h1&gt;
+&lt;p&gt;Parágrafo: herdou 18px.&lt;/p&gt;
+</pre>
+
+<div class="tip">
+<strong>Um tamanho que se adapta à tela</strong>
+<p>Títulos grandes no computador ficam enormes no celular. A função <code>clamp()</code> escolhe um tamanho entre um mínimo e um máximo conforme a largura da tela: <code>font-size: clamp(1.75rem, 5vw, 3rem);</code>. É assunto da aula <a href="clamp.html">min(), max() e clamp()</a>.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Um tamanho inválido é ignorado em silêncio, e o texto fica com o tamanho de antes. As quatro linhas abaixo queriam 24px:</p>
+
+<pre class="file" data-file="erros.html · erro de propósito" data-resultado>&lt;style&gt;
+  .a { font-size: 24; }
+  .b { font-size: 24 px; }
+  .c { font-size: 1,5rem; }
+  .d { font-size: grande; }
+&lt;/style&gt;
+&lt;p class="a"&gt;font-size: 24&lt;/p&gt;
+&lt;p class="b"&gt;font-size: 24 px&lt;/p&gt;
+&lt;p class="c"&gt;font-size: 1,5rem&lt;/p&gt;
+&lt;p class="d"&gt;font-size: grande&lt;/p&gt;
+</pre>
+
+<p>As quatro ficaram com os 16px do padrão.</p>
+
+<div class="cenario">
+<strong><code>error: CSS: “font-size”: only “0” can be a “unit”. You must put a unit after your number.</code></strong>
+<p><strong>O que aconteceu:</strong> o número ficou sem unidade: <code>font-size: 24;</code>.</p>
+<pre class="term" data-cwd="~/tamanho">$ vnu --css sem-unidade.css
+"file:/home/ana/tamanho/sem-unidade.css":2.14-2.15: error: CSS: “font-size”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<p>"Só o 0 pode ficar sem unidade. Você precisa pôr uma unidade depois do número." 24 o quê? Pixels, <code>rem</code>, <code>em</code>? O navegador não adivinha.</p>
+<p><strong>Como consertar:</strong> <code>font-size: 1.5rem;</code> (ou <code>24px</code>).</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “font-size”: Too many values or values are not recognized.</code></strong>
+<p><strong>O que aconteceu:</strong> um espaço entre o número e a unidade (<code>24 px</code>), ou vírgula no decimal (<code>1,5rem</code>).</p>
+<pre class="term" data-cwd="~/tamanho">$ vnu --css espaco.css
+"file:/home/ana/tamanho/espaco.css":2.17-2.18: error: CSS: “font-size”: Too many values or values are not recognized.
+$ vnu --css virgula.css
+"file:/home/ana/tamanho/virgula.css":2.16-2.19: error: CSS: “font-size”: Too many values or values are not recognized.</pre>
+<p>"Valores demais ou não reconhecidos." Com o espaço, <code>24</code> e <code>px</code> viram dois valores separados. Com a vírgula, o CSS lê <code>1</code> e <code>5rem</code>, dois valores (a vírgula separa itens de uma lista, como na <code>font-family</code>).</p>
+<p><strong>Como consertar:</strong> número e unidade colados, decimal com ponto: <code>24px</code>, <code>1.5rem</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “font-size”: “grande” is not a “font-size” value.</code></strong>
+<p><strong>O que aconteceu:</strong> uma palavra que não existe: <code>font-size: grande;</code>.</p>
+<pre class="term" data-cwd="~/tamanho">$ vnu --css palavra.css
+"file:/home/ana/tamanho/palavra.css":2.14-2.19: error: CSS: “font-size”: “grande” is not a “font-size” value.</pre>
+<p><strong>Como consertar:</strong> as palavras são em inglês (<code>large</code>), mas o melhor é um número: <code>1.5rem</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “font-size”: “-2rem” negative values are not allowed.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>font-size: -2rem;</code>. Não existe letra de tamanho negativo; o navegador ignora e mantém os 16px.</p>
+<pre class="term" data-cwd="~/tamanho">$ vnu --css negativo.css
+"file:/home/ana/tamanho/negativo.css":2.15-2.18: error: CSS: “font-size”: “-2rem” negative values are not allowed.</pre>
+<p><strong>Como consertar:</strong> para diminuir a letra, use um número menor que 1: <code>0.875rem</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th><th>Valor calculado</th></tr>
+<tr><td><code>font-size: 1.25rem;</code></td><td>1,25 × a letra da raiz (recomendado)</td><td><code>20px</code></td></tr>
+<tr><td><code>font-size: 20px;</code></td><td>Tamanho fixo; ignora a configuração do leitor</td><td><code>20px</code></td></tr>
+<tr><td><code>font-size: 1.25em;</code> / <code>125%</code></td><td>1,25 × a letra do pai (acumula em elementos dentro de elementos)</td><td>depende do pai</td></tr>
+<tr><td><code>font-size: large;</code></td><td>Palavra com tamanho fixo</td><td><code>18px</code></td></tr>
+<tr><td><code>h1</code> padrão</td><td><code>2em</code></td><td><code>32px</code></td></tr>
+<tr><td><code>body { font-size: … }</code></td><td>Vale para todo o texto, por herança</td><td></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A unidade da raiz</h3>
+<p>Complete com a unidade recomendada para o tamanho da letra:</p>
+<div class="ex-code">p { font-size: 1.125<input data-answer="rem" aria-label="unidade">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. A conta</h3>
+<p>Com a raiz em 16px, quantos pixels dá <code>1.5rem</code>? Escreva só o número.</p>
+<div class="ex-code">1.5rem = <input data-answer="24" aria-label="pixels">px</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. Um <code>li</code> com <code>font-size: 1.2em</code> dentro de outro <code>li</code> com <code>1.2em</code>. O de dentro fica…</p>
+<label><input type="radio" name="q3"> do mesmo tamanho que o de fora</label>
+<label><input type="radio" name="q3"> menor que o de fora</label>
+<label><input type="radio" name="q3"> 1,2 vez maior que o de fora, porque o <code>em</code> é relativo ao pai</label>
+<label><input type="radio" name="q3"> com 16px</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Uma leitora aumentou a letra nas configurações do navegador. Qual texto acompanha a escolha dela?</p>
+<label><input type="radio" name="q4"> O de <code>font-size: 18px</code></label>
+<label><input type="radio" name="q4"> O de <code>font-size: 1.125rem</code></label>
+<label><input type="radio" name="q4"> Nenhum dos dois</label>
+<label><input type="radio" name="q4"> Os dois, igualmente</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. Por que <code>font-size: 24;</code> não muda nada?</p>
+<label><input type="radio" name="q5"> Porque 24 é grande demais</label>
+<label><input type="radio" name="q5"> Porque falta o ponto e vírgula</label>
+<label><input type="radio" name="q5"> Porque <code>font-size</code> não aceita números</label>
+<label><input type="radio" name="q5"> Porque falta a unidade: o navegador não sabe se são <code>px</code>, <code>rem</code>…</label>
+</div>
+
+<h3>Missão final: a página de receita legível</h3>
+
+<div class="tryhtml" data-goal="css:body{font-size}=18px,css:h1{font-size}=36px,css:li li{font-size}=18px,css:.rodape{font-size}=14px,nsrc:font-size:\s*\d+(\.\d+)?px">
+<p class="try-task"><strong>Missão:</strong> a página da receita está com tamanhos errados e em <code>px</code>. Usando só <code>rem</code>: o <code>body</code> com <code>1.125rem</code> (18px); o <code>h1</code> com <code>2.25rem</code> (36px); os itens de lista com <code>1.125rem</code> (18px, inclusive os da sublista, que hoje crescem com o <code>em</code>); e o <code>.rodape</code> com <code>0.875rem</code> (14px).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;Massa
+    &lt;ul&gt;
+      &lt;li&gt;3 cenouras&lt;/li&gt;
+      &lt;li&gt;3 ovos&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p class="rodape"&gt;Receita da vó Lúcia.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-size: 14px;
+}
+
+h1 {
+  font-size: 2em;
+}
+
+li {
+  font-size: 1.2em;
+}
+
+.rodape {
+  font-size: 10px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-size: 1.125rem;
+}
+
+h1 {
+  font-size: 2.25rem;
+}
+
+li {
+  font-size: 1.125rem;
+}
+
+.rodape {
+  font-size: 0.875rem;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>font-size</code> é o tamanho da letra. O padrão é 16px; para texto, não use menos que isso.</li>
+  <li><code>rem</code> multiplica a letra da raiz (16px): <code>1.5rem</code> = 24px. É a unidade recomendada, porque acompanha a configuração de letra do leitor.</li>
+  <li><code>px</code> é fixo e ignora essa configuração. <code>em</code> e <code>%</code> multiplicam a letra do <strong>pai</strong> e acumulam em elementos dentro de elementos.</li>
+  <li>O valor calculado é sempre em <code>px</code>. Títulos vêm em <code>em</code>: <code>h1</code> = 2em = 32px.</li>
+  <li>Número sem unidade, espaço antes da unidade, vírgula no decimal ou palavra inventada: o tamanho é ignorado.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
