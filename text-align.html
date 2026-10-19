@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS text-align — alinhar o texto à esquerda, ao centro, à direita ou justificado | Guia CSS</title>
+<meta name="description" content="A propriedade text-align para quem nunca escreveu CSS: left, center, right, justify, start e end lado a lado, por que ela alinha o conteúdo e não a caixa, a herança, imagens centralizadas, texto justificado e os erros comuns (valor inventado, text-align num span, tentar centralizar a caixa).">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">text-align</span></h1>
+
+<p class="intro">Todo texto começa encostado na margem esquerda da página. Para centralizar o título do site da Ana, pôr o preço no canto direito de um cartão ou deixar um parágrafo com as duas bordas retas, como num jornal, existe uma única propriedade: <code>text-align</code>, "alinhamento do texto". Nesta aula você vai conhecer os valores dela lado a lado, entender <strong>dentro de que</strong> o texto é alinhado e evitar os três tropeços mais comuns.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A regra <code>text-align: center;</code> e cada parte dela.</li>
+  <li>Os valores <code>left</code>, <code>center</code>, <code>right</code>, <code>justify</code>, <code>start</code> e <code>end</code>, um ao lado do outro.</li>
+  <li>Por que o <code>text-align</code> alinha o <strong>conteúdo</strong> de uma caixa, e não a caixa.</li>
+  <li>Como centralizar uma imagem com ele, e como a herança espalha o alinhamento pelos filhos.</li>
+  <li>Quando o texto justificado e o centralizado atrapalham a leitura.</li>
+  <li>O que acontece com um valor inventado (e a mensagem do validador W3C), com o <code>text-align</code> num <code>&lt;span&gt;</code> e na tentativa de centralizar uma caixa.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: livros numa prateleira</h2>
+<p>Pense numa prateleira com alguns livros. Você pode encostá-los todos na <strong>ponta esquerda</strong>, juntá-los no <strong>meio</strong>, empurrá-los para a <strong>ponta direita</strong> ou espaçá-los até que <strong>encostem nas duas pontas</strong>. A prateleira não sai do lugar: só os livros se movem <strong>dentro</strong> dela.</p>
+<p>No CSS, a prateleira é a caixa de um elemento, como um parágrafo ou um título, e os livros são as palavras de cada linha. O <code>text-align</code> diz para que lado as palavras se arrumam.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Na prateleira</th><th>No CSS</th></tr>
+<tr><td>A prateleira, que não se move</td><td>A caixa do elemento (o <code>&lt;p&gt;</code>, o <code>&lt;h1&gt;</code>)</td></tr>
+<tr><td>Os livros</td><td>As palavras de cada linha (e as imagens que estão no meio do texto)</td></tr>
+<tr><td>Encostar à esquerda, no meio, à direita, nas duas pontas</td><td><code>left</code>, <code>center</code>, <code>right</code>, <code>justify</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. A primeira regra: centralizar o título</h2>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  h1 {
+    text-align: center;
+  }
+&lt;/style&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura com cobertura de chocolate.&lt;/p&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>h1</dt><dd>O seletor: a regra vale para todo <code>&lt;h1&gt;</code> da página.</dd>
+  <dt>text-align</dt><dd>A propriedade: "alinhamento do texto". Ela diz como as linhas se arrumam <strong>dentro</strong> da caixa do elemento.</dd>
+  <dt>center</dt><dd>O valor: "centro". Cada linha fica no meio da caixa, com o mesmo espaço sobrando dos dois lados.</dd>
+  <dt>;</dt><dd>Fecha a declaração. Ponha sempre, até na última.</dd>
+</dl>
+
+<p>Repare no resultado: o título foi para o meio, e o parágrafo continuou encostado à esquerda. A regra só vale para o <code>&lt;h1&gt;</code>.</p>
+
+<hr>
+
+<h2>2. Os valores, lado a lado</h2>
+<p>Cada parágrafo abaixo tem uma borda fina, para você ver o tamanho da caixa (a "prateleira"), e o nome do valor escrito dentro:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  p {
+    border: 1px solid gray;
+    padding: 4px;
+  }
+  .esquerda { text-align: left; }
+  .centro { text-align: center; }
+  .direita { text-align: right; }
+  .justificado { text-align: justify; }
+&lt;/style&gt;
+&lt;p class="esquerda"&gt;left: encostado à esquerda&lt;/p&gt;
+&lt;p class="centro"&gt;center: no meio&lt;/p&gt;
+&lt;p class="direita"&gt;right: encostado à direita&lt;/p&gt;
+&lt;p class="justificado"&gt;justify: o bolo de cenoura da Ana leva três cenouras médias, quatro ovos, uma xícara de óleo, duas de açúcar e duas e meia de farinha de trigo. As linhas cheias encostam nas duas bordas; a última fica à esquerda.&lt;/p&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que faz</th><th>Quando usar</th></tr>
+<tr><td><code>left</code></td><td>Encosta as linhas à esquerda; a borda direita fica "recortada"</td><td>O padrão para ler em português. Você quase nunca precisa escrever</td></tr>
+<tr><td><code>center</code></td><td>Põe cada linha no meio da caixa</td><td>Títulos curtos, botões, rodapés, uma frase de destaque</td></tr>
+<tr><td><code>right</code></td><td>Encosta as linhas à direita</td><td>Preços e números numa coluna, uma data no canto de um cartão</td></tr>
+<tr><td><code>justify</code></td><td>Estica os espaços entre as palavras para cada linha cheia encostar nas duas bordas; a <strong>última</strong> linha não é esticada</td><td>Colunas largas de texto corrido, como num livro. Com cuidado (veja a seção 6)</td></tr>
+<tr><td><code>start</code></td><td>Encosta no <strong>começo</strong> da linha, que depende da língua</td><td>É o valor inicial. Bom para sites em mais de uma língua</td></tr>
+<tr><td><code>end</code></td><td>Encosta no <strong>fim</strong> da linha</td><td>O "à direita" que vira "à esquerda" sozinho em árabe ou hebraico</td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque o valor do <code>text-align</code> no <code>style.css</code> por <code>left</code>, <code>right</code> e <code>justify</code>, e veja o parágrafo mudar ao vivo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;p&gt;Bata no liquidificador as cenouras, os ovos e o óleo. Despeje numa tigela, junte o açúcar e a farinha e misture bem. Asse por 40 minutos em forno médio.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">p {
+  text-align: center;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Ele alinha o conteúdo, não a caixa</h2>
+<p>Esta é a ideia mais importante da aula. Um parágrafo ou um título é uma caixa que ocupa <strong>toda a largura</strong> disponível (são elementos de bloco). O <code>text-align</code> não move essa caixa: ele move as linhas <strong>dentro</strong> dela. Veja com uma caixa colorida de 300 pixels de largura:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .caixa {
+    width: 300px;
+    background-color: lightblue;
+    text-align: center;
+  }
+&lt;/style&gt;
+&lt;div class="caixa"&gt;Bolo de fubá&lt;/div&gt;
+</pre>
+
+<p>O texto "Bolo de fubá" ficou no meio da <strong>caixa azul</strong>, mas a caixa continuou encostada à esquerda da página. Para mover a <strong>caixa</strong> em si, o caminho é outro: margens automáticas (<code>margin-inline: auto</code>, aula <a href="margin.html">Margem</a>) ou o Flexbox (aula <a href="centralizar.html">Centralizando Qualquer Coisa</a>).</p>
+
+<h3>Imagens também são "livros"</h3>
+<p>Uma <code>&lt;img&gt;</code> fica <strong>no meio do texto</strong>, como uma palavra grande (ela é um elemento em linha). Por isso o <code>text-align</code> do <strong>pai</strong> a move. Para centralizar uma foto, ponha o alinhamento no parágrafo que a contém, e não na imagem:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .foto {
+    text-align: center;
+  }
+&lt;/style&gt;
+&lt;p class="foto"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="200" height="150"&gt;
+&lt;/p&gt;
+</pre>
+
+<hr>
+
+<h2>4. A herança: um alinhamento para vários filhos</h2>
+<p>O <code>text-align</code> é <strong>herdado</strong>: o que você põe num elemento vale também para tudo o que está dentro dele, até alguém dizer outra coisa (aula <a href="heranca.html">Herança</a>). Um único <code>text-align</code> no <code>&lt;article&gt;</code> centraliza o título e o parágrafo do cartão:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .cartao {
+    text-align: center;
+  }
+&lt;/style&gt;
+&lt;article class="cartao"&gt;
+  &lt;h2&gt;Bolo de fubá&lt;/h2&gt;
+  &lt;p&gt;Fofinho, com erva-doce.&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+
+<p>No F12, na aba <strong>Computed</strong> (Calculado) do <code>&lt;p&gt;</code>, o <code>text-align</code> aparece como <code>center</code>, embora nenhuma regra fale do <code>p</code>: o valor veio do pai. Isso também vale para as metas das missões deste guia, que leem o valor calculado.</p>
+
+<p>Para um filho voltar ao normal, dê a ele o próprio <code>text-align</code>: a regra do filho vence o valor herdado.</p>
+
+<div class="tryhtml" data-goal="css:.cartao h2{text-align}=center,css:.cartao .preco{text-align}=right">
+<p class="try-task"><strong>Missão:</strong> no cartão da lojinha, centralize o título e encoste o preço à direita. Dica: o título pode herdar do <code>.cartao</code>, e o <code>.preco</code> precisa de uma regra própria.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="cartao"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Com cobertura de chocolate. Serve 12 fatias.&lt;/p&gt;
+  &lt;p class="preco"&gt;R$ 45,00&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  width: 260px;
+  border: 1px solid gray;
+  padding: 8px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  width: 260px;
+  border: 1px solid gray;
+  padding: 8px;
+  text-align: center;
+}
+
+.preco {
+  text-align: right;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>5. <code>start</code> e <code>end</code>: o começo e o fim da linha</h2>
+<p>Em português, a gente lê da esquerda para a direita. Em árabe e em hebraico, da direita para a esquerda. O valor inicial do <code>text-align</code> não é <code>left</code>: é <code>start</code>, "o começo da linha", seja ele de que lado for. O atributo <code>dir="rtl"</code> do HTML (<em>right to left</em>, "da direita para a esquerda") troca o lado:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  p {
+    border: 1px solid gray;
+  }
+&lt;/style&gt;
+&lt;p&gt;Receitas da Ana&lt;/p&gt;
+&lt;p dir="rtl"&gt;Receitas da Ana&lt;/p&gt;
+</pre>
+
+<p>Os dois parágrafos têm <code>text-align: start</code> (ninguém escreveu nada), mas o segundo encostou à direita: lá, o começo da linha é a direita. Se você escrever <code>left</code>, o texto fica à esquerda nas duas línguas; com <code>start</code> e <code>end</code>, o alinhamento acompanha a língua. Num site só em português, <code>left</code>/<code>right</code> e <code>start</code>/<code>end</code> dão o mesmo resultado; a aula <a href="propriedades-logicas.html">Propriedades Lógicas</a> aprofunda essa ideia.</p>
+
+<hr>
+
+<h2>6. Justificado e centralizado: com moderação</h2>
+<p>O <code>justify</code> deixa a página com cara de livro, mas numa coluna estreita ele abre <strong>buracos</strong> entre as palavras, porque o navegador estica só os espaços (por padrão, ele não divide palavras com hífen). Os buracos que se alinham de uma linha para outra formam "rios" brancos que atrapalham a leitura, principalmente para quem tem dislexia:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  p {
+    width: 220px;
+    border: 1px solid gray;
+    text-align: justify;
+  }
+&lt;/style&gt;
+&lt;p&gt;Misture os ovos, o açúcar e o óleo no liquidificador. Junte a cenoura ralada e bata até virar um creme liso e alaranjado.&lt;/p&gt;
+</pre>
+
+<p>Já o <code>center</code> num texto longo faz cada linha começar num ponto diferente, e o olho perde tempo procurando o início da próxima. A recomendação de acessibilidade (WCAG) é não justificar blocos de texto. Na prática:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Qual usar</th></tr>
+<tr><td>Parágrafos de texto corrido</td><td>O padrão (<code>start</code>): não escreva nada</td></tr>
+<tr><td>Título curto, chamada, botão, rodapé</td><td><code>center</code></td></tr>
+<tr><td>Preço, número, data no canto</td><td><code>right</code> (ou <code>end</code>)</td></tr>
+<tr><td>Coluna larga que precisa parecer impressa</td><td><code>justify</code>, e confira se não abriu buracos</td></tr>
+<tr><td>Centralizar a <strong>caixa</strong> (um cartão, um bloco com largura)</td><td>Não é <code>text-align</code>: <code>margin-inline: auto</code> ou Flexbox</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Um valor que não existe: <code>text-align: middle</code></strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  h1 {
+    text-align: middle;
+  }
+&lt;/style&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> o título continua encostado à esquerda, como se a regra não existisse. Nenhuma mensagem aparece na página.</p>
+<p><strong>Por quê:</strong> <code>middle</code> ("meio") não é um valor do <code>text-align</code> (ele existe em outra propriedade, a <code>vertical-align</code>). O navegador <strong>ignora</strong> a declaração inteira e fica com o valor que já valia, <code>start</code>. No F12, no painel <strong>Styles</strong> (Estilos), a declaração aparece riscada, com um ícone de aviso ao lado. O mesmo acontece com <code>centre</code> (a grafia britânica) e <code>centro</code>.</p>
+<p><strong>O que o validador diz</strong>, num <code>style.css</code> com os dois erros:</p>
+<pre class="term" data-cwd="~/site">$ cat style.css
+h1 {
+  text-align: middle;
+}
+p {
+  text-align: centre;
+}
+$ vnu --css style.css
+"file:/home/ana/site/style.css":2.15-2.20: error: CSS: “text-align”: “middle” is not a “text-align” value.
+"file:/home/ana/site/style.css":5.15-5.20: error: CSS: “text-align”: “centre” is not a “text-align” value.</pre>
+<p>"<code>middle</code> não é um valor de <code>text-align</code>", na linha 2, coluna 15, e o mesmo para <code>centre</code> na linha 5.</p>
+<p><strong>Como consertar:</strong> <code>text-align: center;</code>, com a grafia americana.</p>
+</div>
+
+<div class="cenario">
+<strong><code>text-align</code> num <code>&lt;span&gt;</code>: nada acontece</strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  .aviso {
+    text-align: center;
+    background-color: lightyellow;
+  }
+&lt;/style&gt;
+&lt;p&gt;&lt;span class="aviso"&gt;Promoção de hoje&lt;/span&gt;&lt;/p&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> o fundo amarelo aparece (a regra funciona), mas "Promoção de hoje" continua à esquerda.</p>
+<p><strong>Por quê:</strong> o <code>&lt;span&gt;</code> é um elemento em linha: a caixa dele tem só o tamanho das palavras, então não sobra espaço para elas se moverem lá dentro. O <code>text-align</code> só tem efeito numa caixa de bloco, que tem largura própria. O F12 até mostra <code>center</code> na aba Computed do span, mas não há para onde mover. O validador não reclama: a declaração é válida.</p>
+<p><strong>Como consertar:</strong> ponha o <code>text-align</code> no pai, o <code>&lt;p&gt;</code>, que é a "prateleira" de verdade.</p>
+</div>
+
+<div class="cenario">
+<strong>Queria centralizar a caixa, e só o texto foi</strong>
+<p>A Ana quer um cartão de 300 pixels no meio da página e escreve <code>text-align: center</code> no cartão. Como você viu na seção 3, o texto vai para o meio do cartão, mas o cartão fica à esquerda. O validador não reclama, porque não há erro: é a propriedade errada para o que ela quer.</p>
+<p><strong>Como consertar:</strong> para mover a caixa, <code>margin-inline: auto;</code> no próprio cartão (aula <a href="margin.html">Margem</a>), ou <code>display: flex; justify-content: center;</code> no pai (aula <a href="centralizar.html">Centralizando Qualquer Coisa</a>).</p>
+</div>
+
+<div class="cenario">
+<strong>Esperava que o texto fosse para o meio na vertical</strong>
+<p>O <code>text-align</code> só trabalha na <strong>horizontal</strong>, ao longo da linha. Numa caixa alta, <code>text-align: center</code> põe o texto no meio da largura, mas ele continua lá em cima. Centralizar na vertical é trabalho do Flexbox ou do Grid (aula <a href="centralizar.html">Centralizando Qualquer Coisa</a>).</p>
+</div>
+
+<div class="tryhtml" data-goal="css:p{text-align}=center,nsrc:middle">
+<p class="try-task"><strong>Missão:</strong> o rodapé da Ana deveria estar centralizado, mas continua à esquerda. Descubra o erro no <code>style.css</code> e conserte.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;footer&gt;
+  &lt;p&gt;Receitas da Ana · desde 2024&lt;/p&gt;
+&lt;/footer&gt;
+</pre>
+<pre class="script" data-file="style.css">footer {
+  text-align: middle;
+}
+</pre>
+<pre class="solucao" data-file="style.css">footer {
+  text-align: center;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>text-align: start;</code></td><td>Valor inicial: encosta no começo da linha (à esquerda em português)</td></tr>
+<tr><td><code>text-align: left;</code></td><td>Encosta à esquerda, em qualquer língua</td></tr>
+<tr><td><code>text-align: center;</code></td><td>Cada linha no meio da caixa</td></tr>
+<tr><td><code>text-align: right;</code></td><td>Encosta à direita, em qualquer língua</td></tr>
+<tr><td><code>text-align: end;</code></td><td>Encosta no fim da linha (à direita em português)</td></tr>
+<tr><td><code>text-align: justify;</code></td><td>Linhas cheias encostam nas duas bordas; a última fica no começo</td></tr>
+<tr><td>Herança</td><td>Sim: os filhos recebem o alinhamento do pai</td></tr>
+<tr><td>Vale em</td><td>Caixas de bloco (<code>p</code>, <code>h1</code>, <code>div</code>, <code>li</code>…); move o texto e as imagens dentro delas</td></tr>
+<tr><td>Não faz</td><td>Mover a caixa; alinhar na vertical; ter efeito num <code>span</code> sozinho</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Centralizar o título</h3>
+<p>Complete a declaração:</p>
+<div class="ex-code">h1 { text-align: <input data-answer="center" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. O preço à direita</h3>
+<p>Complete para encostar o preço à direita:</p>
+<div class="ex-code">.preco { <input data-answer="text-align" aria-label="propriedade">: right; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. As duas bordas retas</h3>
+<p>Qual valor deixa as linhas cheias encostadas nas duas bordas?</p>
+<div class="ex-code">p { text-align: <input data-answer="justify" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. A Ana escreveu <code>.cartao { width: 300px; text-align: center; }</code>. O que acontece?</p>
+<label><input type="radio" name="q4"> O cartão vai para o meio da página</label>
+<label><input type="radio" name="q4"> O texto vai para o meio do cartão, e o cartão fica à esquerda</label>
+<label><input type="radio" name="q4"> Nada: <code>text-align</code> não funciona em <code>div</code></label>
+<label><input type="radio" name="q4"> O texto e o cartão vão para o meio</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Para centralizar uma <code>&lt;img&gt;</code> que está sozinha dentro de um <code>&lt;p&gt;</code>, onde vai o <code>text-align: center</code>?</p>
+<label><input type="radio" name="q5"> Na <code>img</code></label>
+<label><input type="radio" name="q5"> No atributo <code>alt</code></label>
+<label><input type="radio" name="q5"> No <code>p</code>, o pai da imagem</label>
+<label><input type="radio" name="q5"> Em lugar nenhum: imagem não se centraliza</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. O que o navegador faz com <code>text-align: middle;</code>?</p>
+<label><input type="radio" name="q6"> Ignora a declaração e mantém o alinhamento que já valia</label>
+<label><input type="radio" name="q6"> Centraliza o texto, porque <code>middle</code> quer dizer "meio"</label>
+<label><input type="radio" name="q6"> Mostra uma mensagem de erro na página</label>
+<label><input type="radio" name="q6"> Para de ler o resto do arquivo CSS</label>
+</div>
+
+<h3>Missão final: o cardápio da padaria</h3>
+
+<div class="tryhtml" data-goal="css:h1{text-align}=center,css:.foto{text-align}=center,css:.preco{text-align}=right,css:footer p{text-align}=center,nsrc:justify">
+<p class="try-task"><strong>Missão:</strong> arrume o cardápio. (1) Centralize o título. (2) Centralize a foto do bolo (lembre: o alinhamento vai no pai dela, o parágrafo <code>.foto</code>). (3) Encoste os preços à direita. (4) Centralize o rodapé com <strong>uma</strong> regra no <code>footer</code>, deixando a herança levar o alinhamento até o parágrafo. Deixe o texto da descrição no alinhamento padrão, sem <code>justify</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;p class="foto"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="200" height="150"&gt;
+&lt;/p&gt;
+&lt;p&gt;Tudo feito no dia, com ingredientes da feira do bairro.&lt;/p&gt;
+&lt;p class="preco"&gt;Bolo de cenoura: R$ 45,00&lt;/p&gt;
+&lt;p class="preco"&gt;Pão de queijo (6): R$ 12,00&lt;/p&gt;
+&lt;footer&gt;
+  &lt;p&gt;Rua das Flores, 120 · aberto de terça a domingo&lt;/p&gt;
+&lt;/footer&gt;
+</pre>
+<pre class="script" data-file="style.css">p {
+  text-align: justify;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  text-align: center;
+}
+
+.foto {
+  text-align: center;
+}
+
+.preco {
+  text-align: right;
+}
+
+footer {
+  text-align: center;
+}
+</pre>
+</div>
+
+<p>Repare: na solução, o <code>footer p</code> não tem regra nenhuma, e mesmo assim a meta confere <code>center</code> nele. É a herança trabalhando.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>text-align</code> arruma as linhas <strong>dentro</strong> da caixa de um elemento de bloco: <code>left</code>, <code>center</code>, <code>right</code>, <code>justify</code>, <code>start</code> (o valor inicial) e <code>end</code>.</li>
+  <li>Ele move o texto e as imagens do conteúdo, nunca a própria caixa. Para centralizar a caixa, use <code>margin-inline: auto</code> ou Flexbox; para a vertical, Flexbox ou Grid.</li>
+  <li>É herdado: um <code>text-align</code> no pai vale para todos os filhos, até um deles ter a própria regra.</li>
+  <li>Para centralizar uma imagem, ponha <code>text-align: center</code> no pai dela.</li>
+  <li><code>start</code>/<code>end</code> acompanham a direção da língua; <code>left</code>/<code>right</code>, não.</li>
+  <li>Texto corrido: deixe no padrão. <code>center</code> para trechos curtos; <code>justify</code> com cuidado, porque abre buracos em colunas estreitas.</li>
+  <li>Valor inventado (<code>middle</code>, <code>centre</code>) é ignorado em silêncio; o validador avisa: <code>“middle” is not a “text-align” value</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
