@@ -60,7 +60,7 @@
   @layer componentes {
     .botao {
       color: white;
-      background-color: tomato;
+      background-color: firebrick;
     }
   }
 &lt;/style&gt;
@@ -70,7 +70,7 @@
 &lt;/nav&gt;
 </pre>
 
-<p>"Bolos" é um link azul-marinho com fundo cinza-claro. "Encomendar" tem o mesmo espaço interno e não tem sublinhado (isso veio da camada <code>base</code>), mas o texto é branco e o fundo é <code>tomato</code>: as cores vieram da camada <code>componentes</code>, mesmo com a regra <code>nav#menu a</code>, com ID, sendo muito mais específica que <code>.botao</code>.</p>
+<p>"Bolos" é um link azul-marinho com fundo cinza-claro. "Encomendar" tem o mesmo espaço interno e não tem sublinhado (isso veio da camada <code>base</code>), mas o texto é branco e o fundo é <code>firebrick</code>: as cores vieram da camada <code>componentes</code>, mesmo com a regra <code>nav#menu a</code>, com ID, sendo muito mais específica que <code>.botao</code>.</p>
 
 <dl class="anatomy">
   <dt>@layer</dt><dd>Uma <strong>regra @</strong> ("at-rule"), como a <code>@media</code>: começa com arroba e envolve outras regras. <em>Layer</em> = "camada".</dd>
@@ -90,7 +90,7 @@
 
 @layer componentes {
   .botao {
-    background-color: tomato;
+    background-color: firebrick;
   }
 }
 
@@ -108,12 +108,12 @@
 </pre>
 
 <dl class="anatomy">
-  <dt>@layer reset, base, componentes;</dt><dd>A <strong>declaração da ordem</strong>: os nomes, separados por vírgula, de baixo para cima na pilha. Termina com <code>;</code>, sem chaves. Daqui em diante, <code>componentes</code> vence <code>base</code>, que vence <code>reset</code>.</dd>
-  <dt>@layer componentes { … } (antes dos outros)</dt><dd>Depois da linha da ordem, os blocos podem vir em qualquer sequência no arquivo, e uma camada pode ganhar regras em vários blocos: tudo é somado na camada, e a ordem da pilha não muda.</dd>
+  <dt>@layer reset, base, …;</dt><dd>A <strong>declaração da ordem</strong> (<code>@layer reset, base, componentes;</code>): os nomes, separados por vírgula, de baixo para cima na pilha. Termina com <code>;</code>, sem chaves. Daqui em diante, <code>componentes</code> vence <code>base</code>, que vence <code>reset</code>.</dd>
+  <dt>@layer componentes { … }</dt><dd>Depois da linha da ordem, os blocos podem vir em qualquer sequência no arquivo, e uma camada pode ganhar regras em vários blocos: tudo é somado na camada, e a ordem da pilha não muda.</dd>
 </dl>
 
-<div class="tryhtml" data-goal="css:.botao{background-color}=rgb(255, 99, 71)">
-<p class="try-task"><strong>Missão:</strong> o botão deveria ficar <code>tomato</code>, mas a camada <code>base</code> está ganhando. Sem mexer nos seletores nem nos blocos, mude só a <strong>linha da ordem</strong>.</p>
+<div class="tryhtml" data-goal="css:.botao{background-color}=rgb(178, 34, 34)">
+<p class="try-task"><strong>Missão:</strong> o botão deveria ficar <code>firebrick</code>, mas a camada <code>base</code> está ganhando. Sem mexer nos seletores nem nos blocos, mude só a <strong>linha da ordem</strong>.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;main&gt;
   &lt;button class="botao" type="button"&gt;Encomendar bolo&lt;/button&gt;
@@ -130,7 +130,7 @@
 
 @layer componentes {
   .botao {
-    background-color: tomato;
+    background-color: firebrick;
     color: white;
   }
 }
@@ -146,7 +146,7 @@
 
 @layer componentes {
   .botao {
-    background-color: tomato;
+    background-color: firebrick;
     color: white;
   }
 }
@@ -170,7 +170,7 @@
 
 <pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
   p {
-    color: tomato;
+    color: firebrick;
   }
 
   @layer base {
@@ -182,7 +182,7 @@
 &lt;p id="aviso" class="destaque"&gt;Encomendas até sexta-feira.&lt;/p&gt;
 </pre>
 
-<p>O texto ficou <code>tomato</code>. A regra <code>#aviso.destaque</code> tem um ID e uma classe, e veio depois; mas está numa camada, e o simples <code>p</code>, fora de camada, está acima dela.</p>
+<p>O texto ficou <code>firebrick</code>. A regra <code>#aviso.destaque</code> tem um ID e uma classe, e veio depois; mas está numa camada, e o simples <code>p</code>, fora de camada, está acima dela.</p>
 
 <p>Isso parece estranho, mas é de propósito: você pode pôr o CSS de outra pessoa (um framework, um tema baixado) numa camada, e o <strong>seu</strong> CSS, sem camada, vence o dele sem precisar de seletores compridos. A ordem completa, de quem perde para quem vence:</p>
 
@@ -211,7 +211,7 @@
   }
 
   .aviso {
-    color: tomato !important;
+    color: firebrick !important;
   }
 &lt;/style&gt;
 &lt;p class="aviso"&gt;Loja fechada no feriado.&lt;/p&gt;
@@ -238,7 +238,7 @@
 <pre class="file" data-file="style.css">@layer componentes {
   @layer botoes {
     .botao {
-      background-color: tomato;
+      background-color: firebrick;
     }
   }
 }
@@ -406,8 +406,8 @@
 
 <h3>Missão final: adeus, !important</h3>
 
-<div class="tryhtml" data-goal="css:.botao{background-color}=rgb(255, 99, 71),css:.botao{color}=rgb(255, 255, 255),src:@layer\s+reset\s*\,\s*base\s*\,\s*componentes\s*;,nsrc:!important">
-<p class="try-task"><strong>Missão:</strong> o botão só fica <code>tomato</code> por causa de dois <code>!important</code>. Organize o CSS em camadas: (1) na primeira linha, <code>@layer reset, base, componentes;</code>; (2) a regra do <code>*</code> na camada <code>reset</code>, a do <code>nav a</code> na <code>base</code> e a do <code>.botao</code> na <code>componentes</code>; (3) tire os <code>!important</code>. O botão tem de continuar branco com fundo <code>tomato</code>.</p>
+<div class="tryhtml" data-goal="css:.botao{background-color}=rgb(178, 34, 34),css:.botao{color}=rgb(255, 255, 255),src:@layer\s+reset\s*\,\s*base\s*\,\s*componentes\s*;,nsrc:!important">
+<p class="try-task"><strong>Missão:</strong> o botão só fica <code>firebrick</code> por causa de dois <code>!important</code>. Organize o CSS em camadas: (1) na primeira linha, <code>@layer reset, base, componentes;</code>; (2) a regra do <code>*</code> na camada <code>reset</code>, a do <code>nav a</code> na <code>base</code> e a do <code>.botao</code> na <code>componentes</code>; (3) tire os <code>!important</code>. O botão tem de continuar branco com fundo <code>firebrick</code>.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;nav&gt;
   &lt;a href="#"&gt;Bolos&lt;/a&gt;
@@ -430,7 +430,7 @@ nav a {
 
 .botao {
   color: white !important;
-  background-color: tomato !important;
+  background-color: firebrick !important;
   border-radius: 8px;
 }
 </pre>
@@ -456,7 +456,7 @@ nav a {
 @layer componentes {
   .botao {
     color: white;
-    background-color: tomato;
+    background-color: firebrick;
     border-radius: 8px;
   }
 }
