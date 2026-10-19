@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS min(), max() e clamp() — tamanhos com limites | Guia CSS</title>
+<meta name="description" content="As funções min(), max() e clamp() do CSS para quem está começando: larguras que encolhem até um limite, fontes fluidas que nunca ficam pequenas nem grandes demais, contas dentro do clamp, acessibilidade, e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">min(), max() e clamp()</span></h1>
+
+<p class="intro">Um título de 48 pixels fica lindo no computador e enorme no celular. Com <code>vw</code>, ele acompanha a tela, mas fica minúsculo num celular e gigante num monitor largo. As funções <code>min()</code>, <code>max()</code> e <code>clamp()</code> resolvem isso: elas deixam o tamanho <strong>acompanhar a tela, dentro de limites</strong> que você escolhe. Nesta aula você vai usá-las no site da Ana, sem uma única media query.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Como mudar a largura do quadro do editor para ver o mesmo código num celular e num tablet.</li>
+  <li><code>min()</code>: o menor de dois valores (e por que ele cria um <strong>máximo</strong>).</li>
+  <li><code>max()</code>: o maior de dois valores (e por que ele cria um <strong>mínimo</strong>).</li>
+  <li><code>clamp(MÍNIMO, IDEAL, MÁXIMO)</code>: um tamanho fluido com piso e teto.</li>
+  <li>Contas dentro das funções (<code>1rem + 2vw</code>) e o cuidado com o zoom.</li>
+  <li>Quando usar cada uma, e quando uma media query é melhor.</li>
+  <li>Os erros reais do validador W3C.</li>
+</ul>
+</div>
+
+<hr>
+
+<h2>A ideia: "a gosto, mas entre 1 e 3 colheres"</h2>
+<p>A receita do café da Ana diz: "açúcar a gosto, <strong>no mínimo</strong> 1 colher e <strong>no máximo</strong> 3". Cada pessoa põe o quanto quiser, mas ninguém passa dos limites. Quem pede 5 colheres leva 3; quem pede meia, leva 1.</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Na receita</th><th>No CSS</th></tr>
+<tr><td>"No máximo 3 colheres"</td><td><code>min(a-gosto, 3)</code>: fica com o <strong>menor</strong>, então nunca passa de 3</td></tr>
+<tr><td>"No mínimo 1 colher"</td><td><code>max(1, a-gosto)</code>: fica com o <strong>maior</strong>, então nunca é menos de 1</td></tr>
+<tr><td>"A gosto, entre 1 e 3"</td><td><code>clamp(1, a-gosto, 3)</code>: os dois limites de uma vez</td></tr>
+</table>
+</div>
+<p>No CSS, o "a gosto" costuma ser uma medida que muda com a tela: uma porcentagem (<code>100%</code>) ou uma unidade de tela (<code>5vw</code> = 5% da largura da janela, aula <a href="unidades-viewport.html">Unidades da Tela</a>).</p>
+
+<hr>
+
+<h2>1. Antes: a largura do quadro</h2>
+<p>Como o resultado destas funções depende da largura da tela, os exemplos desta aula começam com o quadro do editor numa largura de celular, <strong>375 pixels</strong>. Na barra do quadro há três botões:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Botão</th><th>A página do quadro "pensa" que está…</th></tr>
+<tr><td><strong>375</strong></td><td>num celular: a janela tem 375 pixels de largura</td></tr>
+<tr><td><strong>768</strong></td><td>num tablet: 768 pixels</td></tr>
+<tr><td><strong>cheia</strong></td><td>numa janela da largura toda da caixa (depende da sua tela)</td></tr>
+</table>
+</div>
+<p>Ao lado dos botões, o editor mostra a largura que a página do quadro enxerga. Para ela, essa é a largura da janela: <code>100vw</code> vale exatamente isso, e uma media query responderia a ela.</p>
+
+<hr>
+
+<h2>2. <code>min()</code>: o menor valor</h2>
+<p>A Ana quer o cartão da receita com a largura da tela no celular, mas sem passar de 500 pixels numa tela larga (uma linha de texto muito comprida cansa a leitura):</p>
+
+<div class="tryhtml" data-largura="375">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Bata a cenoura com os ovos e o óleo, junte o açúcar e a farinha e asse por 40 minutos.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  width: min(100%, 500px);
+  padding: 12px;
+  background-color: lightyellow;
+  border: 2px solid orange;
+  box-sizing: border-box;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>min(</dt><dd>A função. O navegador calcula cada valor da lista e fica com o <strong>menor</strong>.</dd>
+  <dt>100%</dt><dd>O primeiro valor: a largura toda do pai (aqui, o <code>&lt;body&gt;</code>).</dd>
+  <dt>,</dt><dd>A vírgula separa os valores. Pode haver mais de dois: <code>min(100%, 500px, 40rem)</code>.</dd>
+  <dt>500px)</dt><dd>O segundo valor, e o parêntese que fecha a função.</dd>
+</dl>
+
+<p>Clique em <strong>375</strong>, <strong>768</strong> e <strong>cheia</strong> e veja o cartão. Os valores calculados, conferidos no Chromium:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quadro</th><th><code>100%</code> vale</th><th><code>500px</code></th><th>O menor (a largura do cartão)</th></tr>
+<tr><td>375 px</td><td>359px (375 menos as margens de 8px do <code>body</code>)</td><td>500px</td><td><strong>359px</strong>: o cartão ocupa a tela toda</td></tr>
+<tr><td>768 px</td><td>752px</td><td>500px</td><td><strong>500px</strong>: o limite</td></tr>
+</table>
+</div>
+
+<div class="warning">
+<strong>A pegadinha do nome</strong>
+<p><code>min()</code> escolhe o menor, então o segundo valor funciona como um <strong>máximo</strong>: "no máximo 500px". E <code>max()</code>, ao contrário, cria um <strong>mínimo</strong>. Quase todo mundo troca os dois no começo. Leia assim: <code>min(100%, 500px)</code> = "100%, mas nunca mais que 500px".</p>
+</div>
+
+<p><code>width: min(100%, 500px)</code> faz o mesmo que duas declarações que você já conhece: <code>width: 100%;</code> e <code>max-width: 500px;</code>. As duas formas funcionam; a função cabe numa linha só e funciona em qualquer propriedade que aceite um tamanho.</p>
+
+<hr>
+
+<h2>3. <code>max()</code>: o maior valor</h2>
+<p>Agora o contrário: o subtítulo cresce com a tela (<code>4vw</code>), mas a Ana não quer que ele fique <strong>menor</strong> que <code>1.25rem</code> (20 pixels) num celular:</p>
+
+<div class="tryhtml" data-largura="375">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Bolos da semana&lt;/h2&gt;
+&lt;p&gt;Cenoura, fubá e chocolate.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h2 {
+  font-size: max(1.25rem, 4vw);
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quadro</th><th><code>1.25rem</code></th><th><code>4vw</code></th><th>O maior (o tamanho da letra)</th></tr>
+<tr><td>375 px</td><td>20px</td><td>15px</td><td><strong>20px</strong>: o piso segurou</td></tr>
+<tr><td>768 px</td><td>20px</td><td>30.72px</td><td><strong>30.72px</strong>: acompanha a tela</td></tr>
+<tr><td>1000 px</td><td>20px</td><td>40px</td><td><strong>40px</strong>: e continua crescendo</td></tr>
+</table>
+</div>
+
+<p>Repare na última linha: <code>max()</code> tem piso, mas <strong>não tem teto</strong>. Num monitor bem largo, o subtítulo fica enorme. Para ter os dois limites, existe o <code>clamp()</code>.</p>
+
+<hr>
+
+<h2>4. <code>clamp()</code>: piso, ideal e teto</h2>
+<p><code>clamp</code> quer dizer "prender", como um grampo que segura uma peça entre duas pontas. Ele recebe sempre <strong>três</strong> valores:</p>
+
+<pre class="file" data-file="style.css">h1 {
+  font-size: clamp(1.5rem, 6vw, 3rem);
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>1.5rem</dt><dd>O <strong>mínimo</strong> (24 pixels): o título nunca fica menor que isso.</dd>
+  <dt>6vw</dt><dd>O <strong>ideal</strong>: 6% da largura da janela. É o valor usado enquanto ele estiver entre os limites.</dd>
+  <dt>3rem</dt><dd>O <strong>máximo</strong> (48 pixels): o título nunca fica maior que isso.</dd>
+</dl>
+
+<div class="tryhtml" data-largura="375">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Clique em 375, 768 e cheia e veja o título mudar.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  font-size: clamp(1.5rem, 6vw, 3rem);
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quadro</th><th><code>6vw</code> vale</th><th>Tamanho calculado</th><th>Quem venceu</th></tr>
+<tr><td>375 px</td><td>22.5px</td><td><strong>24px</strong></td><td>o mínimo</td></tr>
+<tr><td>768 px</td><td>46.08px</td><td><strong>46.08px</strong></td><td>o ideal</td></tr>
+<tr><td>1000 px</td><td>60px</td><td><strong>48px</strong></td><td>o máximo</td></tr>
+</table>
+</div>
+
+<p>Entre um extremo e outro, o título cresce <strong>suavemente</strong>, pixel a pixel, conforme a janela alarga. É o que se chama de <strong>tipografia fluida</strong>. Por dentro, <code>clamp(MIN, IDEAL, MAX)</code> é o mesmo que <code>max(MIN, min(IDEAL, MAX))</code>, só que mais fácil de ler.</p>
+
+<div class="tryhtml" data-largura="375" data-goal="css:h1{font-size}=24px,src:clamp\(">
+<p class="try-task"><strong>Missão:</strong> no celular (375), o título com <code>6vw</code> ficou com só 22.5 pixels. Troque o valor por um <code>clamp()</code> que nunca deixe o título menor que <code>1.5rem</code> nem maior que <code>3rem</code>, usando <code>6vw</code> como ideal. Depois clique em 768 e em cheia para ver ele crescer.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Cardápio da Padaria&lt;/h1&gt;
+&lt;p&gt;Pão francês, pão de queijo e sonho.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  font-size: 6vw;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  font-size: clamp(1.5rem, 6vw, 3rem);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>5. Contas dentro das funções</h2>
+<p>Os valores de <code>min()</code>, <code>max()</code> e <code>clamp()</code> podem ser <strong>contas</strong>, sem precisar de <code>calc()</code> (aula <a href="calc.html">Contas com calc()</a>):</p>
+
+<pre class="file" data-file="style.css">p {
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+}
+</pre>
+
+<p>O ideal agora é "<code>0.9rem</code> e mais meio por cento da tela". Duas regras para as contas:</p>
+<ul>
+  <li>O <code>+</code> e o <code>-</code> precisam de <strong>espaço dos dois lados</strong>: <code>0.9rem + 0.5vw</code>. Grudado (<code>0.9rem+0.5vw</code>), a declaração inteira é ignorada (veja <a href="#errado">Quando dá errado</a>).</li>
+  <li>Pode misturar unidades diferentes (<code>rem</code> com <code>vw</code>, <code>%</code> com <code>px</code>): é para isso que as funções existem. O navegador resolve a conta na hora de desenhar.</li>
+</ul>
+
+<div class="tip">
+<strong>Acessibilidade: misture <code>rem</code> no ideal</strong>
+<p>Muita gente aumenta a letra do navegador nas configurações, ou dá zoom (<kbd>Ctrl</kbd> e <kbd>+</kbd>). Um tamanho só em <code>vw</code> depende apenas da largura da janela: com o zoom, a janela "encolhe" em pixels do CSS, e o <code>vw</code> encolhe junto. Por isso um texto em <code>font-size: 5vw</code> não cresce com o zoom. Com <code>rem</code> no mínimo, no máximo e no ideal (<code>1rem + 2vw</code>), uma parte do tamanho sempre acompanha a preferência do leitor.</p>
+</div>
+
+<hr>
+
+<h2>6. Onde usar</h2>
+<p>As três funções valem em <strong>qualquer</strong> propriedade que aceite um número com unidade: <code>width</code>, <code>padding</code>, <code>margin</code>, <code>gap</code>, <code>font-size</code>, <code>border-radius</code>… Alguns usos comuns:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Para quê</th></tr>
+<tr><td><code>width: min(100%, 60rem);</code></td><td>O "miolo" da página: a tela toda no celular, no máximo 60rem no computador</td></tr>
+<tr><td><code>font-size: clamp(1.5rem, 1rem + 3vw, 3rem);</code></td><td>Título fluido</td></tr>
+<tr><td><code>padding: max(1rem, 4vw);</code></td><td>Respiro nas laterais que cresce com a tela, mas nunca some</td></tr>
+<tr><td><code>gap: clamp(8px, 2vw, 24px);</code></td><td>Espaço entre os cartões que acompanha a tela</td></tr>
+</table>
+</div>
+
+<div class="note">
+<strong>Funciona em todos os navegadores atuais</strong>
+<p><code>min()</code>, <code>max()</code> e <code>clamp()</code> funcionam no Chrome, Edge, Firefox e Safari desde 2020 (o MDN marca como "Baseline: amplamente disponível"). Pode usar sem medo.</p>
+</div>
+
+<hr>
+
+<h2>7. Funções ou media queries?</h2>
+<p>A mesma ideia, "título menor no celular", também sai com <a href="media-queries.html">media queries</a>:</p>
+
+<pre class="file" data-file="style.css">/* Com media query: em degraus */
+h1 {
+  font-size: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  h1 {
+    font-size: 3rem;
+  }
+}
+
+/* Com clamp: numa rampa */
+h1 {
+  font-size: clamp(1.5rem, 6vw, 3rem);
+}
+</pre>
+
+<p>A media query muda o tamanho de uma vez, num ponto (767 pixels: 24px; 768: 48px). O <code>clamp()</code> faz uma <strong>rampa</strong>: o tamanho passa por todos os valores entre os dois limites.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Use</th></tr>
+<tr><td>Um tamanho que deve crescer junto com a tela (títulos, espaços, larguras)</td><td><code>clamp()</code></td></tr>
+<tr><td>Só um teto (largura máxima)</td><td><code>min()</code>, ou <code>max-width</code></td></tr>
+<tr><td>Só um piso</td><td><code>max()</code>, ou <code>min-width</code></td></tr>
+<tr><td>Mudar o <strong>layout</strong> (uma coluna no celular, três no computador), esconder um menu</td><td>Media query (ou <a href="container-queries.html">container query</a>): uma função só muda números</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Com as funções, quase todo erro tem o mesmo resultado: o navegador <strong>ignora a declaração inteira</strong>, e o elemento fica com o tamanho que teria sem ela. No F12, a declaração aparece <strong>riscada</strong>, com um ícone de aviso. O validador W3C mostra onde está o problema:</p>
+
+<pre class="file" data-file="ruim.css">h1 {
+  font-size: clamp(1.5rem 5vw 3rem);
+}
+h2 {
+  font-size: clamp(1.5rem, 5vw);
+}
+h3 {
+  font-size: clamp(24, 5vw, 48);
+}
+.caixa {
+  width: min(100%; 600px);
+}
+p {
+  font-size: clamp(1rem, 0.8rem+1vw, 1.25rem);
+}
+</pre>
+
+<pre class="term" data-cwd="~/site">$ vnu --css ruim.css
+"file:/home/ana/site/ruim.css":2.35-2.35: error: CSS: “font-size”: Parse Error.
+"file:/home/ana/site/ruim.css":5.31-5.31: error: CSS: “font-size”: Parse Error.
+"file:/home/ana/site/ruim.css":8.31-8.31: error: CSS: “font-size”: The types are incompatible.
+"file:/home/ana/site/ruim.css":11.14-11.17: error: CSS: “width”: Parse Error.
+"file:/home/ana/site/ruim.css":11.27-11.27: error: CSS: Parse Error.
+"file:/home/ana/site/ruim.css":12.2-12.2: error: CSS: Parse Error.
+"file:/home/ana/site/ruim.css":14.45-14.45: error: CSS: “font-size”: Parse Error.</pre>
+
+<p><em>Parse Error</em> é "erro de leitura": o validador não conseguiu entender o que está escrito. Ele aponta a linha e a coluna (<code>2.35</code> = linha 2, coluna 35), mas não diz o motivo. Os motivos, um por um:</p>
+
+<div class="cenario">
+<strong>Sem as vírgulas (linha 2)</strong>
+<p><code>clamp(1.5rem 5vw 3rem)</code>: os valores são separados por <strong>vírgula</strong>, e não por espaço. Sem elas, para o navegador é um valor só, que não faz sentido. O título fica com o tamanho padrão do <code>h1</code> (32 pixels), em qualquer largura.</p>
+<p><strong>Como consertar:</strong> <code>clamp(1.5rem, 5vw, 3rem)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Só dois valores no <code>clamp()</code> (linha 5)</strong>
+<p>O <code>clamp()</code> exige exatamente <strong>três</strong>: mínimo, ideal e máximo. Para só um piso, use <code>max(1.5rem, 5vw)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Número sem unidade: <code>The types are incompatible</code> (linha 8)</strong>
+<p>"Os tipos são incompatíveis": <code>24</code> é um número puro, e <code>5vw</code> é um tamanho. Não dá para comparar laranjas com quilos. Escreva <code>24px</code> (ou melhor, <code>1.5rem</code>).</p>
+</div>
+
+<div class="cenario">
+<strong>Ponto e vírgula no lugar da vírgula (linhas 11 e 12)</strong>
+<p>O <code>;</code> encerra a declaração no meio da função. O validador se perde e acusa três erros, inclusive na linha 12, onde não há nada de errado: ele ainda estava tentando entender a linha 11. Sempre que um erro aparecer numa linha "inocente", olhe a linha de cima.</p>
+</div>
+
+<div class="cenario">
+<strong><code>+</code> sem espaços (linha 14)</strong>
+<p><code>0.8rem+1vw</code> é lido como "<code>0.8rem</code>" seguido de "<code>+1vw</code>" (um número positivo), sem conta nenhuma no meio. Com espaços, <code>0.8rem + 1vw</code> funciona. O parágrafo fica com os 16 pixels padrão, conferido no Chromium.</p>
+</div>
+
+<div class="cenario">
+<strong>O mínimo maior que o máximo: o mínimo vence</strong>
+<pre class="file" data-file="style.css">.aviso {
+  font-size: clamp(3rem, 5vw, 1.5rem);
+}
+</pre>
+<p><strong>O que você vê:</strong> o texto fica com <strong>48 pixels</strong> (o <code>3rem</code>) em qualquer largura do quadro: 375, 768 ou 1000 (conferido no Chromium).</p>
+<p><strong>Por quê:</strong> a declaração é válida, então o validador não reclama. Quando os limites estão invertidos, a regra do CSS é que o <strong>primeiro</strong> valor, o mínimo, ganha sempre.</p>
+<p><strong>Como consertar:</strong> a ordem é sempre <code>clamp(MENOR, IDEAL, MAIOR)</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th><th>Lembrete</th></tr>
+<tr><td><code>min(A, B)</code></td><td>O menor dos valores</td><td>Cria um teto: "A, mas no máximo B"</td></tr>
+<tr><td><code>max(A, B)</code></td><td>O maior dos valores</td><td>Cria um piso: "A, mas no mínimo B"</td></tr>
+<tr><td><code>clamp(MIN, IDEAL, MAX)</code></td><td>O ideal, preso entre o mínimo e o máximo</td><td>Sempre três valores, na ordem menor → maior</td></tr>
+<tr><td><code>clamp(1rem, 0.9rem + 1vw, 2rem)</code></td><td>Conta no ideal, sem <code>calc()</code></td><td>Espaço dos dois lados do <code>+</code> e do <code>-</code></td></tr>
+<tr><td><code>min(100%, 500px, 40rem)</code></td><td>Mais de dois valores</td><td>Só <code>min()</code> e <code>max()</code>; o <code>clamp()</code> tem três fixos</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. No máximo 600 pixels</h3>
+<p>Complete para o miolo da página ter a largura toda, mas nunca mais que 600 pixels:</p>
+<div class="ex-code">main { width: <input data-answer="min" aria-label="função">(100%, 600px); }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Piso, ideal e teto</h3>
+<p>Complete a função que recebe os três valores:</p>
+<div class="ex-code">h1 { font-size: <input data-answer="clamp" aria-label="função">(1.5rem, 5vw, 3rem); }</div>
+</div>
+
+<div class="exercise">
+<h3>3. A conta</h3>
+<p>Complete o sinal da conta, lembrando os espaços: <code>clamp(1rem, 0.9rem <input data-answer="+" aria-label="sinal" size="2"> 1vw, 1.5rem)</code></p>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Com o quadro em 375 pixels (<code>4vw</code> = 15px), quanto vale <code>font-size: max(1.25rem, 4vw)</code>?</p>
+<label><input type="radio" name="q4"> 15px</label>
+<label><input type="radio" name="q4"> 20px</label>
+<label><input type="radio" name="q4"> 35px</label>
+<label><input type="radio" name="q4"> A declaração é ignorada</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. O que acontece com <code>font-size: clamp(1rem 4vw 2rem);</code>?</p>
+<label><input type="radio" name="q5"> O texto fica com 1rem</label>
+<label><input type="radio" name="q5"> O texto fica com 2rem</label>
+<label><input type="radio" name="q5"> A declaração é ignorada: faltam as vírgulas</label>
+<label><input type="radio" name="q5"> O navegador usa 4vw</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. A Ana quer trocar o layout de uma coluna para três colunas em telas largas. O que ela usa?</p>
+<label><input type="radio" name="q6"> Uma media query (ou container query)</label>
+<label><input type="radio" name="q6"> <code>clamp()</code></label>
+<label><input type="radio" name="q6"> <code>min()</code></label>
+<label><input type="radio" name="q6"> <code>max()</code></label>
+</div>
+
+<h3>Missão final: a página fluida da padaria</h3>
+
+<div class="tryhtml" data-largura="768" data-goal="css:.miolo{width}=600px,css:h1{font-size}=48px,src:min\(,src:clamp\(">
+<p class="try-task"><strong>Missão:</strong> o quadro está em 768 (um tablet). (1) Dê ao <code>.miolo</code> a largura toda, mas no máximo <code>600px</code>, usando <code>min()</code>. (2) Troque o tamanho fixo do título por <code>clamp(1.5rem, 1rem + 5vw, 3rem)</code>. Confira: no 768, o título bate no teto (48 pixels); no 375, ele encolhe.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="miolo"&gt;
+  &lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+  &lt;p&gt;Pão quentinho às 6 da manhã e às 4 da tarde. Encomendas de bolo com um dia de antecedência.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.miolo {
+  width: 600px;
+  margin: 0 auto;
+  background-color: oldlace;
+}
+
+h1 {
+  font-size: 2rem;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.miolo {
+  width: min(100%, 600px);
+  margin: 0 auto;
+  background-color: oldlace;
+}
+
+h1 {
+  font-size: clamp(1.5rem, 1rem + 5vw, 3rem);
+}
+</pre>
+</div>
+
+<p>Clique em <strong>375</strong>: com <code>width: 600px</code>, o miolo passaria da tela; com <code>min()</code>, ele cabe. O título fica com <code>1rem + 5vw</code> = 16 + 18.75 = 34.75 pixels.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>min(A, B)</code> fica com o menor valor, então cria um <strong>teto</strong>: <code>width: min(100%, 500px)</code> = "a tela toda, no máximo 500px".</li>
+  <li><code>max(A, B)</code> fica com o maior, então cria um <strong>piso</strong>: <code>font-size: max(1.25rem, 4vw)</code> nunca fica abaixo de 20px.</li>
+  <li><code>clamp(MIN, IDEAL, MAX)</code> junta os dois: o ideal acompanha a tela, preso entre o mínimo e o máximo. Sempre três valores, separados por vírgula, do menor para o maior.</li>
+  <li>Dentro delas valem contas (<code>1rem + 2vw</code>), com espaço em volta do <code>+</code> e do <code>-</code>. Misture <code>rem</code> para o texto acompanhar o zoom.</li>
+  <li>Funções mudam <strong>números</strong> de forma suave; para mudar o <strong>layout</strong>, use media queries ou container queries.</li>
+  <li>Vírgula faltando, número sem unidade ou <code>+</code> grudado: o navegador ignora a declaração inteira, e o validador mostra <code>Parse Error</code> ou <code>The types are incompatible</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
