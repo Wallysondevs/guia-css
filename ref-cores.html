@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Nomes de Cores — as 148 cores com nome, com amostras | Guia CSS</title>
+<meta name="description" content="Referência dos nomes de cores do CSS: as 148 cores do padrão CSS Color 4 (de aliceblue a yellowgreen), com a amostra desenhada pelo seu navegador, o código hexadecimal e o rgb(), agrupadas por família e em ordem alfabética, mais transparent, currentcolor, as cores do sistema e os erros mais comuns.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<style>
+  .amostra {
+    display: inline-block;
+    width: 3rem;
+    height: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    vertical-align: middle;
+  }
+  .paleta {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+    gap: 0.75rem;
+  }
+  .paleta li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .paleta .amostra {
+    width: 100%;
+    height: 3rem;
+  }
+  .paleta code {
+    font-size: 0.85rem;
+  }
+  table.ref td code {
+    white-space: nowrap;
+  }
+  .paleta-contraste li {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background-color: #ffffff;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Nomes de Cores</span></h1>
+
+<p class="intro">O CSS conhece <strong>148 cores pelo nome</strong>, de <code>aliceblue</code> a <code>yellowgreen</code>. Esta página traz todas, a lista completa do padrão <strong>CSS Color 4</strong> (conferida no MDN), cada uma com o código hexadecimal, o <code>rgb()</code> e uma <strong>amostra desenhada agora pelo seu navegador</strong> a partir do próprio nome: cada quadradinho é um <code>background-color: nome</code> de verdade, não uma imagem.</p>
+
+<div class="note">
+<strong>Como usar esta página</strong>
+<ul>
+  <li>Procure com <kbd>Ctrl</kbd>+<kbd>F</kbd> pelo nome em inglês (<code>salmon</code>, <code>navy</code>) ou pelo código (<code>#ff6347</code>).</li>
+  <li>Os nomes estão em inglês e são escritos <strong>juntos</strong>, sem espaço nem hífen: <code>lightblue</code>, não <code>light-blue</code>.</li>
+  <li>Os 148 nomes foram conferidos no Chromium: cada um deu exatamente o <code>rgb()</code> da tabela.</li>
+  <li>Para entender como as cores funcionam, comece pela aula <a href="cores.html">Cores por Nome</a>. Para escolher qualquer cor (são mais de 16 milhões), veja <a href="cores-hex.html">Hexadecimais</a>, <a href="cores-rgb.html">rgb()</a> e <a href="cores-hsl.html">hsl()</a>.</li>
+</ul>
+</div>
+
+<p>Atalhos: <a href="#usar">Como usar um nome</a> · <a href="#basicas">As 16 básicas</a> · <a href="#familias">Por família</a> · <a href="#todas">Todas, de A a Z</a> · <a href="#curiosidades">Curiosidades</a> · <a href="#especiais">transparent, currentcolor e cores do sistema</a> · <a href="#contraste">Contraste</a> · <a href="#errado">Quando dá errado</a></p>
+
+<hr>
+
+<h2 id="usar">Como usar um nome de cor</h2>
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  h1 {
+    color: white;
+    background-color: tomato;
+  }
+  p {
+    color: darkslategray;
+    border-left: 4px solid gold;
+    padding-left: 0.5rem;
+  }
+&lt;/style&gt;
+&lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;p&gt;Pão quentinho às 7h.&lt;/p&gt;
+</pre>
+<dl class="anatomy">
+  <dt>tomato</dt><dd>O nome vai direto como valor, sem aspas e sem <code>#</code>. Serve em qualquer propriedade que aceite cor: <code>color</code> (a cor da letra), <code>background-color</code> (o fundo), <code>border-color</code>, <code>outline-color</code>, <code>text-decoration-color</code>, nos degradês…</dd>
+  <dt>darkslategray</dt><dd>Nomes compostos ficam grudados. Maiúsculas não importam: <code>Tomato</code> e <code>TOMATO</code> deram o mesmo <code>rgb(255, 99, 71)</code> no Chromium. O costume é escrever tudo em minúsculas.</dd>
+  <dt>solid gold</dt><dd>Dentro de um atalho como <code>border</code>, o nome da cor entra como mais um valor.</dd>
+</dl>
+<p>Cada nome é só um apelido para um código. Para o navegador, <code>tomato</code>, <code>#ff6347</code> e <code>rgb(255, 99, 71)</code> são a mesma cor; no F12, na aba <strong>Computed</strong> (Calculado), ela aparece como <code>rgb(255, 99, 71)</code>.</p>
+
+<h2 id="basicas">As 16 cores básicas</h2>
+<p>São as cores que existem desde o HTML 3.2 e o CSS 1. Algumas são fortes demais para usar puras (<code>red</code>, <code>lime</code>, <code>fuchsia</code>): servem bem para testes rápidos.</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Amostra</th><th>Nome</th><th>Hex</th><th>rgb()</th></tr>
+<tr><td><span class="amostra" style="background-color: black"></span></td><td><code>black</code></td><td><code>#000000</code></td><td><code>rgb(0, 0, 0)</code></td></tr>
+<tr><td><span class="amostra" style="background-color: silver"></span></td><td><code>silver</code></td><td><code>#c0c0c0</code></td><td><code>rgb(192, 192, 192)</code></td></tr>
+<tr><td><span class="amostra" style="background-color: gray"></span></td><td><code>gray</code></td><td><code>#808080</code></td><td><code>rgb(128, 128, 128)</code></td></tr>
+<tr><td><span class="amostra" style="background-color: white"></span></td><td><code>white</code></td><td><code>#ffffff</code></td><td><code>rgb(255, 255, 255)</code></td></tr>
+<tr><td><span class="amostra" style="background-color: maroon"></span></td><td><code>maroon</code></td><td><code>#800000</code></td><td><code>rgb(128, 0, 0)</code></td></tr>
+<tr><td><span class="amostra" style="background-color: red"></span></td><td><code>red</code></td><td><code>#ff0000</code></td><td><code>rgb(255, 0, 0)</code></td></tr>
+<tr><td><span class="amostra" style="background-color: purple"></span></td><td><code>purple</code></td><td><code>#800080</code></td><td><code>rgb(128, 0, 128)</code></td></tr>
+<tr><td><span class="amostra" style="background-color: fuchsia"></span></td><td><code>fuchsia</code></td><td><code>#ff00ff</code></td><td><code>rgb(255, 0, 255)</code></td></tr>
+<tr><td><span class="amostra" style="background-color: green"></span></td><td><code>green</code></td><td><code>#008000</code></td><td><code>rgb(0, 128, 0)</code></td></tr>
+<tr><td><span class="amostra" style="background-color: lime"></span></td><td><code>lime</code></td><td><code>#00ff00</code></td><td><code>rgb(0, 255, 0)</code></td></tr>
+<tr><td><span class="amostra" style="background-color: olive"></span></td><td><code>olive</code></td><td><code>#808000</code></td><td><code>rgb(128, 128, 0)</code></td></tr>
+<tr><td><span class="amostra" style="background-color: yellow"></span></td><td><code>yellow</code></td><td><code>#ffff00</code></td><td><code>rgb(255, 255, 0)</code></td></tr>
+<tr><td><span class="amostra" style="background-color: navy"></span></td><td><code>navy</code></td><td><code>#000080</code></td><td><code>rgb(0, 0, 128)</code></td></tr>
+<tr><td><span class="amostra" style="background-color: blue"></span></td><td><code>blue</code></td><td><code>#0000ff</code></td><td><code>rgb(0, 0, 255)</code></td></tr>
+<tr><td><span class="amostra" style="background-color: teal"></span></td><td><code>teal</code></td><td><code>#008080</code></td><td><code>rgb(0, 128, 128)</code></td></tr>
+<tr><td><span class="amostra" style="background-color: aqua"></span></td><td><code>aqua</code></td><td><code>#00ffff</code></td><td><code>rgb(0, 255, 255)</code></td></tr>
+</table>
+</div>
+
+<h2 id="familias">Por família</h2>
+<p>As 148 cores, separadas pelo <strong>matiz</strong> (a posição no círculo das cores, o "h" do <a href="cores-hsl.html"><code>hsl()</code></a>) e, dentro de cada família, da mais clara para a mais escura. A separação foi feita pela conta, não "a olho": por isso o <code>brown</code> (marrom) caiu nos vermelhos e o <code>pink</code> (rosa), também. As cores quase brancas e as sem cor (cinzas) ficaram em grupos à parte. Os sinônimos (<code>gray</code> e <code>grey</code>) aparecem os dois.</p>
+<h3>Vermelhos (e rosas claros) <small>(13)</small></h3>
+<ul class="paleta">
+  <li><span class="amostra" style="background-color: pink"></span><code>pink</code></li>
+  <li><span class="amostra" style="background-color: lightpink"></span><code>lightpink</code></li>
+  <li><span class="amostra" style="background-color: lightcoral"></span><code>lightcoral</code></li>
+  <li><span class="amostra" style="background-color: salmon"></span><code>salmon</code></li>
+  <li><span class="amostra" style="background-color: rosybrown"></span><code>rosybrown</code></li>
+  <li><span class="amostra" style="background-color: tomato"></span><code>tomato</code></li>
+  <li><span class="amostra" style="background-color: indianred"></span><code>indianred</code></li>
+  <li><span class="amostra" style="background-color: red"></span><code>red</code></li>
+  <li><span class="amostra" style="background-color: crimson"></span><code>crimson</code></li>
+  <li><span class="amostra" style="background-color: firebrick"></span><code>firebrick</code></li>
+  <li><span class="amostra" style="background-color: brown"></span><code>brown</code></li>
+  <li><span class="amostra" style="background-color: darkred"></span><code>darkred</code></li>
+  <li><span class="amostra" style="background-color: maroon"></span><code>maroon</code></li>
+</ul>
+<h3>Laranjas e marrons <small>(23)</small></h3>
+<ul class="paleta">
+  <li><span class="amostra" style="background-color: papayawhip"></span><code>papayawhip</code></li>
+  <li><span class="amostra" style="background-color: antiquewhite"></span><code>antiquewhite</code></li>
+  <li><span class="amostra" style="background-color: blanchedalmond"></span><code>blanchedalmond</code></li>
+  <li><span class="amostra" style="background-color: bisque"></span><code>bisque</code></li>
+  <li><span class="amostra" style="background-color: peachpuff"></span><code>peachpuff</code></li>
+  <li><span class="amostra" style="background-color: moccasin"></span><code>moccasin</code></li>
+  <li><span class="amostra" style="background-color: navajowhite"></span><code>navajowhite</code></li>
+  <li><span class="amostra" style="background-color: wheat"></span><code>wheat</code></li>
+  <li><span class="amostra" style="background-color: lightsalmon"></span><code>lightsalmon</code></li>
+  <li><span class="amostra" style="background-color: burlywood"></span><code>burlywood</code></li>
+  <li><span class="amostra" style="background-color: darksalmon"></span><code>darksalmon</code></li>
+  <li><span class="amostra" style="background-color: tan"></span><code>tan</code></li>
+  <li><span class="amostra" style="background-color: sandybrown"></span><code>sandybrown</code></li>
+  <li><span class="amostra" style="background-color: coral"></span><code>coral</code></li>
+  <li><span class="amostra" style="background-color: peru"></span><code>peru</code></li>
+  <li><span class="amostra" style="background-color: orangered"></span><code>orangered</code></li>
+  <li><span class="amostra" style="background-color: orange"></span><code>orange</code></li>
+  <li><span class="amostra" style="background-color: darkorange"></span><code>darkorange</code></li>
+  <li><span class="amostra" style="background-color: goldenrod"></span><code>goldenrod</code></li>
+  <li><span class="amostra" style="background-color: chocolate"></span><code>chocolate</code></li>
+  <li><span class="amostra" style="background-color: sienna"></span><code>sienna</code></li>
+  <li><span class="amostra" style="background-color: darkgoldenrod"></span><code>darkgoldenrod</code></li>
+  <li><span class="amostra" style="background-color: saddlebrown"></span><code>saddlebrown</code></li>
+</ul>
+<h3>Amarelos <small>(9)</small></h3>
+<ul class="paleta">
+  <li><span class="amostra" style="background-color: beige"></span><code>beige</code></li>
+  <li><span class="amostra" style="background-color: lightgoldenrodyellow"></span><code>lightgoldenrodyellow</code></li>
+  <li><span class="amostra" style="background-color: lemonchiffon"></span><code>lemonchiffon</code></li>
+  <li><span class="amostra" style="background-color: palegoldenrod"></span><code>palegoldenrod</code></li>
+  <li><span class="amostra" style="background-color: khaki"></span><code>khaki</code></li>
+  <li><span class="amostra" style="background-color: darkkhaki"></span><code>darkkhaki</code></li>
+  <li><span class="amostra" style="background-color: yellow"></span><code>yellow</code></li>
+  <li><span class="amostra" style="background-color: gold"></span><code>gold</code></li>
+  <li><span class="amostra" style="background-color: olive"></span><code>olive</code></li>
+</ul>
+<h3>Verdes <small>(20)</small></h3>
+<ul class="paleta">
+  <li><span class="amostra" style="background-color: palegreen"></span><code>palegreen</code></li>
+  <li><span class="amostra" style="background-color: lightgreen"></span><code>lightgreen</code></li>
+  <li><span class="amostra" style="background-color: aquamarine"></span><code>aquamarine</code></li>
+  <li><span class="amostra" style="background-color: darkseagreen"></span><code>darkseagreen</code></li>
+  <li><span class="amostra" style="background-color: mediumaquamarine"></span><code>mediumaquamarine</code></li>
+  <li><span class="amostra" style="background-color: greenyellow"></span><code>greenyellow</code></li>
+  <li><span class="amostra" style="background-color: yellowgreen"></span><code>yellowgreen</code></li>
+  <li><span class="amostra" style="background-color: springgreen"></span><code>springgreen</code></li>
+  <li><span class="amostra" style="background-color: limegreen"></span><code>limegreen</code></li>
+  <li><span class="amostra" style="background-color: lime"></span><code>lime</code></li>
+  <li><span class="amostra" style="background-color: chartreuse"></span><code>chartreuse</code></li>
+  <li><span class="amostra" style="background-color: lawngreen"></span><code>lawngreen</code></li>
+  <li><span class="amostra" style="background-color: mediumspringgreen"></span><code>mediumspringgreen</code></li>
+  <li><span class="amostra" style="background-color: mediumseagreen"></span><code>mediumseagreen</code></li>
+  <li><span class="amostra" style="background-color: seagreen"></span><code>seagreen</code></li>
+  <li><span class="amostra" style="background-color: olivedrab"></span><code>olivedrab</code></li>
+  <li><span class="amostra" style="background-color: forestgreen"></span><code>forestgreen</code></li>
+  <li><span class="amostra" style="background-color: darkolivegreen"></span><code>darkolivegreen</code></li>
+  <li><span class="amostra" style="background-color: green"></span><code>green</code></li>
+  <li><span class="amostra" style="background-color: darkgreen"></span><code>darkgreen</code></li>
+</ul>
+<h3>Cianos e verde-água <small>(14)</small></h3>
+<ul class="paleta">
+  <li><span class="amostra" style="background-color: paleturquoise"></span><code>paleturquoise</code></li>
+  <li><span class="amostra" style="background-color: powderblue"></span><code>powderblue</code></li>
+  <li><span class="amostra" style="background-color: lightblue"></span><code>lightblue</code></li>
+  <li><span class="amostra" style="background-color: turquoise"></span><code>turquoise</code></li>
+  <li><span class="amostra" style="background-color: mediumturquoise"></span><code>mediumturquoise</code></li>
+  <li><span class="amostra" style="background-color: cyan"></span><code>cyan</code></li>
+  <li><span class="amostra" style="background-color: cadetblue"></span><code>cadetblue</code></li>
+  <li><span class="amostra" style="background-color: aqua"></span><code>aqua</code></li>
+  <li><span class="amostra" style="background-color: lightseagreen"></span><code>lightseagreen</code></li>
+  <li><span class="amostra" style="background-color: darkturquoise"></span><code>darkturquoise</code></li>
+  <li><span class="amostra" style="background-color: darkcyan"></span><code>darkcyan</code></li>
+  <li><span class="amostra" style="background-color: teal"></span><code>teal</code></li>
+  <li><span class="amostra" style="background-color: darkslategrey"></span><code>darkslategrey</code></li>
+  <li><span class="amostra" style="background-color: darkslategray"></span><code>darkslategray</code></li>
+</ul>
+<h3>Azuis <small>(16)</small></h3>
+<ul class="paleta">
+  <li><span class="amostra" style="background-color: lightsteelblue"></span><code>lightsteelblue</code></li>
+  <li><span class="amostra" style="background-color: lightskyblue"></span><code>lightskyblue</code></li>
+  <li><span class="amostra" style="background-color: skyblue"></span><code>skyblue</code></li>
+  <li><span class="amostra" style="background-color: mediumslateblue"></span><code>mediumslateblue</code></li>
+  <li><span class="amostra" style="background-color: cornflowerblue"></span><code>cornflowerblue</code></li>
+  <li><span class="amostra" style="background-color: slateblue"></span><code>slateblue</code></li>
+  <li><span class="amostra" style="background-color: royalblue"></span><code>royalblue</code></li>
+  <li><span class="amostra" style="background-color: dodgerblue"></span><code>dodgerblue</code></li>
+  <li><span class="amostra" style="background-color: deepskyblue"></span><code>deepskyblue</code></li>
+  <li><span class="amostra" style="background-color: blue"></span><code>blue</code></li>
+  <li><span class="amostra" style="background-color: steelblue"></span><code>steelblue</code></li>
+  <li><span class="amostra" style="background-color: mediumblue"></span><code>mediumblue</code></li>
+  <li><span class="amostra" style="background-color: darkslateblue"></span><code>darkslateblue</code></li>
+  <li><span class="amostra" style="background-color: darkblue"></span><code>darkblue</code></li>
+  <li><span class="amostra" style="background-color: midnightblue"></span><code>midnightblue</code></li>
+  <li><span class="amostra" style="background-color: navy"></span><code>navy</code></li>
+</ul>
+<h3>Roxos e violetas <small>(7)</small></h3>
+<ul class="paleta">
+  <li><span class="amostra" style="background-color: mediumpurple"></span><code>mediumpurple</code></li>
+  <li><span class="amostra" style="background-color: mediumorchid"></span><code>mediumorchid</code></li>
+  <li><span class="amostra" style="background-color: blueviolet"></span><code>blueviolet</code></li>
+  <li><span class="amostra" style="background-color: darkorchid"></span><code>darkorchid</code></li>
+  <li><span class="amostra" style="background-color: darkviolet"></span><code>darkviolet</code></li>
+  <li><span class="amostra" style="background-color: rebeccapurple"></span><code>rebeccapurple</code></li>
+  <li><span class="amostra" style="background-color: indigo"></span><code>indigo</code></li>
+</ul>
+<h3>Magentas, rosas e púrpuras <small>(12)</small></h3>
+<ul class="paleta">
+  <li><span class="amostra" style="background-color: thistle"></span><code>thistle</code></li>
+  <li><span class="amostra" style="background-color: plum"></span><code>plum</code></li>
+  <li><span class="amostra" style="background-color: violet"></span><code>violet</code></li>
+  <li><span class="amostra" style="background-color: hotpink"></span><code>hotpink</code></li>
+  <li><span class="amostra" style="background-color: palevioletred"></span><code>palevioletred</code></li>
+  <li><span class="amostra" style="background-color: orchid"></span><code>orchid</code></li>
+  <li><span class="amostra" style="background-color: deeppink"></span><code>deeppink</code></li>
+  <li><span class="amostra" style="background-color: magenta"></span><code>magenta</code></li>
+  <li><span class="amostra" style="background-color: fuchsia"></span><code>fuchsia</code></li>
+  <li><span class="amostra" style="background-color: mediumvioletred"></span><code>mediumvioletred</code></li>
+  <li><span class="amostra" style="background-color: darkmagenta"></span><code>darkmagenta</code></li>
+  <li><span class="amostra" style="background-color: purple"></span><code>purple</code></li>
+</ul>
+<h3>Quase brancos <small>(17)</small></h3>
+<ul class="paleta">
+  <li><span class="amostra" style="background-color: snow"></span><code>snow</code></li>
+  <li><span class="amostra" style="background-color: ghostwhite"></span><code>ghostwhite</code></li>
+  <li><span class="amostra" style="background-color: mintcream"></span><code>mintcream</code></li>
+  <li><span class="amostra" style="background-color: lavenderblush"></span><code>lavenderblush</code></li>
+  <li><span class="amostra" style="background-color: ivory"></span><code>ivory</code></li>
+  <li><span class="amostra" style="background-color: honeydew"></span><code>honeydew</code></li>
+  <li><span class="amostra" style="background-color: floralwhite"></span><code>floralwhite</code></li>
+  <li><span class="amostra" style="background-color: azure"></span><code>azure</code></li>
+  <li><span class="amostra" style="background-color: aliceblue"></span><code>aliceblue</code></li>
+  <li><span class="amostra" style="background-color: seashell"></span><code>seashell</code></li>
+  <li><span class="amostra" style="background-color: oldlace"></span><code>oldlace</code></li>
+  <li><span class="amostra" style="background-color: mistyrose"></span><code>mistyrose</code></li>
+  <li><span class="amostra" style="background-color: linen"></span><code>linen</code></li>
+  <li><span class="amostra" style="background-color: lavender"></span><code>lavender</code></li>
+  <li><span class="amostra" style="background-color: lightyellow"></span><code>lightyellow</code></li>
+  <li><span class="amostra" style="background-color: lightcyan"></span><code>lightcyan</code></li>
+  <li><span class="amostra" style="background-color: cornsilk"></span><code>cornsilk</code></li>
+</ul>
+<h3>Cinzas, preto e branco <small>(17)</small></h3>
+<ul class="paleta">
+  <li><span class="amostra" style="background-color: white"></span><code>white</code></li>
+  <li><span class="amostra" style="background-color: whitesmoke"></span><code>whitesmoke</code></li>
+  <li><span class="amostra" style="background-color: gainsboro"></span><code>gainsboro</code></li>
+  <li><span class="amostra" style="background-color: lightgrey"></span><code>lightgrey</code></li>
+  <li><span class="amostra" style="background-color: lightgray"></span><code>lightgray</code></li>
+  <li><span class="amostra" style="background-color: silver"></span><code>silver</code></li>
+  <li><span class="amostra" style="background-color: darkgrey"></span><code>darkgrey</code></li>
+  <li><span class="amostra" style="background-color: darkgray"></span><code>darkgray</code></li>
+  <li><span class="amostra" style="background-color: lightslategrey"></span><code>lightslategrey</code></li>
+  <li><span class="amostra" style="background-color: lightslategray"></span><code>lightslategray</code></li>
+  <li><span class="amostra" style="background-color: slategrey"></span><code>slategrey</code></li>
+  <li><span class="amostra" style="background-color: slategray"></span><code>slategray</code></li>
+  <li><span class="amostra" style="background-color: grey"></span><code>grey</code></li>
+  <li><span class="amostra" style="background-color: gray"></span><code>gray</code></li>
+  <li><span class="amostra" style="background-color: dimgrey"></span><code>dimgrey</code></li>
+  <li><span class="amostra" style="background-color: dimgray"></span><code>dimgray</code></li>
+  <li><span class="amostra" style="background-color: black"></span><code>black</code></li>
+</ul>
+
+<h2 id="todas">Todas, de A a Z</h2>
+<p>As 148, em ordem alfabética. Na coluna "Nota": <strong>básica</strong> = uma das 16 de cima; <strong>=</strong> = um sinônimo, a mesma cor com outro nome.</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Amostra</th><th>Nome</th><th>Hex</th><th>rgb()</th><th>Nota</th></tr>
+<tr id="cor-aliceblue"><td><span class="amostra" style="background-color: aliceblue"></span></td><td><code>aliceblue</code></td><td><code>#f0f8ff</code></td><td><code>rgb(240, 248, 255)</code></td><td></td></tr>
+<tr id="cor-antiquewhite"><td><span class="amostra" style="background-color: antiquewhite"></span></td><td><code>antiquewhite</code></td><td><code>#faebd7</code></td><td><code>rgb(250, 235, 215)</code></td><td></td></tr>
+<tr id="cor-aqua"><td><span class="amostra" style="background-color: aqua"></span></td><td><code>aqua</code></td><td><code>#00ffff</code></td><td><code>rgb(0, 255, 255)</code></td><td>básica · = <code>cyan</code></td></tr>
+<tr id="cor-aquamarine"><td><span class="amostra" style="background-color: aquamarine"></span></td><td><code>aquamarine</code></td><td><code>#7fffd4</code></td><td><code>rgb(127, 255, 212)</code></td><td></td></tr>
+<tr id="cor-azure"><td><span class="amostra" style="background-color: azure"></span></td><td><code>azure</code></td><td><code>#f0ffff</code></td><td><code>rgb(240, 255, 255)</code></td><td></td></tr>
+<tr id="cor-beige"><td><span class="amostra" style="background-color: beige"></span></td><td><code>beige</code></td><td><code>#f5f5dc</code></td><td><code>rgb(245, 245, 220)</code></td><td></td></tr>
+<tr id="cor-bisque"><td><span class="amostra" style="background-color: bisque"></span></td><td><code>bisque</code></td><td><code>#ffe4c4</code></td><td><code>rgb(255, 228, 196)</code></td><td></td></tr>
+<tr id="cor-black"><td><span class="amostra" style="background-color: black"></span></td><td><code>black</code></td><td><code>#000000</code></td><td><code>rgb(0, 0, 0)</code></td><td>básica</td></tr>
+<tr id="cor-blanchedalmond"><td><span class="amostra" style="background-color: blanchedalmond"></span></td><td><code>blanchedalmond</code></td><td><code>#ffebcd</code></td><td><code>rgb(255, 235, 205)</code></td><td></td></tr>
+<tr id="cor-blue"><td><span class="amostra" style="background-color: blue"></span></td><td><code>blue</code></td><td><code>#0000ff</code></td><td><code>rgb(0, 0, 255)</code></td><td>básica</td></tr>
+<tr id="cor-blueviolet"><td><span class="amostra" style="background-color: blueviolet"></span></td><td><code>blueviolet</code></td><td><code>#8a2be2</code></td><td><code>rgb(138, 43, 226)</code></td><td></td></tr>
+<tr id="cor-brown"><td><span class="amostra" style="background-color: brown"></span></td><td><code>brown</code></td><td><code>#a52a2a</code></td><td><code>rgb(165, 42, 42)</code></td><td></td></tr>
+<tr id="cor-burlywood"><td><span class="amostra" style="background-color: burlywood"></span></td><td><code>burlywood</code></td><td><code>#deb887</code></td><td><code>rgb(222, 184, 135)</code></td><td></td></tr>
+<tr id="cor-cadetblue"><td><span class="amostra" style="background-color: cadetblue"></span></td><td><code>cadetblue</code></td><td><code>#5f9ea0</code></td><td><code>rgb(95, 158, 160)</code></td><td></td></tr>
+<tr id="cor-chartreuse"><td><span class="amostra" style="background-color: chartreuse"></span></td><td><code>chartreuse</code></td><td><code>#7fff00</code></td><td><code>rgb(127, 255, 0)</code></td><td></td></tr>
+<tr id="cor-chocolate"><td><span class="amostra" style="background-color: chocolate"></span></td><td><code>chocolate</code></td><td><code>#d2691e</code></td><td><code>rgb(210, 105, 30)</code></td><td></td></tr>
+<tr id="cor-coral"><td><span class="amostra" style="background-color: coral"></span></td><td><code>coral</code></td><td><code>#ff7f50</code></td><td><code>rgb(255, 127, 80)</code></td><td></td></tr>
+<tr id="cor-cornflowerblue"><td><span class="amostra" style="background-color: cornflowerblue"></span></td><td><code>cornflowerblue</code></td><td><code>#6495ed</code></td><td><code>rgb(100, 149, 237)</code></td><td></td></tr>
+<tr id="cor-cornsilk"><td><span class="amostra" style="background-color: cornsilk"></span></td><td><code>cornsilk</code></td><td><code>#fff8dc</code></td><td><code>rgb(255, 248, 220)</code></td><td></td></tr>
+<tr id="cor-crimson"><td><span class="amostra" style="background-color: crimson"></span></td><td><code>crimson</code></td><td><code>#dc143c</code></td><td><code>rgb(220, 20, 60)</code></td><td></td></tr>
+<tr id="cor-cyan"><td><span class="amostra" style="background-color: cyan"></span></td><td><code>cyan</code></td><td><code>#00ffff</code></td><td><code>rgb(0, 255, 255)</code></td><td>= <code>aqua</code></td></tr>
+<tr id="cor-darkblue"><td><span class="amostra" style="background-color: darkblue"></span></td><td><code>darkblue</code></td><td><code>#00008b</code></td><td><code>rgb(0, 0, 139)</code></td><td></td></tr>
+<tr id="cor-darkcyan"><td><span class="amostra" style="background-color: darkcyan"></span></td><td><code>darkcyan</code></td><td><code>#008b8b</code></td><td><code>rgb(0, 139, 139)</code></td><td></td></tr>
+<tr id="cor-darkgoldenrod"><td><span class="amostra" style="background-color: darkgoldenrod"></span></td><td><code>darkgoldenrod</code></td><td><code>#b8860b</code></td><td><code>rgb(184, 134, 11)</code></td><td></td></tr>
+<tr id="cor-darkgray"><td><span class="amostra" style="background-color: darkgray"></span></td><td><code>darkgray</code></td><td><code>#a9a9a9</code></td><td><code>rgb(169, 169, 169)</code></td><td>= <code>darkgrey</code></td></tr>
+<tr id="cor-darkgreen"><td><span class="amostra" style="background-color: darkgreen"></span></td><td><code>darkgreen</code></td><td><code>#006400</code></td><td><code>rgb(0, 100, 0)</code></td><td></td></tr>
+<tr id="cor-darkgrey"><td><span class="amostra" style="background-color: darkgrey"></span></td><td><code>darkgrey</code></td><td><code>#a9a9a9</code></td><td><code>rgb(169, 169, 169)</code></td><td>= <code>darkgray</code></td></tr>
+<tr id="cor-darkkhaki"><td><span class="amostra" style="background-color: darkkhaki"></span></td><td><code>darkkhaki</code></td><td><code>#bdb76b</code></td><td><code>rgb(189, 183, 107)</code></td><td></td></tr>
+<tr id="cor-darkmagenta"><td><span class="amostra" style="background-color: darkmagenta"></span></td><td><code>darkmagenta</code></td><td><code>#8b008b</code></td><td><code>rgb(139, 0, 139)</code></td><td></td></tr>
+<tr id="cor-darkolivegreen"><td><span class="amostra" style="background-color: darkolivegreen"></span></td><td><code>darkolivegreen</code></td><td><code>#556b2f</code></td><td><code>rgb(85, 107, 47)</code></td><td></td></tr>
+<tr id="cor-darkorange"><td><span class="amostra" style="background-color: darkorange"></span></td><td><code>darkorange</code></td><td><code>#ff8c00</code></td><td><code>rgb(255, 140, 0)</code></td><td></td></tr>
+<tr id="cor-darkorchid"><td><span class="amostra" style="background-color: darkorchid"></span></td><td><code>darkorchid</code></td><td><code>#9932cc</code></td><td><code>rgb(153, 50, 204)</code></td><td></td></tr>
+<tr id="cor-darkred"><td><span class="amostra" style="background-color: darkred"></span></td><td><code>darkred</code></td><td><code>#8b0000</code></td><td><code>rgb(139, 0, 0)</code></td><td></td></tr>
+<tr id="cor-darksalmon"><td><span class="amostra" style="background-color: darksalmon"></span></td><td><code>darksalmon</code></td><td><code>#e9967a</code></td><td><code>rgb(233, 150, 122)</code></td><td></td></tr>
+<tr id="cor-darkseagreen"><td><span class="amostra" style="background-color: darkseagreen"></span></td><td><code>darkseagreen</code></td><td><code>#8fbc8f</code></td><td><code>rgb(143, 188, 143)</code></td><td></td></tr>
+<tr id="cor-darkslateblue"><td><span class="amostra" style="background-color: darkslateblue"></span></td><td><code>darkslateblue</code></td><td><code>#483d8b</code></td><td><code>rgb(72, 61, 139)</code></td><td></td></tr>
+<tr id="cor-darkslategray"><td><span class="amostra" style="background-color: darkslategray"></span></td><td><code>darkslategray</code></td><td><code>#2f4f4f</code></td><td><code>rgb(47, 79, 79)</code></td><td>= <code>darkslategrey</code></td></tr>
+<tr id="cor-darkslategrey"><td><span class="amostra" style="background-color: darkslategrey"></span></td><td><code>darkslategrey</code></td><td><code>#2f4f4f</code></td><td><code>rgb(47, 79, 79)</code></td><td>= <code>darkslategray</code></td></tr>
+<tr id="cor-darkturquoise"><td><span class="amostra" style="background-color: darkturquoise"></span></td><td><code>darkturquoise</code></td><td><code>#00ced1</code></td><td><code>rgb(0, 206, 209)</code></td><td></td></tr>
+<tr id="cor-darkviolet"><td><span class="amostra" style="background-color: darkviolet"></span></td><td><code>darkviolet</code></td><td><code>#9400d3</code></td><td><code>rgb(148, 0, 211)</code></td><td></td></tr>
+<tr id="cor-deeppink"><td><span class="amostra" style="background-color: deeppink"></span></td><td><code>deeppink</code></td><td><code>#ff1493</code></td><td><code>rgb(255, 20, 147)</code></td><td></td></tr>
+<tr id="cor-deepskyblue"><td><span class="amostra" style="background-color: deepskyblue"></span></td><td><code>deepskyblue</code></td><td><code>#00bfff</code></td><td><code>rgb(0, 191, 255)</code></td><td></td></tr>
+<tr id="cor-dimgray"><td><span class="amostra" style="background-color: dimgray"></span></td><td><code>dimgray</code></td><td><code>#696969</code></td><td><code>rgb(105, 105, 105)</code></td><td>= <code>dimgrey</code></td></tr>
+<tr id="cor-dimgrey"><td><span class="amostra" style="background-color: dimgrey"></span></td><td><code>dimgrey</code></td><td><code>#696969</code></td><td><code>rgb(105, 105, 105)</code></td><td>= <code>dimgray</code></td></tr>
+<tr id="cor-dodgerblue"><td><span class="amostra" style="background-color: dodgerblue"></span></td><td><code>dodgerblue</code></td><td><code>#1e90ff</code></td><td><code>rgb(30, 144, 255)</code></td><td></td></tr>
+<tr id="cor-firebrick"><td><span class="amostra" style="background-color: firebrick"></span></td><td><code>firebrick</code></td><td><code>#b22222</code></td><td><code>rgb(178, 34, 34)</code></td><td></td></tr>
+<tr id="cor-floralwhite"><td><span class="amostra" style="background-color: floralwhite"></span></td><td><code>floralwhite</code></td><td><code>#fffaf0</code></td><td><code>rgb(255, 250, 240)</code></td><td></td></tr>
+<tr id="cor-forestgreen"><td><span class="amostra" style="background-color: forestgreen"></span></td><td><code>forestgreen</code></td><td><code>#228b22</code></td><td><code>rgb(34, 139, 34)</code></td><td></td></tr>
+<tr id="cor-fuchsia"><td><span class="amostra" style="background-color: fuchsia"></span></td><td><code>fuchsia</code></td><td><code>#ff00ff</code></td><td><code>rgb(255, 0, 255)</code></td><td>básica · = <code>magenta</code></td></tr>
+<tr id="cor-gainsboro"><td><span class="amostra" style="background-color: gainsboro"></span></td><td><code>gainsboro</code></td><td><code>#dcdcdc</code></td><td><code>rgb(220, 220, 220)</code></td><td></td></tr>
+<tr id="cor-ghostwhite"><td><span class="amostra" style="background-color: ghostwhite"></span></td><td><code>ghostwhite</code></td><td><code>#f8f8ff</code></td><td><code>rgb(248, 248, 255)</code></td><td></td></tr>
+<tr id="cor-gold"><td><span class="amostra" style="background-color: gold"></span></td><td><code>gold</code></td><td><code>#ffd700</code></td><td><code>rgb(255, 215, 0)</code></td><td></td></tr>
+<tr id="cor-goldenrod"><td><span class="amostra" style="background-color: goldenrod"></span></td><td><code>goldenrod</code></td><td><code>#daa520</code></td><td><code>rgb(218, 165, 32)</code></td><td></td></tr>
+<tr id="cor-gray"><td><span class="amostra" style="background-color: gray"></span></td><td><code>gray</code></td><td><code>#808080</code></td><td><code>rgb(128, 128, 128)</code></td><td>básica · = <code>grey</code></td></tr>
+<tr id="cor-green"><td><span class="amostra" style="background-color: green"></span></td><td><code>green</code></td><td><code>#008000</code></td><td><code>rgb(0, 128, 0)</code></td><td>básica</td></tr>
+<tr id="cor-greenyellow"><td><span class="amostra" style="background-color: greenyellow"></span></td><td><code>greenyellow</code></td><td><code>#adff2f</code></td><td><code>rgb(173, 255, 47)</code></td><td></td></tr>
+<tr id="cor-grey"><td><span class="amostra" style="background-color: grey"></span></td><td><code>grey</code></td><td><code>#808080</code></td><td><code>rgb(128, 128, 128)</code></td><td>= <code>gray</code></td></tr>
+<tr id="cor-honeydew"><td><span class="amostra" style="background-color: honeydew"></span></td><td><code>honeydew</code></td><td><code>#f0fff0</code></td><td><code>rgb(240, 255, 240)</code></td><td></td></tr>
+<tr id="cor-hotpink"><td><span class="amostra" style="background-color: hotpink"></span></td><td><code>hotpink</code></td><td><code>#ff69b4</code></td><td><code>rgb(255, 105, 180)</code></td><td></td></tr>
+<tr id="cor-indianred"><td><span class="amostra" style="background-color: indianred"></span></td><td><code>indianred</code></td><td><code>#cd5c5c</code></td><td><code>rgb(205, 92, 92)</code></td><td></td></tr>
+<tr id="cor-indigo"><td><span class="amostra" style="background-color: indigo"></span></td><td><code>indigo</code></td><td><code>#4b0082</code></td><td><code>rgb(75, 0, 130)</code></td><td></td></tr>
+<tr id="cor-ivory"><td><span class="amostra" style="background-color: ivory"></span></td><td><code>ivory</code></td><td><code>#fffff0</code></td><td><code>rgb(255, 255, 240)</code></td><td></td></tr>
+<tr id="cor-khaki"><td><span class="amostra" style="background-color: khaki"></span></td><td><code>khaki</code></td><td><code>#f0e68c</code></td><td><code>rgb(240, 230, 140)</code></td><td></td></tr>
+<tr id="cor-lavender"><td><span class="amostra" style="background-color: lavender"></span></td><td><code>lavender</code></td><td><code>#e6e6fa</code></td><td><code>rgb(230, 230, 250)</code></td><td></td></tr>
+<tr id="cor-lavenderblush"><td><span class="amostra" style="background-color: lavenderblush"></span></td><td><code>lavenderblush</code></td><td><code>#fff0f5</code></td><td><code>rgb(255, 240, 245)</code></td><td></td></tr>
+<tr id="cor-lawngreen"><td><span class="amostra" style="background-color: lawngreen"></span></td><td><code>lawngreen</code></td><td><code>#7cfc00</code></td><td><code>rgb(124, 252, 0)</code></td><td></td></tr>
+<tr id="cor-lemonchiffon"><td><span class="amostra" style="background-color: lemonchiffon"></span></td><td><code>lemonchiffon</code></td><td><code>#fffacd</code></td><td><code>rgb(255, 250, 205)</code></td><td></td></tr>
+<tr id="cor-lightblue"><td><span class="amostra" style="background-color: lightblue"></span></td><td><code>lightblue</code></td><td><code>#add8e6</code></td><td><code>rgb(173, 216, 230)</code></td><td></td></tr>
+<tr id="cor-lightcoral"><td><span class="amostra" style="background-color: lightcoral"></span></td><td><code>lightcoral</code></td><td><code>#f08080</code></td><td><code>rgb(240, 128, 128)</code></td><td></td></tr>
+<tr id="cor-lightcyan"><td><span class="amostra" style="background-color: lightcyan"></span></td><td><code>lightcyan</code></td><td><code>#e0ffff</code></td><td><code>rgb(224, 255, 255)</code></td><td></td></tr>
+<tr id="cor-lightgoldenrodyellow"><td><span class="amostra" style="background-color: lightgoldenrodyellow"></span></td><td><code>lightgoldenrodyellow</code></td><td><code>#fafad2</code></td><td><code>rgb(250, 250, 210)</code></td><td></td></tr>
+<tr id="cor-lightgray"><td><span class="amostra" style="background-color: lightgray"></span></td><td><code>lightgray</code></td><td><code>#d3d3d3</code></td><td><code>rgb(211, 211, 211)</code></td><td>= <code>lightgrey</code></td></tr>
+<tr id="cor-lightgreen"><td><span class="amostra" style="background-color: lightgreen"></span></td><td><code>lightgreen</code></td><td><code>#90ee90</code></td><td><code>rgb(144, 238, 144)</code></td><td></td></tr>
+<tr id="cor-lightgrey"><td><span class="amostra" style="background-color: lightgrey"></span></td><td><code>lightgrey</code></td><td><code>#d3d3d3</code></td><td><code>rgb(211, 211, 211)</code></td><td>= <code>lightgray</code></td></tr>
+<tr id="cor-lightpink"><td><span class="amostra" style="background-color: lightpink"></span></td><td><code>lightpink</code></td><td><code>#ffb6c1</code></td><td><code>rgb(255, 182, 193)</code></td><td></td></tr>
+<tr id="cor-lightsalmon"><td><span class="amostra" style="background-color: lightsalmon"></span></td><td><code>lightsalmon</code></td><td><code>#ffa07a</code></td><td><code>rgb(255, 160, 122)</code></td><td></td></tr>
+<tr id="cor-lightseagreen"><td><span class="amostra" style="background-color: lightseagreen"></span></td><td><code>lightseagreen</code></td><td><code>#20b2aa</code></td><td><code>rgb(32, 178, 170)</code></td><td></td></tr>
+<tr id="cor-lightskyblue"><td><span class="amostra" style="background-color: lightskyblue"></span></td><td><code>lightskyblue</code></td><td><code>#87cefa</code></td><td><code>rgb(135, 206, 250)</code></td><td></td></tr>
+<tr id="cor-lightslategray"><td><span class="amostra" style="background-color: lightslategray"></span></td><td><code>lightslategray</code></td><td><code>#778899</code></td><td><code>rgb(119, 136, 153)</code></td><td>= <code>lightslategrey</code></td></tr>
+<tr id="cor-lightslategrey"><td><span class="amostra" style="background-color: lightslategrey"></span></td><td><code>lightslategrey</code></td><td><code>#778899</code></td><td><code>rgb(119, 136, 153)</code></td><td>= <code>lightslategray</code></td></tr>
+<tr id="cor-lightsteelblue"><td><span class="amostra" style="background-color: lightsteelblue"></span></td><td><code>lightsteelblue</code></td><td><code>#b0c4de</code></td><td><code>rgb(176, 196, 222)</code></td><td></td></tr>
+<tr id="cor-lightyellow"><td><span class="amostra" style="background-color: lightyellow"></span></td><td><code>lightyellow</code></td><td><code>#ffffe0</code></td><td><code>rgb(255, 255, 224)</code></td><td></td></tr>
+<tr id="cor-lime"><td><span class="amostra" style="background-color: lime"></span></td><td><code>lime</code></td><td><code>#00ff00</code></td><td><code>rgb(0, 255, 0)</code></td><td>básica</td></tr>
+<tr id="cor-limegreen"><td><span class="amostra" style="background-color: limegreen"></span></td><td><code>limegreen</code></td><td><code>#32cd32</code></td><td><code>rgb(50, 205, 50)</code></td><td></td></tr>
+<tr id="cor-linen"><td><span class="amostra" style="background-color: linen"></span></td><td><code>linen</code></td><td><code>#faf0e6</code></td><td><code>rgb(250, 240, 230)</code></td><td></td></tr>
+<tr id="cor-magenta"><td><span class="amostra" style="background-color: magenta"></span></td><td><code>magenta</code></td><td><code>#ff00ff</code></td><td><code>rgb(255, 0, 255)</code></td><td>= <code>fuchsia</code></td></tr>
+<tr id="cor-maroon"><td><span class="amostra" style="background-color: maroon"></span></td><td><code>maroon</code></td><td><code>#800000</code></td><td><code>rgb(128, 0, 0)</code></td><td>básica</td></tr>
+<tr id="cor-mediumaquamarine"><td><span class="amostra" style="background-color: mediumaquamarine"></span></td><td><code>mediumaquamarine</code></td><td><code>#66cdaa</code></td><td><code>rgb(102, 205, 170)</code></td><td></td></tr>
+<tr id="cor-mediumblue"><td><span class="amostra" style="background-color: mediumblue"></span></td><td><code>mediumblue</code></td><td><code>#0000cd</code></td><td><code>rgb(0, 0, 205)</code></td><td></td></tr>
+<tr id="cor-mediumorchid"><td><span class="amostra" style="background-color: mediumorchid"></span></td><td><code>mediumorchid</code></td><td><code>#ba55d3</code></td><td><code>rgb(186, 85, 211)</code></td><td></td></tr>
+<tr id="cor-mediumpurple"><td><span class="amostra" style="background-color: mediumpurple"></span></td><td><code>mediumpurple</code></td><td><code>#9370db</code></td><td><code>rgb(147, 112, 219)</code></td><td></td></tr>
+<tr id="cor-mediumseagreen"><td><span class="amostra" style="background-color: mediumseagreen"></span></td><td><code>mediumseagreen</code></td><td><code>#3cb371</code></td><td><code>rgb(60, 179, 113)</code></td><td></td></tr>
+<tr id="cor-mediumslateblue"><td><span class="amostra" style="background-color: mediumslateblue"></span></td><td><code>mediumslateblue</code></td><td><code>#7b68ee</code></td><td><code>rgb(123, 104, 238)</code></td><td></td></tr>
+<tr id="cor-mediumspringgreen"><td><span class="amostra" style="background-color: mediumspringgreen"></span></td><td><code>mediumspringgreen</code></td><td><code>#00fa9a</code></td><td><code>rgb(0, 250, 154)</code></td><td></td></tr>
+<tr id="cor-mediumturquoise"><td><span class="amostra" style="background-color: mediumturquoise"></span></td><td><code>mediumturquoise</code></td><td><code>#48d1cc</code></td><td><code>rgb(72, 209, 204)</code></td><td></td></tr>
+<tr id="cor-mediumvioletred"><td><span class="amostra" style="background-color: mediumvioletred"></span></td><td><code>mediumvioletred</code></td><td><code>#c71585</code></td><td><code>rgb(199, 21, 133)</code></td><td></td></tr>
+<tr id="cor-midnightblue"><td><span class="amostra" style="background-color: midnightblue"></span></td><td><code>midnightblue</code></td><td><code>#191970</code></td><td><code>rgb(25, 25, 112)</code></td><td></td></tr>
+<tr id="cor-mintcream"><td><span class="amostra" style="background-color: mintcream"></span></td><td><code>mintcream</code></td><td><code>#f5fffa</code></td><td><code>rgb(245, 255, 250)</code></td><td></td></tr>
+<tr id="cor-mistyrose"><td><span class="amostra" style="background-color: mistyrose"></span></td><td><code>mistyrose</code></td><td><code>#ffe4e1</code></td><td><code>rgb(255, 228, 225)</code></td><td></td></tr>
+<tr id="cor-moccasin"><td><span class="amostra" style="background-color: moccasin"></span></td><td><code>moccasin</code></td><td><code>#ffe4b5</code></td><td><code>rgb(255, 228, 181)</code></td><td></td></tr>
+<tr id="cor-navajowhite"><td><span class="amostra" style="background-color: navajowhite"></span></td><td><code>navajowhite</code></td><td><code>#ffdead</code></td><td><code>rgb(255, 222, 173)</code></td><td></td></tr>
+<tr id="cor-navy"><td><span class="amostra" style="background-color: navy"></span></td><td><code>navy</code></td><td><code>#000080</code></td><td><code>rgb(0, 0, 128)</code></td><td>básica</td></tr>
+<tr id="cor-oldlace"><td><span class="amostra" style="background-color: oldlace"></span></td><td><code>oldlace</code></td><td><code>#fdf5e6</code></td><td><code>rgb(253, 245, 230)</code></td><td></td></tr>
+<tr id="cor-olive"><td><span class="amostra" style="background-color: olive"></span></td><td><code>olive</code></td><td><code>#808000</code></td><td><code>rgb(128, 128, 0)</code></td><td>básica</td></tr>
+<tr id="cor-olivedrab"><td><span class="amostra" style="background-color: olivedrab"></span></td><td><code>olivedrab</code></td><td><code>#6b8e23</code></td><td><code>rgb(107, 142, 35)</code></td><td></td></tr>
+<tr id="cor-orange"><td><span class="amostra" style="background-color: orange"></span></td><td><code>orange</code></td><td><code>#ffa500</code></td><td><code>rgb(255, 165, 0)</code></td><td></td></tr>
+<tr id="cor-orangered"><td><span class="amostra" style="background-color: orangered"></span></td><td><code>orangered</code></td><td><code>#ff4500</code></td><td><code>rgb(255, 69, 0)</code></td><td></td></tr>
+<tr id="cor-orchid"><td><span class="amostra" style="background-color: orchid"></span></td><td><code>orchid</code></td><td><code>#da70d6</code></td><td><code>rgb(218, 112, 214)</code></td><td></td></tr>
+<tr id="cor-palegoldenrod"><td><span class="amostra" style="background-color: palegoldenrod"></span></td><td><code>palegoldenrod</code></td><td><code>#eee8aa</code></td><td><code>rgb(238, 232, 170)</code></td><td></td></tr>
+<tr id="cor-palegreen"><td><span class="amostra" style="background-color: palegreen"></span></td><td><code>palegreen</code></td><td><code>#98fb98</code></td><td><code>rgb(152, 251, 152)</code></td><td></td></tr>
+<tr id="cor-paleturquoise"><td><span class="amostra" style="background-color: paleturquoise"></span></td><td><code>paleturquoise</code></td><td><code>#afeeee</code></td><td><code>rgb(175, 238, 238)</code></td><td></td></tr>
+<tr id="cor-palevioletred"><td><span class="amostra" style="background-color: palevioletred"></span></td><td><code>palevioletred</code></td><td><code>#db7093</code></td><td><code>rgb(219, 112, 147)</code></td><td></td></tr>
+<tr id="cor-papayawhip"><td><span class="amostra" style="background-color: papayawhip"></span></td><td><code>papayawhip</code></td><td><code>#ffefd5</code></td><td><code>rgb(255, 239, 213)</code></td><td></td></tr>
+<tr id="cor-peachpuff"><td><span class="amostra" style="background-color: peachpuff"></span></td><td><code>peachpuff</code></td><td><code>#ffdab9</code></td><td><code>rgb(255, 218, 185)</code></td><td></td></tr>
+<tr id="cor-peru"><td><span class="amostra" style="background-color: peru"></span></td><td><code>peru</code></td><td><code>#cd853f</code></td><td><code>rgb(205, 133, 63)</code></td><td></td></tr>
+<tr id="cor-pink"><td><span class="amostra" style="background-color: pink"></span></td><td><code>pink</code></td><td><code>#ffc0cb</code></td><td><code>rgb(255, 192, 203)</code></td><td></td></tr>
+<tr id="cor-plum"><td><span class="amostra" style="background-color: plum"></span></td><td><code>plum</code></td><td><code>#dda0dd</code></td><td><code>rgb(221, 160, 221)</code></td><td></td></tr>
+<tr id="cor-powderblue"><td><span class="amostra" style="background-color: powderblue"></span></td><td><code>powderblue</code></td><td><code>#b0e0e6</code></td><td><code>rgb(176, 224, 230)</code></td><td></td></tr>
+<tr id="cor-purple"><td><span class="amostra" style="background-color: purple"></span></td><td><code>purple</code></td><td><code>#800080</code></td><td><code>rgb(128, 0, 128)</code></td><td>básica</td></tr>
+<tr id="cor-rebeccapurple"><td><span class="amostra" style="background-color: rebeccapurple"></span></td><td><code>rebeccapurple</code></td><td><code>#663399</code></td><td><code>rgb(102, 51, 153)</code></td><td>a mais nova (CSS Color 4)</td></tr>
+<tr id="cor-red"><td><span class="amostra" style="background-color: red"></span></td><td><code>red</code></td><td><code>#ff0000</code></td><td><code>rgb(255, 0, 0)</code></td><td>básica</td></tr>
+<tr id="cor-rosybrown"><td><span class="amostra" style="background-color: rosybrown"></span></td><td><code>rosybrown</code></td><td><code>#bc8f8f</code></td><td><code>rgb(188, 143, 143)</code></td><td></td></tr>
+<tr id="cor-royalblue"><td><span class="amostra" style="background-color: royalblue"></span></td><td><code>royalblue</code></td><td><code>#4169e1</code></td><td><code>rgb(65, 105, 225)</code></td><td></td></tr>
+<tr id="cor-saddlebrown"><td><span class="amostra" style="background-color: saddlebrown"></span></td><td><code>saddlebrown</code></td><td><code>#8b4513</code></td><td><code>rgb(139, 69, 19)</code></td><td></td></tr>
+<tr id="cor-salmon"><td><span class="amostra" style="background-color: salmon"></span></td><td><code>salmon</code></td><td><code>#fa8072</code></td><td><code>rgb(250, 128, 114)</code></td><td></td></tr>
+<tr id="cor-sandybrown"><td><span class="amostra" style="background-color: sandybrown"></span></td><td><code>sandybrown</code></td><td><code>#f4a460</code></td><td><code>rgb(244, 164, 96)</code></td><td></td></tr>
+<tr id="cor-seagreen"><td><span class="amostra" style="background-color: seagreen"></span></td><td><code>seagreen</code></td><td><code>#2e8b57</code></td><td><code>rgb(46, 139, 87)</code></td><td></td></tr>
+<tr id="cor-seashell"><td><span class="amostra" style="background-color: seashell"></span></td><td><code>seashell</code></td><td><code>#fff5ee</code></td><td><code>rgb(255, 245, 238)</code></td><td></td></tr>
+<tr id="cor-sienna"><td><span class="amostra" style="background-color: sienna"></span></td><td><code>sienna</code></td><td><code>#a0522d</code></td><td><code>rgb(160, 82, 45)</code></td><td></td></tr>
+<tr id="cor-silver"><td><span class="amostra" style="background-color: silver"></span></td><td><code>silver</code></td><td><code>#c0c0c0</code></td><td><code>rgb(192, 192, 192)</code></td><td>básica</td></tr>
+<tr id="cor-skyblue"><td><span class="amostra" style="background-color: skyblue"></span></td><td><code>skyblue</code></td><td><code>#87ceeb</code></td><td><code>rgb(135, 206, 235)</code></td><td></td></tr>
+<tr id="cor-slateblue"><td><span class="amostra" style="background-color: slateblue"></span></td><td><code>slateblue</code></td><td><code>#6a5acd</code></td><td><code>rgb(106, 90, 205)</code></td><td></td></tr>
+<tr id="cor-slategray"><td><span class="amostra" style="background-color: slategray"></span></td><td><code>slategray</code></td><td><code>#708090</code></td><td><code>rgb(112, 128, 144)</code></td><td>= <code>slategrey</code></td></tr>
+<tr id="cor-slategrey"><td><span class="amostra" style="background-color: slategrey"></span></td><td><code>slategrey</code></td><td><code>#708090</code></td><td><code>rgb(112, 128, 144)</code></td><td>= <code>slategray</code></td></tr>
+<tr id="cor-snow"><td><span class="amostra" style="background-color: snow"></span></td><td><code>snow</code></td><td><code>#fffafa</code></td><td><code>rgb(255, 250, 250)</code></td><td></td></tr>
+<tr id="cor-springgreen"><td><span class="amostra" style="background-color: springgreen"></span></td><td><code>springgreen</code></td><td><code>#00ff7f</code></td><td><code>rgb(0, 255, 127)</code></td><td></td></tr>
+<tr id="cor-steelblue"><td><span class="amostra" style="background-color: steelblue"></span></td><td><code>steelblue</code></td><td><code>#4682b4</code></td><td><code>rgb(70, 130, 180)</code></td><td></td></tr>
+<tr id="cor-tan"><td><span class="amostra" style="background-color: tan"></span></td><td><code>tan</code></td><td><code>#d2b48c</code></td><td><code>rgb(210, 180, 140)</code></td><td></td></tr>
+<tr id="cor-teal"><td><span class="amostra" style="background-color: teal"></span></td><td><code>teal</code></td><td><code>#008080</code></td><td><code>rgb(0, 128, 128)</code></td><td>básica</td></tr>
+<tr id="cor-thistle"><td><span class="amostra" style="background-color: thistle"></span></td><td><code>thistle</code></td><td><code>#d8bfd8</code></td><td><code>rgb(216, 191, 216)</code></td><td></td></tr>
+<tr id="cor-tomato"><td><span class="amostra" style="background-color: tomato"></span></td><td><code>tomato</code></td><td><code>#ff6347</code></td><td><code>rgb(255, 99, 71)</code></td><td></td></tr>
+<tr id="cor-turquoise"><td><span class="amostra" style="background-color: turquoise"></span></td><td><code>turquoise</code></td><td><code>#40e0d0</code></td><td><code>rgb(64, 224, 208)</code></td><td></td></tr>
+<tr id="cor-violet"><td><span class="amostra" style="background-color: violet"></span></td><td><code>violet</code></td><td><code>#ee82ee</code></td><td><code>rgb(238, 130, 238)</code></td><td></td></tr>
+<tr id="cor-wheat"><td><span class="amostra" style="background-color: wheat"></span></td><td><code>wheat</code></td><td><code>#f5deb3</code></td><td><code>rgb(245, 222, 179)</code></td><td></td></tr>
+<tr id="cor-white"><td><span class="amostra" style="background-color: white"></span></td><td><code>white</code></td><td><code>#ffffff</code></td><td><code>rgb(255, 255, 255)</code></td><td>básica</td></tr>
+<tr id="cor-whitesmoke"><td><span class="amostra" style="background-color: whitesmoke"></span></td><td><code>whitesmoke</code></td><td><code>#f5f5f5</code></td><td><code>rgb(245, 245, 245)</code></td><td></td></tr>
+<tr id="cor-yellow"><td><span class="amostra" style="background-color: yellow"></span></td><td><code>yellow</code></td><td><code>#ffff00</code></td><td><code>rgb(255, 255, 0)</code></td><td>básica</td></tr>
+<tr id="cor-yellowgreen"><td><span class="amostra" style="background-color: yellowgreen"></span></td><td><code>yellowgreen</code></td><td><code>#9acd32</code></td><td><code>rgb(154, 205, 50)</code></td><td></td></tr>
+</table>
+</div>
+
+<h2 id="curiosidades">Curiosidades (que confundem)</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>O quê</th><th>Por quê</th></tr>
+<tr><td><code>darkgray</code> é <strong>mais clara</strong> que <code>gray</code></td><td><span class="amostra" style="background-color: darkgray"></span> <code>#a9a9a9</code> × <span class="amostra" style="background-color: gray"></span> <code>#808080</code>. Os nomes vieram de listas diferentes: <code>gray</code> é a das 16 básicas, <code>darkgray</code> veio da lista de cores do sistema X11 (Unix), onde "gray" era mais claro.</td></tr>
+<tr><td><code>gray</code> e <code>grey</code></td><td>As duas grafias (americana e britânica) funcionam, em todos os cinzas: <code>darkgrey</code>, <code>lightslategrey</code>, <code>dimgrey</code>…</td></tr>
+<tr><td><code>aqua</code> = <code>cyan</code>, <code>fuchsia</code> = <code>magenta</code></td><td>Mesma cor, dois nomes: um veio das 16 básicas, o outro do X11.</td></tr>
+<tr><td><code>green</code> é escuro; o verde "puro" é <code>lime</code></td><td><span class="amostra" style="background-color: green"></span> <code>green</code> = <code>#008000</code>; <span class="amostra" style="background-color: lime"></span> <code>lime</code> = <code>#00ff00</code>.</td></tr>
+<tr><td><code>rebeccapurple</code></td><td>A mais nova da lista: entrou no CSS Color 4, em 2014, em homenagem a Rebecca Meyer, filha de Eric Meyer, um dos pioneiros do CSS. Funciona no Chrome 38, Firefox 33 e Safari 9 em diante.</td></tr>
+<tr><td>Não existem <code>darkyellow</code> nem <code>lightred</code></td><td>Os nomes não seguem um padrão: nem todo "dark…" ou "light…" existe. Na dúvida, procure nesta página; se não estiver aqui, use um <a href="cores-hex.html">hexadecimal</a> ou <a href="cores-hsl.html"><code>hsl()</code></a>.</td></tr>
+</table>
+</div>
+
+<h2 id="especiais">Palavras especiais: <code>transparent</code>, <code>currentcolor</code> e as cores do sistema</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Palavra</th><th>O que é</th><th>Calculado no Chromium</th><th>Aula</th></tr>
+<tr><td><code>transparent</code></td><td>totalmente transparente: deixa ver o que está atrás. É o fundo padrão de quase todo elemento.</td><td><code>rgba(0, 0, 0, 0)</code></td><td><a href="opacity.html">Transparência</a></td></tr>
+<tr><td><code>currentcolor</code></td><td>"a cor da letra deste elemento". Com <code>color: navy</code> e <code>border: 2px solid currentcolor</code>, a borda fica azul-marinho; troque o <code>color</code> e a borda acompanha.</td><td><code>border-top-color</code> = <code>rgb(0, 0, 128)</code></td><td><a href="border.html">Bordas</a></td></tr>
+<tr><td><code>Canvas</code> / <code>CanvasText</code></td><td>o fundo e o texto padrão da página, no tema do sistema (claro ou escuro)</td><td><code>rgb(255, 255, 255)</code> / <code>rgb(0, 0, 0)</code> (tema claro)</td><td><a href="tema-escuro.html">Tema Escuro</a></td></tr>
+<tr><td><code>LinkText</code>, <code>VisitedText</code>, <code>ActiveText</code></td><td>as cores padrão dos links: não visitado, visitado, sendo clicado</td><td>—</td><td><a href="links.html">Links</a></td></tr>
+<tr><td><code>ButtonFace</code>, <code>ButtonText</code>, <code>ButtonBorder</code></td><td>o fundo, o texto e a borda dos botões do sistema</td><td>—</td><td><a href="botoes.html">Botões</a></td></tr>
+<tr><td><code>Field</code>, <code>FieldText</code></td><td>o fundo e o texto dos campos de formulário</td><td>—</td><td><a href="formularios.html">Formulários</a></td></tr>
+<tr><td><code>Highlight</code>, <code>HighlightText</code></td><td>o fundo e o texto de um trecho selecionado</td><td>—</td><td>—</td></tr>
+<tr><td><code>GrayText</code></td><td>o texto de algo desativado</td><td>—</td><td>—</td></tr>
+<tr><td><code>AccentColor</code>, <code>AccentColorText</code></td><td>a cor de destaque escolhida no sistema (a das caixas marcadas)</td><td>—</td><td><a href="accent-color.html">accent-color</a></td></tr>
+</table>
+</div>
+<p>As cores do sistema mudam conforme o computador, o tema e o modo de alto contraste: servem para fazer algo "parecer do sistema", não para a identidade do seu site.</p>
+<div class="note"><strong>Suporte:</strong> <code>transparent</code> e <code>currentcolor</code> funcionam em todos os navegadores. Entre as cores do sistema, <code>AccentColor</code> é recente no Chrome (149; Firefox 103, Safari 16.5), e <code>ButtonBorder</code>, <code>Mark</code> e <code>MarkText</code> ainda não funcionam no Safari.</div>
+
+<h2 id="contraste">Contraste: nem toda cor serve para texto</h2>
+<p>Um nome bonito não garante leitura. A regra de acessibilidade (WCAG) pede contraste de pelo menos <strong>4,5 para 1</strong> entre o texto comum e o fundo. Algumas cores com nome sobre fundo branco (a conta é a da WCAG; a amostra, o seu navegador desenha):</p>
+<ul class="paleta paleta-contraste">
+  <li style="color: navy">navy · 16:1</li>
+  <li style="color: maroon">maroon · 10,9:1</li>
+  <li style="color: darkslategray">darkslategray · 8,9:1</li>
+  <li style="color: rebeccapurple">rebeccapurple · 8,4:1</li>
+  <li style="color: darkgreen">darkgreen · 7,4:1</li>
+  <li style="color: firebrick">firebrick · 6,7:1</li>
+  <li style="color: dimgray">dimgray · 5,5:1</li>
+  <li style="color: crimson">crimson · 5:1</li>
+  <li style="color: teal">teal · 4,8:1</li>
+  <li style="color: seagreen">seagreen · 4,3:1 ✗</li>
+  <li style="color: steelblue">steelblue · 4,1:1 ✗</li>
+  <li style="color: gray">gray · 3,9:1 ✗</li>
+  <li style="color: tomato">tomato · 3:1 ✗</li>
+  <li style="color: orange">orange · 2:1 ✗</li>
+  <li style="color: yellow">yellow · 1,1:1 ✗</li>
+</ul>
+<p>As marcadas com ✗ ficam abaixo de 4,5:1: use-as como fundo, borda ou detalhe, e não como cor de texto sobre branco. Mais na aula <a href="acessibilidade.html">CSS e Acessibilidade</a>.</p>
+
+<h2 id="experimente">Experimente</h2>
+<p>Troque os nomes no <code>style.css</code> e veja as cores mudarem. Tente uma da tabela, como <code>cornflowerblue</code> ou <code>papayawhip</code>:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Fofinho, com cobertura de chocolate.&lt;/p&gt;
+  &lt;p class="preco"&gt;R$ 35,00&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  background-color: oldlace;
+  border: 3px solid sandybrown;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+h2 {
+  color: saddlebrown;
+}
+
+.preco {
+  color: white;
+  background-color: seagreen;
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+}
+</pre>
+</div>
+
+<h2 id="errado">Quando dá errado</h2>
+<div class="cenario">
+<strong>Nome escrito errado, com hífen ou com aspas</strong>
+<pre class="file" data-file="style.css · erro de propósito">h1 {
+  color: tomatoe;
+}
+h2 {
+  color: light-blue;
+}
+p {
+  color: "tomato";
+}</pre>
+<p><strong>O que a Ana vê:</strong> os títulos e o parágrafo continuam pretos, a cor que eles herdam. Conferido no Chromium: com <code>color: tomatoe</code>, o calculado ficou <code>rgb(0, 0, 0)</code>.</p>
+<p><strong>Por quê:</strong> o navegador só conhece os nomes desta página, escritos do jeito certo. Um nome que não existe, um hífen no meio ou aspas em volta tornam o valor inválido, e a declaração inteira é ignorada. No F12, painel <strong>Styles</strong> (Estilos), a linha aparece riscada, com um ícone de aviso.</p>
+<p><strong>O validador W3C:</strong></p>
+<pre class="term" data-cwd="~/ref/cores">$ vnu --css tomatoe.css
+"file:/home/ana/ref/cores/tomatoe.css":2.10-2.16: error: CSS: “color”: “tomatoe” is not a “color” value.
+$ vnu --css hifen.css
+"file:/home/ana/ref/cores/hifen.css":2.10-2.19: error: CSS: “color”: “light-blue” is not a “color” value.
+$ vnu --css aspas.css
+"file:/home/ana/ref/cores/aspas.css":2.10-2.17: error: CSS: “color”: “"tomato"” is not a “color” value.</pre>
+<p><em>“tomatoe” is not a “color” value</em> = "<code>tomatoe</code> não é um valor de cor". Nomes certos com maiúsculas (<code>Tomato</code>), <code>grey</code>, <code>rebeccapurple</code>, <code>currentcolor</code> e as cores do sistema (<code>CanvasText</code>) passaram sem nenhuma mensagem.</p>
+<p><strong>Como resolver:</strong> copie o nome desta página. Se a cor que você quer não tem nome, use o código: <code>#ff6347</code> ou <code>rgb(255 99 71)</code>.</p>
+</div>
+
+<h2>Missão</h2>
+<div class="tryhtml" data-goal="css:h1{color}=rgb(102, 51, 153),css:body{background-color}=rgb(255, 240, 245)">
+<p class="try-task"><strong>Missão:</strong> o título da Ana devia sair roxo, mas há um erro no nome da cor. (1) Conserte o nome para <code>rebeccapurple</code>. (2) Dê à página (<code>body</code>) o fundo <code>lavenderblush</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Doces da Ana&lt;/h1&gt;
+&lt;p&gt;Brigadeiro, beijinho e cajuzinho.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: rebecapurple;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  background-color: lavenderblush;
+}
+
+h1 {
+  color: rebeccapurple;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O CSS tem 148 nomes de cores (CSS Color 4), em inglês, escritos juntos e sem aspas: <code>lightseagreen</code>.</li>
+  <li>Maiúsculas não importam, mas o costume é minúsculas.</li>
+  <li>Cada nome é um apelido de um código: <code>tomato</code> = <code>#ff6347</code> = <code>rgb(255, 99, 71)</code>.</li>
+  <li>Sinônimos: <code>gray</code>/<code>grey</code>, <code>aqua</code>/<code>cyan</code>, <code>fuchsia</code>/<code>magenta</code>. E <code>darkgray</code> é mais clara que <code>gray</code>.</li>
+  <li>Especiais: <code>transparent</code>, <code>currentcolor</code> (a cor da letra) e as cores do sistema (<code>Canvas</code>, <code>CanvasText</code>…).</li>
+  <li>Texto precisa de contraste de 4,5:1: <code>yellow</code>, <code>orange</code> e <code>tomato</code> sobre branco não passam.</li>
+  <li>Nome errado = declaração ignorada; o validador diz <code>is not a “color” value</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
