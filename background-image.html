@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS background-image — a imagem de fundo | Guia CSS</title>
+<meta name="description" content="Imagem de fundo em CSS para quem nunca escreveu CSS: background-image com url(), o caminho relativo ao arquivo CSS, a caixa que precisa de tamanho, a repetição em azulejo, a cor por trás da imagem, várias imagens, quando usar img e quando usar fundo, e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">background-image</span></h1>
+
+<p class="intro">Na aula anterior você pintou o fundo com uma cor. Agora vai pôr uma <strong>imagem</strong> no fundo: a foto do bolo atrás do título da receita, o mapa atrás do endereço da lojinha, um desenho que se repete como papel de parede. A propriedade é <code>background-image</code> ("imagem de fundo"), e a imagem entra com a função <code>url()</code>.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Como escrever <code>background-image: url("…")</code>, parte por parte.</li>
+  <li>A regra do caminho: ele parte do <strong>arquivo CSS</strong>, e não da página.</li>
+  <li>Por que a caixa precisa ter tamanho para a imagem aparecer.</li>
+  <li>O que o navegador faz quando a imagem é menor que a caixa (repete) e quando é maior (corta).</li>
+  <li>Por que pôr uma cor junto com a imagem, e como usar várias imagens de uma vez.</li>
+  <li>Quando usar <code>&lt;img&gt;</code> e quando usar imagem de fundo.</li>
+  <li>O que acontece quando dá errado, e as mensagens reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Antes, veja <a href="background-color.html">Cor de Fundo</a>. As imagens dos exemplos são as do próprio guia (pasta <code>assets/midia/</code>): o bolo de cenoura, o logo da Lojinha da Ana e o mapa do bairro. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: o papel de parede</h2>
+<p>No Guia HTML, a foto entrava com o <code>&lt;img&gt;</code>: um quadro pendurado na parede, que faz parte do conteúdo (tem <code>alt</code>, ocupa um lugar no texto). A imagem de fundo é diferente: é o <strong>papel de parede</strong>. Ela fica atrás do conteúdo, cobre só a área da parede (a caixa do elemento) e não "conta" como conteúdo. Se a parede for maior que o rolo de papel, o papel se repete; se for menor, o papel é cortado na beirada.</p>
+
+<p>Guarde essas três ideias, que você vai ver ao vivo: a imagem fica <strong>atrás</strong> do texto, ela <strong>não dá tamanho</strong> à caixa, e ela <strong>se repete ou é cortada</strong> para preencher a caixa.</p>
+
+<hr>
+
+<h2>1. A primeira imagem de fundo</h2>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="capa"&gt;
+  &lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;/div&gt;
+&lt;p&gt;A receita preferida da família da Ana.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.capa {
+  background-image: url("assets/midia/bolo-400.jpg");
+  height: 300px;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>.capa</dt><dd>O seletor: a <code>div</code> com <code>class="capa"</code>.</dd>
+  <dt>background-image</dt><dd>A propriedade: a imagem do fundo.</dd>
+  <dt>url(</dt><dd>A função que diz "isto é o endereço de um arquivo". <code>url</code> vem de <em>Uniform Resource Locator</em>, o nome técnico de um endereço. Sem ela, o navegador não sabe que o texto é um caminho.</dd>
+  <dt>"assets/midia/bolo-400.jpg"</dt><dd>O caminho do arquivo, entre aspas: a mesma ideia do <code>src</code> do <code>&lt;img&gt;</code>. Aqui, a foto do bolo de 400×300 pixels.</dd>
+  <dt>)</dt><dd>Fecha a função.</dd>
+  <dt>height: 300px;</dt><dd>A altura da caixa ("altura" = <em>height</em>). Sem ela, a caixa teria só a altura do título, e a foto ficaria quase toda escondida (seção 3).</dd>
+</dl>
+
+<p>Olhe o resultado. A foto aparece no canto de cima, à esquerda, no tamanho original dela (400×300), e o título fica <strong>por cima</strong> dela. Se o quadro for mais largo que 400 pixels, a foto <strong>começa de novo</strong> logo ao lado, cortada na beirada direita: é o papel de parede se repetindo. O parágrafo de baixo fica fora da <code>div</code>, então não tem fundo.</p>
+
+<h3>As aspas</h3>
+<p>Dentro do <code>url()</code>, as aspas são opcionais: <code>url("bolo.jpg")</code>, <code>url('bolo.jpg')</code> e <code>url(bolo.jpg)</code> funcionam igual. Mas, se o caminho tiver espaço ou parênteses, sem aspas ele quebra (veja "Quando dá errado"). O guia usa sempre aspas duplas: é um hábito que nunca falha.</p>
+
+<hr>
+
+<h2>2. O caminho parte do arquivo CSS</h2>
+<p>Esta é a regra que mais derruba imagens de fundo. No <code>&lt;img src="…"&gt;</code>, o caminho parte da <strong>página HTML</strong>. No <code>url()</code> de uma folha de estilo, ele parte do <strong>arquivo CSS</strong>. Quando os dois estão na mesma pasta, dá no mesmo. Mas os sites costumam guardar o CSS numa pasta própria. O site de receitas da Ana ficou assim:</p>
+
+<pre class="term" data-cwd="~/receitas">$ tree
+.
+├── css
+│   └── style.css
+├── imagens
+│   ├── bolo.jpg
+│   └── logo.png
+└── index.html
+
+3 directories, 4 files</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quem pede a imagem</th><th>Está em</th><th>O caminho certo</th><th>Leia como</th></tr>
+<tr><td><code>&lt;img src&gt;</code> no <code>index.html</code></td><td>a pasta do site</td><td><code>imagens/bolo.jpg</code></td><td>"entre em <code>imagens</code>…"</td></tr>
+<tr><td><code>url()</code> no <code>css/style.css</code></td><td>a pasta <code>css</code></td><td><code>../imagens/bolo.jpg</code></td><td>"suba uma pasta (<code>..</code>), entre em <code>imagens</code>…"</td></tr>
+</table>
+</div>
+
+<p>Se a Ana copiar o <code>imagens/bolo.jpg</code> do HTML para o CSS, o navegador procura <code>css/imagens/bolo.jpg</code>, que não existe, e o fundo fica vazio. Sem mensagem nenhuma na tela.</p>
+
+<p>O editor do guia também funciona com pastas: na missão abaixo, a folha de estilo está em <code>css/style.css</code>, e a foto, em <code>assets/midia/</code>.</p>
+
+<div class="tryhtml" data-goal="src:url\(\s*[&quot;']?\.\./assets/midia/bolo-400\.jpg">
+<p class="try-task"><strong>Missão:</strong> o fundo da capa não aparece: você vê só a faixa cinza-clara. O caminho foi copiado do HTML. Conserte o caminho no <code>css/style.css</code> para que ele parta da pasta <code>css</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="css/style.css"&gt;
+&lt;div class="capa"&gt;
+  &lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="css/style.css">.capa {
+  background-color: lightgray;
+  background-image: url("assets/midia/bolo-400.jpg");
+  height: 300px;
+}
+</pre>
+<pre class="solucao" data-file="css/style.css">.capa {
+  background-color: lightgray;
+  background-image: url("../assets/midia/bolo-400.jpg");
+  height: 300px;
+}
+</pre>
+</div>
+
+<p>Com o <code>../</code>, o navegador sai da pasta <code>css</code>, volta para a pasta do site e de lá entra em <code>assets/midia</code>. Repare que o <code>&lt;link href="css/style.css"&gt;</code> do HTML continua partindo da página: ele está no HTML.</p>
+
+<div class="note">
+<strong>E no atributo <code>style</code>?</strong>
+<p>Num <code>style="background-image: url(…)"</code> escrito na própria tag, ou num <code>&lt;style&gt;</code> dentro da página, o CSS está <strong>no HTML</strong>, então o caminho parte da página. A regra completa é: o caminho parte de <strong>onde o CSS está escrito</strong>.</p>
+</div>
+
+<hr>
+
+<h2>3. A caixa precisa de tamanho</h2>
+<p>Um <code>&lt;img&gt;</code> ocupa o tamanho da foto. Uma imagem de fundo <strong>não</strong>: ela só preenche a caixa que já existe. O tamanho da caixa vem do conteúdo (o texto dentro dela) ou de uma altura que você define. Compare as três caixas, todas com a mesma foto no fundo:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Caixa 1, vazia:&lt;/p&gt;
+&lt;div class="foto"&gt;&lt;/div&gt;
+&lt;p&gt;Caixa 2, com um título dentro:&lt;/p&gt;
+&lt;div class="foto"&gt;&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;&lt;/div&gt;
+&lt;p&gt;Caixa 3, com altura de 200px:&lt;/p&gt;
+&lt;div class="foto alta"&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.foto {
+  background-image: url("assets/midia/bolo-400.jpg");
+  border: 2px solid tomato;
+}
+
+.alta {
+  height: 200px;
+}
+</pre>
+</div>
+
+<ul>
+  <li><strong>Caixa 1:</strong> vazia, ela tem 0 pixel de altura. Sobra só a linha da borda vermelha (as bordas de cima e de baixo, encostadas). A foto está lá, mas não tem onde aparecer.</li>
+  <li><strong>Caixa 2:</strong> a altura é a do título. Aparece só uma faixa da parte de cima da foto (a parede da cozinha), e o bolo, que fica mais embaixo, nem aparece.</li>
+  <li><strong>Caixa 3:</strong> com <code>height: 200px</code>, aparecem os 200 pixels de cima da foto: a parede, a janela e o bolo, mas cortado embaixo: a base do bolo e o prato ficam de fora.</li>
+</ul>
+
+<p>A borda está ali só para você ver o tamanho de cada caixa (aula <a href="border.html">Bordas</a>). Na prática, a altura vem de <code>height</code> (aula <a href="width-height.html">Largura e Altura</a>), de um <code>padding</code> ou do próprio conteúdo. Mostrar a foto <strong>inteira</strong>, encaixada na caixa, é o trabalho do <code>background-size</code>, na aula <a href="background-size.html">Tamanho do Fundo</a>.</p>
+
+<hr>
+
+<h2>4. Menor que a caixa: o azulejo</h2>
+<p>Quando a imagem é menor que a caixa, o navegador a repete para os lados e para baixo, como azulejos, até cobrir tudo. Isso é ótimo para padrões (listras, bolinhas, texturas) e péssimo para fotos. Veja com o logo da lojinha, que tem 200×80 pixels:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="papel"&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.papel {
+  background-image: url("assets/midia/logo-lojinha-200.png");
+  height: 200px;
+}
+</pre>
+</div>
+
+<p>O logo aparece várias vezes, lado a lado, em fileiras: duas fileiras inteiras e, embaixo, uma terceira cortada pela beirada da caixa (200 pixels de altura não são múltiplo de 80). Na direita, o último logo também é cortado. A aula <a href="background-posicao.html">Repetição e Posição do Fundo</a> mostra como desligar a repetição (<code>background-repeat: no-repeat</code>) e escolher onde a imagem fica.</p>
+
+<hr>
+
+<h2>5. Cor e imagem juntas</h2>
+<p>O <code>background-color</code> e o <code>background-image</code> convivem na mesma caixa: a cor fica <strong>embaixo</strong> e a imagem, <strong>por cima</strong>. Isso tem três usos:</p>
+
+<ol>
+  <li><strong>Imagem com partes transparentes</strong> (um PNG ou SVG como o logo): a cor aparece pelos buracos.</li>
+  <li><strong>Enquanto a imagem carrega</strong>, numa internet lenta, a pessoa já vê a cor.</li>
+  <li><strong>Se a imagem não carregar</strong> (caminho errado, arquivo apagado), sobra a cor, e o texto por cima continua legível.</li>
+</ol>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="logo"&gt;&lt;/div&gt;
+&lt;div class="capa"&gt;
+  &lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.logo {
+  background-color: lightyellow;
+  background-image: url("assets/midia/logo-lojinha-200.png");
+  height: 80px;
+}
+
+.capa {
+  background-color: saddlebrown;
+  background-image: url("assets/midia/bolo-400.jgp");
+  color: white;
+  height: 120px;
+}
+</pre>
+</div>
+
+<p>Na primeira caixa, o logo tem fundo transparente, e o amarelo-claro aparece atrás dele, inclusive entre as letras. Na segunda, a extensão está errada de propósito (<code>.jgp</code>): a foto não carrega, e o que você vê é o marrom do <code>saddlebrown</code> com o título branco, ainda legível. Conserte para <code>.jpg</code>: a foto entra por cima do marrom, que deixa de aparecer.</p>
+
+<div class="tip">
+<strong>A cor certa para pôr junto</strong>
+<p>Escolha uma cor parecida com o tom geral da imagem (o marrom do bolo, o verde do mapa). Assim, a troca da cor pela foto quase não se nota, e o texto escolhido para a foto também combina com a cor.</p>
+</div>
+
+<h3>Texto em cima de foto</h3>
+<p>Uma foto tem partes claras e escuras: nenhuma cor de letra dá bom contraste com tudo. No Resultado da seção 1, o título preto fica sobre a parede clarinha e funciona, mas em cima da cobertura de chocolate sumiria. A saída mais simples é dar ao texto um fundo próprio, meio transparente:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="capa"&gt;
+  &lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.capa {
+  background-color: saddlebrown;
+  background-image: url("assets/midia/bolo-400.jpg");
+  height: 300px;
+}
+
+.capa h1 {
+  color: white;
+  background-color: rgb(0 0 0 / 60%);
+}
+</pre>
+</div>
+
+<p>O título fica numa faixa escura e meio transparente: a foto aparece através dela, e as letras brancas se leem bem. Outra saída, mais bonita, é escurecer a foto inteira com um degradê por cima dela, que você vai ver na aula <a href="gradientes.html">Degradês</a>.</p>
+
+<hr>
+
+<h2>6. Várias imagens de uma vez</h2>
+<p>O <code>background-image</code> aceita uma <strong>lista</strong> de imagens, separadas por vírgula. A primeira da lista fica por cima de todas; a última, embaixo. A cor, se houver, fica abaixo de todas:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="onde"&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.onde {
+  background-image:
+    url("assets/midia/logo-lojinha-200.png"),
+    url("assets/midia/mapa-400.png");
+  height: 250px;
+}
+</pre>
+</div>
+
+<p>Os logos (transparentes) ficam por cima do mapa, e os dois se repetem. Do jeito que está, fica confuso. Com <code>background-repeat</code> e <code>background-position</code> (próxima aula), dá para pôr um logo só, num canto, em cima de um mapa: aí as várias imagens mostram para que servem. Troque a ordem das duas linhas e veja o mapa cobrir os logos.</p>
+
+<hr>
+
+<h2>7. <code>&lt;img&gt;</code> ou imagem de fundo?</h2>
+<p>As duas mostram uma imagem, mas não são a mesma coisa. A pergunta que decide é: <strong>se a imagem sumir, a pessoa perde informação?</strong></p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th><code>&lt;img src alt&gt;</code> (no HTML)</th><th><code>background-image</code> (no CSS)</th></tr>
+<tr><td>O que é</td><td>Conteúdo: faz parte do que a página diz</td><td>Enfeite: faz parte da aparência</td></tr>
+<tr><td>Texto alternativo</td><td>Tem <code>alt</code>, lido pelo leitor de tela</td><td>Não tem: o leitor de tela ignora a imagem</td></tr>
+<tr><td>Tamanho da caixa</td><td>A foto dá o tamanho</td><td>A caixa precisa ter tamanho próprio</td></tr>
+<tr><td>Texto por cima</td><td>Difícil (precisa de posicionamento)</td><td>Natural: o conteúdo da caixa fica por cima</td></tr>
+<tr><td>Imprimir a página</td><td>Sai na impressão</td><td>Os navegadores costumam deixar os fundos fora da impressão</td></tr>
+<tr><td>Use para</td><td>a foto da receita, o produto da loja, o logo que é o nome do site, o avatar</td><td>texturas, padrões, a foto de capa atrás de um título, ícones decorativos</td></tr>
+</table>
+</div>
+
+<p>A foto do bolo na página da receita é conteúdo: <code>&lt;img&gt;</code> com <code>alt</code> (aula <a href="https://wallysondevs.github.io/guia-html/imagens.html">Imagens</a> do Guia HTML). A mesma foto, desfocada atrás do título "Receitas da Ana" na página inicial, é enfeite: imagem de fundo.</p>
+
+<hr>
+
+<h2>8. <code>none</code>: sem imagem</h2>
+<p>O valor inicial do <code>background-image</code> é <code>none</code> ("nenhuma"). Escreva-o para <strong>tirar</strong> uma imagem de fundo posta por outra regra, por exemplo, numa versão para celular em que a foto pesada não compensa:</p>
+
+<pre class="file" data-file="style.css">.capa.simples {
+  background-image: none;
+}
+</pre>
+
+<p>No F12, aba <em>Computed</em>, o <code>background-image</code> de uma caixa com imagem aparece como <code>url("…")</code> com o endereço <strong>completo</strong> (<code>https://…/assets/midia/bolo-400.jpg</code>), mesmo que você tenha escrito um caminho relativo: é o endereço que o navegador calculou a partir do arquivo CSS. Isso ajuda a achar caminhos errados (próxima seção).</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Imagem de fundo errada não mostra ícone de imagem quebrada nem mensagem: o fundo simplesmente fica vazio (ou só com a cor). O validador pega os erros de escrita; o caminho errado, ele não vê.</p>
+
+<div class="cenario">
+<strong>Sem mensagem: o caminho errado</strong>
+<p><strong>O que aconteceu:</strong> o nome do arquivo, a pasta ou a extensão estão errados, ou o caminho foi pensado a partir do HTML (seção 2). O CSS é válido, o validador não reclama, e o fundo fica vazio.</p>
+<p>O console do editor do guia avisa quando um <code>&lt;img&gt;</code> não carrega, mas <strong>não</strong> avisa de imagem de fundo: elas não disparam esse aviso. No seu site de verdade, abra o F12:</p>
+<ul>
+  <li>na aba <em>Network</em> ("Rede"), recarregue a página: a imagem que falhou aparece em vermelho, com o código <code>404</code> ("não encontrado");</li>
+  <li>na aba <em>Console</em>, o Chrome mostra um erro de recurso que não carregou, com o endereço completo. Leia o endereço: ele mostra onde o navegador procurou (por exemplo, <code>…/css/imagens/bolo.jpg</code>, com o <code>css/</code> a mais).</li>
+</ul>
+<p><strong>Como consertar:</strong> o caminho parte do arquivo CSS. Confira pasta, nome e extensão, em minúsculas.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-image”: “"bolo.jpg"” is not a “background-image” value.</code></strong>
+<p><strong>O que aconteceu:</strong> faltou o <code>url()</code>: <code>background-image: "bolo.jpg";</code>. Para o CSS, um texto entre aspas não é um endereço. A declaração é ignorada.</p>
+<pre class="term" data-cwd="~/imgfundo">$ vnu --css style.css
+"file:/home/ana/imgfundo/style.css":2.21-2.30: error: CSS: “background-image”: “"bolo.jpg"” is not a “background-image” value.
+"file:/home/ana/imgfundo/style.css":6.21-6.24: error: CSS: “background-image”: “bolo” is not a “background-image” value.
+"file:/home/ana/imgfundo/style.css":6.30-6.30: error: CSS: Parse Error.
+"file:/home/ana/imgfundo/style.css":7.2-8.1: error: CSS: Parse Error.</pre>
+<p>A linha 2 é a do texto entre aspas. As linhas 6 e 7 são de outro jeito do mesmo erro, sem aspas e sem <code>url()</code> (<code>background-image: bolo.jpg;</code>): o validador lê <code>bolo</code>, não entende o <code>.jpg</code> e se perde (<em>Parse Error</em> = "erro de leitura") até o fim da regra.</p>
+<p><strong>Como consertar:</strong> <code>background-image: url("bolo.jpg");</code>. O mesmo vale para quem se lembra do HTML e escreve <code>src("bolo.jpg")</code>: <code>“src("bolo.jpg")” is not a “background-image” value.</code></p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-image”: “url” is not a “background-image” value.</code></strong>
+<p><strong>O que aconteceu:</strong> um espaço entre <code>url</code> e o parêntese: <code>url (mapa.png)</code>. Numa função do CSS, o nome tem de vir <strong>colado</strong> no <code>(</code>. Com o espaço, <code>url</code> virou uma palavra solta.</p>
+<pre class="term" data-cwd="~/imgfundo">$ vnu --css style.css
+"file:/home/ana/imgfundo/style.css":10.24-10.24: error: CSS: “background-image”: “url” is not a “background-image” value.
+"file:/home/ana/imgfundo/style.css":10.36-10.36: error: CSS: Parse Error.
+"file:/home/ana/imgfundo/style.css":11.2-12.1: error: CSS: Parse Error.</pre>
+<p><strong>Como consertar:</strong> <code>url(mapa.png)</code>, sem espaço.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-image”: Parse Error.</code></strong>
+<p><strong>O que aconteceu:</strong> o nome do arquivo tem espaços e está sem aspas: <code>url(foto do bolo.jpg)</code>. Sem aspas, o espaço quebra o endereço.</p>
+<pre class="term" data-cwd="~/imgfundo">$ vnu --css style.css
+"file:/home/ana/imgfundo/style.css":14.41-14.41: error: CSS: “background-image”: Parse Error.</pre>
+<p>Com aspas, <code>url("foto do bolo.jpg")</code>, o validador aceita. Mas o melhor é não ter espaço no nome do arquivo: <code>foto-do-bolo.jpg</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Sem mensagem: a caixa vazia</strong>
+<p><strong>O que aconteceu:</strong> <code>&lt;div class="capa"&gt;&lt;/div&gt;</code> sem conteúdo e sem altura. O CSS está certo, a imagem carregou, mas a caixa tem 0 pixel de altura (seção 3).</p>
+<p><strong>Como consertar:</strong> dê uma altura (<code>height</code>) ou ponha conteúdo dentro. No F12, passe o mouse sobre o elemento na aba <em>Elements</em>: o navegador destaca a caixa na página, e você vê que ela não tem altura.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>background-image: url("bolo.jpg");</code></td><td>Põe a imagem no fundo; o caminho parte do arquivo CSS</td></tr>
+<tr><td><code>url("../imagens/bolo.jpg")</code></td><td>Sobe uma pasta: o caso comum, com o CSS na pasta <code>css/</code></td></tr>
+<tr><td><code>background-image: url("a.png"), url("b.png");</code></td><td>Várias imagens; a primeira fica por cima</td></tr>
+<tr><td><code>background-image: none;</code></td><td>Sem imagem (o valor inicial)</td></tr>
+<tr><td><code>background-color</code> junto</td><td>A cor fica embaixo da imagem: aparece pelos buracos, enquanto carrega e se a imagem falhar</td></tr>
+<tr><td>Imagem menor que a caixa</td><td>Repete como azulejo (aula <a href="background-posicao.html">Repetição e Posição</a>)</td></tr>
+<tr><td>Imagem maior que a caixa</td><td>É cortada; fica do canto de cima, à esquerda (aula <a href="background-size.html">Tamanho do Fundo</a>)</td></tr>
+<tr><td>Valor calculado</td><td><code>url("endereço completo")</code> ou <code>none</code></td></tr>
+<tr><td>Herança</td><td>Não é herdado</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A função do endereço</h3>
+<p>Complete:</p>
+<div class="ex-code">.topo {
+  background-image: <input data-answer="url" aria-label="função">("imagens/textura.png");
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. Subir uma pasta</h3>
+<p>O CSS está em <code>css/style.css</code> e a imagem em <code>imagens/mapa.png</code>. Complete o caminho:</p>
+<div class="ex-code">.onde {
+  background-image: url("<input data-answer="../imagens/mapa.png" aria-label="caminho">");
+}</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. A <code>div</code> tem <code>background-image</code> com o caminho certo, mas nada aparece. A <code>div</code> está vazia e não tem <code>height</code>. Por quê?</p>
+<label><input type="radio" name="q3"> Imagem de fundo só funciona no <code>body</code></label>
+<label><input type="radio" name="q3"> A caixa tem 0 pixel de altura: não há onde a imagem aparecer</label>
+<label><input type="radio" name="q3"> Faltou o <code>alt</code></label>
+<label><input type="radio" name="q3"> O navegador só mostra a imagem quando o mouse passa por cima</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Qual destas imagens deveria ser um <code>&lt;img&gt;</code>, e não um fundo?</p>
+<label><input type="radio" name="q4"> Uma textura de papel atrás do texto</label>
+<label><input type="radio" name="q4"> Bolinhas coloridas repetidas atrás do cabeçalho</label>
+<label><input type="radio" name="q4"> A foto do produto na página da lojinha</label>
+<label><input type="radio" name="q4"> Uma onda decorativa no rodapé</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. <code>background-image: url("a.png"), url("b.png");</code> Qual fica por cima?</p>
+<label><input type="radio" name="q5"> <code>a.png</code>, a primeira da lista</label>
+<label><input type="radio" name="q5"> <code>b.png</code>, a última da lista</label>
+<label><input type="radio" name="q5"> As duas se misturam meio a meio</label>
+<label><input type="radio" name="q5"> Só a última aparece</label>
+</div>
+
+<h3>Missão final: onde fica a lojinha</h3>
+
+<div class="tryhtml" data-goal="src:background-image:\s*url\(\s*[&quot;']?assets/midia/mapa-800\.png[&quot;']?\s*\),css:.mapa{height}=250px,css:.mapa{background-color}=rgb(232, 239, 224)">
+<p class="try-task"><strong>Missão:</strong> a caixa <code>.mapa</code> deve mostrar o mapa do bairro (<code>assets/midia/mapa-800.png</code>) no fundo, com 250px de altura e a cor <code>#e8efe0</code> (um verde bem claro, parecido com o mapa) por baixo, para o caso de a imagem demorar. O CSS está na mesma pasta da página. Conserte o que está errado e complete o que falta.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Onde fica a Lojinha da Ana&lt;/h1&gt;
+&lt;div class="mapa"&gt;&lt;/div&gt;
+&lt;p&gt;Rua das Flores, esquina com a Av. Central.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.mapa {
+  background-image: "mapa-800.png";
+}
+</pre>
+<pre class="solucao" data-file="style.css">.mapa {
+  background-color: #e8efe0;
+  background-image: url("assets/midia/mapa-800.png");
+  height: 250px;
+}
+</pre>
+</div>
+
+<p>No começo, a caixa estava vazia e sem altura, e o <code>background-image</code> tinha dois problemas: faltava o <code>url()</code> e faltava a pasta. Com a altura de 250px, aparece a parte de cima do mapa, com a Rua das Flores e o marcador da lojinha; o resto do mapa fica cortado. Na aula <a href="background-size.html">Tamanho do Fundo</a> você vai encaixar o mapa inteiro.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>background-image: url("caminho");</code> põe uma imagem atrás do conteúdo do elemento. Aspas são opcionais, mas evitam problemas.</li>
+  <li>O caminho parte de <strong>onde o CSS está escrito</strong>: num <code>css/style.css</code>, quase sempre começa com <code>../</code>.</li>
+  <li>A imagem de fundo não dá tamanho à caixa: sem conteúdo nem <code>height</code>, ela não aparece.</li>
+  <li>Imagem menor que a caixa se repete como azulejo; maior, é cortada, a partir do canto de cima, à esquerda.</li>
+  <li>Ponha um <code>background-color</code> junto: aparece pelos buracos, enquanto a imagem carrega e se ela falhar. Texto sobre foto precisa de ajuda para ter contraste.</li>
+  <li>Várias imagens, separadas por vírgula: a primeira fica por cima.</li>
+  <li>Conteúdo (a foto do produto, da receita) é <code>&lt;img&gt;</code> com <code>alt</code>; enfeite é imagem de fundo.</li>
+  <li>Caminho errado não dá mensagem: procure o 404 na aba <em>Network</em> do F12. O validador pega o <code>url()</code> esquecido, o espaço em <code>url (</code> e o caminho com espaço sem aspas.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
