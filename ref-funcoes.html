@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Funções — calc, var, clamp, rgb, color-mix e todas as outras | Guia CSS</title>
+<meta name="description" content="Referência das funções do CSS: contas (calc, min, max, clamp, round), variáveis (var, env, attr), cores (rgb, hsl, hwb, oklch, color-mix, light-dark), imagens e degradês, transformações, filtros, curvas de animação, Grid e recortes. Cada uma com um exemplo, o valor calculado medido no navegador, o suporte e a aula.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Funções</span></h1>
+
+<p class="intro">Uma <strong>função</strong> do CSS é um valor que faz alguma coisa antes de ser usado: uma conta (<code>calc(100% - 2rem)</code>), a leitura de uma variável (<code>var(--cor)</code>), uma cor misturada (<code>color-mix(…)</code>), um giro (<code>rotate(45deg)</code>). Esta página lista todas as funções que você vai encontrar, por assunto, com um exemplo, o resultado calculado pelo Chromium e a aula que explica cada uma.</p>
+
+<div class="note">
+<strong>Como usar esta página</strong>
+<ul>
+  <li>Procure com <kbd>Ctrl</kbd>+<kbd>F</kbd> pelo nome da função (<code>clamp</code>, <code>oklch</code>).</li>
+  <li>A coluna "Calculado" mostra o que o Chromium devolveu em <code>getComputedStyle</code>, o mesmo que a aba <strong>Computed</strong> do F12. Medido num elemento dentro de um pai de 400px, numa janela de 800 × 600, com a letra padrão de 16px. Onde aparece "—", o valor depende da tela ou não foi medido.</li>
+  <li>As funções recentes estão marcadas com <strong>novo</strong> e têm o suporte numa nota (dados do MDN, outubro de 2026).</li>
+</ul>
+</div>
+
+<p>Atalhos: <a href="#anatomia">Como se escreve</a> · <a href="#contas">Contas</a> · <a href="#variaveis">Variáveis e valores de fora</a> · <a href="#cores">Cores</a> · <a href="#imagens">Imagens e degradês</a> · <a href="#transform">Transformações</a> · <a href="#filtros">Filtros</a> · <a href="#tempo">Animação</a> · <a href="#grid">Grid</a> · <a href="#formas">Formas</a> · <a href="#outras">Outras</a> · <a href="#errado">Quando dá errado</a></p>
+
+<hr>
+
+<h2 id="anatomia">Como se escreve</h2>
+<pre class="file" data-file="anatomia">.cartao {
+  width: calc(100% - 2rem);
+  color: var(--cor-marca, tomato);
+}</pre>
+<dl class="anatomy">
+  <dt>calc</dt><dd>O nome da função, <strong>grudado</strong> no parêntese: <code>calc (…)</code>, com espaço, não funciona.</dd>
+  <dt>( … )</dt><dd>Os <strong>argumentos</strong>, o que a função recebe para trabalhar.</dd>
+  <dt>100% - 2rem</dt><dd>No <code>calc()</code>, o <code>+</code> e o <code>-</code> precisam de <strong>espaço dos dois lados</strong>: <code>100%-2rem</code> não funciona.</dd>
+  <dt>--cor-marca, tomato</dt><dd>Vários argumentos são separados por <strong>vírgula</strong>. Aqui, o segundo é a "reserva": a cor usada se a variável não existir.</dd>
+</dl>
+<p>Uma função pode ir dentro de outra: <code>calc(var(--espaco) * 2)</code>, <code>clamp(1rem, 2vw + 1rem, 3rem)</code>.</p>
+
+<h2 id="contas">Contas</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Função</th><th>O que faz</th><th>Exemplo</th><th>Calculado</th><th>Aula</th></tr>
+<tr><td><code>calc()</code></td><td>faz uma conta com <code>+ - * /</code>, misturando unidades</td><td><code>width: calc(100% - 2rem)</code></td><td><code>368px</code> (400 − 32)</td><td><a href="calc.html">calc()</a></td></tr>
+<tr><td><code>min()</code></td><td>o <strong>menor</strong> dos valores: funciona como um limite máximo</td><td><code>padding: min(5vw, 30px)</code></td><td><code>30px</code> (5vw = 40px)</td><td><a href="clamp.html">min, max, clamp</a></td></tr>
+<tr><td><code>max()</code></td><td>o <strong>maior</strong> dos valores: um limite mínimo</td><td><code>margin-left: max(10px, 2%)</code></td><td><code>10px</code> (2% = 8px)</td><td><a href="clamp.html">min, max, clamp</a></td></tr>
+<tr><td><code>clamp(mín, ideal, máx)</code></td><td>o valor ideal, mas preso entre um mínimo e um máximo</td><td><code>font-size: clamp(1rem, 4vw, 2rem)</code></td><td><code>32px</code> (4vw = 32px, dentro do limite)</td><td><a href="clamp.html">min, max, clamp</a></td></tr>
+<tr><td><code>round()</code> <strong>novo</strong></td><td>arredonda para um múltiplo</td><td><code>width: round(37px, 10px)</code></td><td><code>40px</code></td><td>—</td></tr>
+<tr><td><code>mod()</code>, <code>rem()</code> <strong>novo</strong></td><td>o resto de uma divisão</td><td><code>mod(18px, 5px)</code> = 3px</td><td>—</td><td>—</td></tr>
+<tr><td><code>abs()</code>, <code>sign()</code> <strong>novo</strong></td><td>o valor sem sinal / o sinal (−1, 0 ou 1)</td><td><code>abs(-2px)</code> = 2px</td><td>—</td><td>—</td></tr>
+<tr><td><code>sin()</code>, <code>cos()</code>, <code>tan()</code>, <code>asin()</code>, <code>acos()</code>, <code>atan()</code>, <code>atan2()</code></td><td>trigonometria (para pôr itens em círculo, por exemplo)</td><td><code>translate: calc(cos(45deg) * 5rem)</code></td><td>—</td><td>—</td></tr>
+<tr><td><code>pow()</code>, <code>sqrt()</code>, <code>hypot()</code>, <code>log()</code>, <code>exp()</code></td><td>potência, raiz quadrada, hipotenusa, logaritmo, exponencial</td><td><code>font-size: calc(1rem * pow(1.25, 2))</code></td><td>—</td><td>—</td></tr>
+</table>
+</div>
+<div class="note"><strong>Suporte:</strong> <code>calc()</code> funciona em todos há mais de dez anos; <code>min()</code>, <code>max()</code> e <code>clamp()</code>, desde 2020 (Chrome 79, Firefox 75, Safari 13.1). <code>round()</code>, <code>mod()</code> e <code>rem()</code>: Chrome 125, Firefox 118, Safari 15.4. <code>abs()</code> e <code>sign()</code> chegaram por último ao Chrome (138). <code>pow()</code>, <code>sqrt()</code> e companhia: Chrome 120, Firefox 118, Safari 15.4.</div>
+
+<h2 id="variaveis">Variáveis e valores que vêm de fora</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Função</th><th>O que faz</th><th>Exemplo</th><th>Calculado</th><th>Aula</th></tr>
+<tr><td><code>var(--nome)</code></td><td>lê uma variável (<em>custom property</em>)</td><td><code>:root { --cor: tomato; }</code> e <code>color: var(--cor)</code></td><td><code>rgb(255, 99, 71)</code></td><td><a href="variaveis.html">Variáveis</a></td></tr>
+<tr><td><code>var(--nome, reserva)</code></td><td>usa a reserva se a variável não existir</td><td><code>border-top-color: var(--nada, navy)</code></td><td><code>rgb(0, 0, 128)</code></td><td><a href="variaveis.html">Variáveis</a></td></tr>
+<tr><td><code>env()</code></td><td>lê um valor do aparelho, como a área do "entalhe" da câmera no celular</td><td><code>padding-top: env(safe-area-inset-top)</code></td><td>—</td><td><a href="viewport.html">A Meta Viewport</a></td></tr>
+<tr><td><code>attr()</code></td><td>lê um atributo do HTML. Em toda parte, funciona dentro do <code>content</code> de <code>::before</code>/<code>::after</code>.</td><td><code>content: attr(data-preco)</code></td><td><code>"R$ 5"</code></td><td><a href="before-after.html">::before e ::after</a></td></tr>
+<tr><td><code>url()</code></td><td>o endereço de um arquivo: imagem, fonte</td><td><code>background-image: url("assets/midia/bolo-400.jpg")</code></td><td>—</td><td><a href="background-image.html">Imagem de Fundo</a>, <a href="fontes-web.html">@font-face</a></td></tr>
+<tr><td><code>counter()</code>, <code>counters()</code></td><td>mostra o valor de um contador do CSS (numerar títulos, passos)</td><td><code>content: counter(passo) ". "</code></td><td>—</td><td>—</td></tr>
+</table>
+</div>
+<div class="note"><strong>Suporte:</strong> <code>var()</code> funciona em todos (Chrome 49, Firefox 31, Safari 9.1). O <code>attr()</code> com tipo, fora do <code>content</code> (por exemplo, <code>width: attr(data-largura type(&lt;length&gt;))</code>), é <strong>novo</strong>: Chrome 133 e Firefox 155, e ainda não no Safari.</div>
+
+<h2 id="cores">Cores</h2>
+<p>Todas as funções de cor aceitam um quarto valor depois da barra, a transparência (alfa): <code>rgb(255 99 71 / 50%)</code>. As sete primeiras linhas abaixo escrevem a mesma cor, o <code>tomato</code> (a segunda, meio transparente; nas de <code>oklch()</code>, <code>lab()</code> e <code>color()</code>, com os números arredondados):</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Função</th><th>Como funciona</th><th>Exemplo</th><th>Calculado</th><th>Aula</th></tr>
+<tr><td><code>rgb()</code></td><td>vermelho, verde e azul, de 0 a 255</td><td><code>rgb(255 99 71)</code></td><td><code>rgb(255, 99, 71)</code></td><td><a href="cores-rgb.html">rgb()</a></td></tr>
+<tr><td><code>rgb()</code> com alfa</td><td>o mesmo, meio transparente. <code>rgba()</code> é o nome antigo e ainda funciona.</td><td><code>rgb(255 99 71 / 50%)</code></td><td><code>rgba(255, 99, 71, 0.5)</code></td><td><a href="opacity.html">Transparência</a></td></tr>
+<tr><td><code>hsl()</code></td><td>matiz (0–360), saturação e luminosidade</td><td><code>hsl(9 100% 64%)</code></td><td><code>rgb(255, 99, 71)</code></td><td><a href="cores-hsl.html">hsl()</a></td></tr>
+<tr><td><code>hwb()</code></td><td>matiz, quanto de branco, quanto de preto</td><td><code>hwb(9 28% 0%)</code></td><td><code>rgb(255, 99, 71)</code></td><td><a href="cores-modernas.html">Cores Modernas</a></td></tr>
+<tr><td><code>oklch()</code></td><td>luminosidade, croma (intensidade) e matiz, num espaço de cor que acompanha o olho humano</td><td><code>oklch(69.6% 0.195 32.3)</code></td><td><code>oklch(0.696 0.195 32.3)</code> (fica nesse formato, não vira <code>rgb</code>)</td><td><a href="cores-modernas.html">Cores Modernas</a></td></tr>
+<tr><td><code>oklab()</code>, <code>lab()</code>, <code>lch()</code></td><td>outros espaços de cor "do olho humano"</td><td><code>lab(63% 59.4 47.9)</code></td><td>—</td><td><a href="cores-modernas.html">Cores Modernas</a></td></tr>
+<tr><td><code>color()</code></td><td>uma cor num espaço com nome, como o <code>display-p3</code> das telas modernas, com cores mais vivas que o rgb</td><td><code>color(display-p3 0.928 0.429 0.32)</code></td><td>—</td><td><a href="cores-modernas.html">Cores Modernas</a></td></tr>
+<tr><td><code>color-mix()</code></td><td>mistura duas cores, na proporção que você quiser</td><td><code>color-mix(in srgb, red 50%, blue)</code></td><td><code>color(srgb 0.5 0 0.5)</code> (um roxo)</td><td><a href="cores-modernas.html">Cores Modernas</a></td></tr>
+<tr><td><code>light-dark()</code> <strong>novo</strong></td><td>uma cor para o tema claro e outra para o escuro (precisa de <code>color-scheme: light dark</code>)</td><td><code>light-dark(navy, white)</code></td><td><code>rgb(0, 0, 128)</code> (no tema claro)</td><td><a href="tema-escuro.html">Tema Escuro</a></td></tr>
+<tr><td><code>rgb(from …)</code> <strong>novo</strong></td><td>"cor relativa": parte de uma cor e muda um pedaço dela</td><td><code>rgb(from tomato r g b / 50%)</code></td><td><code>color(srgb 1 0.388235 0.278431 / 0.5)</code></td><td><a href="cores-modernas.html">Cores Modernas</a></td></tr>
+</table>
+</div>
+<div class="note"><strong>Suporte:</strong> <code>oklch()</code>, <code>lab()</code>, <code>color()</code> e <code>color-mix()</code> funcionam nos navegadores de 2023 em diante (Chrome 111, Firefox 113, Safari 15–16.2). <code>light-dark()</code>: Chrome 123, Firefox 120, Safari 17.5. A cor relativa (<code>from</code>): Chrome 122, Firefox 128, Safari 18. A lista de nomes de cores está em <a href="ref-cores.html">Nomes de Cores</a>.</div>
+
+<h2 id="imagens">Imagens e degradês</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Função</th><th>O que desenha</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td><code>linear-gradient()</code></td><td>degradê em linha reta</td><td><code>linear-gradient(to right, gold, tomato)</code></td><td><a href="gradientes.html">Degradês</a></td></tr>
+<tr><td><code>radial-gradient()</code></td><td>degradê em círculo ou elipse, do centro para fora</td><td><code>radial-gradient(circle, white, skyblue)</code></td><td><a href="gradientes-radial.html">Radiais e Cônicos</a></td></tr>
+<tr><td><code>conic-gradient()</code></td><td>degradê em volta de um ponto, como um relógio (gráfico de pizza)</td><td><code>conic-gradient(tomato 0 25%, gold 0)</code></td><td><a href="gradientes-radial.html">Radiais e Cônicos</a></td></tr>
+<tr><td><code>repeating-linear-gradient()</code> e as versões <code>repeating-</code> dos outros dois</td><td>o degradê se repete (listras)</td><td><code>repeating-linear-gradient(45deg, white 0 10px, whitesmoke 10px 20px)</code></td><td><a href="gradientes.html">Degradês</a></td></tr>
+<tr><td><code>image-set()</code></td><td>a mesma imagem em várias resoluções; o navegador escolhe</td><td><code>image-set("bolo-400.jpg" 1x, "bolo-800.jpg" 2x)</code></td><td><a href="background-image.html">Imagem de Fundo</a></td></tr>
+</table>
+</div>
+
+<h2 id="transform">Transformações (<code>transform</code>)</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Função</th><th>O que faz</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td><code>translate(x, y)</code>, <code>translateX()</code>, <code>translateY()</code></td><td>move</td><td><code>translate(10px, 20px)</code></td><td><a href="transform.html">transform</a></td></tr>
+<tr><td><code>rotate(ângulo)</code></td><td>gira</td><td><code>rotate(45deg)</code></td><td><a href="transform.html">transform</a></td></tr>
+<tr><td><code>scale(x, y)</code>, <code>scaleX()</code>, <code>scaleY()</code></td><td>aumenta ou diminui (1 = tamanho normal)</td><td><code>scale(1.1)</code></td><td><a href="transform.html">transform</a></td></tr>
+<tr><td><code>skew(x, y)</code>, <code>skewX()</code>, <code>skewY()</code></td><td>inclina</td><td><code>skewX(10deg)</code></td><td><a href="transform.html">transform</a></td></tr>
+<tr><td><code>matrix()</code></td><td>todas as de cima numa conta só. Você quase nunca escreve; é o que o F12 mostra.</td><td><code>translate(10px, 20px) rotate(45deg)</code> → calculado <code>matrix(0.707107, 0.707107, -0.707107, 0.707107, 10, 20)</code></td><td><a href="transform.html">transform</a></td></tr>
+<tr><td><code>perspective()</code>, <code>rotateX()</code>, <code>rotateY()</code>, <code>translateZ()</code>, <code>rotate3d()</code>, <code>matrix3d()</code></td><td>as versões em 3D</td><td><code>perspective(600px) rotateY(30deg)</code></td><td><a href="transform-3d.html">Transformações em 3D</a></td></tr>
+</table>
+</div>
+
+<h2 id="filtros">Filtros (<code>filter</code> e <code>backdrop-filter</code>)</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Função</th><th>O que faz</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td><code>blur()</code></td><td>desfoca</td><td><code>blur(2px)</code></td><td><a href="filter.html">Filtros</a></td></tr>
+<tr><td><code>brightness()</code>, <code>contrast()</code>, <code>saturate()</code></td><td>brilho, contraste, saturação (1 ou 100% = normal)</td><td><code>brightness(1.2)</code></td><td><a href="filter.html">Filtros</a></td></tr>
+<tr><td><code>grayscale()</code>, <code>sepia()</code>, <code>invert()</code></td><td>tons de cinza, tom sépia, inverte as cores (0 = nada, 1 ou 100% = total)</td><td><code>grayscale(50%)</code> → calculado <code>grayscale(0.5)</code></td><td><a href="filter.html">Filtros</a></td></tr>
+<tr><td><code>hue-rotate()</code></td><td>gira todas as cores no círculo</td><td><code>hue-rotate(90deg)</code></td><td><a href="filter.html">Filtros</a></td></tr>
+<tr><td><code>opacity()</code></td><td>transparência, como filtro</td><td><code>opacity(0.5)</code></td><td><a href="filter.html">Filtros</a></td></tr>
+<tr><td><code>drop-shadow()</code></td><td>sombra que segue o <strong>contorno</strong> do desenho (bom para PNG e SVG com fundo transparente)</td><td><code>drop-shadow(2px 2px 4px gray)</code></td><td><a href="filter.html">Filtros</a></td></tr>
+</table>
+</div>
+
+<h2 id="tempo">Animação e transição</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Função</th><th>O que faz</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td><code>cubic-bezier()</code></td><td>a curva de velocidade da animação, desenhada com 4 números (<code>ease</code> = <code>cubic-bezier(0.25, 0.1, 0.25, 1)</code>)</td><td><code>cubic-bezier(0.68, -0.55, 0.27, 1.55)</code> (passa do ponto e volta)</td><td><a href="transition.html">Transições</a></td></tr>
+<tr><td><code>steps()</code></td><td>anda aos pulos, em N passos, sem suavidade</td><td><code>steps(4)</code></td><td><a href="animation-propriedades.html">Controlando Animações</a></td></tr>
+<tr><td><code>linear()</code> <strong>novo</strong></td><td>uma curva feita de vários pontos (quiques, molas)</td><td><code>linear(0, 0.8, 1, 0.9, 1)</code></td><td><a href="animation-propriedades.html">Controlando Animações</a></td></tr>
+</table>
+</div>
+
+<h2 id="grid">Grid</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Função</th><th>O que faz</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td><code>repeat()</code></td><td>repete trilhas</td><td><code>repeat(3, 1fr)</code></td><td><a href="grid-repeat.html">repeat e minmax</a></td></tr>
+<tr><td><code>minmax()</code></td><td>tamanho mínimo e máximo de uma trilha</td><td><code>minmax(12rem, 1fr)</code></td><td><a href="grid-repeat.html">repeat e minmax</a></td></tr>
+<tr><td><code>fit-content()</code></td><td>do tamanho do conteúdo, até um limite</td><td><code>fit-content(20rem)</code></td><td><a href="grid-repeat.html">repeat e minmax</a></td></tr>
+</table>
+</div>
+<p>Mais em <a href="ref-grid.html">Referência do Grid</a>.</p>
+
+<h2 id="formas">Formas (<code>clip-path</code> e <code>shape-outside</code>)</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Função</th><th>Recorta em forma de…</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td><code>circle()</code></td><td>círculo</td><td><code>circle(50%)</code></td><td><a href="clip-path.html">Recortes</a></td></tr>
+<tr><td><code>ellipse()</code></td><td>elipse</td><td><code>ellipse(50% 30%)</code></td><td><a href="clip-path.html">Recortes</a></td></tr>
+<tr><td><code>inset()</code></td><td>retângulo encolhido, com cantos arredondados opcionais</td><td><code>inset(10px round 8px)</code></td><td><a href="clip-path.html">Recortes</a></td></tr>
+<tr><td><code>polygon()</code></td><td>polígono, ponto a ponto</td><td><code>polygon(50% 0, 100% 100%, 0 100%)</code> (triângulo)</td><td><a href="clip-path.html">Recortes</a></td></tr>
+<tr><td><code>path()</code>, <code>shape()</code> <strong>novo</strong></td><td>um caminho livre (como no SVG)</td><td><code>path("M 0 0 L 100 0 L 50 100 Z")</code></td><td><a href="clip-path.html">Recortes</a></td></tr>
+</table>
+</div>
+
+<h2 id="outras">Outras funções que aparecem por aí</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Função</th><th>Onde</th><th>Aula</th></tr>
+<tr><td><code>format()</code>, <code>local()</code></td><td>no <code>src</code> do <code>@font-face</code>: o tipo do arquivo da fonte e uma fonte já instalada</td><td><a href="fontes-web.html">@font-face</a></td></tr>
+<tr><td><code>:not()</code>, <code>:is()</code>, <code>:where()</code>, <code>:has()</code>, <code>:nth-child()</code></td><td>nos seletores (são pseudo-classes, não funções de valor)</td><td><a href="ref-pseudo.html">Pseudo-classes</a></td></tr>
+<tr><td><code>sibling-index()</code>, <code>sibling-count()</code> <strong>novo</strong></td><td>a posição do elemento entre os irmãos e quantos irmãos ele tem, como número (para atrasos de animação em cascata)</td><td>—</td></tr>
+<tr><td><code>anchor()</code> <strong>novo</strong></td><td>posiciona um elemento grudado em outro (dicas, menus) com o <em>anchor positioning</em></td><td>—</td></tr>
+</table>
+</div>
+<div class="note"><strong>Muito novas:</strong> <code>sibling-index()</code> e <code>sibling-count()</code>: Chrome 138, Firefox 154, Safari 26.2. <code>anchor()</code>: Chrome 125, Firefox 147, Safari 26. <code>shape()</code>: Chrome 135, Firefox 148, Safari 18.4. Há ainda funções em teste só no Chrome, como <code>if()</code> e <code>calc-size()</code>: espere chegarem aos outros navegadores antes de usar.</div>
+
+<h2 id="experimente">Experimente</h2>
+<p>Um cartão feito só com funções. Mude o valor da variável <code>--cor-marca</code>, troque a porcentagem do <code>color-mix()</code>, mude a largura da janela para ver o <code>clamp()</code> agir no título:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Com cobertura de chocolate.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --cor-marca: tomato;
+  --espaco: 1rem;
+}
+
+.cartao {
+  box-sizing: border-box;
+  width: calc(100% - 2 * var(--espaco));
+  padding: var(--espaco);
+  background-color: color-mix(in srgb, var(--cor-marca) 15%, white);
+  border-left: 6px solid var(--cor-marca);
+  transform: rotate(-1deg);
+}
+
+h2 {
+  font-size: clamp(1.25rem, 5vw, 2.5rem);
+  color: var(--cor-marca);
+  filter: drop-shadow(1px 1px 0 white);
+}
+</pre>
+</div>
+
+<h2 id="errado">Quando dá errado</h2>
+<div class="cenario">
+<strong>Espaço que falta, vírgula que falta, <code>--</code> que falta</strong>
+<pre class="file" data-file="style.css · erro de propósito">.cartao {
+  width: calc(100%-2rem);
+  color: var(cor);
+}
+h1 {
+  font-size: clamp(1rem 4vw 2rem);
+}</pre>
+<p><strong>O que a Ana vê:</strong> a largura, a cor e o tamanho do título continuam os de antes, como se as três linhas não existissem.</p>
+<p><strong>Por quê:</strong></p>
+<ul>
+  <li><code>calc(100%-2rem)</code>: sem espaço em volta do <code>-</code>, o navegador lê "<code>100%</code>" seguido de "<code>-2rem</code>" (um número negativo), sem conta nenhuma. A expressão é inválida. Medido no Chromium: a largura ficou a do bloco inteiro, como se a declaração não existisse.</li>
+  <li><code>var(cor)</code>: o nome da variável sempre começa com <code>--</code>: <code>var(--cor)</code>.</li>
+  <li><code>clamp(1rem 4vw 2rem)</code>: faltaram as vírgulas entre os três valores.</li>
+</ul>
+<p><strong>O validador W3C</strong> responde com o genérico <em>Parse Error</em> ("erro de leitura"), apontando a coluna:</p>
+<pre class="term" data-cwd="~/ref/funcoes">$ vnu --css calc.css
+"file:/home/ana/ref/funcoes/calc.css":2.24-2.24: error: CSS: “width”: Parse Error.
+$ vnu --css var.css
+"file:/home/ana/ref/funcoes/var.css":2.17-2.17: error: CSS: “color”: Parse Error.
+$ vnu --css clamp.css
+"file:/home/ana/ref/funcoes/clamp.css":2.33-2.33: error: CSS: “font-size”: Parse Error.</pre>
+<p><strong>Como resolver:</strong> espaço dos dois lados do <code>+</code> e do <code>-</code> no <code>calc()</code>; <code>--</code> no nome da variável; vírgulas entre os argumentos.</p>
+</div>
+
+<div class="cenario">
+<strong>A variável que não existe (e o F12 não risca)</strong>
+<p>Com <code>width: var(--larg)</code> e nenhuma <code>--larg</code> definida, o navegador não tem como saber, ao ler o CSS, que a variável não existe: a declaração parece válida e não aparece riscada no painel <strong>Styles</strong>. Na hora de calcular, o valor vira o <strong>padrão</strong> da propriedade (ou o herdado, se ela é herdada). Medido no Chromium: <code>width: var(--larg)</code> deu <code>400px</code> (a largura automática, a do pai) e <code>color: var(--x)</code> deu <code>rgb(0, 0, 0)</code> (a cor herdada). Use uma reserva, <code>var(--larg, 20rem)</code>, e confira o nome da variável na aba <strong>Computed</strong>.</p>
+</div>
+
+<div class="cenario">
+<strong>O validador que reclama do que está certo</strong>
+<p>O <code>vnu</code> 26.10.12 ainda não conhece algumas funções novas e dá erro em CSS que os navegadores entendem. Conferido:</p>
+<pre class="term" data-cwd="~/ref/funcoes">$ vnu --css t.css
+"file:/home/ana/ref/funcoes/t.css":2.53-2.53: error: CSS: “background-image”: “image-set("a.png" 1x,"b.png" 2x)” is not a “background-image” value.</pre>
+<p>Também deram erro <code>linear(0, 0.5, 1)</code>, <code>color(display-p3 1 0 0)</code> e <code>sibling-index()</code>. Já <code>clamp()</code>, <code>min()</code>, <code>color-mix()</code>, <code>oklch()</code>, <code>light-dark()</code>, <code>round()</code>, <code>abs()</code>, <code>hwb()</code>, <code>lab()</code>, <code>env()</code> e a cor relativa <code>rgb(from …)</code> passaram sem mensagem. Quando o erro é numa função nova, confira o suporte no MDN antes de mexer no código.</p>
+</div>
+
+<h2>Missão</h2>
+<div class="tryhtml" data-goal="css:h2{color}=rgb(255, 99, 71),css:.cartao{padding-top}=24px,src:h2\s*\{[^}]*var\(\s*--cor-marca\s*\),src:\.cartao\s*\{[^}]*calc\([^)]*var\(\s*--espaco\s*\)">
+<p class="try-task"><strong>Missão:</strong> a Ana criou as variáveis, mas esqueceu de usá-las. (1) O título deve usar <code>var(--cor-marca)</code> como cor. (2) O <code>padding</code> do cartão deve ser uma vez e meia o <code>--espaco</code>: use <code>calc()</code> com <code>var(--espaco)</code> (o resultado deve dar 24px).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Sonho de creme&lt;/h2&gt;
+  &lt;p&gt;Recheado na hora.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --cor-marca: tomato;
+  --espaco: 1rem;
+}
+
+.cartao {
+  padding: 10px;
+  border: 2px solid gold;
+}
+
+h2 {
+  color: black;
+}
+</pre>
+<pre class="solucao" data-file="style.css">:root {
+  --cor-marca: tomato;
+  --espaco: 1rem;
+}
+
+.cartao {
+  padding: calc(var(--espaco) * 1.5);
+  border: 2px solid gold;
+}
+
+h2 {
+  color: var(--cor-marca);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Função = nome grudado no parêntese, argumentos separados por vírgula: <code>clamp(1rem, 4vw, 2rem)</code>.</li>
+  <li>Contas: <code>calc()</code> (espaço em volta de <code>+</code> e <code>-</code>), <code>min()</code>, <code>max()</code>, <code>clamp()</code>, <code>round()</code>.</li>
+  <li>Variáveis: <code>var(--nome, reserva)</code>. Também <code>env()</code>, <code>attr()</code>, <code>url()</code>.</li>
+  <li>Cores: <code>rgb()</code>, <code>hsl()</code>, <code>hwb()</code>, <code>oklch()</code>, <code>color-mix()</code>, <code>light-dark()</code>; alfa depois da barra.</li>
+  <li>Degradês, <code>transform</code>, <code>filter</code>, curvas de animação, Grid e <code>clip-path</code> têm as suas funções.</li>
+  <li>Função escrita errada = declaração ignorada (<em>Parse Error</em> no validador). Variável inexistente não é riscada: vira o valor padrão.</li>
+  <li>O <code>vnu</code> ainda dá erro em algumas funções novas (<code>image-set()</code>, <code>linear()</code>, <code>color(display-p3 …)</code>).</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
