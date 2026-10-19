@@ -308,7 +308,7 @@ espaço ocupado = caixa visível + margin-left + margin-right
 
 <ul>
   <li>Nos <strong>lados</strong>, tudo funciona: o padding, a borda e a margem afastam o texto da frase.</li>
-  <li>Em <strong>cima e embaixo</strong>, o padding e a borda são desenhados, mas <strong>não empurram</strong> as linhas: a caixa amarela invade a linha de cima e a de baixo, por cima do texto. E a margem de cima e de baixo não faz nada.</li>
+  <li>Em <strong>cima e embaixo</strong>, o padding e a borda são desenhados, mas <strong>não empurram</strong> as linhas: a caixa amarela fica mais alta que a linha e avança sobre as linhas vizinhas, sem afastá-las (com a janela estreita, ela cobre parte do texto da linha de cima ou de baixo). E a margem de cima e de baixo não faz nada.</li>
 </ul>
 
 <p>Para uma caixa em linha que respeite as medidas na vertical, existe o <code>display: inline-block</code>, da aula <a href="display.html">display</a>.</p>
