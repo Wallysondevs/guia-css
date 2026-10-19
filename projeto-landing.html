@@ -1,0 +1,2402 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Projeto: Página de Apresentação — variáveis, hero com degradê, seções e topo fixo | Guia CSS</title>
+<meta name="description" content="Projeto do Guia CSS: a página de apresentação da Lojinha da Ana em seis versões, com variáveis de cor, topo com Flexbox, hero com degradê e título com clamp(), duas colunas com Grid, cartões de vantagens, seção com avatar e mapa, rodapé, topo fixo com sticky e rolagem suave.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Projeto: Página de Apresentação</span></h1>
+
+<p class="intro">A "página de apresentação" (em inglês, <em>landing page</em>) é a porta de entrada de um negócio na internet: em poucos segundos, ela diz o que a loja faz, por que vale a pena e como chegar lá. Neste projeto você monta a da Lojinha da Ana em <strong>seis versões</strong>: topo com logo e menu, uma faixa de abertura grande com degradê e foto, as vantagens em cartões, a seção "Quem faz", o mapa, o rodapé e, no fim, um topo que acompanha a rolagem. É o projeto que mais junta assuntos do guia.</p>
+
+<div class="note">
+<strong>Você vai aprender (juntando o que já viu)</strong>
+<ul>
+  <li>A guardar as cores do site em <strong>variáveis</strong> e usá-las em todo lugar com <code>var()</code>.</li>
+  <li>A montar o topo com logo à esquerda e menu à direita, com Flexbox.</li>
+  <li>A fazer a "faixa de abertura" (<em>hero</em>): degradê de fundo, título que cresce com a tela (<code>clamp()</code>), botão de chamada e foto, em duas colunas na tela larga.</li>
+  <li>A repetir um padrão de seção (largura máxima, respiro) e a fazer cartões, avatar redondo e rodapé.</li>
+  <li>A deixar o topo grudado no alto com <code>position: sticky</code>, e a fazer os links do menu rolarem suavemente até a seção certa, sem a seção ficar escondida embaixo do topo.</li>
+</ul>
+</div>
+
+<p>As descrições do resultado foram conferidas em fotos do Chromium, nos quadros de 768 px e 375 px (os botões <strong>768</strong> e <strong>375</strong> da barra de cada caixa). As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>O que vamos construir</h2>
+<p>Pense na fachada de uma loja de rua: a placa com o nome em cima, uma vitrine grande e bonita logo na frente (é o que faz a pessoa parar), cartazes menores com as vantagens, uma foto da dona no balcão e, na porta, o endereço e o horário. A página de apresentação é essa fachada, de cima para baixo.</p>
+
+<p>No fim, num quadro de 768 px: no alto, uma faixa branca com o logo à esquerda e o menu "Vantagens · Quem faz · Endereço" à direita, que fica grudada no alto quando você rola. Embaixo, a faixa de abertura com degradê creme-pêssego: à esquerda, o título grande "Bolos caseiros, feitos sem pressa" em marrom-alaranjado, a frase de apoio e o botão-pílula laranja "Fazer uma encomenda"; à direita, a foto do bolo com cantos arredondados e sombra. Depois, três cartões creme com uma faixa laranja em cima, lado a lado; o avatar redondo da Ana, com aro pêssego, ao lado do texto "Quem faz"; o mapa com cantos arredondados; e o rodapé escuro. No celular, tudo fica numa coluna, e o menu desce para baixo do logo.</p>
+
+
+<h3>O HTML (é o mesmo em todas as versões)</h3>
+<p>Um <code>&lt;header&gt;</code> com o logo e um <code>&lt;nav&gt;</code> de âncoras para as seções (<code>href="#vantagens"</code> leva até o elemento com <code>id="vantagens"</code>); um <code>&lt;main&gt;</code> com quatro <code>&lt;section&gt;</code>; e um <code>&lt;footer&gt;</code>. As classes dizem o papel de cada parte: <code>topo</code>, <code>hero</code>, <code>secao</code>, <code>vantagens</code>, <code>quem-faz</code>, <code>rodape</code>. Âncoras e seções estão no <a href="https://wallysondevs.github.io/guia-html/">Guia HTML</a>.</p>
+
+<pre class="file" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" srcset="assets/midia/logo-lojinha-400.png 2x" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;nav aria-label="Principal"&gt;
+    &lt;a href="#vantagens"&gt;Vantagens&lt;/a&gt;
+    &lt;a href="#quem-faz"&gt;Quem faz&lt;/a&gt;
+    &lt;a href="#endereco"&gt;Endereço&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+&lt;main&gt;
+  &lt;section class="hero"&gt;
+    &lt;div class="hero-texto"&gt;
+      &lt;h1&gt;Bolos caseiros, feitos sem pressa&lt;/h1&gt;
+      &lt;p&gt;Receitas de família, ingredientes frescos e entrega no bairro. Encomende até as 18h e receba no dia seguinte.&lt;/p&gt;
+      &lt;a class="botao" href="#endereco"&gt;Fazer uma encomenda&lt;/a&gt;
+    &lt;/div&gt;
+    &lt;img class="hero-foto" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate e cenourinhas de enfeite" width="800" height="600"&gt;
+  &lt;/section&gt;
+  &lt;section id="vantagens" class="secao"&gt;
+    &lt;h2&gt;Por que a Lojinha da Ana?&lt;/h2&gt;
+    &lt;ul class="vantagens"&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Receita de família&lt;/h3&gt;
+        &lt;p&gt;Os bolos da avó da Ana, testados em 30 anos de domingos.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Feito no dia&lt;/h3&gt;
+        &lt;p&gt;Nada de estoque: o bolo sai do forno no dia da entrega.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Entrega no bairro&lt;/h3&gt;
+        &lt;p&gt;De bicicleta, a até 3 km da lojinha.&lt;/p&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/section&gt;
+  &lt;section id="quem-faz" class="secao quem-faz"&gt;
+    &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="Desenho da Ana sorrindo, de coque e blusa verde" width="96" height="96"&gt;
+    &lt;div&gt;
+      &lt;h2&gt;Quem faz&lt;/h2&gt;
+      &lt;p&gt;Eu sou a Ana. Aprendi a fazer bolo com a minha avó e, em 2024, transformei a cozinha de casa na Lojinha.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+  &lt;section id="endereco" class="secao"&gt;
+    &lt;h2&gt;Onde estamos&lt;/h2&gt;
+    &lt;p&gt;Rua das Flores, perto da Av. Central. De segunda a sábado, das 8h às 18h.&lt;/p&gt;
+    &lt;img class="mapa" src="assets/midia/mapa-800.png" alt="Mapa do bairro: a Lojinha da Ana fica na Rua das Flores, perto da Av. Central e da Praça da Árvore" width="800" height="500"&gt;
+  &lt;/section&gt;
+&lt;/main&gt;
+&lt;footer class="rodape"&gt;
+  &lt;p&gt;© 2026 Lojinha da Ana · Feito com CSS e muito chocolate&lt;/p&gt;
+&lt;/footer&gt;
+</pre>
+
+<p>Com o <code>style.css</code> vazio: o logo no tamanho natural, os três links azuis sublinhados lado a lado embaixo dele, o título, o link azul "Fazer uma encomenda", a foto do bolo com 800 px (passa até de um quadro de 768 px), a lista com bolinhas, o avatar, o mapa de 800 px e o rodapé, tudo dentro da margem de 8 px do navegador.</p>
+
+
+<hr>
+
+<h2 id="versao1">Versão 1 · Variáveis, base e o topo</h2>
+<p>Uma página de apresentação repete as mesmas cores em dezenas de lugares. Se a Ana resolver trocar o laranja, ela não quer caçar <code>#c2410c</code> pelo arquivo inteiro. Por isso as cores ficam guardadas uma vez só, com nome, no começo do CSS.</p>
+
+<pre class="file" data-file="style.css (versão 1)">:root {
+  --laranja: #c2410c;
+  --laranja-escuro: #9a3412;
+  --creme: #fff7ed;
+  --texto: #292524;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: var(--texto);
+  background-color: #fff;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border-bottom: 1px solid #fed7aa;
+}
+
+.topo .logo {
+  width: 150px;
+}
+
+.topo nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.topo nav a {
+  color: var(--laranja-escuro);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.topo nav a:hover {
+  text-decoration: underline;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>:root { --laranja: #c2410c; … }</code></dt>
+  <dd><code>:root</code> é o elemento raiz, o <code>&lt;html&gt;</code>. Uma propriedade que começa com <code>--</code> é uma <strong>variável</strong> (o nome oficial é <em>custom property</em>, "propriedade personalizada"). Como ela é herdada, vale na página inteira. Aula: <a href="variaveis.html">Variáveis</a>.</dd>
+  <dt><code>color: var(--texto)</code></dt>
+  <dd><code>var()</code> lê o valor da variável. Trocar <code>--laranja</code> no <code>:root</code> troca o laranja do site todo.</dd>
+  <dt><code>img { display: block; max-width: 100%; height: auto; }</code></dt>
+  <dd>Uma regra para todas as imagens: nenhuma passa da largura de quem a contém. Aula: <a href="imagens-responsivas.html">Imagens que se Adaptam</a>.</dd>
+  <dt><code>.topo { display: flex; justify-content: space-between; align-items: center; }</code></dt>
+  <dd>O logo vai para a esquerda e o menu para a direita, centralizados na altura. Com <code>flex-wrap: wrap</code>, numa tela estreita o menu desce para a linha de baixo em vez de espremer o logo; o <code>gap: 0.5rem 1.5rem</code> dá 8 px entre as linhas e 24 px entre as colunas. Aulas: <a href="justify-content.html">justify-content</a> e <a href="flex-wrap.html">flex-wrap</a>.</dd>
+  <dt><code>.topo .logo { width: 150px; }</code></dt>
+  <dd>O logo de 200 px fica com 150, e a altura acompanha (60 px), por causa do <code>height: auto</code>.</dd>
+  <dt><code>.topo nav</code> e os links</dt>
+  <dd>Os três links lado a lado com 16 px entre eles, em marrom-alaranjado, negrito, sem sublinhado; o sublinhado volta no <code>:hover</code>. Aula: <a href="links.html">Estilizando Links</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 768 px, o topo vira uma faixa branca com uma linha pêssego embaixo: o logo menor (150 px) à esquerda e "Vantagens", "Quem faz", "Endereço" em marrom-alaranjado e negrito à direita, na mesma altura. No quadro de 375 px, não cabe tudo numa linha: o menu desce para baixo do logo, alinhado à esquerda. A foto e o mapa não passam mais do quadro (regra do <code>img</code>), mas o resto ainda é texto corrido, encostado nas bordas.</p>
+
+
+<h3>Experimente: a versão 1</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" srcset="assets/midia/logo-lojinha-400.png 2x" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;nav aria-label="Principal"&gt;
+    &lt;a href="#vantagens"&gt;Vantagens&lt;/a&gt;
+    &lt;a href="#quem-faz"&gt;Quem faz&lt;/a&gt;
+    &lt;a href="#endereco"&gt;Endereço&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+&lt;main&gt;
+  &lt;section class="hero"&gt;
+    &lt;div class="hero-texto"&gt;
+      &lt;h1&gt;Bolos caseiros, feitos sem pressa&lt;/h1&gt;
+      &lt;p&gt;Receitas de família, ingredientes frescos e entrega no bairro. Encomende até as 18h e receba no dia seguinte.&lt;/p&gt;
+      &lt;a class="botao" href="#endereco"&gt;Fazer uma encomenda&lt;/a&gt;
+    &lt;/div&gt;
+    &lt;img class="hero-foto" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate e cenourinhas de enfeite" width="800" height="600"&gt;
+  &lt;/section&gt;
+  &lt;section id="vantagens" class="secao"&gt;
+    &lt;h2&gt;Por que a Lojinha da Ana?&lt;/h2&gt;
+    &lt;ul class="vantagens"&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Receita de família&lt;/h3&gt;
+        &lt;p&gt;Os bolos da avó da Ana, testados em 30 anos de domingos.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Feito no dia&lt;/h3&gt;
+        &lt;p&gt;Nada de estoque: o bolo sai do forno no dia da entrega.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Entrega no bairro&lt;/h3&gt;
+        &lt;p&gt;De bicicleta, a até 3 km da lojinha.&lt;/p&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/section&gt;
+  &lt;section id="quem-faz" class="secao quem-faz"&gt;
+    &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="Desenho da Ana sorrindo, de coque e blusa verde" width="96" height="96"&gt;
+    &lt;div&gt;
+      &lt;h2&gt;Quem faz&lt;/h2&gt;
+      &lt;p&gt;Eu sou a Ana. Aprendi a fazer bolo com a minha avó e, em 2024, transformei a cozinha de casa na Lojinha.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+  &lt;section id="endereco" class="secao"&gt;
+    &lt;h2&gt;Onde estamos&lt;/h2&gt;
+    &lt;p&gt;Rua das Flores, perto da Av. Central. De segunda a sábado, das 8h às 18h.&lt;/p&gt;
+    &lt;img class="mapa" src="assets/midia/mapa-800.png" alt="Mapa do bairro: a Lojinha da Ana fica na Rua das Flores, perto da Av. Central e da Praça da Árvore" width="800" height="500"&gt;
+  &lt;/section&gt;
+&lt;/main&gt;
+&lt;footer class="rodape"&gt;
+  &lt;p&gt;© 2026 Lojinha da Ana · Feito com CSS e muito chocolate&lt;/p&gt;
+&lt;/footer&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --laranja: #c2410c;
+  --laranja-escuro: #9a3412;
+  --creme: #fff7ed;
+  --texto: #292524;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: var(--texto);
+  background-color: #fff;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border-bottom: 1px solid #fed7aa;
+}
+
+.topo .logo {
+  width: 150px;
+}
+
+.topo nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.topo nav a {
+  color: var(--laranja-escuro);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.topo nav a:hover {
+  text-decoration: underline;
+}
+</pre>
+</div>
+
+<p>Brinque: no <code>:root</code>, troque <code>--laranja-escuro: #9a3412;</code> por <code>--laranja-escuro: rebeccapurple;</code> e veja os links do menu mudarem de cor sem mexer em mais nada.</p>
+
+<h3>Missão 1</h3>
+<div class="tryhtml" data-goal="css:.topo{display}=flex,css:.topo{justify-content}=space-between,css:.topo{align-items}=center,css:.topo nav a{color}=rgb(154, 52, 18),src:color:\s*var\(\s*--laranja-escuro\s*\)">
+<p class="try-task"><strong>Missão:</strong> ponha o logo à esquerda e o menu à direita, centralizados na altura, e pinte os links do menu com a variável <code>--laranja-escuro</code> (use <code>var()</code>, não o código da cor).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;nav aria-label="Principal"&gt;
+    &lt;a href="#vantagens"&gt;Vantagens&lt;/a&gt;
+    &lt;a href="#quem-faz"&gt;Quem faz&lt;/a&gt;
+    &lt;a href="#endereco"&gt;Endereço&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --laranja: #c2410c;
+  --laranja-escuro: #9a3412;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+.topo {
+  padding: 0.5rem 1rem;
+}
+
+.topo .logo {
+  width: 150px;
+  height: auto;
+}
+
+.topo nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.topo nav a {
+  font-weight: 600;
+  text-decoration: none;
+}
+</pre>
+<pre class="solucao" data-file="style.css">:root {
+  --laranja: #c2410c;
+  --laranja-escuro: #9a3412;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+.topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+}
+
+.topo .logo {
+  width: 150px;
+  height: auto;
+}
+
+.topo nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.topo nav a {
+  color: var(--laranja-escuro);
+  font-weight: 600;
+  text-decoration: none;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao2">Versão 2 · A faixa de abertura</h2>
+<p>A primeira coisa que a pessoa vê: uma frase grande dizendo o que a loja faz, uma frase de apoio, um botão com a ação principal ("Fazer uma encomenda") e a foto do produto. O fundo ganha um degradê suave, do creme ao pêssego.</p>
+
+<pre class="file" data-file="style.css (versão 2: o que entra)">
+.hero {
+  padding: 2rem 1rem;
+  background-image: linear-gradient(160deg, var(--creme), #fed7aa);
+}
+
+.hero h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  line-height: 1.1;
+  color: var(--laranja-escuro);
+}
+
+.hero p {
+  font-size: 1.125rem;
+}
+
+.botao {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  background-color: var(--laranja);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.botao:hover {
+  background-color: var(--laranja-escuro);
+}
+
+.hero-foto {
+  margin-top: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgb(154 52 18 / 0.3);
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>background-image: linear-gradient(160deg, var(--creme), #fed7aa)</code></dt>
+  <dd>Um degradê inclinado (160 graus, quase de cima para baixo) do creme ao pêssego. Variáveis funcionam dentro de funções. Aula: <a href="gradientes.html">Degradês</a>.</dd>
+  <dt><code>font-size: clamp(2rem, 6vw, 3.5rem)</code></dt>
+  <dd>"6% da largura da tela, mas nunca menos que 2rem (32 px) nem mais que 3.5rem (56 px)." O título cresce com a tela, sem media query. Aulas: <a href="clamp.html">min(), max() e clamp()</a> e <a href="unidades-viewport.html">Unidades da Tela</a>.</dd>
+  <dt><code>.botao</code></dt>
+  <dd>Um link com cara de botão em forma de pílula (<code>border-radius: 999px</code>). <code>display: inline-block</code> faz o preenchimento de cima e de baixo ocupar espaço de verdade, sem invadir as linhas vizinhas. Aulas: <a href="botoes.html">Botões</a> e <a href="display.html">display</a>.</dd>
+  <dt><code>.hero-foto</code></dt>
+  <dd>A foto com cantos de 16 px e uma sombra alaranjada larga, 12 px para baixo: parece um pouco acima do fundo. Aula: <a href="box-shadow.html">Sombra</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela</strong> (quadro de 375 px): a faixa de abertura ganha o degradê, do creme no alto ao pêssego embaixo. O título fica em 32 px (é o mínimo do <code>clamp</code>: 6% de 375 px seria só 22,5 px), marrom-alaranjado, em duas linhas. O link vira a pílula laranja "Fazer uma encomenda", com letra branca. A foto fica embaixo, com cantos arredondados e uma sombra alaranjada. No quadro de 768 px, o título fica com 46,08 px (6% de 768).</p>
+
+
+<h3>Experimente: a versão 2</h3>
+<div class="tryhtml" data-largura="375">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" srcset="assets/midia/logo-lojinha-400.png 2x" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;nav aria-label="Principal"&gt;
+    &lt;a href="#vantagens"&gt;Vantagens&lt;/a&gt;
+    &lt;a href="#quem-faz"&gt;Quem faz&lt;/a&gt;
+    &lt;a href="#endereco"&gt;Endereço&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+&lt;main&gt;
+  &lt;section class="hero"&gt;
+    &lt;div class="hero-texto"&gt;
+      &lt;h1&gt;Bolos caseiros, feitos sem pressa&lt;/h1&gt;
+      &lt;p&gt;Receitas de família, ingredientes frescos e entrega no bairro. Encomende até as 18h e receba no dia seguinte.&lt;/p&gt;
+      &lt;a class="botao" href="#endereco"&gt;Fazer uma encomenda&lt;/a&gt;
+    &lt;/div&gt;
+    &lt;img class="hero-foto" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate e cenourinhas de enfeite" width="800" height="600"&gt;
+  &lt;/section&gt;
+  &lt;section id="vantagens" class="secao"&gt;
+    &lt;h2&gt;Por que a Lojinha da Ana?&lt;/h2&gt;
+    &lt;ul class="vantagens"&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Receita de família&lt;/h3&gt;
+        &lt;p&gt;Os bolos da avó da Ana, testados em 30 anos de domingos.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Feito no dia&lt;/h3&gt;
+        &lt;p&gt;Nada de estoque: o bolo sai do forno no dia da entrega.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Entrega no bairro&lt;/h3&gt;
+        &lt;p&gt;De bicicleta, a até 3 km da lojinha.&lt;/p&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/section&gt;
+  &lt;section id="quem-faz" class="secao quem-faz"&gt;
+    &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="Desenho da Ana sorrindo, de coque e blusa verde" width="96" height="96"&gt;
+    &lt;div&gt;
+      &lt;h2&gt;Quem faz&lt;/h2&gt;
+      &lt;p&gt;Eu sou a Ana. Aprendi a fazer bolo com a minha avó e, em 2024, transformei a cozinha de casa na Lojinha.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+  &lt;section id="endereco" class="secao"&gt;
+    &lt;h2&gt;Onde estamos&lt;/h2&gt;
+    &lt;p&gt;Rua das Flores, perto da Av. Central. De segunda a sábado, das 8h às 18h.&lt;/p&gt;
+    &lt;img class="mapa" src="assets/midia/mapa-800.png" alt="Mapa do bairro: a Lojinha da Ana fica na Rua das Flores, perto da Av. Central e da Praça da Árvore" width="800" height="500"&gt;
+  &lt;/section&gt;
+&lt;/main&gt;
+&lt;footer class="rodape"&gt;
+  &lt;p&gt;© 2026 Lojinha da Ana · Feito com CSS e muito chocolate&lt;/p&gt;
+&lt;/footer&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --laranja: #c2410c;
+  --laranja-escuro: #9a3412;
+  --creme: #fff7ed;
+  --texto: #292524;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: var(--texto);
+  background-color: #fff;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border-bottom: 1px solid #fed7aa;
+}
+
+.topo .logo {
+  width: 150px;
+}
+
+.topo nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.topo nav a {
+  color: var(--laranja-escuro);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.topo nav a:hover {
+  text-decoration: underline;
+}
+
+.hero {
+  padding: 2rem 1rem;
+  background-image: linear-gradient(160deg, var(--creme), #fed7aa);
+}
+
+.hero h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  line-height: 1.1;
+  color: var(--laranja-escuro);
+}
+
+.hero p {
+  font-size: 1.125rem;
+}
+
+.botao {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  background-color: var(--laranja);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.botao:hover {
+  background-color: var(--laranja-escuro);
+}
+
+.hero-foto {
+  margin-top: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgb(154 52 18 / 0.3);
+}
+</pre>
+</div>
+
+<p>Brinque: esta caixa abre no quadro de 375 px. Clique em 768 e em cheia e veja o título crescer (o <code>clamp</code>). Troque <code>160deg</code> por <code>90deg</code>.</p>
+
+<h3>Missão 2</h3>
+<div class="tryhtml" data-goal="src:clamp\(\s*2rem\s*\,\s*6vw\s*\,\s*3\.5rem\s*\),src:linear-gradient\(,css:.botao{display}=inline-block,css:.botao{background-color}=rgb(194, 65, 12)">
+<p class="try-task"><strong>Missão:</strong> dê à <code>.hero</code> um degradê (<code>linear-gradient</code>) do creme ao pêssego; faça o título ter <code>clamp(2rem, 6vw, 3.5rem)</code>; e transforme o <code>.botao</code> num <code>inline-block</code> com fundo <code>var(--laranja)</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;section class="hero"&gt;
+  &lt;div class="hero-texto"&gt;
+    &lt;h1&gt;Bolos caseiros, feitos sem pressa&lt;/h1&gt;
+    &lt;p&gt;Receitas de família, ingredientes frescos e entrega no bairro.&lt;/p&gt;
+    &lt;a class="botao" href="#endereco"&gt;Fazer uma encomenda&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/section&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --laranja: #c2410c;
+  --creme: #fff7ed;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+.hero {
+  padding: 2rem 1rem;
+}
+
+.hero h1 {
+  margin: 0 0 1rem;
+  line-height: 1.1;
+}
+
+.botao {
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+</pre>
+<pre class="solucao" data-file="style.css">:root {
+  --laranja: #c2410c;
+  --creme: #fff7ed;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+.hero {
+  padding: 2rem 1rem;
+  background-image: linear-gradient(160deg, var(--creme), #fed7aa);
+}
+
+.hero h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  line-height: 1.1;
+}
+
+.botao {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  background-color: var(--laranja);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao3">Versão 3 · Texto e foto lado a lado</h2>
+<p>No celular, a foto embaixo do texto está ótima. Numa tela larga, ela fica enorme e empurra o resto da página para longe. A partir de 48rem, texto e foto dividem a faixa.</p>
+
+<pre class="file" data-file="style.css (versão 3: o que entra)">
+@media (min-width: 48rem) {
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 2rem;
+    padding: 3rem 2rem;
+  }
+
+  .hero-foto {
+    margin-top: 0;
+  }
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>grid-template-columns: 1fr 1fr</code></dt>
+  <dd>Duas colunas iguais: o <code>.hero-texto</code> cai na primeira, a foto na segunda. Aula: <a href="grid-colunas.html">Colunas</a>.</dd>
+  <dt><code>align-items: center</code></dt>
+  <dd>O texto fica centralizado na altura da foto, em vez de grudado no alto. Aula: <a href="grid-alinhar.html">Alinhando no Grid</a>.</dd>
+  <dt><code>.hero-foto { margin-top: 0; }</code></dt>
+  <dd>A margem de cima da foto só fazia sentido com ela embaixo do texto.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 768 px, o texto fica à esquerda e a foto à direita (336 px de largura), centralizada na altura do bloco de texto. O título, com 46,08 px, quebra em quatro linhas ("Bolos / caseiros, / feitos sem / pressa"). No quadro de 375 px, nada muda.</p>
+
+
+<h3>Experimente: a versão 3</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" srcset="assets/midia/logo-lojinha-400.png 2x" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;nav aria-label="Principal"&gt;
+    &lt;a href="#vantagens"&gt;Vantagens&lt;/a&gt;
+    &lt;a href="#quem-faz"&gt;Quem faz&lt;/a&gt;
+    &lt;a href="#endereco"&gt;Endereço&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+&lt;main&gt;
+  &lt;section class="hero"&gt;
+    &lt;div class="hero-texto"&gt;
+      &lt;h1&gt;Bolos caseiros, feitos sem pressa&lt;/h1&gt;
+      &lt;p&gt;Receitas de família, ingredientes frescos e entrega no bairro. Encomende até as 18h e receba no dia seguinte.&lt;/p&gt;
+      &lt;a class="botao" href="#endereco"&gt;Fazer uma encomenda&lt;/a&gt;
+    &lt;/div&gt;
+    &lt;img class="hero-foto" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate e cenourinhas de enfeite" width="800" height="600"&gt;
+  &lt;/section&gt;
+  &lt;section id="vantagens" class="secao"&gt;
+    &lt;h2&gt;Por que a Lojinha da Ana?&lt;/h2&gt;
+    &lt;ul class="vantagens"&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Receita de família&lt;/h3&gt;
+        &lt;p&gt;Os bolos da avó da Ana, testados em 30 anos de domingos.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Feito no dia&lt;/h3&gt;
+        &lt;p&gt;Nada de estoque: o bolo sai do forno no dia da entrega.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Entrega no bairro&lt;/h3&gt;
+        &lt;p&gt;De bicicleta, a até 3 km da lojinha.&lt;/p&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/section&gt;
+  &lt;section id="quem-faz" class="secao quem-faz"&gt;
+    &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="Desenho da Ana sorrindo, de coque e blusa verde" width="96" height="96"&gt;
+    &lt;div&gt;
+      &lt;h2&gt;Quem faz&lt;/h2&gt;
+      &lt;p&gt;Eu sou a Ana. Aprendi a fazer bolo com a minha avó e, em 2024, transformei a cozinha de casa na Lojinha.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+  &lt;section id="endereco" class="secao"&gt;
+    &lt;h2&gt;Onde estamos&lt;/h2&gt;
+    &lt;p&gt;Rua das Flores, perto da Av. Central. De segunda a sábado, das 8h às 18h.&lt;/p&gt;
+    &lt;img class="mapa" src="assets/midia/mapa-800.png" alt="Mapa do bairro: a Lojinha da Ana fica na Rua das Flores, perto da Av. Central e da Praça da Árvore" width="800" height="500"&gt;
+  &lt;/section&gt;
+&lt;/main&gt;
+&lt;footer class="rodape"&gt;
+  &lt;p&gt;© 2026 Lojinha da Ana · Feito com CSS e muito chocolate&lt;/p&gt;
+&lt;/footer&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --laranja: #c2410c;
+  --laranja-escuro: #9a3412;
+  --creme: #fff7ed;
+  --texto: #292524;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: var(--texto);
+  background-color: #fff;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border-bottom: 1px solid #fed7aa;
+}
+
+.topo .logo {
+  width: 150px;
+}
+
+.topo nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.topo nav a {
+  color: var(--laranja-escuro);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.topo nav a:hover {
+  text-decoration: underline;
+}
+
+.hero {
+  padding: 2rem 1rem;
+  background-image: linear-gradient(160deg, var(--creme), #fed7aa);
+}
+
+.hero h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  line-height: 1.1;
+  color: var(--laranja-escuro);
+}
+
+.hero p {
+  font-size: 1.125rem;
+}
+
+.botao {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  background-color: var(--laranja);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.botao:hover {
+  background-color: var(--laranja-escuro);
+}
+
+.hero-foto {
+  margin-top: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgb(154 52 18 / 0.3);
+}
+
+@media (min-width: 48rem) {
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 2rem;
+    padding: 3rem 2rem;
+  }
+
+  .hero-foto {
+    margin-top: 0;
+  }
+}
+</pre>
+</div>
+
+<h3>Missão 3</h3>
+<div class="tryhtml" data-largura="768" data-goal="css:.hero{display}=grid,css:.hero{align-items}=center,css:.hero-foto{margin-top}=0px,src:@media\s*\(\s*min-width:\s*48rem\s*\)">
+<p class="try-task"><strong>Missão:</strong> a partir de <code>48rem</code>, ponha o texto e a foto da <code>.hero</code> lado a lado (<code>1fr 1fr</code>), centralizados na altura, e tire a margem de cima da foto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;section class="hero"&gt;
+  &lt;div class="hero-texto"&gt;
+    &lt;h1&gt;Bolos caseiros, feitos sem pressa&lt;/h1&gt;
+    &lt;p&gt;Receitas de família, ingredientes frescos e entrega no bairro.&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;img class="hero-foto" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate e cenourinhas de enfeite" width="800" height="600"&gt;
+&lt;/section&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.hero {
+  padding: 2rem 1rem;
+  background-color: #fff7ed;
+}
+
+.hero-foto {
+  margin-top: 1.5rem;
+  border-radius: 16px;
+}
+
+/* a partir de 48rem: lado a lado aqui embaixo */
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.hero {
+  padding: 2rem 1rem;
+  background-color: #fff7ed;
+}
+
+.hero-foto {
+  margin-top: 1.5rem;
+  border-radius: 16px;
+}
+
+/* a partir de 48rem: lado a lado aqui embaixo */
+@media (min-width: 48rem) {
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .hero-foto {
+    margin-top: 0;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao4">Versão 4 · As seções e os cartões de vantagens</h2>
+<p>Toda seção da página segue o mesmo molde: largura máxima, centralizada, com respiro. Um molde (a classe <code>secao</code>) para todas, e não um CSS diferente para cada. Dentro de "Vantagens", três cartões.</p>
+
+<pre class="file" data-file="style.css (versão 4: o que entra)">
+.secao {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.secao h2 {
+  color: var(--laranja-escuro);
+}
+
+.vantagens {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vantagens li {
+  padding: 1rem 1.25rem;
+  background-color: var(--creme);
+  border-top: 4px solid var(--laranja);
+  border-radius: 8px;
+}
+
+.vantagens h3 {
+  margin: 0 0 0.25rem;
+}
+
+.vantagens p {
+  margin: 0;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>.secao</code></dt>
+  <dd>Até 60rem (960 px), centralizada, com 2rem (32 px) em cima e embaixo e 1rem dos lados. Os títulos das seções ficam marrom-alaranjados. Aula: <a href="centralizar.html">Centralizando</a>.</dd>
+  <dt><code>.vantagens</code></dt>
+  <dd>A lista vira uma grade de colunas automáticas de no mínimo 13rem, sem bolinhas nem recuo. Aula: <a href="grid-repeat.html">repeat, minmax e auto-fit</a>.</dd>
+  <dt><code>.vantagens li</code></dt>
+  <dd>Cada vantagem num cartão creme, com uma faixa laranja de 4 px em cima (<code>border-top</code>) e cantos de 8 px. Aula: <a href="border.html">Bordas</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 768 px, "Por que a Lojinha da Ana?" fica marrom-alaranjado, e as três vantagens viram cartões creme lado a lado (235 px cada), com uma faixa laranja em cima, o título em negrito e a frase embaixo. No quadro de 375 px, os cartões ficam um embaixo do outro. As seções "Quem faz" e "Onde estamos" também ganham o respiro e a largura máxima.</p>
+
+
+<h3>Experimente: a versão 4</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" srcset="assets/midia/logo-lojinha-400.png 2x" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;nav aria-label="Principal"&gt;
+    &lt;a href="#vantagens"&gt;Vantagens&lt;/a&gt;
+    &lt;a href="#quem-faz"&gt;Quem faz&lt;/a&gt;
+    &lt;a href="#endereco"&gt;Endereço&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+&lt;main&gt;
+  &lt;section class="hero"&gt;
+    &lt;div class="hero-texto"&gt;
+      &lt;h1&gt;Bolos caseiros, feitos sem pressa&lt;/h1&gt;
+      &lt;p&gt;Receitas de família, ingredientes frescos e entrega no bairro. Encomende até as 18h e receba no dia seguinte.&lt;/p&gt;
+      &lt;a class="botao" href="#endereco"&gt;Fazer uma encomenda&lt;/a&gt;
+    &lt;/div&gt;
+    &lt;img class="hero-foto" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate e cenourinhas de enfeite" width="800" height="600"&gt;
+  &lt;/section&gt;
+  &lt;section id="vantagens" class="secao"&gt;
+    &lt;h2&gt;Por que a Lojinha da Ana?&lt;/h2&gt;
+    &lt;ul class="vantagens"&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Receita de família&lt;/h3&gt;
+        &lt;p&gt;Os bolos da avó da Ana, testados em 30 anos de domingos.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Feito no dia&lt;/h3&gt;
+        &lt;p&gt;Nada de estoque: o bolo sai do forno no dia da entrega.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Entrega no bairro&lt;/h3&gt;
+        &lt;p&gt;De bicicleta, a até 3 km da lojinha.&lt;/p&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/section&gt;
+  &lt;section id="quem-faz" class="secao quem-faz"&gt;
+    &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="Desenho da Ana sorrindo, de coque e blusa verde" width="96" height="96"&gt;
+    &lt;div&gt;
+      &lt;h2&gt;Quem faz&lt;/h2&gt;
+      &lt;p&gt;Eu sou a Ana. Aprendi a fazer bolo com a minha avó e, em 2024, transformei a cozinha de casa na Lojinha.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+  &lt;section id="endereco" class="secao"&gt;
+    &lt;h2&gt;Onde estamos&lt;/h2&gt;
+    &lt;p&gt;Rua das Flores, perto da Av. Central. De segunda a sábado, das 8h às 18h.&lt;/p&gt;
+    &lt;img class="mapa" src="assets/midia/mapa-800.png" alt="Mapa do bairro: a Lojinha da Ana fica na Rua das Flores, perto da Av. Central e da Praça da Árvore" width="800" height="500"&gt;
+  &lt;/section&gt;
+&lt;/main&gt;
+&lt;footer class="rodape"&gt;
+  &lt;p&gt;© 2026 Lojinha da Ana · Feito com CSS e muito chocolate&lt;/p&gt;
+&lt;/footer&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --laranja: #c2410c;
+  --laranja-escuro: #9a3412;
+  --creme: #fff7ed;
+  --texto: #292524;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: var(--texto);
+  background-color: #fff;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border-bottom: 1px solid #fed7aa;
+}
+
+.topo .logo {
+  width: 150px;
+}
+
+.topo nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.topo nav a {
+  color: var(--laranja-escuro);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.topo nav a:hover {
+  text-decoration: underline;
+}
+
+.hero {
+  padding: 2rem 1rem;
+  background-image: linear-gradient(160deg, var(--creme), #fed7aa);
+}
+
+.hero h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  line-height: 1.1;
+  color: var(--laranja-escuro);
+}
+
+.hero p {
+  font-size: 1.125rem;
+}
+
+.botao {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  background-color: var(--laranja);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.botao:hover {
+  background-color: var(--laranja-escuro);
+}
+
+.hero-foto {
+  margin-top: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgb(154 52 18 / 0.3);
+}
+
+@media (min-width: 48rem) {
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 2rem;
+    padding: 3rem 2rem;
+  }
+
+  .hero-foto {
+    margin-top: 0;
+  }
+}
+
+.secao {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.secao h2 {
+  color: var(--laranja-escuro);
+}
+
+.vantagens {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vantagens li {
+  padding: 1rem 1.25rem;
+  background-color: var(--creme);
+  border-top: 4px solid var(--laranja);
+  border-radius: 8px;
+}
+
+.vantagens h3 {
+  margin: 0 0 0.25rem;
+}
+
+.vantagens p {
+  margin: 0;
+}
+</pre>
+</div>
+
+<h3>Missão 4</h3>
+<div class="tryhtml" data-goal="css:.secao{max-width}=960px,css:.vantagens{display}=grid,css:.vantagens{list-style-type}=none,css:.vantagens li{border-top-width}=4px,css:.vantagens li{border-top-color}=rgb(194, 65, 12)">
+<p class="try-task"><strong>Missão:</strong> limite a <code>.secao</code> a <code>60rem</code>; transforme a lista <code>.vantagens</code> numa grade sem bolinhas; e dê a cada item uma borda de cima de <code>4px</code> contínua na cor <code>var(--laranja)</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;section id="vantagens" class="secao"&gt;
+  &lt;h2&gt;Por que a Lojinha da Ana?&lt;/h2&gt;
+  &lt;ul class="vantagens"&gt;
+    &lt;li&gt;
+      &lt;h3&gt;Receita de família&lt;/h3&gt;
+      &lt;p&gt;Os bolos da avó da Ana, testados em 30 anos de domingos.&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;h3&gt;Feito no dia&lt;/h3&gt;
+      &lt;p&gt;Nada de estoque: o bolo sai do forno no dia da entrega.&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;h3&gt;Entrega no bairro&lt;/h3&gt;
+      &lt;p&gt;De bicicleta, a até 3 km da lojinha.&lt;/p&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/section&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --laranja: #c2410c;
+  --creme: #fff7ed;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+.secao {
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.vantagens {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+}
+
+.vantagens li {
+  padding: 1rem 1.25rem;
+  background-color: var(--creme);
+  border-radius: 8px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">:root {
+  --laranja: #c2410c;
+  --creme: #fff7ed;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+.secao {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.vantagens {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vantagens li {
+  padding: 1rem 1.25rem;
+  background-color: var(--creme);
+  border-top: 4px solid var(--laranja);
+  border-radius: 8px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao5">Versão 5 · Quem faz, o mapa e o rodapé</h2>
+
+<pre class="file" data-file="style.css (versão 5: o que entra)">
+.quem-faz {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.quem-faz .avatar {
+  border-radius: 50%;
+  border: 4px solid #fed7aa;
+}
+
+.mapa {
+  border-radius: 12px;
+  border: 1px solid #e7e5e4;
+}
+
+.rodape {
+  padding: 1.5rem 1rem;
+  background-color: var(--texto);
+  color: #fafaf9;
+  text-align: center;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>.quem-faz { display: flex; align-items: center; gap: 1.5rem; }</code></dt>
+  <dd>O avatar e o texto lado a lado, centralizados na altura. Aula: <a href="align-items.html">align-items</a>.</dd>
+  <dt><code>.avatar { border-radius: 50%; border: 4px solid #fed7aa; }</code></dt>
+  <dd>A foto redonda (raio de metade do tamanho), com um aro pêssego de 4 px. O Flexbox não espreme o avatar, mesmo no celular: os atributos <code>width="96"</code> e <code>height="96"</code> dão um tamanho a ele, e um item flex não encolhe abaixo do tamanho mínimo do seu conteúdo. Quem encolhe é o texto ao lado, que quebra em mais linhas. Aula: <a href="flex-grow.html">Crescer e Encolher</a>.</dd>
+  <dt><code>.mapa</code></dt>
+  <dd>Cantos de 12 px e uma borda cinza bem clara, para o mapa não se misturar ao fundo branco.</dd>
+  <dt><code>.rodape</code></dt>
+  <dd>Fundo escuro (a própria cor do texto, <code>var(--texto)</code>) e letra quase branca, centralizada: o "fim da página" fica claro.</dd>
+</dl>
+
+<p><strong>O que muda na tela</strong> (quadro de 375 px): o avatar fica redondo, com aro pêssego, à esquerda do bloco "Quem faz", que ocupa o resto da largura e fica centralizado na altura do avatar. O mapa ganha cantos arredondados, e o rodapé vira uma faixa escura com o texto claro, centralizado.</p>
+
+
+<h3>Experimente: a versão 5</h3>
+<div class="tryhtml" data-largura="375">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" srcset="assets/midia/logo-lojinha-400.png 2x" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;nav aria-label="Principal"&gt;
+    &lt;a href="#vantagens"&gt;Vantagens&lt;/a&gt;
+    &lt;a href="#quem-faz"&gt;Quem faz&lt;/a&gt;
+    &lt;a href="#endereco"&gt;Endereço&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+&lt;main&gt;
+  &lt;section class="hero"&gt;
+    &lt;div class="hero-texto"&gt;
+      &lt;h1&gt;Bolos caseiros, feitos sem pressa&lt;/h1&gt;
+      &lt;p&gt;Receitas de família, ingredientes frescos e entrega no bairro. Encomende até as 18h e receba no dia seguinte.&lt;/p&gt;
+      &lt;a class="botao" href="#endereco"&gt;Fazer uma encomenda&lt;/a&gt;
+    &lt;/div&gt;
+    &lt;img class="hero-foto" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate e cenourinhas de enfeite" width="800" height="600"&gt;
+  &lt;/section&gt;
+  &lt;section id="vantagens" class="secao"&gt;
+    &lt;h2&gt;Por que a Lojinha da Ana?&lt;/h2&gt;
+    &lt;ul class="vantagens"&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Receita de família&lt;/h3&gt;
+        &lt;p&gt;Os bolos da avó da Ana, testados em 30 anos de domingos.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Feito no dia&lt;/h3&gt;
+        &lt;p&gt;Nada de estoque: o bolo sai do forno no dia da entrega.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Entrega no bairro&lt;/h3&gt;
+        &lt;p&gt;De bicicleta, a até 3 km da lojinha.&lt;/p&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/section&gt;
+  &lt;section id="quem-faz" class="secao quem-faz"&gt;
+    &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="Desenho da Ana sorrindo, de coque e blusa verde" width="96" height="96"&gt;
+    &lt;div&gt;
+      &lt;h2&gt;Quem faz&lt;/h2&gt;
+      &lt;p&gt;Eu sou a Ana. Aprendi a fazer bolo com a minha avó e, em 2024, transformei a cozinha de casa na Lojinha.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+  &lt;section id="endereco" class="secao"&gt;
+    &lt;h2&gt;Onde estamos&lt;/h2&gt;
+    &lt;p&gt;Rua das Flores, perto da Av. Central. De segunda a sábado, das 8h às 18h.&lt;/p&gt;
+    &lt;img class="mapa" src="assets/midia/mapa-800.png" alt="Mapa do bairro: a Lojinha da Ana fica na Rua das Flores, perto da Av. Central e da Praça da Árvore" width="800" height="500"&gt;
+  &lt;/section&gt;
+&lt;/main&gt;
+&lt;footer class="rodape"&gt;
+  &lt;p&gt;© 2026 Lojinha da Ana · Feito com CSS e muito chocolate&lt;/p&gt;
+&lt;/footer&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --laranja: #c2410c;
+  --laranja-escuro: #9a3412;
+  --creme: #fff7ed;
+  --texto: #292524;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: var(--texto);
+  background-color: #fff;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border-bottom: 1px solid #fed7aa;
+}
+
+.topo .logo {
+  width: 150px;
+}
+
+.topo nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.topo nav a {
+  color: var(--laranja-escuro);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.topo nav a:hover {
+  text-decoration: underline;
+}
+
+.hero {
+  padding: 2rem 1rem;
+  background-image: linear-gradient(160deg, var(--creme), #fed7aa);
+}
+
+.hero h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  line-height: 1.1;
+  color: var(--laranja-escuro);
+}
+
+.hero p {
+  font-size: 1.125rem;
+}
+
+.botao {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  background-color: var(--laranja);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.botao:hover {
+  background-color: var(--laranja-escuro);
+}
+
+.hero-foto {
+  margin-top: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgb(154 52 18 / 0.3);
+}
+
+@media (min-width: 48rem) {
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 2rem;
+    padding: 3rem 2rem;
+  }
+
+  .hero-foto {
+    margin-top: 0;
+  }
+}
+
+.secao {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.secao h2 {
+  color: var(--laranja-escuro);
+}
+
+.vantagens {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vantagens li {
+  padding: 1rem 1.25rem;
+  background-color: var(--creme);
+  border-top: 4px solid var(--laranja);
+  border-radius: 8px;
+}
+
+.vantagens h3 {
+  margin: 0 0 0.25rem;
+}
+
+.vantagens p {
+  margin: 0;
+}
+
+.quem-faz {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.quem-faz .avatar {
+  border-radius: 50%;
+  border: 4px solid #fed7aa;
+}
+
+.mapa {
+  border-radius: 12px;
+  border: 1px solid #e7e5e4;
+}
+
+.rodape {
+  padding: 1.5rem 1rem;
+  background-color: var(--texto);
+  color: #fafaf9;
+  text-align: center;
+}
+</pre>
+</div>
+
+<p>Brinque: esta caixa abre no quadro de 375 px. Troque <code>align-items: center</code> por <code>flex-start</code> e veja o avatar subir para o alto do texto.</p>
+
+<h3>Missão 5</h3>
+<div class="tryhtml" data-largura="375" data-goal="css:.quem-faz{display}=flex,css:.quem-faz{align-items}=center,css:.quem-faz .avatar{border-top-left-radius}=50%">
+<p class="try-task"><strong>Missão:</strong> ponha o avatar ao lado do texto (<code>flex</code>), centralizado na altura dele, e deixe-o redondo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;section id="quem-faz" class="secao quem-faz"&gt;
+  &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="Desenho da Ana sorrindo, de coque e blusa verde" width="96" height="96"&gt;
+  &lt;div&gt;
+    &lt;h2&gt;Quem faz&lt;/h2&gt;
+    &lt;p&gt;Eu sou a Ana. Aprendi a fazer bolo com a minha avó e, em 2024, transformei a cozinha de casa na Lojinha.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/section&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.secao {
+  padding: 2rem 1rem;
+}
+
+.quem-faz {
+  gap: 1.5rem;
+}
+
+.quem-faz .avatar {
+  border: 4px solid #fed7aa;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.secao {
+  padding: 2rem 1rem;
+}
+
+.quem-faz {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.quem-faz .avatar {
+  border-radius: 50%;
+  border: 4px solid #fed7aa;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao6">Versão 6 · O topo que acompanha e a rolagem suave</h2>
+<p>Numa página comprida, o menu some quando a pessoa rola. Vamos grudar o topo no alto da tela e fazer os links do menu deslizarem até a seção, em vez de pularem.</p>
+
+<pre class="file" data-file="style.css (versão 6: o que entra)">
+.topo {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.secao {
+  scroll-margin-top: 7rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>.topo { position: sticky; top: 0; }</code></dt>
+  <dd>O topo rola junto com a página até encostar no alto da tela (<code>top: 0</code>); daí em diante, fica grudado ali. Aula: <a href="position-sticky.html">position: sticky</a>.</dd>
+  <dt><code>z-index: 10</code></dt>
+  <dd>Um elemento posicionado (o <code>sticky</code> é um deles) já é desenhado por cima do conteúdo comum que vem depois. O <code>z-index: 10</code> garante o mesmo diante de outros elementos posicionados ou com <code>transform</code> que venham depois no HTML (um selo, um cartão animado). E o fundo branco do topo (versão 1) esconde o que passa por trás. Aula: <a href="z-index.html">Camadas</a>.</dd>
+  <dt><code>.secao { scroll-margin-top: 7rem; }</code></dt>
+  <dd>Quando um link <code>#vantagens</code> rola a página até a seção, o navegador para 7rem (112 px) antes dela. Sem isso, o título da seção ficaria escondido atrás do topo grudado. Aula: <a href="scroll.html">Rolagem Suave e scroll-snap</a>.</dd>
+  <dt><code>html { scroll-behavior: smooth; }</code> dentro de <code>prefers-reduced-motion: no-preference</code></dt>
+  <dd>A rolagem até a âncora vira um deslizar suave, mas só para quem <strong>não</strong> pediu ao sistema menos movimento. Aula: <a href="reduced-motion.html">Respeitando Quem Prefere Menos Movimento</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> parada no alto, a página fica igual à da versão 5. Rolando 800 px para baixo, o topo continua no alto da tela, com o logo e o menu, e o conteúdo passa por baixo dele. Clicando em "Endereço", a página desliza até "Onde estamos" e para com a seção 112 px abaixo do alto: o título aparece logo depois do topo, que tem 77 px no quadro de 768 e 111 px no de 375 (por isso os 7rem).</p>
+
+
+<h3>Experimente: a versão 6 (a página completa)</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" srcset="assets/midia/logo-lojinha-400.png 2x" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;nav aria-label="Principal"&gt;
+    &lt;a href="#vantagens"&gt;Vantagens&lt;/a&gt;
+    &lt;a href="#quem-faz"&gt;Quem faz&lt;/a&gt;
+    &lt;a href="#endereco"&gt;Endereço&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+&lt;main&gt;
+  &lt;section class="hero"&gt;
+    &lt;div class="hero-texto"&gt;
+      &lt;h1&gt;Bolos caseiros, feitos sem pressa&lt;/h1&gt;
+      &lt;p&gt;Receitas de família, ingredientes frescos e entrega no bairro. Encomende até as 18h e receba no dia seguinte.&lt;/p&gt;
+      &lt;a class="botao" href="#endereco"&gt;Fazer uma encomenda&lt;/a&gt;
+    &lt;/div&gt;
+    &lt;img class="hero-foto" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate e cenourinhas de enfeite" width="800" height="600"&gt;
+  &lt;/section&gt;
+  &lt;section id="vantagens" class="secao"&gt;
+    &lt;h2&gt;Por que a Lojinha da Ana?&lt;/h2&gt;
+    &lt;ul class="vantagens"&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Receita de família&lt;/h3&gt;
+        &lt;p&gt;Os bolos da avó da Ana, testados em 30 anos de domingos.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Feito no dia&lt;/h3&gt;
+        &lt;p&gt;Nada de estoque: o bolo sai do forno no dia da entrega.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Entrega no bairro&lt;/h3&gt;
+        &lt;p&gt;De bicicleta, a até 3 km da lojinha.&lt;/p&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/section&gt;
+  &lt;section id="quem-faz" class="secao quem-faz"&gt;
+    &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="Desenho da Ana sorrindo, de coque e blusa verde" width="96" height="96"&gt;
+    &lt;div&gt;
+      &lt;h2&gt;Quem faz&lt;/h2&gt;
+      &lt;p&gt;Eu sou a Ana. Aprendi a fazer bolo com a minha avó e, em 2024, transformei a cozinha de casa na Lojinha.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+  &lt;section id="endereco" class="secao"&gt;
+    &lt;h2&gt;Onde estamos&lt;/h2&gt;
+    &lt;p&gt;Rua das Flores, perto da Av. Central. De segunda a sábado, das 8h às 18h.&lt;/p&gt;
+    &lt;img class="mapa" src="assets/midia/mapa-800.png" alt="Mapa do bairro: a Lojinha da Ana fica na Rua das Flores, perto da Av. Central e da Praça da Árvore" width="800" height="500"&gt;
+  &lt;/section&gt;
+&lt;/main&gt;
+&lt;footer class="rodape"&gt;
+  &lt;p&gt;© 2026 Lojinha da Ana · Feito com CSS e muito chocolate&lt;/p&gt;
+&lt;/footer&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --laranja: #c2410c;
+  --laranja-escuro: #9a3412;
+  --creme: #fff7ed;
+  --texto: #292524;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: var(--texto);
+  background-color: #fff;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border-bottom: 1px solid #fed7aa;
+}
+
+.topo .logo {
+  width: 150px;
+}
+
+.topo nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.topo nav a {
+  color: var(--laranja-escuro);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.topo nav a:hover {
+  text-decoration: underline;
+}
+
+.hero {
+  padding: 2rem 1rem;
+  background-image: linear-gradient(160deg, var(--creme), #fed7aa);
+}
+
+.hero h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  line-height: 1.1;
+  color: var(--laranja-escuro);
+}
+
+.hero p {
+  font-size: 1.125rem;
+}
+
+.botao {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  background-color: var(--laranja);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.botao:hover {
+  background-color: var(--laranja-escuro);
+}
+
+.hero-foto {
+  margin-top: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgb(154 52 18 / 0.3);
+}
+
+@media (min-width: 48rem) {
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 2rem;
+    padding: 3rem 2rem;
+  }
+
+  .hero-foto {
+    margin-top: 0;
+  }
+}
+
+.secao {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.secao h2 {
+  color: var(--laranja-escuro);
+}
+
+.vantagens {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vantagens li {
+  padding: 1rem 1.25rem;
+  background-color: var(--creme);
+  border-top: 4px solid var(--laranja);
+  border-radius: 8px;
+}
+
+.vantagens h3 {
+  margin: 0 0 0.25rem;
+}
+
+.vantagens p {
+  margin: 0;
+}
+
+.quem-faz {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.quem-faz .avatar {
+  border-radius: 50%;
+  border: 4px solid #fed7aa;
+}
+
+.mapa {
+  border-radius: 12px;
+  border: 1px solid #e7e5e4;
+}
+
+.rodape {
+  padding: 1.5rem 1rem;
+  background-color: var(--texto);
+  color: #fafaf9;
+  text-align: center;
+}
+
+.topo {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.secao {
+  scroll-margin-top: 7rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+</pre>
+</div>
+
+<p>Brinque: o quadro das caixas tem uma altura máxima (460 px) e, depois dela, rola por dentro: role dentro dele e veja o topo ficar grudado. Clique em "Endereço" no menu. Depois apague a linha do <code>scroll-margin-top</code> e clique de novo: o título "Onde estamos" vai parar atrás do topo.</p>
+
+<h3>Missão 6</h3>
+<div class="tryhtml" data-goal="css:.topo{position}=sticky,css:.topo{top}=0px,css:.topo{z-index}=10,css:.secao{scroll-margin-top}=112px">
+<p class="try-task"><strong>Missão:</strong> grude o <code>.topo</code> no alto da tela, por cima do resto (<code>z-index: 10</code>), e faça as seções pararem <code>7rem</code> abaixo do alto quando um link do menu rolar até elas.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha-200.png" srcset="assets/midia/logo-lojinha-400.png 2x" alt="Lojinha da Ana" width="200" height="80"&gt;
+  &lt;nav aria-label="Principal"&gt;
+    &lt;a href="#vantagens"&gt;Vantagens&lt;/a&gt;
+    &lt;a href="#quem-faz"&gt;Quem faz&lt;/a&gt;
+    &lt;a href="#endereco"&gt;Endereço&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+&lt;main&gt;
+  &lt;section class="hero"&gt;
+    &lt;div class="hero-texto"&gt;
+      &lt;h1&gt;Bolos caseiros, feitos sem pressa&lt;/h1&gt;
+      &lt;p&gt;Receitas de família, ingredientes frescos e entrega no bairro. Encomende até as 18h e receba no dia seguinte.&lt;/p&gt;
+      &lt;a class="botao" href="#endereco"&gt;Fazer uma encomenda&lt;/a&gt;
+    &lt;/div&gt;
+    &lt;img class="hero-foto" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate e cenourinhas de enfeite" width="800" height="600"&gt;
+  &lt;/section&gt;
+  &lt;section id="vantagens" class="secao"&gt;
+    &lt;h2&gt;Por que a Lojinha da Ana?&lt;/h2&gt;
+    &lt;ul class="vantagens"&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Receita de família&lt;/h3&gt;
+        &lt;p&gt;Os bolos da avó da Ana, testados em 30 anos de domingos.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Feito no dia&lt;/h3&gt;
+        &lt;p&gt;Nada de estoque: o bolo sai do forno no dia da entrega.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;h3&gt;Entrega no bairro&lt;/h3&gt;
+        &lt;p&gt;De bicicleta, a até 3 km da lojinha.&lt;/p&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/section&gt;
+  &lt;section id="quem-faz" class="secao quem-faz"&gt;
+    &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="Desenho da Ana sorrindo, de coque e blusa verde" width="96" height="96"&gt;
+    &lt;div&gt;
+      &lt;h2&gt;Quem faz&lt;/h2&gt;
+      &lt;p&gt;Eu sou a Ana. Aprendi a fazer bolo com a minha avó e, em 2024, transformei a cozinha de casa na Lojinha.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+  &lt;section id="endereco" class="secao"&gt;
+    &lt;h2&gt;Onde estamos&lt;/h2&gt;
+    &lt;p&gt;Rua das Flores, perto da Av. Central. De segunda a sábado, das 8h às 18h.&lt;/p&gt;
+    &lt;img class="mapa" src="assets/midia/mapa-800.png" alt="Mapa do bairro: a Lojinha da Ana fica na Rua das Flores, perto da Av. Central e da Praça da Árvore" width="800" height="500"&gt;
+  &lt;/section&gt;
+&lt;/main&gt;
+&lt;footer class="rodape"&gt;
+  &lt;p&gt;© 2026 Lojinha da Ana · Feito com CSS e muito chocolate&lt;/p&gt;
+&lt;/footer&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --laranja: #c2410c;
+  --laranja-escuro: #9a3412;
+  --creme: #fff7ed;
+  --texto: #292524;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: var(--texto);
+  background-color: #fff;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border-bottom: 1px solid #fed7aa;
+}
+
+.topo .logo {
+  width: 150px;
+}
+
+.topo nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.topo nav a {
+  color: var(--laranja-escuro);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.topo nav a:hover {
+  text-decoration: underline;
+}
+
+.hero {
+  padding: 2rem 1rem;
+  background-image: linear-gradient(160deg, var(--creme), #fed7aa);
+}
+
+.hero h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  line-height: 1.1;
+  color: var(--laranja-escuro);
+}
+
+.hero p {
+  font-size: 1.125rem;
+}
+
+.botao {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  background-color: var(--laranja);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.botao:hover {
+  background-color: var(--laranja-escuro);
+}
+
+.hero-foto {
+  margin-top: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgb(154 52 18 / 0.3);
+}
+
+@media (min-width: 48rem) {
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 2rem;
+    padding: 3rem 2rem;
+  }
+
+  .hero-foto {
+    margin-top: 0;
+  }
+}
+
+.secao {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.secao h2 {
+  color: var(--laranja-escuro);
+}
+
+.vantagens {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vantagens li {
+  padding: 1rem 1.25rem;
+  background-color: var(--creme);
+  border-top: 4px solid var(--laranja);
+  border-radius: 8px;
+}
+
+.vantagens h3 {
+  margin: 0 0 0.25rem;
+}
+
+.vantagens p {
+  margin: 0;
+}
+
+.quem-faz {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.quem-faz .avatar {
+  border-radius: 50%;
+  border: 4px solid #fed7aa;
+}
+
+.mapa {
+  border-radius: 12px;
+  border: 1px solid #e7e5e4;
+}
+
+.rodape {
+  padding: 1.5rem 1rem;
+  background-color: var(--texto);
+  color: #fafaf9;
+  text-align: center;
+}
+</pre>
+<pre class="solucao" data-file="style.css">:root {
+  --laranja: #c2410c;
+  --laranja-escuro: #9a3412;
+  --creme: #fff7ed;
+  --texto: #292524;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: var(--texto);
+  background-color: #fff;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border-bottom: 1px solid #fed7aa;
+}
+
+.topo .logo {
+  width: 150px;
+}
+
+.topo nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.topo nav a {
+  color: var(--laranja-escuro);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.topo nav a:hover {
+  text-decoration: underline;
+}
+
+.hero {
+  padding: 2rem 1rem;
+  background-image: linear-gradient(160deg, var(--creme), #fed7aa);
+}
+
+.hero h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  line-height: 1.1;
+  color: var(--laranja-escuro);
+}
+
+.hero p {
+  font-size: 1.125rem;
+}
+
+.botao {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  background-color: var(--laranja);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.botao:hover {
+  background-color: var(--laranja-escuro);
+}
+
+.hero-foto {
+  margin-top: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgb(154 52 18 / 0.3);
+}
+
+@media (min-width: 48rem) {
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 2rem;
+    padding: 3rem 2rem;
+  }
+
+  .hero-foto {
+    margin-top: 0;
+  }
+}
+
+.secao {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.secao h2 {
+  color: var(--laranja-escuro);
+}
+
+.vantagens {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vantagens li {
+  padding: 1rem 1.25rem;
+  background-color: var(--creme);
+  border-top: 4px solid var(--laranja);
+  border-radius: 8px;
+}
+
+.vantagens h3 {
+  margin: 0 0 0.25rem;
+}
+
+.vantagens p {
+  margin: 0;
+}
+
+.quem-faz {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.quem-faz .avatar {
+  border-radius: 50%;
+  border: 4px solid #fed7aa;
+}
+
+.mapa {
+  border-radius: 12px;
+  border: 1px solid #e7e5e4;
+}
+
+.rodape {
+  padding: 1.5rem 1rem;
+  background-color: var(--texto);
+  color: #fafaf9;
+  text-align: center;
+}
+
+.topo {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.secao {
+  scroll-margin-top: 7rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Formas diferentes de fazer as mesmas coisas</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Para</th><th>Usamos</th><th>Também daria</th><th>Quando preferir a outra</th></tr></thead>
+<tbody>
+<tr><td>Cores repetidas</td><td>Variáveis no <code>:root</code></td><td>Escrever o código da cor em cada lugar</td><td>Só num exemplo de uma regra. Num site, variável sempre: um lugar para mudar, e o tema escuro fica fácil (<a href="tema-escuro.html">Tema Escuro</a>).</td></tr>
+<tr><td>Título que cresce</td><td><code>clamp(2rem, 6vw, 3.5rem)</code></td><td>Um <code>font-size</code> por <code>@media</code></td><td>Quando o design pede tamanhos exatos em cada faixa de tela.</td></tr>
+<tr><td>Texto e foto lado a lado</td><td>Grid <code>1fr 1fr</code></td><td>Flexbox com <code>flex: 1</code> nos dois</td><td>Dá no mesmo com dois itens; Grid deixa as colunas iguais mesmo que o conteúdo seja diferente.</td></tr>
+<tr><td>Topo sempre visível</td><td><code>position: sticky</code></td><td><code>position: fixed</code> + <code>padding-top</code> no <code>body</code></td><td>Quase nunca: o <code>fixed</code> sai do fluxo, e você precisa compensar a altura dele à mão (<a href="position-fixed.html">position: fixed</a>).</td></tr>
+<tr><td>Rolagem suave</td><td><code>scroll-behavior: smooth</code></td><td>JavaScript (<code>scrollIntoView({ behavior: "smooth" })</code>)</td><td>Quando a rolagem depende de alguma lógica; para âncoras simples, o CSS basta.</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<h2>Quando dá errado</h2>
+
+<div class="cenario">
+<h3>Os links do menu ficaram cinza-escuros</h3>
+<pre class="file" data-file="style.css · erro de propósito">.topo nav a {
+  color: var(--laranja-escur);
+}
+</pre>
+<p><strong>O que você vê:</strong> os links "Vantagens", "Quem faz" e "Endereço" aparecem na cor do texto, um cinza quase preto, e não laranjas nem azuis. <strong>Por quê:</strong> a variável <code>--laranja-escur</code> (faltou o "o") não existe. O navegador só descobre isso na hora de calcular o estilo e, então, trata a declaração como se fosse <code>unset</code>: a cor é herdada do pai (o estilo calculado do <code>color</code> fica <code>rgb(41, 37, 36)</code>, a cor do <code>body</code>). O validador <strong>não acusa nada</strong>: ele não confere se a variável existe. No F12, o nome da variável inexistente costuma aparecer marcado no painel de estilos.</p>
+</div>
+
+<div class="cenario">
+<h3>O título não cresce</h3>
+<pre class="file" data-file="style.css · erro de propósito">.hero h1 {
+  font-size: clamp(2rem 6vw 3.5rem);
+}
+</pre>
+<p><strong>O que você vê:</strong> no quadro de 768 px, o título fica com 32 px, o tamanho padrão de um <code>&lt;h1&gt;</code>, em vez de 46,08 px. <strong>Por quê:</strong> os três valores do <code>clamp()</code> vão separados por vírgulas. Sem elas, a função é inválida e a declaração é descartada. O validador:</p>
+<pre class="term" data-cwd="~/lojinha">$ vnu --css style.css
+"file:/home/ana/lojinha/style.css":2.35-2.35: error: CSS: “font-size”: Parse Error.</pre>
+</div>
+
+<div class="cenario">
+<h3>O topo não gruda</h3>
+<pre class="file" data-file="style.css · erro de propósito">.topo {
+  position: sticky;
+  z-index: 10;
+}
+</pre>
+<p><strong>O que você vê:</strong> o topo rola para fora da tela como qualquer outra parte da página (rolando 800 px, ele fica 800 px acima do alto). <strong>Por quê:</strong> o <code>sticky</code> precisa saber <strong>onde</strong> grudar: sem <code>top</code> (ou <code>bottom</code>), não há limite, e ele se comporta como um elemento comum. O validador não acusa nada. Outra causa comum: um ancestral com <code>overflow: hidden</code> ou <code>auto</code> faz o <code>sticky</code> grudar dentro dele, e não na tela (aula <a href="position-sticky.html">position: sticky</a>).</p>
+</div>
+
+<div class="cenario">
+<h3>O título da seção some atrás do topo</h3>
+<p>Com o topo grudado, mas sem o <code>scroll-margin-top</code>:</p>
+<p><strong>O que você vê:</strong> clicando em "Endereço", a seção "Onde estamos" vai para o alto da tela, e o título fica quase todo escondido atrás do topo de 77 px; só o pé das letras aparece logo abaixo dele. <strong>Por quê:</strong> o navegador rola até a seção encostar no alto da janela, sem saber que há um topo grudado ali. O <code>scroll-margin-top: 7rem</code> diz para parar 112 px antes. O CSS é válido; o validador não tem como perceber.</p>
+</div>
+
+
+<hr>
+
+<h2>Referência: o que o projeto usou</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Versão</th><th>Propriedades</th><th>Aulas</th></tr></thead>
+<tbody>
+<tr><td>1 · Base e topo</td><td><code>--variáveis</code>, <code>var()</code>, <code>display: flex</code>, <code>justify-content</code>, <code>align-items</code>, <code>flex-wrap</code>, <code>gap</code></td><td><a href="variaveis.html">Variáveis</a>, <a href="flexbox.html">Flexbox</a></td></tr>
+<tr><td>2 · Abertura</td><td><code>linear-gradient()</code>, <code>clamp()</code>, <code>vw</code>, <code>inline-block</code>, <code>border-radius</code>, <code>box-shadow</code></td><td><a href="gradientes.html">Degradês</a>, <a href="clamp.html">clamp()</a></td></tr>
+<tr><td>3 · Duas colunas</td><td><code>@media</code>, <code>grid-template-columns</code>, <code>align-items</code></td><td><a href="media-queries.html">Media Queries</a></td></tr>
+<tr><td>4 · Seções e cartões</td><td><code>max-width</code>, <code>margin: 0 auto</code>, <code>repeat(auto-fit, minmax())</code>, <code>border-top</code></td><td><a href="grid-repeat.html">repeat e minmax</a></td></tr>
+<tr><td>5 · Quem faz e rodapé</td><td><code>display: flex</code>, <code>align-items</code>, <code>border-radius: 50%</code>, <code>text-align</code></td><td><a href="align-items.html">align-items</a></td></tr>
+<tr><td>6 · Topo fixo</td><td><code>position: sticky</code>, <code>z-index</code>, <code>scroll-margin-top</code>, <code>scroll-behavior</code>, <code>prefers-reduced-motion</code></td><td><a href="position-sticky.html">sticky</a>, <a href="scroll.html">Rolagem Suave</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Desafios extras</h2>
+<ul>
+  <li>Crie o tema escuro: redefina as variáveis dentro de <code>@media (prefers-color-scheme: dark)</code> (<a href="tema-escuro.html">Tema Escuro</a>).</li>
+  <li>Faça os cartões de vantagens subirem um pouco no <code>:hover</code>, com <code>transition</code>.</li>
+  <li>Use <code>&lt;picture&gt;</code> ou <code>srcset</code> com <code>sizes="(min-width: 48rem) 50vw, 100vw"</code> para a foto da abertura (Guia HTML).</li>
+</ul>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Usar uma variável</h3>
+<p>Complete para o botão usar a cor guardada em <code>--laranja</code>:</p>
+<div class="ex-code">.botao { background-color: <input data-answer="var(--laranja)" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. O topo grudado</h3>
+<p>Complete para o topo grudar no alto da tela:</p>
+<div class="ex-code">.topo { position: <input data-answer="sticky" aria-label="position">; top: 0; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. O que <code>font-size: clamp(2rem, 6vw, 3.5rem)</code> faz numa tela de 375 px (6vw = 22,5 px)?</p>
+<label><input type="radio" name="q3"> Usa 22,5 px</label>
+<label><input type="radio" name="q3"> Usa 2rem (32 px), o mínimo</label>
+<label><input type="radio" name="q3"> Usa 3.5rem (56 px), o máximo</label>
+<label><input type="radio" name="q3"> Ignora a declaração</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">4. Clicando em "Endereço", o título "Onde estamos" fica escondido atrás do topo grudado. O que resolve?</p>
+<label><input type="radio" name="q4"> <code>scroll-margin-top</code> na seção</label>
+<label><input type="radio" name="q4"> <code>z-index: -1</code> no topo</label>
+<label><input type="radio" name="q4"> <code>scroll-behavior: smooth</code></label>
+<label><input type="radio" name="q4"> <code>margin-top: 7rem</code> no topo</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. O <code>.quem-faz</code> já é <code>display: flex</code>. O que centraliza o avatar e o texto na altura um do outro?</p>
+<label><input type="radio" name="q5"> <code>justify-content: center</code></label>
+<label><input type="radio" name="q5"> <code>text-align: center</code></label>
+<label><input type="radio" name="q5"> <code>align-items: center</code></label>
+<label><input type="radio" name="q5"> <code>vertical-align: middle</code></label>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Cores em variáveis no <code>:root</code>, usadas com <code>var()</code>: um lugar só para mudar.</li>
+  <li>Topo com Flexbox: <code>justify-content: space-between</code>, <code>align-items: center</code> e <code>flex-wrap</code> para o celular.</li>
+  <li>Abertura: degradê de fundo, título com <code>clamp()</code>, botão <code>inline-block</code> e foto; duas colunas com Grid só a partir de 48rem.</li>
+  <li>Uma classe de seção para todas (<code>max-width</code> + <code>margin: 0 auto</code> + respiro); cartões com Grid automático.</li>
+  <li>Avatar redondo (<code>border-radius: 50%</code>) ao lado do texto com Flexbox; rodapé escuro.</li>
+  <li>Topo grudado com <code>position: sticky; top: 0</code> e <code>z-index</code>; <code>scroll-margin-top</code> nas seções; rolagem suave só para quem não pediu menos movimento.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
