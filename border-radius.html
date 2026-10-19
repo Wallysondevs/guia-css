@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS border-radius — cantos arredondados, círculos e pílulas | Guia CSS</title>
+<meta name="description" content="A propriedade border-radius do CSS para quem nunca escreveu CSS: cantos arredondados em caixas, botões e imagens, foto redonda com 50%, botão em forma de pílula, um canto de cada vez, cantos elípticos, a imagem que escapa do cartão arredondado e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">border-radius</span></h1>
+
+<p class="intro">Repare nos botões, cartões e fotos de perfil dos sites que você usa: quase nada tem canto vivo. Os cantos arredondados deixam a página mais suave, e no CSS eles vêm de uma propriedade só, o <code>border-radius</code> ("raio da borda"). Nesta aula você vai arredondar os cartões e botões da Ana, fazer uma foto redonda e um botão em forma de pílula, mexer em um canto de cada vez e consertar a foto que "vaza" pelo canto do cartão.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que o <code>border-radius</code> faz e o que o número dele quer dizer.</li>
+  <li>Os valores lado a lado: de um arredondado leve até o círculo.</li>
+  <li>A foto redonda (<code>50%</code>) e o botão pílula (<code>999px</code>).</li>
+  <li>Um canto de cada vez, com o atalho de 1 a 4 valores ou com as propriedades longas.</li>
+  <li>Cantos elípticos, com a barra <code>/</code>.</li>
+  <li>Por que a imagem escapa do cartão arredondado, e o conserto com <code>overflow: hidden</code>.</li>
+  <li>Os erros reais do validador e um que ele não pega.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a moeda no canto</h2>
+<p>Pegue um cartão de papel e ponha uma moeda encostada num dos cantos, tocando os dois lados. Risque em volta da moeda e corte fora a pontinha: o canto fica arredondado, no formato da moeda. Com uma moeda maior, a curva fica maior.</p>
+<p>O <code>border-radius</code> é o <strong>raio dessa moeda</strong>. <code>border-radius: 10px</code> põe um círculo de 10px de raio em cada canto e corta o que sobra. <code>0</code> (o valor inicial) é canto vivo.</p>
+
+<hr>
+
+<h2>1. O primeiro canto arredondado</h2>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .cartao {
+    background-color: lavender;
+    border: 2px solid slateblue;
+    padding: 16px;
+    max-width: 280px;
+    border-radius: 12px;
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;Bolo de cenoura com cobertura de chocolate. 50 minutos.&lt;/div&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>border-radius</dt><dd>A propriedade: o <strong>raio</strong> da curva dos cantos. <em>Radius</em> = "raio".</dd>
+  <dt>12px</dt><dd>O raio, em pixels. Com um valor só, os <strong>quatro cantos</strong> ficam iguais.</dd>
+</dl>
+
+<p>Repare que tudo acompanha a curva: a <strong>borda</strong> roxa, o <strong>fundo</strong> lavanda e até o que fica de fora do canto, que vira transparente. Apesar do nome, o <code>border-radius</code> não precisa de borda: uma caixa só com fundo também fica arredondada.</p>
+
+<hr>
+
+<h2>2. Os valores lado a lado</h2>
+<p>As caixas abaixo são quadrados de 90px. Só o <code>border-radius</code> muda, e o valor está escrito dentro:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .q {
+    display: inline-block;
+    width: 90px;
+    height: 90px;
+    line-height: 90px;
+    margin: 6px;
+    text-align: center;
+    font-family: monospace;
+    background-color: lightsalmon;
+    border: 3px solid chocolate;
+  }
+&lt;/style&gt;
+&lt;div class="q" style="border-radius: 0"&gt;0&lt;/div&gt;
+&lt;div class="q" style="border-radius: 4px"&gt;4px&lt;/div&gt;
+&lt;div class="q" style="border-radius: 12px"&gt;12px&lt;/div&gt;
+&lt;div class="q" style="border-radius: 24px"&gt;24px&lt;/div&gt;
+&lt;div class="q" style="border-radius: 50%"&gt;50%&lt;/div&gt;
+</pre>
+
+<ul>
+  <li><code>4px</code> é um arredondado discreto, comum em campos de formulário.</li>
+  <li><code>8px</code> a <code>16px</code> é o "visual de cartão" da maioria dos sites hoje.</li>
+  <li><code>50%</code> num quadrado vira um <strong>círculo</strong>: cada canto pega metade do lado, e as quatro curvas se encontram no meio.</li>
+</ul>
+
+<p>(O atributo <code>style="…"</code> só evita cinco classes diferentes neste exemplo; no seu site, prefira classes no <code>style.css</code>.)</p>
+
+<hr>
+
+<h2>3. A foto redonda e o botão pílula</h2>
+<p>Dois usos tão comuns que valem uma seção própria:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+  }
+  .pilula {
+    display: inline-block;
+    background-color: darkgreen;
+    color: white;
+    padding: 10px 24px;
+    border-radius: 999px;
+  }
+  .oval {
+    display: inline-block;
+    background-color: darkgreen;
+    color: white;
+    padding: 10px 24px;
+    border-radius: 50%;
+  }
+&lt;/style&gt;
+&lt;img class="avatar" src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo de cenoura"&gt;
+&lt;p&gt;
+  &lt;span class="pilula"&gt;999px: pílula&lt;/span&gt;
+  &lt;span class="oval"&gt;50%: oval&lt;/span&gt;
+&lt;/p&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>.avatar { border-radius: 50%; }</dt><dd>Uma imagem <strong>quadrada</strong> (largura igual à altura) com 50% vira um círculo. É o jeito das fotos de perfil. Se a imagem não for quadrada, sai uma <strong>elipse</strong>.</dd>
+  <dt>.pilula { border-radius: 999px; }</dt><dd>Um número bem maior que a altura do botão. O navegador reduz o raio até caber, e os lados curtos viram meias-luas perfeitas: a forma de <strong>pílula</strong>. Qualquer valor grande serve (<code>100px</code>, <code>9999px</code>); <code>999px</code> é só um costume.</dd>
+  <dt>.oval { border-radius: 50%; }</dt><dd>Num retângulo, 50% da largura na horizontal e 50% da altura na vertical: sai um <strong>ovo achatado</strong>, não uma pílula. Para botões, use o número grande.</dd>
+</dl>
+
+<div class="tryhtml" data-goal="css:.botao{border-top-left-radius}=999px,css:.botao{border-bottom-right-radius}=999px,css:.foto{border-top-left-radius}=50%,css:.foto{border-bottom-left-radius}=50%">
+<p class="try-task"><strong>Missão:</strong> (1) Deixe a <code>.foto</code> redonda com <code>50%</code>. (2) Transforme o botão "Encomendar" numa pílula com <code>999px</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;img class="foto" src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo de cenoura" width="120" height="120"&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;a class="botao" href="#encomendar"&gt;Encomendar&lt;/a&gt;
+</pre>
+<pre class="script" data-file="style.css">.foto {
+  border: 4px solid orange;
+}
+
+.botao {
+  display: inline-block;
+  background-color: darkred;
+  color: white;
+  text-decoration: none;
+  padding: 10px 24px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.foto {
+  border: 4px solid orange;
+  border-radius: 50%;
+}
+
+.botao {
+  display: inline-block;
+  background-color: darkred;
+  color: white;
+  text-decoration: none;
+  padding: 10px 24px;
+  border-radius: 999px;
+}
+</pre>
+</div>
+
+<p>Repare que a borda laranja da foto também ficou redonda: ela acompanha a curva.</p>
+
+<hr>
+
+<h2>4. Um canto de cada vez</h2>
+<p>O atalho <code>border-radius</code> aceita de 1 a 4 valores. A ordem começa no canto de <strong>cima à esquerda</strong> e gira no sentido do relógio:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Quer dizer</th></tr>
+<tr><td><code>border-radius: 20px;</code></td><td>os quatro cantos com 20px</td></tr>
+<tr><td><code>border-radius: 20px 0;</code></td><td>cima-esquerda e baixo-direita com 20px; cima-direita e baixo-esquerda com 0 (os cantos opostos fazem par)</td></tr>
+<tr><td><code>border-radius: 20px 0 40px;</code></td><td>cima-esquerda 20px; cima-direita e baixo-esquerda 0; baixo-direita 40px</td></tr>
+<tr><td><code>border-radius: 0 20px 40px 60px;</code></td><td>cima-esquerda, cima-direita, baixo-direita, baixo-esquerda</td></tr>
+</table>
+</div>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .c {
+    display: inline-block;
+    width: 110px;
+    height: 80px;
+    margin: 6px;
+    padding: 8px;
+    font-family: monospace;
+    font-size: 13px;
+    background-color: paleturquoise;
+    border: 3px solid teal;
+  }
+&lt;/style&gt;
+&lt;div class="c" style="border-radius: 20px"&gt;20px&lt;/div&gt;
+&lt;div class="c" style="border-radius: 20px 0"&gt;20px 0&lt;/div&gt;
+&lt;div class="c" style="border-radius: 20px 0 40px"&gt;20px 0 40px&lt;/div&gt;
+&lt;div class="c" style="border-radius: 0 20px 40px 60px"&gt;0 20px 40px 60px&lt;/div&gt;
+</pre>
+
+<h3>As propriedades longas</h3>
+<p>Cada canto tem a sua propriedade. O nome diz primeiro o lado de cima ou de baixo, depois a esquerda ou a direita:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>Canto</th></tr>
+<tr><td><code>border-top-left-radius</code></td><td>cima, à esquerda</td></tr>
+<tr><td><code>border-top-right-radius</code></td><td>cima, à direita</td></tr>
+<tr><td><code>border-bottom-right-radius</code></td><td>baixo, à direita</td></tr>
+<tr><td><code>border-bottom-left-radius</code></td><td>baixo, à esquerda</td></tr>
+</table>
+</div>
+
+<p>É o que o F12 mostra na aba <em>Computed</em> (Calculado). Elas servem bem para uma "aba" de pasta, arredondada só em cima:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .aba {
+    display: inline-block;
+    background-color: gold;
+    padding: 8px 20px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+  .painel {
+    background-color: gold;
+    padding: 16px;
+    max-width: 260px;
+  }
+&lt;/style&gt;
+&lt;div class="aba"&gt;Receitas doces&lt;/div&gt;
+&lt;div class="painel"&gt;Bolo, brigadeiro, pudim.&lt;/div&gt;
+</pre>
+
+<hr>
+
+<h2>5. Cantos elípticos: a barra <code>/</code></h2>
+<p>Até aqui, cada canto era um pedaço de <strong>círculo</strong>. Com uma barra, você dá dois raios: o da horizontal antes da barra e o da vertical depois. O canto vira um pedaço de <strong>elipse</strong>:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .e {
+    display: inline-block;
+    width: 140px;
+    height: 80px;
+    margin: 6px;
+    padding: 8px;
+    font-family: monospace;
+    background-color: thistle;
+    border: 3px solid purple;
+  }
+&lt;/style&gt;
+&lt;div class="e" style="border-radius: 40px"&gt;40px&lt;/div&gt;
+&lt;div class="e" style="border-radius: 40px / 20px"&gt;40px / 20px&lt;/div&gt;
+&lt;div class="e" style="border-radius: 20px / 40px"&gt;20px / 40px&lt;/div&gt;
+</pre>
+
+<p>Na aba <em>Computed</em>, cada canto mostra os dois raios: <code>border-top-left-radius: 40px 20px</code>. Os cantos elípticos são raros no dia a dia; é bom reconhecê-los quando aparecerem num código.</p>
+
+<hr>
+
+<h2>6. A imagem que escapa do canto</h2>
+<p>O <code>border-radius</code> arredonda a <strong>própria</strong> caixa, mas não corta o que está dentro dela. Uma foto encostada no topo de um cartão arredondado continua com os cantos vivos e passa por cima da curva:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .cartao {
+    display: inline-block;
+    vertical-align: top;
+    width: 200px;
+    margin: 6px;
+    border: 3px solid sienna;
+    border-radius: 24px;
+    background-color: linen;
+  }
+  .cartao img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .cartao p {
+    margin: 10px 14px;
+  }
+  .cortado {
+    overflow: hidden;
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura" width="400" height="300"&gt;
+  &lt;p&gt;Sem overflow: a foto vaza nos cantos.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="cartao cortado"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura" width="400" height="300"&gt;
+  &lt;p&gt;Com overflow: hidden.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<p>No primeiro cartão, os cantos de cima da foto ficam pontudos, passando por cima da borda curva. No segundo, o <code>overflow: hidden</code> ("o que transbordar, esconda") no cartão corta tudo o que sai da curva, e a foto acompanha o arredondado. O <code>overflow</code> tem aula própria: <a href="overflow.html">O que Transborda</a>.</p>
+
+<hr>
+
+<h2>7. Formas de escrever e qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Quando usar</th></tr>
+<tr><td><code>border-radius: 8px;</code></td><td>Cartões, caixas, campos: o caso mais comum.</td></tr>
+<tr><td><code>border-radius: 0.5rem;</code></td><td>O mesmo, em <code>rem</code>: acompanha o tamanho de letra que o leitor escolheu no navegador.</td></tr>
+<tr><td><code>border-radius: 50%;</code></td><td>Círculo, numa caixa ou imagem quadrada (fotos de perfil, ícones, bolinhas de aviso).</td></tr>
+<tr><td><code>border-radius: 999px;</code></td><td>Pílula: botões, etiquetas, campos de busca.</td></tr>
+<tr><td><code>border-radius: 12px 12px 0 0;</code></td><td>Só os cantos de cima (abas, o topo de um cartão).</td></tr>
+<tr><td><code>border-top-left-radius: 0;</code></td><td>Ajustar um canto depois de arredondar todos. Escreva o atalho antes.</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Como sempre no CSS: nenhuma mensagem na página. A declaração inválida é <strong>ignorada</strong>, os cantos continuam vivos, e o F12 mostra a linha <strong>riscada</strong> no painel de estilos (aula <a href="devtools.html">DevTools</a>).</p>
+
+<div class="cenario">
+<strong>Valor negativo: <code>negative values are not allowed</code></strong>
+<pre class="term" data-cwd="~/site">$ cat raio-neg.css
+.aviso {
+  border: 2px solid red;
+  border-radius: -5px;
+}
+$ vnu --css raio-neg.css
+"file:/home/ana/site/raio-neg.css":3.19-3.21: error: CSS: “border-radius”: “-5px” negative values are not allowed.</pre>
+<p><strong>O que você vê:</strong> a borda vermelha com cantos vivos. Não existe raio menor que zero; "cantos para dentro" não se fazem com <code>border-radius</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Vírgula ou número sem unidade</strong>
+<pre class="term" data-cwd="~/site">$ vnu --css raio-virgula.css
+"file:/home/ana/site/raio-virgula.css":2.24-2.27: error: CSS: “border-radius”: “,” is an incorrect operator.
+$ vnu --css raio-semunidade.css
+"file:/home/ana/site/raio-semunidade.css":2.18-2.19: error: CSS: “border-radius”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<p>Em <code>border-radius: 10px, 20px;</code>, a vírgula "é um operador incorreto": os valores vão separados por espaço. Em <code>border-radius: 50;</code>, falta a unidade ("só o <code>0</code> pode ficar sem unidade"). O navegador ignora as duas declarações.</p>
+<p><strong>Como consertar:</strong> <code>border-radius: 10px 20px;</code> e <code>border-radius: 50%;</code> (ou <code>50px</code>, conforme a ideia).</p>
+</div>
+
+<div class="cenario">
+<strong>Nome errado: <code>Property “border-raduis” doesn't exist</code></strong>
+<pre class="term" data-cwd="~/site">$ vnu --css raio-nome.css
+"file:/home/ana/site/raio-nome.css":2.18-2.20: error: CSS: “border-raduis”: Property “border-raduis” doesn't exist.</pre>
+<p>"A propriedade <code>border-raduis</code> não existe": as letras <code>i</code> e <code>u</code> trocadas. É um dos erros de digitação mais comuns do CSS.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:.selo{border-top-left-radius}=8px,css:.selo{border-bottom-right-radius}=8px,nsrc:raduis">
+<p class="try-task"><strong>Missão:</strong> o selo deveria ter cantos de 8px, mas continua quadrado. Ache o erro de digitação e conserte.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;span class="selo"&gt;Feito em casa&lt;/span&gt;
+</pre>
+<pre class="script" data-file="style.css">.selo {
+  display: inline-block;
+  background-color: teal;
+  color: white;
+  padding: 6px 12px;
+  border-raduis: 8px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.selo {
+  display: inline-block;
+  background-color: teal;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+</pre>
+</div>
+
+<div class="cenario">
+<strong>Cinco valores: o navegador ignora, mas o validador não avisa</strong>
+<pre class="term" data-cwd="~/site">$ cat raio-cinco.css
+.foto {
+  border-radius: 10px 20px 30px 40px 50px;
+}
+$ vnu --css raio-cinco.css
+$</pre>
+<p><strong>O que você vê:</strong> cantos vivos. São quatro cantos, então o máximo são quatro valores; com cinco, o navegador joga a declaração fora (no Chromium do guia, o calculado de <code>border-top-left-radius</code> ficou <code>0px</code>).</p>
+<p><strong>O que o validador diz:</strong> nada. O <code>vnu</code> 26.10.12 deixa passar este erro, que ele acusa no <code>padding</code> e na <code>border</code>. É um lembrete de que o validador ajuda, mas não substitui olhar o resultado.</p>
+<p><strong>Como consertar:</strong> no máximo quatro valores (e, com a barra, até quatro de cada lado dela).</p>
+</div>
+
+<div class="cenario">
+<strong>Arredondei o cartão e a foto continua pontuda</strong>
+<p><strong>O que você vê:</strong> o cartão tem a borda curva, mas a imagem do topo passa por cima dos cantos (seção 6). Nenhum validador acusa: não é erro de CSS, é o comportamento normal.</p>
+<p><strong>Como consertar:</strong> <code>overflow: hidden;</code> no cartão; ou arredonde a própria imagem só em cima, com <code>border-radius: 24px 24px 0 0</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>border-radius: A;</code></td><td>Os quatro cantos com raio A</td></tr>
+<tr><td><code>border-radius: A B;</code></td><td>cima-esquerda e baixo-direita = A; cima-direita e baixo-esquerda = B</td></tr>
+<tr><td><code>border-radius: A B C;</code></td><td>cima-esquerda = A; cima-direita e baixo-esquerda = B; baixo-direita = C</td></tr>
+<tr><td><code>border-radius: A B C D;</code></td><td>cima-esquerda, cima-direita, baixo-direita, baixo-esquerda</td></tr>
+<tr><td><code>border-radius: H / V;</code></td><td>Cantos elípticos: raio horizontal H, vertical V</td></tr>
+<tr><td><code>border-top-left-radius</code>… (4 propriedades)</td><td>Um canto só</td></tr>
+<tr><td><code>50%</code></td><td>Círculo num quadrado; elipse num retângulo</td></tr>
+<tr><td><code>999px</code></td><td>Pílula (o raio é reduzido até caber)</td></tr>
+<tr><td>Valor inicial</td><td><code>0</code> (canto vivo)</td></tr>
+<tr><td>Herdado?</td><td>Não; e não corta os filhos (para isso, <code>overflow: hidden</code>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O círculo</h3>
+<p>Complete para a foto quadrada ficar redonda:</p>
+<div class="ex-code">.avatar { border-radius: <input data-answer="50%" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Um canto</h3>
+<p>Complete o nome da propriedade do canto de baixo, à direita:</p>
+<div class="ex-code"><input data-answer="border-bottom-right-radius" aria-label="propriedade">: 16px;</div>
+</div>
+
+<div class="exercise">
+<h3>3. A grafia</h3>
+<p>Escreva o nome da propriedade corretamente:</p>
+<div class="ex-code">.cartao { <input data-answer="border-radius" aria-label="propriedade">: 12px; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Um botão retangular (mais largo que alto) deve ficar em forma de pílula. Qual valor?</p>
+<label><input type="radio" name="q4"> <code>border-radius: 50%;</code></label>
+<label><input type="radio" name="q4"> <code>border-radius: 999px;</code></label>
+<label><input type="radio" name="q4"> <code>border-radius: 0;</code></label>
+<label><input type="radio" name="q4"> <code>border-radius: -10px;</code></label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Em <code>border-radius: 0 0 20px 20px;</code>, quais cantos ficam arredondados?</p>
+<label><input type="radio" name="q5"> Os dois de cima</label>
+<label><input type="radio" name="q5"> Os dois da esquerda</label>
+<label><input type="radio" name="q5"> Os dois de baixo</label>
+<label><input type="radio" name="q5"> Cima-esquerda e baixo-direita</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. O cartão tem <code>border-radius: 20px</code>, mas a foto dentro dele aparece com cantos vivos. O que resolve?</p>
+<label><input type="radio" name="q6"> <code>overflow: hidden;</code> no cartão</label>
+<label><input type="radio" name="q6"> Aumentar o <code>border-radius</code> para <code>200px</code></label>
+<label><input type="radio" name="q6"> Tirar a borda do cartão</label>
+<label><input type="radio" name="q6"> Nada: imagens nunca ficam arredondadas</label>
+</div>
+
+<h3>Missão final: o cartão de perfil</h3>
+
+<div class="tryhtml" data-goal="css:.perfil{border-top-left-radius}=16px,css:.perfil{border-bottom-right-radius}=16px,css:.perfil{overflow}=hidden,css:.avatar{border-top-left-radius}=50%,css:.seguir{border-top-left-radius}=999px">
+<p class="try-task"><strong>Missão:</strong> monte o cartão de perfil da Ana. (1) O <code>.perfil</code> com cantos de <code>16px</code> e <code>overflow: hidden</code>, para a capa acompanhar a curva. (2) O <code>.avatar</code> redondo (<code>50%</code>). (3) O botão <code>.seguir</code> em pílula (<code>999px</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="perfil"&gt;
+  &lt;img class="capa" src="assets/midia/bolo-400.jpg" alt="" width="400" height="300"&gt;
+  &lt;div class="info"&gt;
+    &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" alt="Foto da Ana" width="64" height="64"&gt;
+    &lt;h2&gt;Ana&lt;/h2&gt;
+    &lt;p&gt;Receitas de fim de semana.&lt;/p&gt;
+    &lt;a class="seguir" href="#seguir"&gt;Seguir&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.perfil {
+  max-width: 260px;
+  border: 2px solid lightgray;
+  background-color: oldlace;
+}
+
+.capa {
+  display: block;
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+}
+
+.info {
+  padding: 12px 16px 16px;
+}
+
+.avatar {
+  border: 3px solid white;
+}
+
+.seguir {
+  display: inline-block;
+  background-color: darkslateblue;
+  color: white;
+  text-decoration: none;
+  padding: 8px 20px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.perfil {
+  max-width: 260px;
+  border: 2px solid lightgray;
+  background-color: oldlace;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.capa {
+  display: block;
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+}
+
+.info {
+  padding: 12px 16px 16px;
+}
+
+.avatar {
+  border: 3px solid white;
+  border-radius: 50%;
+}
+
+.seguir {
+  display: inline-block;
+  background-color: darkslateblue;
+  color: white;
+  text-decoration: none;
+  padding: 8px 20px;
+  border-radius: 999px;
+}
+</pre>
+</div>
+
+<p>A capa usa <code>object-fit: cover</code> para preencher a faixa de 100px sem deformar a foto (aula <a href="imagens-responsivas.html">Imagens que se Adaptam</a>).</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>border-radius</code> arredonda os cantos: o número é o raio da curva. Funciona com ou sem borda, em caixas e em imagens.</li>
+  <li><code>50%</code> num quadrado = círculo (fotos de perfil). <code>999px</code> = pílula (botões). <code>50%</code> num retângulo = oval.</li>
+  <li>De 1 a 4 valores, começando em cima à esquerda e girando no sentido do relógio. Um canto: <code>border-top-left-radius</code> e as outras três. Com <code>/</code>, cantos elípticos.</li>
+  <li>O arredondado não corta os filhos: use <code>overflow: hidden</code> no cartão.</li>
+  <li>Erros (a declaração é ignorada): valor negativo, vírgula, número sem unidade, <code>border-raduis</code>. Cinco valores também são ignorados, e o validador não avisa.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
