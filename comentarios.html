@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Comentários — notas no código com /* e */ | Guia CSS</title>
+<meta name="description" content="Comentários no CSS para quem está começando: a forma /* … */, comentários de uma e de várias linhas, para que servem (explicar, organizar, desligar uma declaração para testar) e os erros reais: // não é comentário em CSS, comentário dentro de comentário e comentário sem fechar, com o que o navegador faz e o que o validador W3C diz.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Comentários</span></h1>
+
+<p class="intro">Um comentário é uma nota que você deixa no código para as pessoas, e não para o navegador: ele pula tudo o que está dentro. No CSS, o comentário fica entre <code>/*</code> e <code>*/</code>. Nesta aula você vai escrever comentários, usá-los para organizar a folha de estilo e para "desligar" uma declaração num teste, e conhecer os três erros que fazem um comentário engolir CSS que devia funcionar.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A forma do comentário: <code>/* … */</code>, numa linha ou em várias.</li>
+  <li>Para que servem: explicar o porquê, dividir o arquivo em seções, desligar uma declaração para testar.</li>
+  <li>A diferença entre os comentários do HTML, do CSS e do JavaScript.</li>
+  <li>Os erros reais: <code>//</code> (que não é comentário no CSS), comentário dentro de comentário e comentário sem <code>*/</code>.</li>
+</ul>
+</div>
+
+<p>O que o navegador faz em cada erro foi conferido no Chromium. As mensagens são do validador W3C (<code>vnu --css</code>), rodado na máquina fictícia da Ana, na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: o post-it na receita</h2>
+<p>No caderno de receitas da Ana há post-its colados: "a vó usava manteiga, não margarina", "testar com menos açúcar". Quem faz o bolo segue a receita e ignora os post-its; quem vai <strong>mexer</strong> na receita lê os post-its e entende por que ela é assim.</p>
+<p>O navegador é quem faz o bolo: segue as regras e pula os comentários. Você (e quem mexer no seu CSS daqui a seis meses) lê os comentários.</p>
+
+<hr>
+
+<h2>1. A forma do comentário</h2>
+
+<pre class="file" data-file="style.css">/* Cor da marca da Ana */
+h1 {
+  color: teal;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>/*</dt><dd>Abre o comentário: uma barra seguida de um asterisco, sem espaço entre eles.</dd>
+  <dt>Cor da marca da Ana</dt><dd>O texto do comentário. Pode ter qualquer coisa: acentos, sinais, código.</dd>
+  <dt>*/</dt><dd>Fecha o comentário: o asterisco e depois a barra. Tudo entre o <code>/*</code> e o <code>*/</code> é ignorado pelo navegador.</dd>
+</dl>
+
+<p>O comentário pode ficar em qualquer lugar onde caberia um espaço: numa linha própria, no fim de uma declaração, entre duas regras. E pode ocupar várias linhas:</p>
+
+<pre class="file" data-file="style.css">/*
+  Folha de estilo do site Receitas da Ana
+  Cores: teal (títulos), dimgray (textos), honeydew (fundo)
+*/
+
+h1 {
+  color: teal; /* a mesma cor do logo */
+}
+</pre>
+
+<p>Nada disso aparece na página. O comentário existe só no arquivo.</p>
+
+<hr>
+
+<h2>2. Para que servem</h2>
+
+<h3>Explicar o porquê</h3>
+<p>Um bom comentário diz <strong>por que</strong> o código é assim, e não o que ele faz (isso o próprio código já diz):</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Comentário que não ajuda</th><th>Comentário que ajuda</th></tr>
+<tr><td><code>color: dimgray; /* cor cinza */</code></td><td><code>color: dimgray; /* cinza mais claro deixaria pouco contraste */</code></td></tr>
+<tr><td><code>font-size: 18px; /* tamanho 18 */</code></td><td><code>font-size: 18px; /* as receitas são lidas de longe, na cozinha */</code></td></tr>
+</table>
+</div>
+
+<h3>Dividir o arquivo em seções</h3>
+<p>Uma folha de estilo de verdade passa fácil de 300 linhas. Comentários de seção ajudam a achar as coisas (e o <kbd>Ctrl</kbd>+<kbd>F</kbd> do editor acha o título da seção):</p>
+
+<pre class="file" data-file="style.css">/* ========== Base ========== */
+
+body {
+  font-family: sans-serif;
+}
+
+/* ========== Cabeçalho ========== */
+
+h1 {
+  color: teal;
+}
+
+/* ========== Receitas ========== */
+
+h2 {
+  color: darkgreen;
+}
+</pre>
+
+<p>Os sinais de <code>=</code> são só enfeite, para a seção saltar aos olhos. Cada equipe tem o seu estilo; o importante é usar sempre o mesmo. Organizar o CSS em vários arquivos é outra opção, para projetos maiores (aula <a href="organizar-arquivos.html">Organizando os Arquivos de CSS</a>).</p>
+
+<h3>Desligar uma declaração para testar</h3>
+<p>Quer ver como a página fica sem uma declaração, mas sem apagá-la? Ponha-a dentro de um comentário. É o uso mais comum no dia a dia:</p>
+
+<div class="tryhtml" data-goal="css:body{background-color}=rgba(0, 0, 0, 0),src:/[*]\s*background-color,css:h1{color}=rgb(0, 128, 128)">
+<p class="try-task"><strong>Missão:</strong> a Ana quer ver a página sem o fundo verde, mas sem perder a declaração. Transforme a linha do <code>background-color</code> num comentário: ponha <code>/*</code> antes e <code>*/</code> depois. O fundo fica branco; para religar, é só tirar os sinais.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  background-color: honeydew;
+}
+
+h1 {
+  color: teal;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  /* background-color: honeydew; */
+}
+
+h1 {
+  color: teal;
+}
+</pre>
+</div>
+
+<p>Muitos editores de código fazem isso com um atalho: <kbd>Ctrl</kbd>+<kbd>/</kbd> põe ou tira o comentário da linha onde está o cursor (no VS Code, por exemplo). Dá para "desligar" uma regra inteira também, com o <code>/*</code> antes do seletor e o <code>*/</code> depois da <code>}</code>.</p>
+
+<hr>
+
+<h2>3. Cada linguagem, o seu comentário</h2>
+<p>HTML, CSS e JavaScript têm comentários diferentes, e cada um só funciona na sua linguagem:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Linguagem</th><th>Comentário</th><th>Vale no CSS?</th></tr>
+<tr><td>HTML</td><td><code>&lt;!-- nota --&gt;</code></td><td>Não</td></tr>
+<tr><td>CSS</td><td><code>/* nota */</code></td><td><strong>Sim</strong></td></tr>
+<tr><td>JavaScript</td><td><code>// nota</code> (até o fim da linha) e <code>/* nota */</code></td><td>Só o <code>/* */</code></td></tr>
+</table>
+</div>
+
+<p>Dentro de um <code>&lt;style&gt;</code> no HTML, vale o comentário do CSS, porque ali dentro o navegador está lendo CSS.</p>
+
+<div class="warning">
+<strong>Comentário não é segredo</strong>
+<p>Qualquer visitante pode abrir o seu <code>style.css</code> (é só digitar o endereço dele, ou usar o F12) e ler os comentários. Nunca escreva neles senhas, dados de clientes ou "este cliente é chato".</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong><code>//</code> não é comentário no CSS: a regra seguinte some</strong>
+<p>Quem já viu JavaScript (ou C, ou Java) tenta usar <code>//</code>:</p>
+<pre class="file" data-file="barras.css · erro de propósito">// Títulos
+h1 {
+  color: teal;
+}
+
+p {
+  // color: dimgray;
+  font-size: 18px;
+}
+</pre>
+<p><strong>O que você vê:</strong> o título <strong>preto</strong>. O parágrafo fica com a letra de 18px, mas preto também.</p>
+<p><strong>Por quê:</strong> o CSS não conhece <code>//</code>. Na primeira linha, o navegador junta <code>// Títulos</code> com o <code>h1</code> e lê um seletor só, <code>// Títulos h1</code>, que não faz sentido; a regra inteira do <code>h1</code> é jogada fora. Dentro do <code>p</code>, o <code>// color: dimgray;</code> vira uma declaração inválida e é ignorada até o <code>;</code>. Por acaso, ali o <code>//</code> "funcionou" como comentário, só porque a linha terminava em <code>;</code>. É essa sorte que engana: um <code>// cor da marca</code> dentro do bloco, sem <code>;</code> no fim, engole a declaração da linha de baixo, e fora de um bloco ele derruba a regra inteira.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css barras.css
+"file:/home/ana/site/barras.css":4.2-5.1: error: CSS: Parse Error.
+"file:/home/ana/site/barras.css":7.13-7.19: error: CSS: Parse Error.</pre>
+<p><strong>O que significa:</strong> dois "erros de leitura": o primeiro, no fim da regra que foi descartada (linhas 4 e 5); o segundo, na linha 7, a do <code>// color</code>. As posições não apontam para o <code>//</code> da linha 1: o validador só percebe o problema quando a regra termina.</p>
+<p><strong>Como consertar:</strong> <code>/* Títulos */</code> e <code>/* color: dimgray; */</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Comentário dentro de comentário: o primeiro <code>*/</code> fecha tudo</strong>
+<pre class="file" data-file="aninhado.css · erro de propósito">h1 {
+  color: teal; /* cor /* da marca */ */
+  text-align: center;
+}
+
+p {
+  color: dimgray;
+}
+</pre>
+<p><strong>O que você vê:</strong> o título verde-azulado, mas <strong>à esquerda</strong>: o <code>text-align</code> sumiu. O parágrafo fica cinza, normal.</p>
+<p><strong>Por quê:</strong> comentários não se aninham. O <code>/*</code> abre; o segundo <code>/*</code> é só texto do comentário; o <strong>primeiro</strong> <code>*/</code> fecha. Sobra um <code>*/</code> solto, que gruda na linha de baixo: o navegador lê <code>*/ text-align: center;</code> como uma declaração só, sem sentido, e a descarta.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css aninhado.css
+"file:/home/ana/site/aninhado.css":3.15-3.20: error: CSS: Parse Error.</pre>
+<p><strong>O que significa:</strong> "erro de leitura" na linha 3, a do <code>text-align</code>, que foi engolida.</p>
+<p><strong>Como consertar:</strong> um comentário só: <code>/* cor da marca */</code>. Ao desligar com comentário um trecho que já tem comentários dentro, tire os de dentro antes (ou desligue linha por linha).</p>
+</div>
+
+<div class="cenario">
+<strong>Esqueceu o <code>*/</code>: o resto do arquivo vira comentário, e o validador não avisa</strong>
+<pre class="file" data-file="aberto.css · erro de propósito">h1 {
+  color: teal;
+}
+
+/* Rascunho: testar depois
+p {
+  color: dimgray;
+}
+
+h2 {
+  color: navy;
+}
+</pre>
+<p><strong>O que você vê:</strong> o título verde-azulado, mas o parágrafo e o <code>h2</code> pretos, como se as regras deles não existissem. E, para o navegador, não existem mesmo: o comentário abriu na linha 5 e nunca fechou, então tudo até o fim do arquivo é comentário.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css aberto.css; echo "saida: $?"
+saida: 0</pre>
+<p><strong>O que o validador diz:</strong> nada (código de saída 0). Um comentário que vai até o fim do arquivo é permitido.</p>
+<p><strong>Como achar:</strong> se "tudo daqui para baixo" parou de funcionar, procure um <code>/*</code> sem par logo acima. Muitos editores pintam o comentário de outra cor (em geral, cinza ou verde): se metade do arquivo ficou dessa cor, o comentário não fechou.</p>
+<p><strong>Como consertar:</strong> feche o comentário: <code>/* Rascunho: testar depois */</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>/* nota */</code></td><td>Comentário de uma linha</td></tr>
+<tr><td><code>/*</code> … várias linhas … <code>*/</code></td><td>Comentário de várias linhas</td></tr>
+<tr><td><code>color: teal; /* nota */</code></td><td>Comentário no fim de uma declaração</td></tr>
+<tr><td><code>/* color: teal; */</code></td><td>Declaração "desligada" para testar</td></tr>
+<tr><td><code>/* ===== Seção ===== */</code></td><td>Título de seção, para organizar o arquivo</td></tr>
+<tr><td><code>// nota</code></td><td><strong>Não</strong> é comentário no CSS: derruba a regra seguinte</td></tr>
+<tr><td><code>/* a /* b */ c */</code></td><td>Não aninha: o primeiro <code>*/</code> fecha, e o resto vira lixo</td></tr>
+<tr><td><code>/*</code> sem <code>*/</code></td><td>Comenta tudo até o fim do arquivo, sem aviso do validador</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Abrir o comentário</h3>
+<p>Complete o sinal que abre o comentário:</p>
+<div class="ex-code"><input data-answer="/*" aria-label="abre"> Cor da marca */</div>
+</div>
+
+<div class="exercise">
+<h3>2. Fechar o comentário</h3>
+<p>Complete o sinal que fecha o comentário:</p>
+<div class="ex-code">/* Cor da marca <input data-answer="*/" aria-label="fecha"></div>
+</div>
+
+<div class="exercise">
+<h3>3. Desligar uma declaração</h3>
+<p>Complete para desligar a declaração sem apagá-la:</p>
+<div class="ex-code">h1 {
+  <input data-answer="/*" aria-label="abre"> color: teal; <input data-answer="*/" aria-label="fecha">
+}</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Qual destes é um comentário de CSS?</p>
+<label><input type="radio" name="q4"> <code>// cor do título</code></label>
+<label><input type="radio" name="q4"> <code>&lt;!-- cor do título --&gt;</code></label>
+<label><input type="radio" name="q4"> <code>/* cor do título */</code></label>
+<label><input type="radio" name="q4"> <code># cor do título</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. A Ana escreveu <code>/* Rascunho</code> no meio do arquivo e esqueceu o <code>*/</code>. O que acontece?</p>
+<label><input type="radio" name="q5"> Todas as regras dali até o fim do arquivo são ignoradas, e o validador não avisa</label>
+<label><input type="radio" name="q5"> Só a linha do comentário é ignorada</label>
+<label><input type="radio" name="q5"> O navegador fecha o comentário no fim da linha</label>
+<label><input type="radio" name="q5"> Aparece uma mensagem de erro na página</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. Qual é o melhor comentário para <code>font-size: 18px;</code>?</p>
+<label><input type="radio" name="q6"> <code>/* tamanho da fonte */</code></label>
+<label><input type="radio" name="q6"> <code>/* 18 pixels */</code></label>
+<label><input type="radio" name="q6"> <code>// maior</code></label>
+<label><input type="radio" name="q6"> <code>/* as receitas são lidas de longe, na cozinha */</code></label>
+</div>
+
+<h3>Missão final: conserte os comentários</h3>
+
+<div class="tryhtml" data-goal="css:h1{color}=rgb(0, 128, 128),css:p{color}=rgb(105, 105, 105),css:h2{color}=rgb(0, 100, 0),nsrc:^\s*//">
+<p class="try-task"><strong>Missão:</strong> a Ana escreveu dois comentários errados, e só sobrou uma regra funcionando. Conserte os dois (sem apagar o texto deles) até o título ficar verde-azulado (<code>teal</code>), o parágrafo cinza (<code>dimgray</code>) e o <code>h2</code> verde-escuro (<code>darkgreen</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+</pre>
+<pre class="script" data-file="style.css">// Cabeçalho
+h1 {
+  color: teal;
+}
+
+/* Textos
+p {
+  color: dimgray;
+}
+
+h2 {
+  color: darkgreen;
+}
+</pre>
+<pre class="solucao" data-file="style.css">/* Cabeçalho */
+h1 {
+  color: teal;
+}
+
+/* Textos */
+p {
+  color: dimgray;
+}
+
+h2 {
+  color: darkgreen;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Comentário no CSS: <code>/* … */</code>, numa linha ou em várias. O navegador ignora tudo o que está dentro.</li>
+  <li>Use para explicar o <strong>porquê</strong>, dividir o arquivo em seções e desligar declarações para testar.</li>
+  <li><code>//</code> e <code>&lt;!-- --&gt;</code> não são comentários no CSS. O <code>//</code> numa linha antes de uma regra derruba a regra inteira.</li>
+  <li>Comentários não se aninham: o primeiro <code>*/</code> fecha, e o que sobra estraga a declaração seguinte.</li>
+  <li>Um <code>/*</code> sem <code>*/</code> apaga, em silêncio, tudo até o fim do arquivo; o validador não avisa.</li>
+  <li>Comentário é público: qualquer visitante pode ler o seu CSS.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
