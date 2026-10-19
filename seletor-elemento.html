@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Seletor de Elemento — estilizar todos os p, h1, li, a | Guia CSS</title>
+<meta name="description" content="O seletor de elemento (ou de tipo) do CSS: o nome da tag sem os sinais de menor e maior, que pega todos os elementos daquele tipo em qualquer lugar da página. Estilos de base para body, títulos, parágrafos e links, quando usar e quando preferir uma classe, e os erros reais: a tag com < >, o link que não herda a cor do li e o seletor que pega mais do que devia.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Seletor de Elemento</span></h1>
+
+<p class="intro">O seletor mais simples do CSS é o nome de um elemento HTML: <code>p</code>, <code>h1</code>, <code>li</code>, <code>a</code>. Ele escolhe <strong>todos</strong> os elementos daquele tipo, em qualquer lugar da página. É com ele que se monta a base do visual de um site: a letra do <code>body</code>, a cor dos títulos, o jeito dos links. Nesta aula você vai usá-lo, ver até onde ele alcança (às vezes, mais longe do que você queria) e saber quando trocar por uma classe.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A escrever um seletor de elemento: o nome da tag, sem <code>&lt;</code> e <code>&gt;</code>.</li>
+  <li>Que ele pega <strong>todos</strong> os elementos do tipo, no cabeçalho, no meio e no rodapé.</li>
+  <li>A montar os <strong>estilos de base</strong> de um site com <code>body</code>, títulos, parágrafos e links.</li>
+  <li>Quando usar o seletor de elemento e quando preferir uma classe.</li>
+  <li>Os erros reais: a tag escrita com <code>&lt; &gt;</code>, o link que não fica da cor do <code>li</code> e a regra que pega elementos demais.</li>
+</ul>
+</div>
+
+<hr>
+
+<h2>A ideia: "todos os cozinheiros"</h2>
+<p>Na padaria da Ana, um aviso diz: "<strong>todos os cozinheiros</strong> usam touca". Não importa se o cozinheiro está na cozinha, no balcão ou no estoque, nem se chegou ontem: se é cozinheiro, usa touca.</p>
+<p>O seletor de elemento é esse aviso. <code>p { … }</code> quer dizer "todo parágrafo", onde quer que ele esteja, inclusive os que você ainda vai escrever.</p>
+
+<hr>
+
+<h2>1. A forma: o nome da tag</h2>
+
+<pre class="file" data-file="style.css">h2 {
+  color: darkgreen;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>h2</dt><dd>O seletor de elemento (também chamado <strong>seletor de tipo</strong>; em inglês, <em>type selector</em>): o nome da tag <code>&lt;h2&gt;</code>, <strong>sem</strong> os sinais <code>&lt;</code> e <code>&gt;</code>. Escolhe todos os <code>&lt;h2&gt;</code> da página.</dd>
+  <dt>{ color: darkgreen; }</dt><dd>O que acontece com todos eles: texto verde-escuro.</dd>
+</dl>
+
+<p>Qualquer elemento do HTML pode ser seletor: <code>body</code>, <code>header</code>, <code>nav</code>, <code>ul</code>, <code>li</code>, <code>a</code>, <code>img</code>, <code>table</code>, <code>button</code>… Os nomes são os mesmos do HTML (em inglês). Escreva-os em minúsculas, como no HTML.</p>
+
+<hr>
+
+<h2>2. Todos, em qualquer lugar</h2>
+<p>A página da Ana tem parágrafos no cabeçalho, na receita e no rodapé. Uma regra para <code>p</code> pega os três:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> os três parágrafos ficaram verde-azulados e em itálico, cada um num lugar diferente da página. Acrescente um quarto parágrafo em qualquer lugar do <code>index.html</code>: ele já nasce com o mesmo visual. Depois troque o seletor <code>p</code> por <code>h2</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header&gt;
+  &lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+  &lt;p&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+&lt;/header&gt;
+&lt;main&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Fofinho, com cobertura de chocolate.&lt;/p&gt;
+&lt;/main&gt;
+&lt;footer&gt;
+  &lt;p&gt;Feito pela Ana em 2026.&lt;/p&gt;
+&lt;/footer&gt;
+</pre>
+<pre class="script" data-file="style.css">p {
+  color: teal;
+  font-style: italic;
+}
+</pre>
+</div>
+
+<p>O navegador não quer saber se o <code>&lt;p&gt;</code> está dentro do <code>&lt;header&gt;</code>, do <code>&lt;main&gt;</code> ou do <code>&lt;footer&gt;</code>: é um <code>&lt;p&gt;</code>, então recebe o estilo. Para escolher só os parágrafos do rodapé, existe outro seletor, que vem nas próximas aulas (<code>footer p</code>, em <a href="combinadores.html">Descendente, Filho e Irmãos</a>), ou uma classe (<a href="seletor-classe.html">Seletor de Classe</a>).</p>
+
+<hr>
+
+<h2>3. Estilos de base</h2>
+<p>Como o seletor de elemento pega tudo de um tipo, ele é perfeito para o "visual padrão" do <strong>seu</strong> site, por cima do padrão do navegador: a letra de todo o texto, a cor de todos os títulos, o jeito de todos os links. Quase toda folha de estilo começa assim:</p>
+
+<pre class="file" data-file="style.css">/* ========== Base ========== */
+
+body {
+  font-family: sans-serif;
+  background-color: linen;
+}
+
+h1 {
+  color: firebrick;
+}
+
+h2 {
+  color: darkgreen;
+}
+
+a {
+  color: firebrick;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>body</dt><dd>O corpo da página. A cor de fundo dele pinta a janela inteira, e a fonte passa para todos os elementos de dentro (aula <a href="heranca.html">Herança</a>).</dd>
+  <dt>h1, h2</dt><dd>Todos os títulos de cada nível, cada nível com a sua regra.</dd>
+  <dt>a</dt><dd>Todos os links da página.</dd>
+</dl>
+
+<p>Depois da base, os detalhes ("este parágrafo é um aviso", "este botão é o principal") ficam com as classes. É a divisão que você vai ver em quase todo site: <strong>elementos para o geral, classes para o específico</strong>.</p>
+
+<div class="tip">
+<strong>E o elemento <code>html</code>?</strong>
+<p>O seletor <code>html</code> também existe e pega o elemento raiz da página. Na prática, o visual geral vai no <code>body</code>. O <code>html</code> aparece em casos especiais, como o tamanho de letra de base para a unidade <code>rem</code> (aula <a href="unidades.html">Unidades</a>).</p>
+</div>
+
+<hr>
+
+<h2>4. Quando usar, e quando não</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você quer…</th><th>Use</th><th>Exemplo</th></tr>
+<tr><td>Mudar <strong>todos</strong> os elementos de um tipo</td><td>Seletor de elemento</td><td><code>a { color: firebrick; }</code></td></tr>
+<tr><td>O visual de base do site</td><td>Seletor de elemento</td><td><code>body</code>, <code>h1</code>, <code>p</code>, <code>a</code></td></tr>
+<tr><td>Mudar <strong>só alguns</strong> elementos de um tipo</td><td>Classe</td><td><code>.aviso { … }</code> em <code>&lt;p class="aviso"&gt;</code></td></tr>
+<tr><td>Elementos de um tipo <strong>dentro</strong> de uma parte da página</td><td>Combinador</td><td><code>footer p { … }</code></td></tr>
+<tr><td>O mesmo visual para tipos diferentes</td><td>Grupo</td><td><code>h1, h2, h3 { … }</code></td></tr>
+</table>
+</div>
+
+<p>Um sinal de que o seletor de elemento não é a ferramenta certa: você escreve <code>p { … }</code> e logo depois precisa "desfazer" o estilo em vários parágrafos. Aí é melhor uma classe só nos parágrafos que precisam.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>A tag com <code>&lt; &gt;</code> no seletor: <code>Style sheets should not include HTML syntax</code></strong>
+<pre class="file" data-file="tag.css · erro de propósito">&lt;p&gt; {
+  color: teal;
+}
+</pre>
+<p><strong>O que você vê:</strong> os parágrafos continuam pretos (conferido no Chromium). O seletor <code>&lt;p&gt;</code> não é CSS válido, e o navegador descarta a regra inteira. As regras depois dela funcionam normalmente.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css tag.css
+"file:/home/ana/site/tag.css":1.1-1.3: error: CSS: Parse Error. Style sheets should not include HTML syntax.
+"file:/home/ana/site/tag.css":3.2-4.1: error: CSS: Parse Error.</pre>
+<p><strong>O que significa:</strong> "erro de leitura: folhas de estilo não devem ter sintaxe de HTML" (na linha 1, o <code>&lt;p&gt;</code>), e um segundo erro de leitura no fim da regra descartada.</p>
+<p><strong>Como consertar:</strong> só o nome: <code>p { … }</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>li</code> ficou verde, mas o link dentro dele, não</strong>
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  li {
+    color: teal;
+  }
+&lt;/style&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href="bolo.html"&gt;Bolo de cenoura&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;Pão de queijo&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<p><strong>O que você vê:</strong> o "Pão de queijo" e as bolinhas ficam verde-azulados, mas o link "Bolo de cenoura" continua azul.</p>
+<p><strong>Por quê:</strong> a regra <code>li</code> pinta o <code>&lt;li&gt;</code>. O texto do link, porém, pertence ao <code>&lt;a&gt;</code>, e o <code>&lt;a&gt;</code> tem uma cor própria, que vem da folha padrão do navegador. Uma regra que fala <strong>diretamente</strong> do elemento (a do navegador, para o <code>a</code>) vence a cor que viria do pai (o <code>li</code>). No F12, o painel Computed do link mostra <code>rgb(0, 0, 238)</code>, o azul padrão. Aula <a href="heranca.html">Herança</a>.</p>
+<p><strong>Como consertar:</strong> uma regra para o próprio link, com o seletor <code>a</code>. É a missão abaixo.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:a{color}=rgb(0, 128, 128),css:li{color}=rgb(0, 128, 128)">
+<p class="try-task"><strong>Missão:</strong> deixe o link "Bolo de cenoura" da mesma cor dos itens da lista (<code>teal</code>), com uma regra nova para o elemento <code>a</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href="bolo.html"&gt;Bolo de cenoura&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;Pão de queijo&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">li {
+  color: teal;
+}
+</pre>
+<pre class="solucao" data-file="style.css">li {
+  color: teal;
+}
+
+a {
+  color: teal;
+}
+</pre>
+</div>
+
+<div class="cenario">
+<strong>A regra pegou elementos demais</strong>
+<pre class="file" data-file="style.css">p {
+  text-align: center;
+  font-size: 24px;
+}
+</pre>
+<p><strong>O que acontece:</strong> a Ana queria centralizar e aumentar a frase de boas-vindas do cabeçalho. Mas <strong>todos</strong> os parágrafos do site ficaram centralizados e grandes: o modo de preparo das receitas, o rodapé, tudo. Não é um erro de sintaxe (o validador não diz nada), é o seletor fazendo exatamente o que diz.</p>
+<p><strong>Como consertar:</strong> deixe no seletor de elemento só o que vale para todos, e use uma classe para o caso especial: <code>&lt;p class="boas-vindas"&gt;</code> e <code>.boas-vindas { … }</code> (aula <a href="seletor-classe.html">Seletor de Classe</a>).</p>
+</div>
+
+<div class="cenario">
+<strong>O seletor está certo, mas o HTML usa outro elemento</strong>
+<p><strong>O que acontece:</strong> o CSS tem <code>h2 { color: darkgreen; }</code>, mas os títulos das receitas não mudam. Abrindo o HTML (ou o painel Elements do F12), a Ana descobre que eles são <code>&lt;h3&gt;</code>. Ou a regra é <code>paragrafo</code>, <code>titulo</code>, <code>lista</code>: nomes em português, que não são elementos do HTML.</p>
+<p><strong>O que o validador diz:</strong> nada. Ele não compara o CSS com o HTML.</p>
+<p><strong>Como consertar:</strong> o seletor tem de ser o nome exato da tag usada no HTML.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Pega</th><th>Uso comum</th></tr>
+<tr><td><code>body</code></td><td>O corpo da página</td><td>Fonte, cor do texto e fundo de toda a página</td></tr>
+<tr><td><code>h1</code>, <code>h2</code>…</td><td>Todos os títulos daquele nível</td><td>Cor e tamanho dos títulos</td></tr>
+<tr><td><code>p</code></td><td>Todos os parágrafos</td><td>Espaçamento e tamanho do texto</td></tr>
+<tr><td><code>a</code></td><td>Todos os links</td><td>Cor dos links (o <code>a</code> não herda a cor do pai)</td></tr>
+<tr><td><code>ul</code>, <code>li</code></td><td>Todas as listas, todos os itens</td><td>Marcadores, recuo</td></tr>
+<tr><td><code>img</code></td><td>Todas as imagens</td><td>Imagens que não passam da largura da tela</td></tr>
+<tr><td><code>&lt;p&gt;</code></td><td colspan="2"><strong>Errado:</strong> sem <code>&lt; &gt;</code> no CSS</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Todos os parágrafos</h3>
+<p>Complete o seletor:</p>
+<div class="ex-code"><input data-answer="p" aria-label="seletor"> {
+  color: dimgray;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. Todos os links</h3>
+<p>Complete o seletor que pega todos os links:</p>
+<div class="ex-code"><input data-answer="a" aria-label="seletor"> {
+  color: firebrick;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>3. A página inteira</h3>
+<p>Complete o seletor do elemento que envolve tudo o que aparece na página, para pintar o fundo:</p>
+<div class="ex-code"><input data-answer="body" aria-label="seletor"> {
+  background-color: linen;
+}</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. A página tem um <code>&lt;p&gt;</code> no cabeçalho, dois no meio e um no rodapé. Quantos ficam verdes com <code>p { color: green; }</code>?</p>
+<label><input type="radio" name="q4"> Só o primeiro</label>
+<label><input type="radio" name="q4"> Os dois do meio</label>
+<label><input type="radio" name="q4"> Os quatro</label>
+<label><input type="radio" name="q4"> Nenhum: falta dizer onde eles estão</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Com <code>li { color: teal; }</code>, um link dentro do <code>&lt;li&gt;</code> fica de que cor?</p>
+<label><input type="radio" name="q5"> Azul, a cor padrão dos links: o <code>a</code> precisa da sua própria regra</label>
+<label><input type="radio" name="q5"> Verde-azulado, como o <code>li</code></label>
+<label><input type="radio" name="q5"> Preto</label>
+<label><input type="radio" name="q5"> Roxo, sempre</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">6. A Ana quer destacar <strong>um</strong> parágrafo só. O que ela deve usar?</p>
+<label><input type="radio" name="q6"> <code>p { … }</code></label>
+<label><input type="radio" name="q6"> Uma classe no parágrafo e um seletor de classe no CSS</label>
+<label><input type="radio" name="q6"> <code>&lt;p&gt; { … }</code></label>
+<label><input type="radio" name="q6"> <code>paragrafo { … }</code></label>
+</div>
+
+<h3>Missão final: a base do site da Ana</h3>
+
+<div class="tryhtml" data-goal="css:body{background-color}=rgb(250, 240, 230),css:h1{color}=rgb(178, 34, 34),css:h2{color}=rgb(0, 100, 0),css:a{color}=rgb(178, 34, 34)">
+<p class="try-task"><strong>Missão:</strong> monte os estilos de base, uma regra por elemento: (1) o <code>body</code> com o fundo <code>linen</code>; (2) todos os <code>h1</code> da cor <code>firebrick</code>; (3) todos os <code>h2</code> da cor <code>darkgreen</code>; (4) todos os links (<code>a</code>) da cor <code>firebrick</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p&gt;Fofinho, com cobertura de chocolate. &lt;a href="bolo.html"&gt;Ver a receita&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;Pão de queijo&lt;/h2&gt;
+&lt;p&gt;Crocante por fora, macio por dentro. &lt;a href="pao.html"&gt;Ver a receita&lt;/a&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">/* ========== Base ========== */
+
+</pre>
+<pre class="solucao" data-file="style.css">/* ========== Base ========== */
+
+body {
+  background-color: linen;
+}
+
+h1 {
+  color: firebrick;
+}
+
+h2 {
+  color: darkgreen;
+}
+
+a {
+  color: firebrick;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O seletor de elemento (ou de tipo) é o nome da tag, sem <code>&lt; &gt;</code>: <code>p</code>, <code>h1</code>, <code>a</code>, <code>body</code>.</li>
+  <li>Ele pega <strong>todos</strong> os elementos do tipo, em qualquer lugar da página, inclusive os que você acrescentar depois.</li>
+  <li>É o seletor dos <strong>estilos de base</strong>: elementos para o geral, classes para o específico.</li>
+  <li>O <code>a</code> tem cor própria (do navegador): a cor do <code>li</code> ou do <code>p</code> não chega no link. Dê a ele a sua regra.</li>
+  <li>Seletor com <code>&lt;p&gt;</code> derruba a regra (<code>Style sheets should not include HTML syntax</code>). Nome de tag que não está no HTML não dá erro: só não pega ninguém.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
