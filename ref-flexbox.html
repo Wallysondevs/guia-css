@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Flexbox — tabela de consulta das propriedades e valores | Guia CSS</title>
+<meta name="description" content="Referência do Flexbox: as propriedades do contêiner (display: flex, flex-direction, flex-wrap, justify-content, align-items, align-content, gap) e dos itens (flex-grow, flex-shrink, flex-basis, flex, order, align-self), cada valor com o que faz, o valor inicial, os atalhos medidos no navegador, exemplos desenhados ao vivo e os problemas mais comuns.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Flexbox</span></h1>
+
+<p class="intro">O <strong>Flexbox</strong> arruma itens numa <strong>linha</strong> (ou numa coluna): lado a lado, com espaço entre eles, alinhados no meio, quebrando para a linha de baixo quando não cabem. Esta página é a "cola" de consulta: todas as propriedades, todos os valores, o que cada um faz e a aula que explica. Os valores calculados foram medidos no Chromium.</p>
+
+<div class="note">
+<strong>Como usar esta página</strong>
+<ul>
+  <li>As propriedades se dividem em duas turmas: as do <strong>contêiner</strong> (o pai, que tem <code>display: flex</code>) e as dos <strong>itens</strong> (os filhos diretos). Pôr uma propriedade na turma errada é o erro número 1.</li>
+  <li>Os nomes falam de dois <strong>eixos</strong>: o <strong>principal</strong> (a direção da fila, que o <code>flex-direction</code> escolhe) e o <strong>transversal</strong> (o outro). <code>justify-…</code> = eixo principal; <code>align-…</code> = eixo transversal.</li>
+  <li>Para aprender do começo, vá à aula <a href="flexbox.html">Introdução ao Flexbox</a>.</li>
+</ul>
+</div>
+
+<p>Atalhos: <a href="#ideia">A ideia</a> · <a href="#conteiner">Propriedades do contêiner</a> · <a href="#justify">justify-content ao vivo</a> · <a href="#align">align-items ao vivo</a> · <a href="#itens">Propriedades dos itens</a> · <a href="#flex">O atalho flex</a> · <a href="#receitas">Receitas prontas</a> · <a href="#errado">Quando dá errado</a></p>
+
+<hr>
+
+<h2 id="ideia">A ideia em uma tela</h2>
+<p>Pense numa prateleira de padaria. A <strong>prateleira</strong> é o contêiner: ela decide se os pães ficam em fila (<code>row</code>) ou empilhados (<code>column</code>), se ficam juntos à esquerda ou espalhados, e se passam para a prateleira de baixo quando não cabem. Cada <strong>pão</strong> é um item: pode pedir para ocupar mais espaço (<code>flex-grow</code>) ou para ficar numa altura diferente (<code>align-self</code>).</p>
+<pre class="file" data-file="anatomia">.prateleira {          /* o CONTÊINER */
+  display: flex;       /* liga o Flexbox: os FILHOS diretos viram itens */
+  gap: 1rem;           /* espaço entre os itens */
+}
+
+.prateleira .pao {     /* um ITEM */
+  flex: 1;             /* cresce para dividir o espaço com os irmãos */
+}</pre>
+
+<h2 id="conteiner">Propriedades do contêiner (o pai)</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>Valores</th><th>Inicial</th><th>O que faz</th><th>Aula</th></tr>
+<tr><td><code>display</code></td><td><code>flex</code> · <code>inline-flex</code></td><td>—</td><td><code>flex</code>: o contêiner é um bloco (ocupa a linha toda) e os filhos viram itens flex. <code>inline-flex</code>: o mesmo, mas o contêiner fica no meio do texto, do tamanho do conteúdo.</td><td><a href="flexbox.html">Introdução</a></td></tr>
+<tr><td><code>flex-direction</code></td><td><code>row</code> · <code>row-reverse</code> · <code>column</code> · <code>column-reverse</code></td><td><code>row</code></td><td>a direção do eixo principal: em linha (da esquerda para a direita, em português) ou em coluna (de cima para baixo). <code>-reverse</code> inverte a ordem <strong>na tela</strong>, não no HTML.</td><td><a href="flex-direction.html">flex-direction</a></td></tr>
+<tr><td><code>flex-wrap</code></td><td><code>nowrap</code> · <code>wrap</code> · <code>wrap-reverse</code></td><td><code>nowrap</code></td><td><code>nowrap</code>: todos numa linha só, mesmo que tenham de encolher (ou vazar). <code>wrap</code>: quem não cabe desce para a linha de baixo.</td><td><a href="flex-wrap.html">flex-wrap</a></td></tr>
+<tr><td><code>flex-flow</code></td><td><em>direção</em> <em>quebra</em></td><td><code>row nowrap</code></td><td>atalho dos dois de cima. <code>flex-flow: column wrap</code> → calculado <code>column</code> e <code>wrap</code>.</td><td><a href="flex-wrap.html">flex-wrap</a></td></tr>
+<tr><td><code>justify-content</code></td><td><code>flex-start</code> · <code>flex-end</code> · <code>center</code> · <code>space-between</code> · <code>space-around</code> · <code>space-evenly</code> · <code>start</code> · <code>end</code></td><td><code>normal</code> (no flex, age como <code>flex-start</code>)</td><td>distribui os itens no <strong>eixo principal</strong>: juntos no começo, no fim, no meio, ou espalhados (<a href="#justify">veja ao vivo</a>). Só faz diferença se sobra espaço.</td><td><a href="justify-content.html">justify-content</a></td></tr>
+<tr><td><code>align-items</code></td><td><code>stretch</code> · <code>flex-start</code> · <code>flex-end</code> · <code>center</code> · <code>baseline</code> · <code>start</code> · <code>end</code></td><td><code>normal</code> (no flex, age como <code>stretch</code>)</td><td>alinha os itens no <strong>eixo transversal</strong>, dentro da linha. <code>stretch</code> estica todos até a altura do mais alto; <code>baseline</code> alinha pela linha de base do texto (<a href="#align">veja ao vivo</a>).</td><td><a href="align-items.html">align-items</a></td></tr>
+<tr><td><code>align-content</code></td><td><code>stretch</code> · <code>flex-start</code> · <code>flex-end</code> · <code>center</code> · <code>space-between</code> · <code>space-around</code> · <code>space-evenly</code></td><td><code>normal</code></td><td>distribui as <strong>linhas</strong> (quando há <code>flex-wrap: wrap</code> e várias linhas) no eixo transversal. Com uma linha só, não faz nada.</td><td><a href="flex-wrap.html">flex-wrap</a></td></tr>
+<tr><td><code>gap</code></td><td><em>tamanho</em> · <em>linhas</em> <em>colunas</em></td><td><code>normal</code> (= 0 no flex)</td><td>espaço <strong>entre</strong> os itens (não nas pontas). <code>gap: 1rem 2rem</code> → calculado <code>row-gap: 16px</code> e <code>column-gap: 32px</code>.</td><td><a href="gap.html">gap</a></td></tr>
+<tr><td><code>row-gap</code>, <code>column-gap</code></td><td><em>tamanho</em></td><td><code>normal</code></td><td>só entre as linhas / só entre as colunas</td><td><a href="gap.html">gap</a></td></tr>
+<tr><td><code>place-content</code></td><td><em>align</em> <em>justify</em></td><td><code>normal</code></td><td>atalho de <code>align-content</code> + <code>justify-content</code>. <code>place-content: center</code> → os dois <code>center</code>.</td><td><a href="centralizar.html">Centralizando</a></td></tr>
+</table>
+</div>
+<div class="note"><strong>Suporte:</strong> o Flexbox funciona em todos os navegadores atuais (Chrome 29, Firefox 20, Safari 9 em diante). O <code>gap</code> no Flexbox veio depois: Chrome 84, Firefox 63, Safari 14.1. O <code>space-evenly</code>: Chrome 60, Firefox 52, Safari 11. Prefixos como <code>display: -webkit-box</code> e <code>-ms-flexbox</code> são de navegadores de mais de dez anos atrás: não precisa mais.</div>
+
+<h3 id="justify"><code>justify-content</code> ao vivo</h3>
+<p>Cada faixa é um contêiner com <code>display: flex</code> e três itens; só muda o <code>justify-content</code>:</p>
+<pre class="file" data-file="justify-content" data-resultado>&lt;style&gt;
+  .fila { display: flex; gap: 4px; margin-bottom: 0.5rem; padding: 4px; background-color: whitesmoke; border: 1px solid silver; }
+  .fila span { padding: 0.25rem 0.75rem; background-color: steelblue; color: white; }
+  .fila span:first-child { background-color: navy; }
+  p { margin: 0.75rem 0 0.25rem; font: bold 0.9rem monospace; }
+&lt;/style&gt;
+&lt;p&gt;flex-start (o padrão)&lt;/p&gt;
+&lt;div class="fila" style="justify-content: flex-start"&gt;&lt;span&gt;1&lt;/span&gt;&lt;span&gt;2&lt;/span&gt;&lt;span&gt;3&lt;/span&gt;&lt;/div&gt;
+&lt;p&gt;flex-end&lt;/p&gt;
+&lt;div class="fila" style="justify-content: flex-end"&gt;&lt;span&gt;1&lt;/span&gt;&lt;span&gt;2&lt;/span&gt;&lt;span&gt;3&lt;/span&gt;&lt;/div&gt;
+&lt;p&gt;center&lt;/p&gt;
+&lt;div class="fila" style="justify-content: center"&gt;&lt;span&gt;1&lt;/span&gt;&lt;span&gt;2&lt;/span&gt;&lt;span&gt;3&lt;/span&gt;&lt;/div&gt;
+&lt;p&gt;space-between&lt;/p&gt;
+&lt;div class="fila" style="justify-content: space-between"&gt;&lt;span&gt;1&lt;/span&gt;&lt;span&gt;2&lt;/span&gt;&lt;span&gt;3&lt;/span&gt;&lt;/div&gt;
+&lt;p&gt;space-around&lt;/p&gt;
+&lt;div class="fila" style="justify-content: space-around"&gt;&lt;span&gt;1&lt;/span&gt;&lt;span&gt;2&lt;/span&gt;&lt;span&gt;3&lt;/span&gt;&lt;/div&gt;
+&lt;p&gt;space-evenly&lt;/p&gt;
+&lt;div class="fila" style="justify-content: space-evenly"&gt;&lt;span&gt;1&lt;/span&gt;&lt;span&gt;2&lt;/span&gt;&lt;span&gt;3&lt;/span&gt;&lt;/div&gt;
+</pre>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O espaço que sobra vai…</th><th>Uso típico</th></tr>
+<tr><td><code>flex-start</code></td><td>todo para o fim: os itens ficam juntos no começo</td><td>o padrão; menus alinhados à esquerda</td></tr>
+<tr><td><code>flex-end</code></td><td>todo para o começo: itens juntos no fim</td><td>botões "Cancelar / Salvar" à direita</td></tr>
+<tr><td><code>center</code></td><td>metade para cada ponta</td><td>centralizar na horizontal</td></tr>
+<tr><td><code>space-between</code></td><td>só <strong>entre</strong> os itens; o primeiro e o último encostam nas pontas</td><td>logo à esquerda, menu à direita</td></tr>
+<tr><td><code>space-around</code></td><td>em volta de cada item: nas pontas fica a <strong>metade</strong> do espaço entre dois itens</td><td>raramente</td></tr>
+<tr><td><code>space-evenly</code></td><td>em partes <strong>iguais</strong>, inclusive nas pontas</td><td>ícones espalhados por igual</td></tr>
+</table>
+</div>
+
+<h3 id="align"><code>align-items</code> ao vivo</h3>
+<p>Agora cada contêiner tem altura fixa (<code>height: 5rem</code>) e itens de tamanhos diferentes; só muda o <code>align-items</code>:</p>
+<pre class="file" data-file="align-items" data-resultado>&lt;style&gt;
+  .fila { display: flex; gap: 4px; height: 5rem; margin-bottom: 0.5rem; padding: 4px; background-color: whitesmoke; border: 1px solid silver; }
+  .fila span { padding: 0.25rem 0.75rem; background-color: steelblue; color: white; }
+  .fila .grande { font-size: 1.6rem; background-color: navy; }
+  p { margin: 0.75rem 0 0.25rem; font: bold 0.9rem monospace; }
+&lt;/style&gt;
+&lt;p&gt;stretch (o padrão)&lt;/p&gt;
+&lt;div class="fila" style="align-items: stretch"&gt;&lt;span&gt;pão&lt;/span&gt;&lt;span class="grande"&gt;Bolo&lt;/span&gt;&lt;span&gt;sonho&lt;/span&gt;&lt;/div&gt;
+&lt;p&gt;flex-start&lt;/p&gt;
+&lt;div class="fila" style="align-items: flex-start"&gt;&lt;span&gt;pão&lt;/span&gt;&lt;span class="grande"&gt;Bolo&lt;/span&gt;&lt;span&gt;sonho&lt;/span&gt;&lt;/div&gt;
+&lt;p&gt;center&lt;/p&gt;
+&lt;div class="fila" style="align-items: center"&gt;&lt;span&gt;pão&lt;/span&gt;&lt;span class="grande"&gt;Bolo&lt;/span&gt;&lt;span&gt;sonho&lt;/span&gt;&lt;/div&gt;
+&lt;p&gt;flex-end&lt;/p&gt;
+&lt;div class="fila" style="align-items: flex-end"&gt;&lt;span&gt;pão&lt;/span&gt;&lt;span class="grande"&gt;Bolo&lt;/span&gt;&lt;span&gt;sonho&lt;/span&gt;&lt;/div&gt;
+&lt;p&gt;baseline&lt;/p&gt;
+&lt;div class="fila" style="align-items: baseline"&gt;&lt;span&gt;pão&lt;/span&gt;&lt;span class="grande"&gt;Bolo&lt;/span&gt;&lt;span&gt;sonho&lt;/span&gt;&lt;/div&gt;
+</pre>
+<p>Com <code>flex-direction: column</code>, os eixos trocam de lugar: o <code>justify-content</code> passa a agir na vertical e o <code>align-items</code>, na horizontal. Os exemplos acima usam <code>style="…"</code> só para caber numa tela; no seu site, ponha as regras no <code>style.css</code>.</p>
+
+<h2 id="itens">Propriedades dos itens (os filhos diretos)</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>Valores</th><th>Inicial</th><th>O que faz</th><th>Aula</th></tr>
+<tr><td><code>flex-grow</code></td><td>número ≥ 0</td><td><code>0</code></td><td>quanto do espaço que <strong>sobra</strong> o item pega. Um item com <code>2</code> pega o dobro de um com <code>1</code>. <code>0</code> = não cresce.</td><td><a href="flex-grow.html">flex-grow…</a></td></tr>
+<tr><td><code>flex-shrink</code></td><td>número ≥ 0</td><td><code>1</code></td><td>quanto o item encolhe quando <strong>falta</strong> espaço. <code>0</code> = não encolhe nunca (um logo, um ícone).</td><td><a href="flex-grow.html">flex-grow…</a></td></tr>
+<tr><td><code>flex-basis</code></td><td><code>auto</code> · <em>tamanho</em> · <code>content</code></td><td><code>auto</code></td><td>o tamanho de partida, antes de crescer ou encolher. <code>auto</code> = usa o <code>width</code> (ou a <code>height</code>, em coluna) ou, sem ele, o conteúdo.</td><td><a href="flex-grow.html">flex-grow…</a></td></tr>
+<tr><td><code>flex</code></td><td>atalho dos três (<a href="#flex">tabela abaixo</a>)</td><td><code>0 1 auto</code></td><td>o jeito recomendado de escrever os três</td><td><a href="flex-grow.html">flex-grow…</a></td></tr>
+<tr><td><code>order</code></td><td>número inteiro (pode ser negativo)</td><td><code>0</code></td><td>muda a ordem <strong>na tela</strong>: os menores vêm antes. A ordem do <kbd>Tab</kbd> e do leitor de tela continua a do HTML: use com cuidado.</td><td><a href="align-self.html">align-self e order</a></td></tr>
+<tr><td><code>align-self</code></td><td><code>auto</code> · <code>stretch</code> · <code>flex-start</code> · <code>flex-end</code> · <code>center</code> · <code>baseline</code></td><td><code>auto</code> (segue o <code>align-items</code> do pai)</td><td>o <code>align-items</code> de um item só</td><td><a href="align-self.html">align-self e order</a></td></tr>
+<tr><td><code>margin: auto</code></td><td><code>margin-left: auto</code> etc.</td><td>—</td><td>num item flex, a margem <code>auto</code> <strong>engole</strong> todo o espaço livre daquele lado: <code>margin-left: auto</code> empurra o item (e os seguintes) para a direita.</td><td><a href="centralizar.html">Centralizando</a></td></tr>
+<tr><td><code>min-width</code></td><td><code>auto</code> · <em>tamanho</em></td><td><code>auto</code></td><td>no flex, o <code>auto</code> impede o item de ficar mais estreito que o conteúdo (uma palavra comprida, uma imagem). <code>min-width: 0</code> libera (<a href="#errado">veja abaixo</a>).</td><td><a href="flex-grow.html">flex-grow…</a></td></tr>
+</table>
+</div>
+
+<h3 id="flex">O atalho <code>flex</code> (medido no Chromium)</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você escreve</th><th>Calculado (grow, shrink, basis)</th><th>Significa</th></tr>
+<tr><td><code>flex: initial</code> (o padrão)</td><td><code>0 1 auto</code></td><td>não cresce, pode encolher, parte do tamanho natural</td></tr>
+<tr><td><code>flex: 1</code></td><td><code>1 1 0%</code></td><td>todos com <code>flex: 1</code> ficam do <strong>mesmo tamanho</strong>, dividindo o espaço inteiro</td></tr>
+<tr><td><code>flex: auto</code></td><td><code>1 1 auto</code></td><td>cresce e encolhe, mas parte do tamanho do conteúdo: itens com mais texto ficam maiores</td></tr>
+<tr><td><code>flex: none</code></td><td><code>0 0 auto</code></td><td>rígido: nem cresce, nem encolhe</td></tr>
+<tr><td><code>flex: 200px</code></td><td><code>1 1 200px</code></td><td>parte de 200px e cresce/encolhe a partir daí</td></tr>
+<tr><td><code>flex: 1 0</code></td><td><code>1 0 0%</code></td><td>cresce, nunca encolhe</td></tr>
+<tr><td><code>flex: 2 1 10rem</code></td><td><code>2 1 160px</code></td><td>os três valores, na ordem</td></tr>
+</table>
+</div>
+
+<h2 id="receitas">Receitas prontas</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quero…</th><th>CSS</th><th>Aula</th></tr>
+<tr><td>itens lado a lado com espaço</td><td><code>display: flex; gap: 1rem;</code></td><td><a href="gap.html">gap</a></td></tr>
+<tr><td>centralizar na horizontal e na vertical</td><td><code>display: flex; justify-content: center; align-items: center;</code></td><td><a href="centralizar.html">Centralizando</a></td></tr>
+<tr><td>logo à esquerda, menu à direita</td><td><code>display: flex; justify-content: space-between; align-items: center;</code></td><td><a href="projeto-menu.html">Menu Responsivo</a></td></tr>
+<tr><td>um item empurrado para a direita</td><td>no item: <code>margin-left: auto;</code></td><td><a href="centralizar.html">Centralizando</a></td></tr>
+<tr><td>colunas iguais</td><td>nos itens: <code>flex: 1;</code></td><td><a href="flex-grow.html">flex-grow…</a></td></tr>
+<tr><td>cartões que quebram de linha, com largura mínima</td><td>no pai: <code>display: flex; flex-wrap: wrap; gap: 1rem;</code> nos itens: <code>flex: 1 1 15rem;</code></td><td><a href="flex-wrap.html">flex-wrap</a></td></tr>
+<tr><td>rodapé sempre no fim da página</td><td><code>body { display: flex; flex-direction: column; min-height: 100dvh; }</code> e <code>main { flex: 1; }</code></td><td><a href="flex-direction.html">flex-direction</a></td></tr>
+<tr><td>uma grade com linhas <strong>e</strong> colunas alinhadas</td><td>use <strong>Grid</strong>, não Flexbox</td><td><a href="flex-ou-grid.html">Flexbox ou Grid?</a>, <a href="ref-grid.html">Referência do Grid</a></td></tr>
+</table>
+</div>
+
+<h2 id="experimente">Experimente</h2>
+<p>Uma prateleira com quatro pães. Mude os valores no <code>style.css</code>: troque o <code>justify-content</code>, ligue o <code>flex-wrap: wrap</code>, dê <code>flex: 1</code> aos itens, mude o <code>flex-direction</code> para <code>column</code>:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="prateleira"&gt;
+  &lt;div class="pao"&gt;Pão francês&lt;/div&gt;
+  &lt;div class="pao destaque"&gt;Pão de queijo&lt;/div&gt;
+  &lt;div class="pao"&gt;Broa&lt;/div&gt;
+  &lt;div class="pao"&gt;Sonho&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.prateleira {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 0.5rem;
+  min-height: 8rem;
+  padding: 0.5rem;
+  background-color: wheat;
+}
+
+.pao {
+  flex: initial;
+  padding: 0.5rem;
+  background-color: white;
+  border: 2px solid peru;
+}
+
+.destaque {
+  align-self: auto;
+  order: 0;
+}
+</pre>
+</div>
+
+<h2 id="errado">Quando dá errado</h2>
+<div class="cenario">
+<strong>"O <code>justify-content</code> não faz nada"</strong>
+<p><strong>O que a Ana vê:</strong> escreveu <code>justify-content: center</code> e os itens continuam empilhados à esquerda.</p>
+<p><strong>Por quê (as causas mais comuns):</strong></p>
+<ol class="passo">
+  <li><strong>O pai não é flex.</strong> <code>justify-content</code> e <code>align-items</code> só funcionam num contêiner com <code>display: flex</code> (ou grid). Num bloco comum, o navegador aceita a declaração, mas ela não muda nada. No F12, o Chrome mostra a propriedade <strong>apagada</strong> (em cinza) no painel <strong>Styles</strong>, com um ícone de informação: passe o mouse para ver a explicação.</li>
+  <li><strong>A propriedade foi para o elemento errado.</strong> <code>justify-content</code> vai no <strong>pai</strong>; <code>align-self</code> e <code>flex</code>, nos <strong>filhos</strong>. E só nos filhos <strong>diretos</strong>: um neto não é item flex.</li>
+  <li><strong>Não sobra espaço.</strong> Se os itens têm <code>flex: 1</code>, eles já ocupam tudo: não há espaço para distribuir.</li>
+  <li><strong>O eixo é o outro.</strong> Com <code>flex-direction: column</code>, o <code>justify-content</code> age na vertical, e o contêiner só é tão alto quanto o conteúdo: dê uma altura a ele.</li>
+</ol>
+<p>O validador W3C <strong>não reclama</strong> de nenhum desses casos: o CSS está certo, só não tem efeito. No F12, o Chrome mostra um selo <strong>flex</strong> ao lado do elemento na aba <strong>Elements</strong>: se o selo não aparece, o elemento não é um contêiner flex.</p>
+</div>
+
+<div class="cenario">
+<strong>O item que não encolhe (e vaza para fora)</strong>
+<p>Dois itens com <code>flex: 1</code> num contêiner de 300px, e um deles tem uma palavra enorme. <strong>Medido no Chromium:</strong> o item com a palavra ficou com 413px de largura, maior que o próprio contêiner, e o outro, com 8px.</p>
+<p><strong>Por quê:</strong> o valor inicial <code>min-width: auto</code> dos itens flex não deixa um item ficar mais estreito que o seu conteúdo (a palavra, uma imagem, um <code>&lt;pre&gt;</code>).</p>
+<p><strong>Como resolver:</strong> no item, <code>min-width: 0</code> (e, para a palavra quebrar, <code>overflow-wrap: anywhere</code>). Medido: os dois itens voltaram a ter 150px cada. Veja a aula <a href="texto-longo.html">Texto que Não Cabe</a>.</p>
+</div>
+
+<div class="cenario">
+<strong>Valor escrito errado</strong>
+<pre class="term" data-cwd="~/ref/flex">$ vnu --css flexbox.css
+"file:/home/ana/ref/flex/flexbox.css":2.12-2.18: error: CSS: “display”: “flexbox” is not a “display” value.
+$ vnu --css colum.css
+"file:/home/ana/ref/flex/colum.css":3.19-3.23: error: CSS: “flex-direction”: “colum” is not a “flex-direction” value.
+$ vnu --css middle.css
+"file:/home/ana/ref/flex/middle.css":3.20-3.25: error: CSS: “justify-content”: “middle” is not a “justify-content” value.
+$ vnu --css negativo.css
+"file:/home/ana/ref/flex/negativo.css":2.15-2.15: error: CSS: “flex-grow”: “-1” negative values are not allowed.</pre>
+<p><code>display: flexbox</code> não existe (o certo é <code>flex</code>); <code>colum</code> perdeu o "n"; o "meio" é <code>center</code>, não <code>middle</code>; e <code>flex-grow</code> não aceita número negativo (<em>negative values are not allowed</em> = "valores negativos não são permitidos"). Em todos os casos, o navegador ignora a declaração e o layout fica como se ela não existisse.</p>
+</div>
+
+<h2>Missão</h2>
+<div class="tryhtml" data-goal="css:.menu{display}=flex,css:.menu{justify-content}=space-between,css:.menu{align-items}=center">
+<p class="try-task"><strong>Missão:</strong> monte o cabeçalho da padaria: a <code>.menu</code> deve virar um contêiner flex, com o logo numa ponta e os links na outra (<code>space-between</code>), todos centralizados na vertical (<code>align-items</code>). Repare que, no código inicial, o <code>justify-content</code> está lá, mas não faz nada.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="menu"&gt;
+  &lt;strong class="logo"&gt;Padaria da Ana&lt;/strong&gt;
+  &lt;nav&gt;
+    &lt;a href="#paes"&gt;Pães&lt;/a&gt;
+    &lt;a href="#bolos"&gt;Bolos&lt;/a&gt;
+    &lt;a href="#contato"&gt;Contato&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu {
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background-color: saddlebrown;
+}
+
+.logo {
+  font-size: 1.5rem;
+  color: white;
+}
+
+.menu a {
+  color: white;
+  margin-left: 1rem;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: saddlebrown;
+}
+
+.logo {
+  font-size: 1.5rem;
+  color: white;
+}
+
+.menu a {
+  color: white;
+  margin-left: 1rem;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Contêiner: <code>display: flex</code>, <code>flex-direction</code>, <code>flex-wrap</code>, <code>justify-content</code> (eixo principal), <code>align-items</code> (eixo transversal), <code>align-content</code> (as linhas), <code>gap</code>.</li>
+  <li>Itens: <code>flex</code> (= <code>flex-grow</code> + <code>flex-shrink</code> + <code>flex-basis</code>), <code>order</code>, <code>align-self</code>, <code>margin: auto</code>.</li>
+  <li><code>flex: 1</code> = <code>1 1 0%</code> (tamanhos iguais); <code>flex: auto</code> = <code>1 1 auto</code>; <code>flex: none</code> = <code>0 0 auto</code>.</li>
+  <li>Sem <code>display: flex</code> no pai, as propriedades de alinhamento não fazem nada, e o validador não avisa.</li>
+  <li>Item que vaza: <code>min-width: 0</code>.</li>
+  <li>Linhas <strong>e</strong> colunas ao mesmo tempo: <a href="ref-grid.html">Grid</a>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
