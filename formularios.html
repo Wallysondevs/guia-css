@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Formulários — estilizando campos, rótulos e foco | Guia CSS</title>
+<meta name="description" content="Como estilizar formulários com CSS: rótulos em cima dos campos, font: inherit, largura com box-sizing, bordas e cantos, foco visível com :focus-visible, campos inválidos com :user-invalid, placeholder e textarea, com os resultados ao vivo e os erros do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Formulários</span></h1>
+
+<p class="intro">Um formulário sem CSS funciona, mas parece um rascunho: rótulos e campos amontoados na mesma linha, letras menores que as do resto da página, campos de tamanhos diferentes. Nesta aula você vai arrumar o formulário de encomendas da Ana, passo a passo: rótulos em cima, campos da mesma largura, letra igual à da página, um foco bem visível e um aviso vermelho quando o e-mail estiver errado.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Como o navegador desenha um formulário sem CSS, e por quê.</li>
+  <li><code>display: block</code> nos rótulos (<code>label</code>) para empilhar.</li>
+  <li><code>font: inherit</code>: os campos com a mesma letra da página.</li>
+  <li><code>width: 100%</code> + <code>box-sizing: border-box</code>: campos do mesmo tamanho, sem passar da borda.</li>
+  <li>Borda, cantos e espaço interno dos campos; o <code>textarea</code> e o <code>resize</code>.</li>
+  <li>Foco visível com <code>:focus-visible</code>, e por que nunca apagar o contorno.</li>
+  <li>Campos inválidos com <code>:user-invalid</code> (e o problema do <code>:invalid</code>).</li>
+  <li>O texto de exemplo (<code>::placeholder</code>) e os erros do validador W3C.</li>
+</ul>
+</div>
+
+<p>O HTML dos formulários (<code>&lt;form&gt;</code>, <code>&lt;label&gt;</code>, <code>&lt;input&gt;</code>…) é assunto do <a href="https://wallysondevs.github.io/guia-html/formularios.html">Guia HTML</a>. Aqui ele já está pronto e certo: cada campo tem o seu <code>&lt;label for="…"&gt;</code>. Os botões têm aula própria, <a href="botoes.html">Estilizando Botões</a>.</p>
+
+<hr>
+
+<h2>A ideia: o formulário de papel</h2>
+<p>Pense numa ficha de papel bem feita: cada pergunta em cima do seu espaço, todos os espaços do mesmo tamanho, alinhados, com letra legível. Quem preenche sabe onde está e o que falta. O CSS faz isso na tela, e acrescenta duas coisas que o papel não tem: um destaque no campo que está sendo preenchido (o <strong>foco</strong>) e um aviso no campo errado.</p>
+
+<hr>
+
+<h2>1. O ponto de partida: sem CSS</h2>
+<p>O formulário de encomendas da Ana, só com a largura do formulário definida (300 pixels):</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;form class="encomenda"&gt;
+  &lt;label for="nome"&gt;Nome&lt;/label&gt;
+  &lt;input type="text" id="nome" name="nome" placeholder="Ana Souza"&gt;
+  &lt;label for="email"&gt;E-mail&lt;/label&gt;
+  &lt;input type="email" id="email" name="email"&gt;
+  &lt;label for="sabor"&gt;Sabor&lt;/label&gt;
+  &lt;select id="sabor" name="sabor"&gt;
+    &lt;option&gt;Cenoura&lt;/option&gt;
+    &lt;option&gt;Fubá&lt;/option&gt;
+  &lt;/select&gt;
+  &lt;label for="recado"&gt;Recado&lt;/label&gt;
+  &lt;textarea id="recado" name="recado" rows="3"&gt;&lt;/textarea&gt;
+  &lt;button&gt;Encomendar&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">.encomenda {
+  width: 300px;
+}
+</pre>
+</div>
+
+<p>Três problemas aparecem:</p>
+<ul>
+  <li><strong>Tudo na mesma linha</strong>, quebrando onde der: "Nome [campo] E-mail", "[campo] Sabor [lista] Recado". O <code>&lt;label&gt;</code>, o <code>&lt;input&gt;</code> e os outros campos são elementos <strong>em linha</strong> (<code>display: inline</code> e <code>inline-block</code>, aula <a href="display.html">display</a>), como palavras numa frase.</li>
+  <li><strong>A letra dos campos é diferente</strong> da letra da página: menor (13.3333px, contra 16px do texto, conferido no Chromium) e de outra família. O <code>textarea</code> usa até letra de máquina de escrever (<code>monospace</code>). Os campos <strong>não herdam</strong> a fonte da página (aula <a href="heranca.html">Herança</a>): o navegador dá a eles uma fonte própria.</li>
+  <li><strong>Cada campo tem um tamanho</strong>: o texto, a lista e a caixa de recado têm larguras diferentes.</li>
+</ul>
+
+<hr>
+
+<h2>2. Rótulos em cima: <code>display: block</code></h2>
+<p>Basta transformar o rótulo em bloco: ele ocupa a linha toda e empurra o campo para baixo. Um pouco de margem separa uma pergunta da outra:</p>
+
+<pre class="file" data-file="style.css">label {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+</pre>
+
+<p>O rótulo em <strong>cima</strong> do campo é o mais fácil de ler, inclusive no celular, onde não há espaço ao lado. E deixe o rótulo sempre visível: ele diz o que o campo pede, e clicar nele leva o foco para o campo (graças ao <code>for</code>).</p>
+
+<hr>
+
+<h2>3. A mesma letra: <code>font: inherit</code></h2>
+
+<pre class="file" data-file="style.css">input,
+select,
+textarea {
+  font: inherit;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>input, select, textarea</dt><dd>Três seletores agrupados com vírgula (aula <a href="seletor-grupo.html">Agrupando Seletores</a>): a regra vale para os três tipos de campo.</dd>
+  <dt>font</dt><dd>O atalho que junta <code>font-family</code>, <code>font-size</code>, <code>font-weight</code>, <code>font-style</code> e <code>line-height</code>.</dd>
+  <dt>inherit</dt><dd>"Herdar": em vez do valor do navegador, use o mesmo valor do pai. Com isso, o campo fica com a letra do formulário, que herdou do <code>body</code>.</dd>
+</dl>
+
+<p>Depois dessa regra, o texto digitado nos campos fica com 16px, a mesma letra da página. Além de ficar mais bonito, letra de 16px ou mais evita outro problema: no iPhone, o Safari dá zoom na página ao tocar num campo com letra menor que 16px.</p>
+
+<hr>
+
+<h2>4. A mesma largura: <code>width: 100%</code> e <code>box-sizing</code></h2>
+<p>Para todos os campos terem a largura do formulário, use <code>width: 100%</code>. Mas cuidado com o espaço interno (<code>padding</code>) e a borda:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;form class="encomenda"&gt;
+  &lt;label for="nome"&gt;Nome&lt;/label&gt;
+  &lt;input type="text" id="nome" name="nome"&gt;
+  &lt;label for="email"&gt;E-mail&lt;/label&gt;
+  &lt;input class="certo" type="email" id="email" name="email"&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">.encomenda {
+  width: 300px;
+  border-right: 2px dashed gray;
+}
+
+label {
+  display: block;
+}
+
+input {
+  width: 100%;
+  padding: 8px 10px;
+}
+
+.certo {
+  box-sizing: border-box;
+}
+</pre>
+</div>
+
+<p>A linha tracejada marca o fim do formulário (300 pixels). O campo "Nome" <strong>passa da linha</strong>: o <code>width: 100%</code> deu 300 pixels só para o <strong>conteúdo</strong>, e o navegador somou por fora os 20 do <code>padding</code> (10 de cada lado) e os 4 da borda. O campo "E-mail", com <code>box-sizing: border-box</code>, fica exatamente nos 300: o <code>padding</code> e a borda passam a contar <strong>dentro</strong> da largura (aula <a href="box-sizing.html">box-sizing</a>).</p>
+
+<div class="tryhtml" data-goal="css:#nome{box-sizing}=border-box,css:#nome{font-size}=16px,css:#email{box-sizing}=border-box,css:#email{font-size}=16px">
+<p class="try-task"><strong>Missão:</strong> os dois campos passam da linha tracejada e têm a letra menor que a da página. Complete a regra do <code>input</code> para que eles fiquem dentro dos 300 pixels e com a mesma letra da página.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;form class="encomenda"&gt;
+  &lt;label for="nome"&gt;Nome&lt;/label&gt;
+  &lt;input type="text" id="nome" name="nome" value="Ana Souza"&gt;
+  &lt;label for="email"&gt;E-mail&lt;/label&gt;
+  &lt;input type="email" id="email" name="email" value="ana@example.com"&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">.encomenda {
+  width: 300px;
+  border-right: 2px dashed gray;
+}
+
+label {
+  display: block;
+}
+
+input {
+  width: 100%;
+  padding: 8px 10px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.encomenda {
+  width: 300px;
+  border-right: 2px dashed gray;
+}
+
+label {
+  display: block;
+}
+
+input {
+  width: 100%;
+  padding: 8px 10px;
+  box-sizing: border-box;
+  font: inherit;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>5. Borda, cantos e o <code>textarea</code></h2>
+<p>Com a base pronta, o resto é o modelo de caixa que você já conhece: <a href="border.html">borda</a>, <a href="border-radius.html">cantos arredondados</a>, <a href="padding.html">espaço interno</a>. Juntando tudo:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;form class="encomenda"&gt;
+  &lt;label for="nome"&gt;Nome&lt;/label&gt;
+  &lt;input type="text" id="nome" name="nome" placeholder="Ana Souza"&gt;
+  &lt;label for="email"&gt;E-mail&lt;/label&gt;
+  &lt;input type="email" id="email" name="email"&gt;
+  &lt;label for="sabor"&gt;Sabor&lt;/label&gt;
+  &lt;select id="sabor" name="sabor"&gt;
+    &lt;option&gt;Cenoura&lt;/option&gt;
+    &lt;option&gt;Fubá&lt;/option&gt;
+  &lt;/select&gt;
+  &lt;label for="recado"&gt;Recado&lt;/label&gt;
+  &lt;textarea id="recado" name="recado" rows="3"&gt;&lt;/textarea&gt;
+  &lt;button&gt;Encomendar&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+
+.encomenda {
+  width: 300px;
+}
+
+label {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #888;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+textarea {
+  resize: vertical;
+}
+
+button {
+  font: inherit;
+  margin-top: 16px;
+  padding: 8px 16px;
+}
+</pre>
+</div>
+
+<p>Agora os rótulos estão em negrito, em cima de cada campo; o nome, o e-mail, a lista de sabores e o recado têm a mesma largura, a mesma borda cinza e os mesmos cantos arredondados; e a letra dos campos é a mesma da página.</p>
+
+<h3>O <code>resize</code> do <code>textarea</code></h3>
+<p>O cantinho de baixo, à direita, do <code>textarea</code> deixa o leitor puxar a caixa para aumentá-la. Por padrão, ela cresce para os <strong>dois</strong> lados (<code>resize: both</code>), e pode passar da largura do formulário. <code>resize: vertical</code> deixa crescer só para baixo:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O leitor pode puxar…</th></tr>
+<tr><td><code>both</code></td><td>Para os dois lados (padrão do <code>textarea</code>)</td></tr>
+<tr><td><code>vertical</code></td><td>Só a altura: o mais usado</td></tr>
+<tr><td><code>horizontal</code></td><td>Só a largura</td></tr>
+<tr><td><code>none</code></td><td>Nada (evite: quem escreve muito quer ver o texto todo)</td></tr>
+</table>
+</div>
+
+<div class="note">
+<strong>E o <code>select</code>, as caixas de marcar e os botões de rádio?</strong>
+<p>A lista (<code>&lt;select&gt;</code>) aceita borda, letra e espaço, como acima, mas a setinha e a lista que abre são desenhadas pelo sistema. As caixas de marcar (<code>checkbox</code>) e os botões de rádio mudam de cor com uma linha só, <code>accent-color</code>; para ir além, existe o <code>appearance</code>. Os dois estão na aula <a href="accent-color.html">accent-color e appearance</a>.</p>
+</div>
+
+<hr>
+
+<h2>6. O foco: <code>:focus-visible</code></h2>
+<p>O campo que está recebendo o que você digita está "em foco". O navegador já desenha um contorno nele, mas o padrão às vezes é discreto. Para quem usa o teclado (<kbd>Tab</kbd> de campo em campo), ver onde está o foco é essencial. A pseudo-classe <code>:focus-visible</code> (aula <a href="hover-focus.html">Estados</a>) vale quando o campo está em foco e o navegador acha que o contorno deve aparecer:</p>
+
+<pre class="file" data-file="style.css">input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid orange;
+  outline-offset: 2px;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>:focus-visible</dt><dd>"Em foco, e o foco deve aparecer". Num campo de texto, vale tanto com o teclado quanto com o clique, porque você vai digitar ali.</dd>
+  <dt>outline</dt><dd>O contorno (aula <a href="outline.html">outline</a>): fica por fora da borda e <strong>não ocupa espaço</strong>, então nada na página se mexe quando ele aparece.</dd>
+  <dt>outline-offset: 2px</dt><dd>Afasta o contorno 2 pixels da borda, deixando um respiro entre os dois.</dd>
+</dl>
+
+<p>Clique no campo "Nome" de qualquer formulário desta aula, ou use o <kbd>Tab</kbd>, para ver o foco. Com a regra acima, o campo ganha um contorno laranja grosso, um pouco afastado da borda, acompanhando os cantos arredondados.</p>
+
+<div class="warning">
+<strong>Nunca apague o foco sem pôr outro no lugar</strong>
+<p><code>outline: none</code> sozinho é um dos erros de acessibilidade mais comuns da web: quem navega pelo teclado perde o rumo, sem saber em que campo está. Se o contorno padrão não combina com o site, <strong>troque</strong> por outro (outra cor, uma borda mais grossa, uma sombra), nunca deixe sem nada.</p>
+</div>
+
+<hr>
+
+<h2>7. Campos inválidos: <code>:user-invalid</code></h2>
+<p>O HTML já sabe quando um campo está errado: um <code>type="email"</code> sem e-mail válido, um <code>required</code> vazio (Guia HTML, <a href="https://wallysondevs.github.io/guia-html/validacao.html">Validação</a>). O CSS pode pintar esse campo. Há duas pseudo-classes:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Pseudo-classe</th><th>Vale quando…</th><th>Problema</th></tr>
+<tr><td><code>:invalid</code></td><td>o campo está inválido, <strong>sempre</strong></td><td>Um campo obrigatório vazio já aparece vermelho quando a página abre, antes de a pessoa digitar qualquer coisa. Parece uma bronca antes da hora.</td></tr>
+<tr><td><code>:user-invalid</code></td><td>o campo está inválido <strong>e a pessoa já mexeu nele</strong> (digitou e saiu do campo, ou tentou enviar)</td><td>Nenhum: é o comportamento que se espera. Funciona em todos os navegadores atuais desde novembro de 2023 (MDN, "Baseline").</td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o primeiro campo usa <code>:invalid</code> e já começa vermelho. No segundo, com <code>:user-invalid</code>, digite <code>ana@</code> e clique fora: só então ele fica vermelho. Complete para <code>ana@example.com</code> e o vermelho some na hora.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;form&gt;
+  &lt;label for="e1"&gt;E-mail (com :invalid)&lt;/label&gt;
+  &lt;input class="cedo" type="email" id="e1" name="e1" required&gt;
+  &lt;label for="e2"&gt;E-mail (com :user-invalid)&lt;/label&gt;
+  &lt;input class="na-hora" type="email" id="e2" name="e2" required&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">label {
+  display: block;
+  margin-top: 12px;
+}
+
+input {
+  font: inherit;
+  padding: 6px;
+  border: 2px solid gray;
+}
+
+.cedo:invalid {
+  border-color: crimson;
+  background-color: mistyrose;
+}
+
+.na-hora:user-invalid {
+  border-color: crimson;
+  background-color: mistyrose;
+}
+</pre>
+</div>
+
+<div class="tip">
+<strong>A cor não pode ser o único aviso</strong>
+<p>Quem não distingue vermelho de verde, ou usa leitor de tela, não percebe só a cor. A mensagem do próprio navegador ("Inclua um @ no endereço de e-mail", ao enviar) continua aparecendo; num site completo, escreva também o erro em texto, perto do campo.</p>
+</div>
+
+<hr>
+
+<h2>8. O texto de exemplo: <code>::placeholder</code></h2>
+<p>O <code>placeholder</code> é o texto cinza dentro do campo vazio ("Ana Souza"). O pseudo-elemento <code>::placeholder</code> (aula <a href="pseudo-elementos.html">Outros Pseudo-elementos</a>) muda a cor dele:</p>
+
+<pre class="file" data-file="style.css">input::placeholder {
+  color: #767676;
+}
+</pre>
+
+<p>O cinza <code>#767676</code> é o mais claro que ainda tem contraste suficiente num fundo branco (4,5 para 1, o mínimo recomendado para texto). O placeholder é só um <strong>exemplo</strong> de resposta: ele some quando a pessoa começa a digitar, então nunca o use no lugar do <code>&lt;label&gt;</code>.</p>
+
+<hr>
+
+<h2>9. Resumo das escolhas</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quero…</th><th>Use</th></tr>
+<tr><td>Rótulo em cima do campo</td><td><code>label { display: block; }</code></td></tr>
+<tr><td>Rótulo ao lado do campo (telas largas)</td><td>Grid no formulário (<code>grid-template-columns: auto 1fr</code>, aula <a href="grid-colunas.html">Colunas</a>), de preferência só a partir de uma largura, com <a href="media-queries.html">media query</a></td></tr>
+<tr><td>A mesma letra da página</td><td><code>font: inherit;</code> nos campos e no botão</td></tr>
+<tr><td>Campos da largura do formulário</td><td><code>width: 100%;</code> + <code>box-sizing: border-box;</code></td></tr>
+<tr><td>Foco visível</td><td><code>:focus-visible</code> com <code>outline</code></td></tr>
+<tr><td>Aviso de campo errado</td><td><code>:user-invalid</code> (não <code>:invalid</code>), mais um texto</td></tr>
+<tr><td>Cor das caixas de marcar e rádios</td><td><code>accent-color</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>O campo passa da borda do formulário</strong>
+<p><strong>O que você vê:</strong> com <code>width: 100%</code> e <code>padding</code>, o campo fica 24 pixels mais largo que o formulário (veja a seção 4).</p>
+<p><strong>Por quê:</strong> o <code>box-sizing</code> padrão do <code>input</code> é <code>content-box</code> (conferido no Chromium): a largura vale só para o conteúdo, e o espaço interno e a borda são somados por fora.</p>
+<p><strong>Como consertar:</strong> <code>box-sizing: border-box;</code> nos campos (ou em todos os elementos, com <code>*, *::before, *::after { box-sizing: border-box; }</code>, aula <a href="box-sizing.html">box-sizing</a>).</p>
+</div>
+
+<div class="cenario">
+<strong>A letra do campo continua pequena</strong>
+<pre class="file" data-file="style.css">form {
+  font-size: 1.125rem;
+}
+</pre>
+<p><strong>O que você vê:</strong> os rótulos ficam com a letra maior, mas o texto dentro dos campos continua com 13.3333px.</p>
+<p><strong>Por quê:</strong> o navegador dá aos campos uma fonte própria, que vence a herança. Mudar a fonte do pai não chega até eles.</p>
+<p><strong>Como consertar:</strong> <code>font: inherit;</code> nos campos.</p>
+</div>
+
+<div class="cenario">
+<strong>Erro de digitação no seletor: a regra inteira some</strong>
+<pre class="file" data-file="form.css">input:foucs {
+  outline: 3px solid orange;
+}
+textarea {
+  resize: vertical-only;
+}
+input {
+  border: 1px solid #88;
+}
+</pre>
+<p><strong>O que você vê:</strong> o foco continua com o contorno padrão, o <code>textarea</code> ainda cresce para os lados, e a borda do campo continua a do navegador. Nenhuma das três declarações funcionou. No F12, as declarações com valor errado aparecem riscadas; a regra com o seletor errado nem aparece no painel de estilos do campo, porque não casa com nada.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css form.css
+"file:/home/ana/site/form.css":1.7-1.11: error: CSS: Unknown pseudo-element or pseudo-class “:foucs”
+"file:/home/ana/site/form.css":5.11-5.23: error: CSS: “resize”: “vertical-only” is not a “resize” value.
+"file:/home/ana/site/form.css":8.21-8.23: error: CSS: “border”: “#88” is not a valid color 3 or 6 hexadecimals numbers.</pre>
+<p><strong>O que significa:</strong></p>
+<ul>
+  <li>"Pseudo-elemento ou pseudo-classe desconhecido: <code>:foucs</code>". Com o seletor inválido, o navegador descarta a <strong>regra inteira</strong>, com todas as declarações dentro. O certo é <code>:focus</code>.</li>
+  <li>"<code>vertical-only</code> não é um valor de <code>resize</code>": é só <code>vertical</code>.</li>
+  <li>"<code>#88</code> não é uma cor válida de 3 ou 6 dígitos hexadecimais" (aula <a href="cores-hex.html">Cores Hexadecimais</a>): faltou um dígito, <code>#888</code>. Como a cor é inválida, o atalho <code>border</code> inteiro é ignorado.</li>
+</ul>
+</div>
+
+<div class="cenario">
+<strong><code>outline: none</code>: o foco sumiu</strong>
+<pre class="file" data-file="style.css">input:focus {
+  outline: none;
+}
+</pre>
+<p><strong>O que você vê:</strong> ao clicar no campo ou chegar nele pelo <kbd>Tab</kbd>, nada indica que ele está em foco.</p>
+<p><strong>O que o validador diz:</strong> nada; o CSS é válido. O problema é de acessibilidade: quem usa o teclado não sabe onde está.</p>
+<p><strong>Como consertar:</strong> apague a regra, ou troque o contorno por outro bem visível (seção 6).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>label { display: block; }</code></td><td>Rótulo numa linha só, em cima do campo</td></tr>
+<tr><td><code>font: inherit;</code></td><td>O campo usa a letra do pai (os campos não herdam sozinhos)</td></tr>
+<tr><td><code>width: 100%; box-sizing: border-box;</code></td><td>O campo ocupa a largura toda, sem passar dela</td></tr>
+<tr><td><code>resize: vertical;</code></td><td>O <code>textarea</code> só cresce para baixo</td></tr>
+<tr><td><code>:focus-visible { outline: … }</code></td><td>Contorno do campo em foco</td></tr>
+<tr><td><code>:user-invalid</code></td><td>Campo inválido depois que a pessoa mexeu nele</td></tr>
+<tr><td><code>:invalid</code></td><td>Campo inválido desde o começo (cuidado)</td></tr>
+<tr><td><code>::placeholder { color: … }</code></td><td>Cor do texto de exemplo</td></tr>
+<tr><td><code>:disabled</code></td><td>Campo desativado (<code>disabled</code> no HTML)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Herdar a letra</h3>
+<p>Complete para o campo usar a mesma letra da página:</p>
+<div class="ex-code">input { font: <input data-answer="inherit" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Rótulo em cima</h3>
+<p>Complete para o rótulo ficar numa linha só, em cima do campo:</p>
+<div class="ex-code">label { display: <input data-answer="block" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Só para baixo</h3>
+<p>Complete para o <code>textarea</code> só crescer na altura:</p>
+<div class="ex-code">textarea { resize: <input data-answer="vertical" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Um campo com <code>width: 100%</code> e <code>padding: 10px</code> passa da borda do formulário. O que falta?</p>
+<label><input type="radio" name="q4"> <code>font: inherit</code></label>
+<label><input type="radio" name="q4"> <code>display: block</code></label>
+<label><input type="radio" name="q4"> <code>box-sizing: border-box</code></label>
+<label><input type="radio" name="q4"> <code>outline: none</code></label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Qual pseudo-classe pinta o campo de e-mail de vermelho só depois que a pessoa digitou algo errado e saiu dele?</p>
+<label><input type="radio" name="q5"> <code>:invalid</code></label>
+<label><input type="radio" name="q5"> <code>:user-invalid</code></label>
+<label><input type="radio" name="q5"> <code>:focus</code></label>
+<label><input type="radio" name="q5"> <code>::placeholder</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. A Ana achou o contorno de foco feio. O que ela deve fazer?</p>
+<label><input type="radio" name="q6"> <code>outline: none</code></label>
+<label><input type="radio" name="q6"> <code>outline: 0</code></label>
+<label><input type="radio" name="q6"> Tirar o <code>&lt;label&gt;</code></label>
+<label><input type="radio" name="q6"> Trocar por outro contorno visível, com <code>:focus-visible</code></label>
+</div>
+
+<h3>Missão final: o formulário de encomendas</h3>
+
+<div class="tryhtml" data-goal="css:label{display}=block,css:#nome{box-sizing}=border-box,css:#nome{font-size}=16px,css:#nome{border-top-left-radius}=6px,css:textarea{resize}=vertical,css:textarea{font-size}=16px,src::focus-visible[^{]*\{[^}]*outline,nsrc:outline:\s*(none|0)\s*;">
+<p class="try-task"><strong>Missão:</strong> arrume o formulário. (1) Rótulos em cima dos campos. (2) Nos campos (<code>input</code>, <code>select</code>, <code>textarea</code>): a letra da página, a largura toda sem passar da borda e cantos arredondados de <code>6px</code>. (3) O <code>textarea</code> só cresce para baixo. (4) Um foco visível com <code>:focus-visible</code> e <code>outline</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;form class="encomenda"&gt;
+  &lt;label for="nome"&gt;Nome&lt;/label&gt;
+  &lt;input type="text" id="nome" name="nome" placeholder="Ana Souza"&gt;
+  &lt;label for="email"&gt;E-mail&lt;/label&gt;
+  &lt;input type="email" id="email" name="email"&gt;
+  &lt;label for="sabor"&gt;Sabor&lt;/label&gt;
+  &lt;select id="sabor" name="sabor"&gt;
+    &lt;option&gt;Cenoura&lt;/option&gt;
+    &lt;option&gt;Fubá&lt;/option&gt;
+    &lt;option&gt;Chocolate&lt;/option&gt;
+  &lt;/select&gt;
+  &lt;label for="recado"&gt;Recado&lt;/label&gt;
+  &lt;textarea id="recado" name="recado" rows="3"&gt;&lt;/textarea&gt;
+  &lt;button&gt;Encomendar&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+
+.encomenda {
+  width: 300px;
+}
+
+input,
+select,
+textarea {
+  padding: 8px 10px;
+  border: 1px solid #888;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+
+.encomenda {
+  width: 300px;
+}
+
+label {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #888;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+textarea {
+  resize: vertical;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid orange;
+  outline-offset: 2px;
+}
+
+button {
+  font: inherit;
+  margin-top: 16px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Sem CSS, rótulos e campos ficam na mesma linha (são elementos em linha), com letras e larguras diferentes.</li>
+  <li><code>label { display: block; }</code> põe o rótulo em cima do campo. Rótulo sempre visível; o placeholder é só exemplo.</li>
+  <li>Os campos não herdam a fonte: <code>font: inherit;</code>. Com 16px, o iPhone não dá zoom ao tocar no campo.</li>
+  <li><code>width: 100%</code> + <code>box-sizing: border-box</code>: campos da largura do formulário, sem passar dela.</li>
+  <li><code>resize: vertical</code> no <code>textarea</code>.</li>
+  <li>Foco visível com <code>:focus-visible</code> e <code>outline</code>; nunca <code>outline: none</code> sem outro destaque no lugar.</li>
+  <li><code>:user-invalid</code> avisa o erro depois que a pessoa mexeu no campo; <code>:invalid</code> avisa cedo demais.</li>
+  <li>Seletor com erro de digitação (<code>:foucs</code>) derruba a regra inteira; o validador avisa <code>Unknown pseudo-element or pseudo-class</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
