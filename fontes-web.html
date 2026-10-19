@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Fontes da Internet — @font-face e Google Fonts | Guia CSS</title>
+<meta name="description" content="Fontes da internet no CSS para quem nunca escreveu CSS: a regra @font-face parte por parte, o formato woff2, o Google Fonts com link, font-display swap, um arquivo por peso, hospedar a fonte no próprio site, licença e privacidade, e o que acontece quando o nome ou o caminho estão errados.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Fontes da Internet (@font-face)</span></h1>
+
+<p class="intro">Na aula <a href="font-family.html">Fontes (font-family)</a>, a Ana só podia usar as fontes que já estão no computador de quem lê. Mas ela quer o título do blog com uma letra que imita a escrita à mão, e essa fonte ninguém tem instalada. A solução é <strong>mandar o arquivo da fonte junto com o site</strong>: o navegador baixa a fonte, como baixa uma imagem, e desenha o texto com ela. Quem faz isso é a regra <code>@font-face</code>, que você pode escrever à mão ou receber pronta de um serviço como o Google Fonts.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Como o navegador baixa uma fonte e qual formato de arquivo usar (<code>woff2</code>).</li>
+  <li>A regra <code>@font-face</code>, parte por parte, com a fonte na pasta do site.</li>
+  <li>O jeito mais rápido: o Google Fonts, com um <code>&lt;link&gt;</code>.</li>
+  <li>O que o leitor vê enquanto a fonte baixa, e o <code>font-display: swap</code>.</li>
+  <li>Por que cada peso (normal, negrito) é um arquivo, e o "negrito falso".</li>
+  <li>Hospedar a fonte você mesmo: licença, privacidade e velocidade.</li>
+  <li>O que acontece quando o nome ou o caminho da fonte estão errados.</li>
+</ul>
+</div>
+
+<div class="warning">
+<strong>Estes exemplos usam a internet</strong>
+<p>Os Resultados desta aula baixam fontes de verdade do servidor do Google Fonts (<code>fonts.googleapis.com</code> e <code>fonts.gstatic.com</code>). Se a sua internet estiver desligada, ou se uma rede (da escola, de uma empresa) bloquear esses endereços, você vai ver a fonte do plano B no lugar. E isso já é uma lição: é exatamente o que acontece com o leitor do seu site quando a fonte não chega.</p>
+</div>
+
+<p>As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: levar o próprio tempero</h2>
+<p>A Ana vai cozinhar na casa de uma amiga. Ela não sabe se a amiga tem páprica defumada, então leva o potinho na bolsa. Com a <code>font-family</code> comum, o site "pede emprestadas" as fontes do computador do leitor. Com o <code>@font-face</code>, o site leva a própria fonte: no começo da página, ela diz "existe uma fonte chamada <em>Caveat</em>, e o arquivo dela está aqui". Depois, é só usar o nome.</p>
+
+<hr>
+
+<h2>1. O arquivo da fonte</h2>
+<p>Uma fonte é um arquivo, como uma foto. Existem vários formatos:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Formato</th><th>O que é</th><th>Use na web?</th></tr>
+<tr><td><code>.woff2</code></td><td><em>Web Open Font Format</em> 2: feito para a web, comprimido (o menor)</td><td><strong>Sim</strong>: todos os navegadores atuais entendem</td></tr>
+<tr><td><code>.woff</code></td><td>A versão 1, menos comprimida</td><td>Só para navegadores muito antigos</td></tr>
+<tr><td><code>.ttf</code>, <code>.otf</code></td><td>Os formatos de fonte do computador (os que você instala no Windows ou no Mac)</td><td>Funcionam, mas são bem maiores: converta para <code>.woff2</code></td></tr>
+<tr><td><code>.eot</code>, <code>.svg</code></td><td>Formatos do Internet Explorer e de iPhones antigos</td><td>Não: você só vai vê-los em códigos velhos</td></tr>
+</table>
+</div>
+
+<p>No site da Ana, as fontes ficam numa pasta própria, ao lado das imagens:</p>
+<pre class="term" data-cwd="~/blog">$ tree
+.
+├── fontes
+│   └── caveat.woff2
+├── imagens
+│   └── bolo.jpg
+├── index.html
+└── style.css
+
+3 directories, 4 files</pre>
+<p>(Uma pasta <code>fontes</code> com o arquivo da fonte Caveat, uma pasta <code>imagens</code>, a página e o CSS. A última linha conta: 3 pastas, contando a do próprio site, e 4 arquivos.)</p>
+
+<hr>
+
+<h2>2. A regra <code>@font-face</code></h2>
+<p>No começo do <code>style.css</code>, a Ana declara a fonte e, depois, usa o nome dela como qualquer outra:</p>
+
+<pre class="file" data-file="style.css">@font-face {
+  font-family: "Caveat";
+  src: url("fontes/caveat.woff2") format("woff2");
+  font-display: swap;
+}
+
+h1 {
+  font-family: "Caveat", cursive;
+}</pre>
+
+<dl class="anatomy">
+  <dt>@font-face</dt><dd>Uma <strong>regra @</strong> (<em>at-rule</em>): não escolhe elementos, como um seletor; ela <strong>declara</strong> uma fonte. "face" é "face", "cara" da letra.</dd>
+  <dt>font-family: "Caveat";</dt><dd>O <strong>nome</strong> que você dá à fonte. Pode ser qualquer um (<code>"Letra da Ana"</code> também funcionaria); é por ele que você vai chamá-la depois. Aqui, é um apelido, e não uma propriedade que pinta algo.</dd>
+  <dt>src: url("fontes/caveat.woff2")</dt><dd><code>src</code> = "fonte", "origem": de onde baixar o arquivo. O <code>url(…)</code> é um caminho, com as mesmas regras do <code>src</code> de uma imagem; ele parte da pasta do <strong>arquivo CSS</strong>.</dd>
+  <dt>format("woff2")</dt><dd>Diz o formato antes de baixar: um navegador que não entende <code>woff2</code> nem perde tempo. É opcional, mas recomendado.</dd>
+  <dt>font-display: swap;</dt><dd>O que mostrar enquanto a fonte baixa: com <code>swap</code> ("trocar"), o texto aparece logo com a fonte do plano B e é trocado quando a fonte chega (seção 4).</dd>
+  <dt>h1 { font-family: "Caveat", cursive; }</dt><dd>O uso, igual ao da aula anterior: o nome dado no <code>@font-face</code> e, no fim, a genérica do plano B.</dd>
+</dl>
+
+<p>O <code>@font-face</code> sozinho não muda nada na tela: ele só apresenta a fonte. É a regra do <code>h1</code> que a coloca em uso. E o navegador é econômico: ele só baixa o arquivo se algum texto da página usar aquela fonte.</p>
+
+<h3>Agora de verdade</h3>
+<p>O guia não tem o arquivo <code>caveat.woff2</code> na pasta dele, então este exemplo aponta o <code>url()</code> para o arquivo da Caveat que o Google Fonts publica (um endereço completo, <code>https://…</code>, em vez de um caminho da pasta). O resto é igual:</p>
+
+<pre class="file" data-file="font-face.html" data-resultado>&lt;style&gt;
+  @font-face {
+    font-family: "Caveat";
+    src: url("https://fonts.gstatic.com/s/caveat/v23/WnznHAc5bAfYB2QRah7pcpNvOx-pjfJ9eIWpYQ.woff2") format("woff2");
+    font-display: swap;
+  }
+  h1 {
+    font-family: "Caveat", cursive;
+  }
+&lt;/style&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;O título usa a fonte Caveat, baixada da internet; este parágrafo, não.&lt;/p&gt;
+</pre>
+
+<p>O título saiu com letra de mão, como escrita com caneta, enquanto o parágrafo ficou com a fonte padrão. Se você estiver sem internet, o título sai com a <code>cursive</code> do seu sistema (ou, se o sistema não tiver uma, com a fonte padrão).</p>
+
+<hr>
+
+<h2>3. O jeito rápido: Google Fonts</h2>
+<p>O <a href="https://fonts.google.com/" target="_blank" rel="noopener">Google Fonts</a> é um catálogo gratuito com mais de mil fontes livres. Você escolhe a fonte no site, e ele entrega um <code>&lt;link&gt;</code> pronto, que vai no <code>&lt;head&gt;</code> da sua página, <strong>antes</strong> do seu <code>style.css</code>:</p>
+
+<pre class="file" data-file="index.html">&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;Blog da Ana&lt;/title&gt;
+  &lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;
+  &lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;
+  &lt;link href="https://fonts.googleapis.com/css2?family=Lobster&amp;display=swap" rel="stylesheet"&gt;
+  &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;</pre>
+
+<dl class="anatomy">
+  <dt>rel="preconnect"</dt><dd>"Conecte antes": avisa o navegador para já ir abrindo a conexão com os servidores do Google, e a fonte chega um pouco mais rápido. Opcional, mas o Google o inclui no código que entrega.</dd>
+  <dt>crossorigin</dt><dd>As fontes vêm de outro site e são baixadas num modo especial (CORS); este atributo deixa a conexão antecipada pronta para esse modo.</dd>
+  <dt>css2?family=Lobster</dt><dd>O pedido: "me mande o CSS da fonte Lobster". O que volta é um arquivo CSS cheio de regras <code>@font-face</code>, já com os <code>url()</code> dos arquivos <code>.woff2</code>. Ou seja: o Google escreve o <code>@font-face</code> por você.</dd>
+  <dt>&amp;display=swap</dt><dd>Põe <code>font-display: swap</code> nessas regras. (Dentro do HTML, o <code>&amp;</code> pode ser escrito <code>&amp;</code> ou <code>&amp;amp;</code>; o validador aceita os dois aqui.)</dd>
+</dl>
+
+<p>Depois, no <code>style.css</code>, use o nome da fonte com um plano B:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link href="https://fonts.googleapis.com/css2?family=Lobster&amp;display=swap" rel="stylesheet"&gt;
+&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;p&gt;Pão francês quentinho às 7h e às 17h.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  font-family: "Lobster", cursive;
+  color: hsl(12 73% 45%);
+}
+</pre>
+</div>
+
+<p>O título fica com a Lobster, uma letra cursiva grossa, bem de letreiro de padaria. Na aba <code>style.css</code>, troque <code>"Lobster"</code> por <code>"Lobsterr"</code> (com dois <code>r</code>): o título volta para a fonte do plano B, sem nenhum aviso.</p>
+
+<div class="tryhtml" data-goal="sel:link[href^=&quot;https://fonts.googleapis.com/css2?family=Caveat&quot;],src:h1\s*\{[^}]*font-family:\s*[&quot;']?Caveat[&quot;']?\s*\,\s*cursive\s*;">
+<p class="try-task"><strong>Missão:</strong> o blog da Ana vai usar a fonte <strong>Caveat</strong> do Google Fonts no título. No <code>index.html</code>, acrescente o <code>&lt;link&gt;</code> com <code>https://fonts.googleapis.com/css2?family=Caveat&amp;display=swap</code> (antes do <code>style.css</code>). No <code>style.css</code>, faça o <code>h1</code> usar <code>"Caveat"</code>, com <code>cursive</code> de plano B.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Blog da Ana&lt;/h1&gt;
+&lt;p&gt;Hoje: como fiz o bolo de cenoura perfeito.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: hsl(176 59% 27%);
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link href="https://fonts.googleapis.com/css2?family=Caveat&amp;display=swap" rel="stylesheet"&gt;
+&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Blog da Ana&lt;/h1&gt;
+&lt;p&gt;Hoje: como fiz o bolo de cenoura perfeito.&lt;/p&gt;
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: hsl(176 59% 27%);
+  font-family: "Caveat", cursive;
+}
+</pre>
+</div>
+
+<p>A missão confere o <code>&lt;link&gt;</code> e a regra, e não a fonte desenhada: assim ela funciona até para quem está sem internet.</p>
+
+<hr>
+
+<h2>4. Enquanto a fonte baixa: <code>font-display</code></h2>
+<p>A fonte é um arquivo a mais para baixar. Nos primeiros instantes, o navegador ainda não a tem. O que ele mostra? Depende do <code>font-display</code>:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que o leitor vê enquanto a fonte baixa</th></tr>
+<tr><td><code>swap</code></td><td>O texto aparece <strong>na hora</strong>, com a fonte do plano B, e troca quando a fonte chega. O recomendado para quase tudo: ninguém fica sem ler.</td></tr>
+<tr><td><code>block</code></td><td>O texto fica <strong>invisível</strong> por até uns 3 segundos, esperando a fonte. Ruim em internet lenta.</td></tr>
+<tr><td><code>fallback</code></td><td>Invisível por um instante bem curto; se a fonte demorar, fica com o plano B.</td></tr>
+<tr><td><code>optional</code></td><td>Usa a fonte só se ela chegar quase na hora; senão, fica com o plano B (e a fonte serve na próxima visita).</td></tr>
+<tr><td><code>auto</code></td><td>O navegador decide (o padrão; costuma agir como <code>block</code>).</td></tr>
+</table>
+</div>
+<p>Com <code>swap</code>, numa internet lenta, o leitor pode ver o título "pular" de uma fonte para outra quando a fonte chega. É um preço pequeno: pior é não conseguir ler nada. E é mais um motivo para escolher bem o plano B: quanto mais parecido com a fonte baixada, menor o pulo.</p>
+
+<hr>
+
+<h2>5. Cada peso é um arquivo</h2>
+<p>Uma fonte não é um arquivo só: normalmente há um arquivo para o normal, outro para o negrito, outro para o itálico… Se a página pede negrito e você só carregou o normal, o navegador "engrossa" as letras sozinho, um <strong>negrito falso</strong>, que costuma ficar borrado. A Lobster só tem um peso; veja-a num <code>&lt;h2&gt;</code> (que é negrito por padrão) e com o negrito desligado (<code>font-weight</code>, da aula <a href="font-weight.html">Negrito e Itálico</a>):</p>
+
+<pre class="file" data-file="negrito-falso.html" data-resultado>&lt;link href="https://fonts.googleapis.com/css2?family=Lobster&amp;display=swap" rel="stylesheet"&gt;
+&lt;style&gt;
+  h2 {
+    font-family: "Lobster", cursive;
+  }
+  .normal {
+    font-weight: normal;
+  }
+&lt;/style&gt;
+&lt;h2&gt;Lobster com negrito falso&lt;/h2&gt;
+&lt;h2 class="normal"&gt;Lobster no peso de verdade&lt;/h2&gt;
+</pre>
+
+<p>A primeira linha está mais grossa e mais "embolada" que a segunda: o navegador inventou esse negrito. A segunda é a Lobster como ela foi desenhada.</p>
+
+<p>Para ter os pesos de verdade, peça todos no Google Fonts (por exemplo, <code>family=Caveat:wght@400;700</code>, os pesos 400 e 700) ou, no seu <code>@font-face</code>, declare um bloco por arquivo, com o <strong>mesmo nome</strong> e o peso de cada um:</p>
+<pre class="file" data-file="style.css">@font-face {
+  font-family: "Lato";
+  src: url("fontes/lato-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("fontes/lato-negrito.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+body {
+  font-family: "Lato", sans-serif;
+}</pre>
+<p>Agora, o texto normal usa <code>lato-normal.woff2</code>, e todo negrito (<code>&lt;strong&gt;</code>, títulos) usa <code>lato-negrito.woff2</code>, porque o navegador escolhe o bloco pelo peso. Cada arquivo a mais é mais coisa para baixar: carregue só os pesos que você usa.</p>
+
+<hr>
+
+<h2>6. Google Fonts ou hospedar você mesmo?</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th>Google Fonts (<code>&lt;link&gt;</code>)</th><th>Arquivo no seu site (<code>@font-face</code>)</th></tr>
+<tr><td>Trabalho</td><td>Copiar e colar um <code>&lt;link&gt;</code></td><td>Baixar os <code>.woff2</code>, pôr numa pasta, escrever o <code>@font-face</code></td></tr>
+<tr><td>Privacidade</td><td>Cada visita conta ao Google o endereço IP do leitor (por isso, sites sob leis como a LGPD e a europeia GDPR muitas vezes evitam)</td><td>Nada sai do seu site</td></tr>
+<tr><td>Funciona se o Google estiver bloqueado</td><td>Não</td><td>Sim</td></tr>
+<tr><td>Velocidade</td><td>Uma conexão a mais, com outro servidor</td><td>Vem do mesmo servidor do site</td></tr>
+</table>
+</div>
+<p>As fontes do Google Fonts são <strong>livres</strong>: você pode baixar os arquivos (o próprio site tem o botão de baixar) e hospedá-los no seu. Já uma fonte comprada, ou instalada no seu computador, tem licença: muitas não permitem uso na web. Leia a licença antes de subir o arquivo.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Com fontes, o navegador não mostra erro na página: se algo falha, ele usa o plano B em silêncio. Os três títulos abaixo queriam a Lobster:</p>
+
+<pre class="file" data-file="erros.html · erro de propósito" data-resultado>&lt;link href="https://fonts.googleapis.com/css2?family=Lobster&amp;display=swap" rel="stylesheet"&gt;
+&lt;style&gt;
+  @font-face {
+    font-family: "Minha Fonte";
+    src: url("fontes/minha-fonte.woff2") format("woff2");
+  }
+  .certo { font-family: "Lobster", cursive; }
+  .nome { font-family: "Lobstar", cursive; }
+  .caminho { font-family: "Minha Fonte", cursive; }
+  .sem-plano-b { font-family: "Lobstar"; }
+&lt;/style&gt;
+&lt;h2 class="certo"&gt;"Lobster", cursive (o certo)&lt;/h2&gt;
+&lt;h2 class="nome"&gt;"Lobstar", cursive (nome errado)&lt;/h2&gt;
+&lt;h2 class="caminho"&gt;arquivo que não existe&lt;/h2&gt;
+&lt;h2 class="sem-plano-b"&gt;nome errado e sem plano B&lt;/h2&gt;
+</pre>
+
+<p>Só a primeira linha saiu com a Lobster. As outras três ficaram com o plano B ou com a fonte padrão do navegador. No computador do laboratório do guia, as três ficaram iguais, com serifa, porque ali até a <code>cursive</code> cai na fonte padrão; num Windows, as duas do meio costumam sair com a cursiva do sistema (a Comic Sans), e só a última com serifa.</p>
+
+<div class="cenario">
+<strong>Nenhuma mensagem: o nome não bate</strong>
+<p><strong>O que aconteceu:</strong> o <code>@font-face</code> (ou o Google Fonts) declarou <code>"Lobster"</code>, e a regra usou <code>"Lobstar"</code>. Para o navegador, são duas fontes diferentes, e a segunda não existe: ele vai para o plano B (<code>cursive</code>). O validador não tem como saber: os dois nomes são válidos.</p>
+<p><strong>Como consertar:</strong> copie o nome exatamente como está no <code>font-family</code> do <code>@font-face</code> (ou no site do Google Fonts).</p>
+</div>
+
+<div class="cenario">
+<strong>O arquivo não foi encontrado (404)</strong>
+<p><strong>O que aconteceu:</strong> o <code>url()</code> aponta para um arquivo que não existe: nome errado, pasta errada, ou o caminho foi escrito a partir da página quando devia partir do CSS. O navegador tenta baixar, recebe "não encontrado" e usa o plano B. No F12, na aba de rede (<em>Network</em>), o pedido da fonte aparece em vermelho com o código 404, e o console mostra um erro com o endereço que falhou.</p>
+<p><strong>Como consertar:</strong> confira o caminho a partir da pasta do arquivo CSS. Com o CSS em <code>css/style.css</code> e a fonte em <code>fontes/caveat.woff2</code>, o caminho é <code>url("../fontes/caveat.woff2")</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Nenhuma mensagem: sem plano B</strong>
+<p><strong>O que aconteceu:</strong> <code>font-family: "Lobstar";</code>, sem genérica no fim. Quando a fonte falha (ou enquanto ela baixa, ou se o leitor está sem internet), não há plano B, e o navegador usa a fonte padrão dele, quase sempre com serifa: o título "de letreiro" vira letra de jornal.</p>
+<p><strong>Como consertar:</strong> termine sempre com uma genérica parecida: <code>"Lobster", cursive</code>; para uma fonte de texto, <code>"Lato", sans-serif</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “src”: “"fontes/caveat.woff2"” is not a “src” value.</code></strong>
+<p><strong>O que aconteceu:</strong> o caminho foi escrito sem o <code>url( )</code>: <code>src: "fontes/caveat.woff2";</code>.</p>
+<pre class="term" data-cwd="~/fonteweb">$ vnu --css sem-url.css
+"file:/home/ana/fonteweb/sem-url.css":3.8-3.28: error: CSS: “src”: “"fontes/caveat.woff2"” is not a “src” value.</pre>
+<p>"Não é um valor de <code>src</code>." No CSS, um endereço de arquivo vai sempre dentro de <code>url( )</code>.</p>
+<p><strong>Como consertar:</strong> <code>src: url("fontes/caveat.woff2") format("woff2");</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: Unrecognized at-rule “@fontface”</code></strong>
+<p><strong>O que aconteceu:</strong> faltou o hífen: <code>@fontface</code>.</p>
+<pre class="term" data-cwd="~/fonteweb">$ vnu --css fontface.css
+"file:/home/ana/fonteweb/fontface.css":1.1-1.9: error: CSS: Unrecognized at-rule “@fontface”</pre>
+<p>"Regra @ não reconhecida." O navegador ignora o bloco inteiro, e a fonte nunca é declarada.</p>
+<p><strong>Como consertar:</strong> <code>@font-face</code>, com hífen.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “font-display”: “rapido” is not a “font-display” value.</code></strong>
+<p><strong>O que aconteceu:</strong> um valor inventado: <code>font-display: rapido;</code>.</p>
+<pre class="term" data-cwd="~/fonteweb">$ vnu --css display.css
+"file:/home/ana/fonteweb/display.css":4.17-4.22: error: CSS: “font-display”: “rapido” is not a “font-display” value.</pre>
+<p>Só essa linha é ignorada; a fonte funciona, mas com o comportamento padrão (<code>auto</code>).</p>
+<p><strong>Como consertar:</strong> um dos valores da tabela da seção 4, quase sempre <code>swap</code>.</p>
+</div>
+
+<div class="note">
+<strong>O que o validador não pega</strong>
+<p>Um <code>@font-face</code> sem <code>font-family</code> ou sem <code>src</code> passa no validador sem nenhuma mensagem, mas não serve para nada: sem nome, não há como usar a fonte; sem <code>src</code>, não há arquivo. Os dois são obrigatórios.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>@font-face { … }</code></td><td>Declara uma fonte que o site leva junto</td></tr>
+<tr><td><code>font-family: "Nome";</code> (dentro do <code>@font-face</code>)</td><td>O nome pelo qual a fonte vai ser chamada</td></tr>
+<tr><td><code>src: url("fontes/x.woff2") format("woff2");</code></td><td>Onde está o arquivo (caminho a partir do CSS) e o formato</td></tr>
+<tr><td><code>font-weight: 700;</code> (dentro do <code>@font-face</code>)</td><td>Para qual peso esse arquivo serve</td></tr>
+<tr><td><code>font-display: swap;</code></td><td>Mostra o plano B enquanto baixa e troca quando chega</td></tr>
+<tr><td><code>&lt;link href="https://fonts.googleapis.com/css2?family=Lobster&amp;display=swap" rel="stylesheet"&gt;</code></td><td>O Google Fonts escreve os <code>@font-face</code> por você</td></tr>
+<tr><td><code>font-family: "Lobster", cursive;</code></td><td>O uso, sempre com uma genérica de plano B</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A regra</h3>
+<p>Complete com o nome da regra que declara uma fonte:</p>
+<div class="ex-code"><input data-answer="@font-face" aria-label="regra"> {
+  font-family: "Caveat";
+  src: url("fontes/caveat.woff2") format("woff2");
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. Enquanto baixa</h3>
+<p>Complete para o texto aparecer logo, com o plano B, e trocar quando a fonte chegar:</p>
+<div class="ex-code">font-display: <input data-answer="swap" aria-label="valor">;</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. Qual formato de arquivo de fonte usar na web hoje?</p>
+<label><input type="radio" name="q3"> <code>.ttf</code></label>
+<label><input type="radio" name="q3"> <code>.woff2</code></label>
+<label><input type="radio" name="q3"> <code>.eot</code></label>
+<label><input type="radio" name="q3"> <code>.docx</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">4. O <code>@font-face</code> declara <code>font-family: "Letra da Ana";</code>, e o <code>h1</code> usa <code>font-family: "Letra Ana", cursive;</code>. O que acontece?</p>
+<label><input type="radio" name="q4"> O título usa a fonte da Ana, porque os nomes são parecidos</label>
+<label><input type="radio" name="q4"> Aparece uma mensagem de erro</label>
+<label><input type="radio" name="q4"> A página não carrega</label>
+<label><input type="radio" name="q4"> Os nomes não batem, e o título usa o plano B, <code>cursive</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Por que a missão desta aula confere o código, e não a fonte desenhada?</p>
+<label><input type="radio" name="q5"> Porque a fonte depende da internet do leitor; o código, não</label>
+<label><input type="radio" name="q5"> Porque fontes não aparecem no editor</label>
+<label><input type="radio" name="q5"> Porque o Google Fonts proíbe</label>
+<label><input type="radio" name="q5"> Porque <code>@font-face</code> não funciona no Chrome</label>
+</div>
+
+<h3>Missão final: a letra da Ana</h3>
+
+<div class="tryhtml" data-goal="src:@font-face\s*\{[^}]*font-family:\s*[&quot;']Letra da Ana[&quot;'],src:@font-face\s*\{[^}]*src:\s*url\(,src:@font-face\s*\{[^}]*font-display:\s*swap,src:h1\s*\{[^}]*font-family:\s*[&quot;']Letra da Ana[&quot;']\s*\,\s*cursive\s*;">
+<p class="try-task"><strong>Missão:</strong> escreva o <code>@font-face</code> à mão. Dê à fonte o nome <code>"Letra da Ana"</code>; no <code>src</code>, use o endereço do arquivo que já está no comentário; ponha <code>font-display: swap</code>. Depois, faça o <code>h1</code> usar <code>"Letra da Ana"</code>, com <code>cursive</code> de plano B.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Escritas à mão, testadas na cozinha.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">/* arquivo da fonte:
+   https://fonts.gstatic.com/s/caveat/v23/WnznHAc5bAfYB2QRah7pcpNvOx-pjfJ9eIWpYQ.woff2 */
+
+h1 {
+  color: hsl(12 73% 45%);
+}
+</pre>
+<pre class="solucao" data-file="style.css">/* arquivo da fonte:
+   https://fonts.gstatic.com/s/caveat/v23/WnznHAc5bAfYB2QRah7pcpNvOx-pjfJ9eIWpYQ.woff2 */
+
+@font-face {
+  font-family: "Letra da Ana";
+  src: url("https://fonts.gstatic.com/s/caveat/v23/WnznHAc5bAfYB2QRah7pcpNvOx-pjfJ9eIWpYQ.woff2") format("woff2");
+  font-display: swap;
+}
+
+h1 {
+  color: hsl(12 73% 45%);
+  font-family: "Letra da Ana", cursive;
+}
+</pre>
+</div>
+
+<p>Repare que o nome "Letra da Ana" foi inventado por você: o arquivo é da fonte Caveat, mas, dentro do seu CSS, ela se chama como você quiser.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Com <code>@font-face</code>, o site leva o arquivo da fonte: ela aparece igual para todo mundo, mesmo para quem não a tem instalada.</li>
+  <li>O <code>@font-face</code> dá um <strong>nome</strong> (<code>font-family</code>) e diz onde está o <strong>arquivo</strong> (<code>src: url(…) format("woff2")</code>). Depois, use o nome normalmente, com uma genérica de plano B.</li>
+  <li>Use <code>.woff2</code>. O caminho do <code>url()</code> parte da pasta do arquivo CSS.</li>
+  <li>O Google Fonts escreve os <code>@font-face</code> por você: basta o <code>&lt;link&gt;</code> no <code>&lt;head&gt;</code>. Hospedar você mesmo é melhor para a privacidade e não depende do Google.</li>
+  <li><code>font-display: swap</code> mostra o texto na hora, com o plano B, e troca quando a fonte chega.</li>
+  <li>Cada peso é um arquivo; sem o arquivo do negrito, o navegador faz um negrito falso.</li>
+  <li>Nome que não bate, arquivo que não existe, sem plano B: nenhuma mensagem, só a fonte errada na tela.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
