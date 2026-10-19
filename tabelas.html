@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Tabelas — bordas, border-collapse e listras | Guia CSS</title>
+<meta name="description" content="Estilizando tabelas com CSS para quem nunca escreveu CSS: bordas nas células, border-collapse para juntar as linhas duplas, padding, alinhamento, cabeçalho colorido, listras com nth-child, legenda, tabela larga no celular e os erros reais: borda no tr que não aparece, collapsed em vez de collapse e a mensagem do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Tabelas</span></h1>
+
+<p class="intro">A tabela de preços da lojinha da Ana está pronta no HTML, mas o navegador a desenha sem nenhuma linha: só texto em colunas, apertado. Nesta aula você vai dar a ela bordas, espaço, um cabeçalho colorido e listras, e vai entender o detalhe que confunde todo mundo na primeira vez: as <strong>bordas duplas</strong>.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Como o navegador desenha uma tabela sem CSS.</li>
+  <li>Bordas nas células e por que elas saem <strong>duplas</strong>.</li>
+  <li><code>border-collapse: collapse</code>: as linhas simples.</li>
+  <li><code>padding</code>, <code>text-align</code> e <code>vertical-align</code> nas células.</li>
+  <li>Cabeçalho colorido e linhas listradas (zebra).</li>
+  <li>A legenda (<code>caption-side</code>) e a tabela larga no celular.</li>
+  <li>Os erros: a borda no <code>&lt;tr&gt;</code> que não aparece, a borda só por fora e o validador W3C.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador. O HTML das tabelas (<code>&lt;table&gt;</code>, <code>&lt;tr&gt;</code>, <code>&lt;th&gt;</code>, <code>&lt;td&gt;</code>, <code>&lt;thead&gt;</code>, <code>&lt;caption&gt;</code>) está no <a href="https://wallysondevs.github.io/guia-html/tabelas.html">Guia HTML</a>.</p>
+
+<hr>
+
+<h2>A ideia: a grade de uma planilha</h2>
+<p>Abra uma planilha: cada valor fica numa célula, e as células são separadas por linhas finas, uma só entre duas células vizinhas. Uma tabela HTML sem CSS é como uma planilha com as linhas de grade desligadas. O CSS liga as linhas, escolhe a grossura e a cor, e dá espaço dentro de cada célula.</p>
+
+<p>Primeiro, a tabela crua:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;table&gt;
+  &lt;tr&gt;&lt;th&gt;Produto&lt;/th&gt;&lt;th&gt;Preço&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Bolo de cenoura&lt;/td&gt;&lt;td&gt;R$ 35,00&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Pão de queijo&lt;/td&gt;&lt;td&gt;R$ 2,50&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+</pre>
+
+<p>O que o navegador põe sozinho (é o que o F12 mostra na aba <em>Computed</em>):</p>
+<ul>
+  <li>nenhuma borda;</li>
+  <li>o <code>&lt;th&gt;</code> (célula de cabeçalho) em <strong>negrito</strong> (<code>font-weight: 700</code>) e <strong>centralizado</strong> (<code>text-align: center</code>);</li>
+  <li>só 1px de <code>padding</code> dentro de cada célula, e 2px de espaço entre as células (<code>border-spacing: 2px</code>);</li>
+  <li>o texto no meio da altura da célula (<code>vertical-align: middle</code>).</li>
+</ul>
+
+<hr>
+
+<h2>1. Bordas nas células, e as linhas duplas</h2>
+<p>A borda vem da propriedade <code>border</code> (aula <a href="border.html">Bordas</a>). O primeiro instinto é pôr a borda na tabela, nas células de cabeçalho e nas células comuns:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> tire o <code>table,</code> do seletor e veja a moldura de fora sumir. Depois tire o <code>th,</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;table&gt;
+  &lt;tr&gt;&lt;th&gt;Produto&lt;/th&gt;&lt;th&gt;Preço&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Bolo de cenoura&lt;/td&gt;&lt;td&gt;R$ 35,00&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Pão de queijo&lt;/td&gt;&lt;td&gt;R$ 2,50&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+</pre>
+<pre class="script" data-file="style.css">table, th, td {
+  border: 1px solid navy;
+}
+</pre>
+</div>
+
+<p>O resultado parece um monte de caixinhas: cada célula tem a <strong>sua</strong> borda, a tabela tem a <strong>dela</strong>, e entre elas sobram os 2px do <code>border-spacing</code>. Por isso as linhas saem <strong>duplas</strong>. É o jeito "separado" de desenhar tabelas, o padrão do navegador (<code>border-collapse: separate</code>).</p>
+
+<hr>
+
+<h2>2. Linhas simples: <code>border-collapse: collapse</code></h2>
+<p>A propriedade <code>border-collapse</code> ("juntar as bordas") faz as bordas vizinhas virarem uma só, como na planilha:</p>
+
+<pre class="file" data-file="lado-a-lado.html" data-resultado>&lt;style&gt;
+  table { margin-bottom: 12px; }
+  th, td { border: 1px solid navy; }
+  .separada { border-collapse: separate; }
+  .junta    { border-collapse: collapse; }
+&lt;/style&gt;
+&lt;table class="separada"&gt;
+  &lt;tr&gt;&lt;th&gt;separate&lt;/th&gt;&lt;th&gt;(o padrão)&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Bolo de cenoura&lt;/td&gt;&lt;td&gt;R$ 35,00&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;table class="junta"&gt;
+  &lt;tr&gt;&lt;th&gt;collapse&lt;/th&gt;&lt;th&gt;(linhas simples)&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Bolo de cenoura&lt;/td&gt;&lt;td&gt;R$ 35,00&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>table</dt><dd>O <code>border-collapse</code> vai na <strong>tabela</strong>, não nas células.</dd>
+  <dt>border-collapse</dt><dd>Como juntar as bordas das células.</dd>
+  <dt>collapse</dt><dd>"Juntar": duas bordas vizinhas viram uma, e o <code>border-spacing</code> deixa de valer.</dd>
+  <dt>separate</dt><dd>"Separar" (o padrão): cada célula com a sua borda, afastadas pelo <code>border-spacing</code>.</dd>
+</dl>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quero</th><th>Escreva</th></tr>
+<tr><td>Grade de linhas simples (o mais comum)</td><td><code>table { border-collapse: collapse; }</code> + <code>th, td { border: … }</code></td></tr>
+<tr><td>Só linhas horizontais, visual mais leve</td><td><code>border-collapse: collapse</code> + <code>border-bottom</code> nas células</td></tr>
+<tr><td>Células como "azulejos" separados</td><td><code>border-collapse: separate; border-spacing: 6px;</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>3. Espaço e alinhamento dentro da célula</h2>
+<p>Com as linhas no lugar, o texto fica grudado nelas. O espaço de dentro é o <code>padding</code> (aula <a href="padding.html">Espaço Interno</a>), escrito nas <strong>células</strong>:</p>
+
+<pre class="file" data-file="alinhamento.html" data-resultado>&lt;style&gt;
+  table { border-collapse: collapse; }
+  th, td {
+    border: 1px solid navy;
+    padding: 8px 12px;
+  }
+  th { text-align: left; }
+  .preco { text-align: right; }
+  td { height: 48px; }
+  .topo { vertical-align: top; }
+&lt;/style&gt;
+&lt;table&gt;
+  &lt;tr&gt;&lt;th&gt;Produto&lt;/th&gt;&lt;th&gt;Preço&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td class="topo"&gt;Bolo (vertical-align: top)&lt;/td&gt;&lt;td class="preco"&gt;R$ 35,00&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Pão de queijo (middle, o padrão)&lt;/td&gt;&lt;td class="preco"&gt;R$ 2,50&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>padding: 8px 12px</dt><dd>8px em cima e embaixo, 12px nas laterais.</dd>
+  <dt>text-align</dt><dd>Alinhamento na <strong>horizontal</strong>: <code>left</code>, <code>center</code>, <code>right</code> (aula <a href="text-align.html">Alinhamento</a>). Na tabela, textos ficam melhor à esquerda e <strong>números à direita</strong>, para as casas decimais se alinharem.</dd>
+  <dt>vertical-align</dt><dd>Alinhamento na <strong>vertical</strong>, dentro da altura da célula: <code>top</code>, <code>middle</code> (o padrão) ou <code>bottom</code>.</dd>
+</dl>
+
+<div class="tryhtml" data-goal="css:table{border-collapse}=collapse,css:td{border-top-style}=solid,css:th{border-top-style}=solid,css:td{padding-left}=8px">
+<p class="try-task"><strong>Missão:</strong> dê à tabela de preços linhas simples (<code>1px solid</code>, a cor que quiser) em volta de todas as células, de cabeçalho e comuns, e <code>8px</code> de espaço dentro de cada célula.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;table&gt;
+  &lt;tr&gt;&lt;th&gt;Produto&lt;/th&gt;&lt;th&gt;Preço&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Bolo de cenoura&lt;/td&gt;&lt;td&gt;R$ 35,00&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Pão de queijo&lt;/td&gt;&lt;td&gt;R$ 2,50&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+</pre>
+<pre class="script" data-file="style.css">table {
+
+}
+
+th, td {
+
+}
+</pre>
+<pre class="solucao" data-file="style.css">table {
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid navy;
+  padding: 8px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>4. Cabeçalho colorido e listras (zebra)</h2>
+<p>Numa tabela comprida, o olho se perde ao seguir uma linha da esquerda para a direita. Duas ajudas clássicas: um <strong>cabeçalho</strong> que se destaca e <strong>listras</strong>, uma linha sim, outra não, com um fundo levemente diferente.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque <code>even</code> (pares) por <code>odd</code> (ímpares) e veja as listras mudarem de linha. Depois troque o <code>#eeeeee</code> por <code>#fde8e1</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;table class="precos"&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;&lt;th&gt;Produto&lt;/th&gt;&lt;th&gt;Preço&lt;/th&gt;&lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;&lt;td&gt;Bolo de cenoura&lt;/td&gt;&lt;td&gt;R$ 35,00&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Bolo de fubá&lt;/td&gt;&lt;td&gt;R$ 30,00&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Pão de queijo&lt;/td&gt;&lt;td&gt;R$ 2,50&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Brigadeiro&lt;/td&gt;&lt;td&gt;R$ 3,00&lt;/td&gt;&lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+</pre>
+<pre class="script" data-file="style.css">.precos {
+  border-collapse: collapse;
+}
+
+.precos th,
+.precos td {
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.precos th {
+  background-color: navy;
+  color: white;
+}
+
+.precos tbody tr:nth-child(even) {
+  background-color: #eeeeee;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>.precos th</dt><dd>As células de cabeçalho: fundo azul-marinho (<code>navy</code>) e letra branca, com bom contraste.</dd>
+  <dt>tbody tr</dt><dd>As linhas do <strong>corpo</strong> da tabela. Usar o <code>tbody</code> no seletor deixa a linha do cabeçalho fora da contagem.</dd>
+  <dt>:nth-child(even)</dt><dd>"O filho de número par": a 2ª, a 4ª, a 6ª linha… <code>odd</code> são as ímpares. A aula <a href="nth-child.html">:nth-child</a> mostra todas as contas possíveis.</dd>
+  <dt>background-color</dt><dd>O fundo da linha inteira (aula <a href="background-color.html">Cor de Fundo</a>). Um cinza bem claro basta: listra forte cansa a vista.</dd>
+</dl>
+
+<div class="tip">
+<strong>Destacar a linha sob o mouse</strong>
+<p>Com <code>.precos tbody tr:hover { background-color: #fff3c4; }</code>, a linha em que o mouse está fica amarelada. Ajuda a ler tabelas largas no computador (no celular não há mouse). Os estados <code>:hover</code> e companhia estão na aula <a href="hover-focus.html">Estados</a>.</p>
+</div>
+
+<hr>
+
+<h2>5. A legenda e a largura</h2>
+<p>O <code>&lt;caption&gt;</code>, o título da tabela, aparece em cima por padrão. Com <code>caption-side: bottom</code> ele vai para baixo. E <code>width: 100%</code> faz a tabela ocupar a largura toda do espaço disponível, em vez de só o tamanho do conteúdo:</p>
+
+<pre class="file" data-file="legenda.html" data-resultado>&lt;style&gt;
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  caption {
+    caption-side: bottom;
+    font-style: italic;
+    padding-top: 6px;
+  }
+  th, td {
+    border-bottom: 1px solid #cccccc;
+    padding: 8px;
+    text-align: left;
+  }
+&lt;/style&gt;
+&lt;table&gt;
+  &lt;caption&gt;Preços de outubro&lt;/caption&gt;
+  &lt;tr&gt;&lt;th&gt;Produto&lt;/th&gt;&lt;th&gt;Preço&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Bolo de cenoura&lt;/td&gt;&lt;td&gt;R$ 35,00&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+</pre>
+
+<p>Repare também no estilo "só linhas horizontais": um <code>border-bottom</code> em cada célula, sem bordas verticais. É o visual mais comum em sites hoje.</p>
+
+<h3>Tabela larga no celular</h3>
+<p>Uma tabela com muitas colunas não cabe numa tela estreita. O navegador primeiro aperta as colunas e quebra o texto; quando não dá mais, a tabela passa da borda e a página inteira ganha rolagem para o lado. A saída é pôr a tabela dentro de uma <code>&lt;div&gt;</code> que rola sozinha:</p>
+
+<pre class="file" data-file="rolagem.html" data-resultado>&lt;style&gt;
+  .tabela-rolagem {
+    max-width: 260px;
+    overflow-x: auto;
+    border: 1px dashed gray;
+  }
+  td { white-space: nowrap; padding: 4px 8px; }
+&lt;/style&gt;
+&lt;div class="tabela-rolagem"&gt;
+  &lt;table&gt;
+    &lt;tr&gt;&lt;td&gt;Bolo de cenoura&lt;/td&gt;&lt;td&gt;R$ 35,00&lt;/td&gt;&lt;td&gt;Encomenda com 2 dias&lt;/td&gt;&lt;td&gt;Serve 12&lt;/td&gt;&lt;/tr&gt;
+  &lt;/table&gt;
+&lt;/div&gt;
+</pre>
+
+<p>O <code>max-width: 260px</code> faz o papel da tela estreita do celular. A tabela continua inteira, e só a caixa tracejada rola para o lado (arraste ou use a barra). O <code>overflow-x: auto</code> é o assunto da aula <a href="overflow.html">O que Transborda</a>.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Borda só na tabela: aparece só a moldura</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  table {
+    border: 1px solid navy;
+  }
+&lt;/style&gt;
+&lt;table&gt;
+  &lt;tr&gt;&lt;th&gt;Produto&lt;/th&gt;&lt;th&gt;Preço&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Bolo de cenoura&lt;/td&gt;&lt;td&gt;R$ 35,00&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+</pre>
+<p><strong>O que você vê:</strong> uma moldura em volta da tabela inteira, sem nenhuma linha entre as células.</p>
+<p><strong>Por quê:</strong> a <code>border</code> não é herdada: a borda do <code>&lt;table&gt;</code> é só da caixa da tabela. As células têm as suas próprias bordas, que continuam sem nada.</p>
+<p><strong>Como consertar:</strong> ponha a borda em <code>th, td</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Borda no <code>&lt;tr&gt;</code>: não aparece nada</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  tr {
+    border-bottom: 2px solid tomato;
+  }
+&lt;/style&gt;
+&lt;table&gt;
+  &lt;tr&gt;&lt;td&gt;Bolo de cenoura&lt;/td&gt;&lt;td&gt;R$ 35,00&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Pão de queijo&lt;/td&gt;&lt;td&gt;R$ 2,50&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+</pre>
+<p><strong>O que você vê:</strong> nenhuma linha vermelha.</p>
+<p><strong>Por quê:</strong> no modo padrão (<code>separate</code>), as linhas da tabela (<code>&lt;tr&gt;</code>) <strong>não desenham borda</strong>: só a tabela e as células desenham. O validador não reclama, porque a declaração é válida; ela só não tem efeito ali.</p>
+<p><strong>Como consertar:</strong> ponha <code>border-collapse: collapse</code> na tabela (aí a borda do <code>&lt;tr&gt;</code> aparece), ou ponha o <code>border-bottom</code> nas células (<code>td</code>), que funciona nos dois modos.</p>
+</div>
+
+<div class="cenario">
+<strong><code>collapsed</code> em vez de <code>collapse</code>: as linhas continuam duplas</strong>
+<pre class="file" data-file="style.css · erro de propósito">table {
+  border-collapse: collapsed;
+}
+</pre>
+<p><strong>O que você vê:</strong> nada muda; as bordas continuam duplas. No F12, no painel <em>Styles</em> (Estilos), a declaração aparece riscada, com um ícone de aviso.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":2.20-2.28: error: CSS: “border-collapse”: “collapsed” is not a “border-collapse” value.</pre>
+<p><strong>O que significa:</strong> "<code>collapsed</code> não é um valor de <code>border-collapse</code>". O valor é o verbo, <code>collapse</code>, sem o <code>d</code>. O navegador ignorou a declaração inteira e ficou com o padrão, <code>separate</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>th, td { border: 1px solid navy; }</code></td><td>Linhas em volta de cada célula</td></tr>
+<tr><td><code>table { border-collapse: collapse; }</code></td><td>Junta as bordas vizinhas numa só</td></tr>
+<tr><td><code>table { border-spacing: 6px; }</code></td><td>Espaço entre as células (só no modo <code>separate</code>)</td></tr>
+<tr><td><code>th, td { padding: 8px; }</code></td><td>Espaço dentro da célula</td></tr>
+<tr><td><code>text-align: right;</code></td><td>Alinha na horizontal (números à direita)</td></tr>
+<tr><td><code>vertical-align: top;</code></td><td>Alinha na vertical dentro da célula (padrão <code>middle</code>)</td></tr>
+<tr><td><code>tbody tr:nth-child(even) { background-color: #eeeeee; }</code></td><td>Listras (zebra)</td></tr>
+<tr><td><code>caption { caption-side: bottom; }</code></td><td>Legenda embaixo da tabela</td></tr>
+<tr><td><code>table { width: 100%; }</code></td><td>Tabela na largura toda</td></tr>
+<tr><td><code>.tabela-rolagem { overflow-x: auto; }</code></td><td>Caixa que rola para o lado com a tabela larga</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Linhas simples</h3>
+<p>Complete o valor que junta as bordas duplas:</p>
+<div class="ex-code">table { border-collapse: <input data-answer="collapse" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Linhas pares</h3>
+<p>Complete a palavra que escolhe as linhas pares:</p>
+<div class="ex-code">tbody tr:nth-child(<input data-answer="even" aria-label="pares">) { background-color: #eeeeee; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. No alto da célula</h3>
+<p>Complete a propriedade que põe o texto no alto da célula:</p>
+<div class="ex-code">td { <input data-answer="vertical-align" aria-label="propriedade">: top; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Por que as bordas saem duplas com <code>table, th, td { border: 1px solid; }</code>?</p>
+<label><input type="radio" name="q4"> Porque a borda foi escrita duas vezes</label>
+<label><input type="radio" name="q4"> Porque faltou <code>border-spacing: 2px</code></label>
+<label><input type="radio" name="q4"> Porque, no modo padrão, cada célula tem a sua borda, separada das vizinhas</label>
+<label><input type="radio" name="q4"> Porque o <code>th</code> tem borda grossa</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. A Ana pôs <code>border-bottom</code> no <code>&lt;tr&gt;</code>, e nada apareceu. O que resolve?</p>
+<label><input type="radio" name="q5"> <code>!important</code> no <code>border-bottom</code></label>
+<label><input type="radio" name="q5"> <code>border-collapse: collapse</code> na tabela, ou a borda nas células</label>
+<label><input type="radio" name="q5"> Trocar <code>&lt;tr&gt;</code> por <code>&lt;div&gt;</code></label>
+<label><input type="radio" name="q5"> <code>vertical-align: bottom</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Onde os números de uma tabela de preços ficam mais fáceis de comparar?</p>
+<label><input type="radio" name="q6"> Alinhados à direita</label>
+<label><input type="radio" name="q6"> Centralizados</label>
+<label><input type="radio" name="q6"> Alinhados à esquerda</label>
+<label><input type="radio" name="q6"> Tanto faz</label>
+</div>
+
+<h3>Missão final: a tabela de preços da lojinha</h3>
+
+<div class="tryhtml" data-goal="css:.precos{border-collapse}=collapse,css:.precos th{background-color}=rgb(0, 0, 128),css:.precos th{color}=rgb(255, 255, 255),css:.precos tbody tr:nth-child(2){background-color}=rgb(238, 238, 238),css:.precos tbody tr:nth-child(1){background-color}=rgba(0, 0, 0, 0),css:.precos .preco{text-align}=right">
+<p class="try-task"><strong>Missão:</strong> (1) linhas simples na tabela; (2) cabeçalho com fundo <code>navy</code> e letra <code>white</code>; (3) listras <code>#eeeeee</code> nas linhas <strong>pares</strong> do corpo; (4) preços (<code>class="preco"</code>) alinhados à direita.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;table class="precos"&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;&lt;th&gt;Produto&lt;/th&gt;&lt;th&gt;Preço&lt;/th&gt;&lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;&lt;td&gt;Bolo de cenoura&lt;/td&gt;&lt;td class="preco"&gt;R$ 35,00&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Bolo de fubá&lt;/td&gt;&lt;td class="preco"&gt;R$ 30,00&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Pão de queijo&lt;/td&gt;&lt;td class="preco"&gt;R$ 2,50&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Brigadeiro&lt;/td&gt;&lt;td class="preco"&gt;R$ 3,00&lt;/td&gt;&lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+</pre>
+<pre class="script" data-file="style.css">.precos th,
+.precos td {
+  border-bottom: 1px solid #cccccc;
+  padding: 8px 12px;
+  text-align: left;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.precos {
+  border-collapse: collapse;
+}
+
+.precos th,
+.precos td {
+  border-bottom: 1px solid #cccccc;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.precos th {
+  background-color: navy;
+  color: white;
+}
+
+.precos tbody tr:nth-child(even) {
+  background-color: #eeeeee;
+}
+
+.precos .preco {
+  text-align: right;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Sem CSS, a tabela não tem bordas, o <code>th</code> é negrito e centralizado, as células têm 1px de <code>padding</code> e ficam separadas por 2px (<code>border-spacing</code>).</li>
+  <li>A borda vai nas <strong>células</strong> (<code>th, td</code>); na tabela, ela é só a moldura de fora.</li>
+  <li>No modo padrão (<code>separate</code>) as bordas saem duplas; <code>border-collapse: collapse</code>, na tabela, junta numa linha só.</li>
+  <li><code>padding</code> dá espaço dentro da célula; <code>text-align</code> alinha na horizontal (números à direita) e <code>vertical-align</code> na vertical.</li>
+  <li>Listras: <code>tbody tr:nth-child(even)</code> com um fundo claro. Cabeçalho: fundo escuro e letra clara, com contraste.</li>
+  <li>Tabela larga: dentro de uma <code>&lt;div&gt;</code> com <code>overflow-x: auto</code>.</li>
+  <li>Erros: borda no <code>&lt;tr&gt;</code> só aparece com <code>collapse</code>; <code>collapsed</code> não existe (o validador avisa e o navegador ignora).</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
