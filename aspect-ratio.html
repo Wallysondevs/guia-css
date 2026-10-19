@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Proporção — aspect-ratio | Guia CSS</title>
+<meta name="description" content="Proporção em CSS para quem está começando: aspect-ratio com 16 / 9, 4 / 3 e 1, a altura que se calcula sozinha, miniaturas quadradas com object-fit, os atributos width e height da imagem, o jeito antigo do padding-top, quando a proporção é ignorada e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Proporção</span></h1>
+
+<p class="intro">A Ana quer uma capa no topo do blog que ocupe toda a largura e tenha sempre o formato de uma tela de cinema, no celular e no computador. E quer uma galeria de fotos em que todas as miniaturas sejam quadradas, mesmo as fotos sendo retangulares. Nos dois casos, ela não sabe a largura (muda com a tela), mas sabe o <strong>formato</strong>. A propriedade <code>aspect-ratio</code> ("proporção da imagem") diz exatamente isso: "a altura é tanto da largura", e o navegador calcula o resto.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que é proporção (16 por 9, 4 por 3, quadrado) e como escrever <code>aspect-ratio: 16 / 9</code>.</li>
+  <li>A altura que se calcula sozinha a partir da largura.</li>
+  <li>Miniaturas quadradas com <code>aspect-ratio: 1</code> e <code>object-fit: cover</code>.</li>
+  <li>Por que os atributos <code>width</code> e <code>height</code> da imagem ainda importam.</li>
+  <li>O jeito antigo (<code>padding-top: 56.25%</code>), para você reconhecer.</li>
+  <li>Quando a proporção é ignorada, e as mensagens reais do validador.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="width-height.html">Largura e Altura</a> e <a href="imagens-responsivas.html">Imagens que se Adaptam</a> (o <code>object-fit</code>). Os resultados são desenhados agora pelo seu navegador, e as mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: o formato da foto</h2>
+<p>Na loja de fotos, você não pede "uma foto de 10 centímetros de largura"; você pede um formato: 10 × 15, 15 × 21. Cada formato tem uma <strong>proporção</strong>: a relação entre a largura e a altura. Uma foto 10 × 15 deitada tem proporção 3 por 2: para cada 3 partes de largura, 2 de altura. Se você ampliar, ela continua 3 por 2.</p>
+
+<p>As telas também: a TV e o vídeo do YouTube são <strong>16 por 9</strong>; as fotos de câmera costumam ser <strong>4 por 3</strong> ou <strong>3 por 2</strong>; as do Instagram, <strong>quadradas</strong> (1 por 1). O <code>aspect-ratio</code> dá um formato desses a qualquer caixa.</p>
+
+<hr>
+
+<h2>1. A primeira proporção</h2>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .capa {
+    aspect-ratio: 16 / 9;
+    background-color: gold;
+  }
+&lt;/style&gt;
+&lt;div class="capa"&gt;Capa 16 por 9&lt;/div&gt;
+</pre>
+
+<p>Uma faixa amarela que ocupa toda a largura do quadro, com uma altura de pouco mais da metade da largura. Mude a largura da janela do navegador: a faixa cresce e encolhe, sempre com o mesmo formato.</p>
+
+<dl class="anatomy">
+  <dt>aspect-ratio</dt><dd>A propriedade: <em>aspect</em> = "aspecto", <em>ratio</em> = "razão", "proporção".</dd>
+  <dt>16</dt><dd>A parte da <strong>largura</strong>.</dd>
+  <dt>/</dt><dd>A barra separa largura e altura. Leia "16 por 9". Os espaços em volta são opcionais; o guia usa, por clareza.</dd>
+  <dt>9</dt><dd>A parte da <strong>altura</strong>.</dd>
+</dl>
+
+<p>O <code>&lt;div&gt;</code> não tem <code>height</code>. A largura veio do jeito normal (um bloco ocupa a linha toda), e a altura saiu da conta: largura × 9 ÷ 16. Num quadro de 400 pixels de largura, a altura seria 225 pixels (no Chromium, com <code>body</code> de 400px, o calculado deu <code>225px</code>).</p>
+
+<h3>As proporções mais comuns</h3>
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .linha {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: flex-start;
+    font-family: sans-serif;
+  }
+  .caixa {
+    width: 120px;
+    background-color: tomato;
+    color: white;
+    padding: 4px;
+  }
+  .cinema    { aspect-ratio: 16 / 9; }
+  .foto      { aspect-ratio: 4 / 3; }
+  .quadrado  { aspect-ratio: 1; }
+  .retrato   { aspect-ratio: 3 / 4; }
+  .celular   { aspect-ratio: 9 / 16; }
+&lt;/style&gt;
+&lt;div class="linha"&gt;
+  &lt;div class="caixa cinema"&gt;16 / 9&lt;/div&gt;
+  &lt;div class="caixa foto"&gt;4 / 3&lt;/div&gt;
+  &lt;div class="caixa quadrado"&gt;1&lt;/div&gt;
+  &lt;div class="caixa retrato"&gt;3 / 4&lt;/div&gt;
+  &lt;div class="caixa celular"&gt;9 / 16&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Cinco caixas com a mesma largura, cada uma com uma altura diferente: a 16 / 9 é a mais baixa, deitada; a 1 é um quadrado; a 9 / 16 é a mais alta, em pé, como a tela de um celular.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>Formato</th><th>Onde aparece</th><th>Calculado (<code>getComputedStyle</code>)</th></tr>
+<tr><td><code>16 / 9</code></td><td>deitado, largo</td><td>vídeo, TV, capa</td><td><code>16 / 9</code></td></tr>
+<tr><td><code>4 / 3</code></td><td>deitado</td><td>foto de câmera, as fotos do guia (800 × 600)</td><td><code>4 / 3</code></td></tr>
+<tr><td><code>1</code> (ou <code>1 / 1</code>)</td><td>quadrado</td><td>miniaturas, avatares</td><td><code>1 / 1</code></td></tr>
+<tr><td><code>3 / 4</code>, <code>9 / 16</code></td><td>em pé</td><td>retrato, vídeo de celular</td><td><code>3 / 4</code>, <code>9 / 16</code></td></tr>
+<tr><td><code>auto</code></td><td>o natural do conteúdo (o padrão)</td><td>imagens e vídeos usam o formato do arquivo</td><td><code>auto</code></td></tr>
+</table>
+</div>
+
+<p>Um número sozinho quer dizer "esse número por 1": <code>aspect-ratio: 2</code> é o mesmo que <code>2 / 1</code>. Também valem decimais: <code>1.5</code> = <code>3 / 2</code>.</p>
+
+<div class="tryhtml" data-goal="css:.capa{aspect-ratio}=16 / 9">
+<p class="try-task"><strong>Missão:</strong> a capa do blog tem uma imagem de fundo, mas não aparece: o <code>&lt;div&gt;</code> está vazio e por isso tem altura zero. Dê a ele a proporção <code>16 / 9</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="capa"&gt;&lt;/div&gt;
+&lt;h1&gt;Blog da Ana&lt;/h1&gt;
+</pre>
+<pre class="script" data-file="style.css">.capa {
+  background-image: url("assets/midia/bolo-800.jpg");
+  background-size: cover;
+  background-position: center;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.capa {
+  aspect-ratio: 16 / 9;
+  background-image: url("assets/midia/bolo-800.jpg");
+  background-size: cover;
+  background-position: center;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. Miniaturas quadradas: aspect-ratio + object-fit</h2>
+<p>As fotos do guia são 4 por 3. Para uma galeria de quadradinhos, dá vontade de só pôr <code>aspect-ratio: 1</code> na imagem. Veja o que acontece, e o conserto:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .mini {
+    width: 150px;
+    aspect-ratio: 1;
+  }
+  .cortada {
+    object-fit: cover;
+  }
+&lt;/style&gt;
+&lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura" width="150"&gt;
+&lt;img class="mini" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura, achatado"&gt;
+&lt;img class="mini cortada" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura, recortado em quadrado"&gt;
+</pre>
+
+<p>A primeira é a foto original, deitada. A segunda virou um quadrado, mas o bolo ficou <strong>espremido</strong>: mais estreito e mais alto que o de verdade. A terceira também é um quadrado, e o bolo mantém o formato: as laterais da foto foram cortadas.</p>
+
+<p>O <code>aspect-ratio</code> muda o tamanho da <strong>caixa</strong> da imagem. Por padrão, a foto estica para preencher a caixa nova (é o <code>object-fit: fill</code>). O <code>object-fit: cover</code> ("cobrir") diz: preencha a caixa sem deformar, cortando o que sobrar. Por isso, em imagens, os dois andam juntos.</p>
+
+<hr>
+
+<h2>3. Os atributos width e height da imagem</h2>
+<p>Uma imagem leva um tempo para chegar. Enquanto isso, o navegador não sabe o tamanho dela, e o texto embaixo "pula" quando a foto aparece. Os atributos <code>width</code> e <code>height</code> do HTML resolvem: com eles, o navegador já sabe o formato antes de a foto chegar.</p>
+
+<pre class="file" data-file="index.html">&lt;img src="bolo-800.jpg" alt="Bolo de cenoura" width="800" height="600"&gt;
+</pre>
+
+<pre class="file" data-file="style.css">img {
+  max-width: 100%;
+  height: auto;
+}
+</pre>
+
+<p>Por dentro, o navegador transforma os dois atributos numa proporção. No Chromium, essa imagem tem o <code>aspect-ratio</code> calculado <code>auto 800 / 600</code>: "use o formato do arquivo; enquanto ele não chegar, 800 por 600". Com o CSS acima, a imagem encolhe para caber na tela, a altura (<code>auto</code>) acompanha, e o espaço certo fica reservado desde o começo. Com <code>style="width: 200px"</code>, a altura calculada deu <code>150px</code> (4 por 3).</p>
+
+<div class="tip">
+<p><strong>Ponha sempre <code>width</code> e <code>height</code> nas imagens</strong>, com o tamanho real do arquivo, mesmo que o CSS mude o tamanho delas. A página para de "pular" enquanto carrega, e o Google mede isso (a métrica se chama CLS, "mudança de layout acumulada").</p>
+</div>
+
+<h3>auto com uma proporção</h3>
+<p>O valor <code>aspect-ratio: auto 4 / 3</code> é o mesmo que o navegador cria com os atributos: em imagens e vídeos, vale o formato do arquivo depois que ele carrega, e o <code>4 / 3</code> só vale enquanto ele não chega. Num <code>&lt;div&gt;</code>, que não tem "formato do arquivo", vale o <code>4 / 3</code>.</p>
+
+<hr>
+
+<h2>4. Quando a proporção é ignorada</h2>
+<p>O <code>aspect-ratio</code> calcula <strong>um</strong> lado a partir do outro. Se você já deu os dois, não sobra conta para fazer:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .caixa {
+    display: inline-block;
+    width: 100px;
+    margin: 4px;
+    vertical-align: top;
+    background-color: lightgreen;
+    font-family: sans-serif;
+  }
+  .so-largura {
+    aspect-ratio: 1;
+  }
+  .as-duas {
+    height: 50px;
+    aspect-ratio: 1;
+  }
+  .texto-grande {
+    aspect-ratio: 1;
+  }
+&lt;/style&gt;
+&lt;div class="caixa so-largura"&gt;quadrado&lt;/div&gt;
+&lt;div class="caixa as-duas"&gt;height: 50px&lt;/div&gt;
+&lt;div class="caixa texto-grande"&gt;Bolo de cenoura com cobertura de chocolate, receita da vó Ana, rende 12 fatias e fica pronto em 50 minutos.&lt;/div&gt;
+</pre>
+
+<p>A primeira caixa é um quadrado de 100 × 100. A segunda tem <code>width</code> e <code>height</code>: ficou 100 × 50, e o <code>aspect-ratio</code> não fez nada. A terceira deveria ser um quadrado, mas o texto não cabe em 100 pixels de altura, e a caixa <strong>cresceu</strong> para caber o texto (no Chromium, 180 pixels): o navegador prefere não cortar o conteúdo. Para manter o quadrado e rolar o texto, use <code>overflow: auto</code> (aula <a href="overflow.html">overflow</a>); com ele, a altura ficou nos 100 pixels.</p>
+
+<hr>
+
+<h2>5. O jeito antigo: padding-top em porcentagem</h2>
+<p>Antes do <code>aspect-ratio</code>, que funciona em todos os navegadores desde 2021, a proporção era feita com um truque que você vai ver em muito código por aí:</p>
+
+<pre class="file" data-file="style.css · jeito antigo">.video-antigo {
+  position: relative;
+  height: 0;
+  padding-top: 56.25%;   /* 9 ÷ 16 = 0,5625 */
+}
+
+.video-antigo iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+</pre>
+
+<p>O truque usa uma regra curiosa: o <code>padding</code> em porcentagem é calculado sobre a <strong>largura</strong> do pai, mesmo o de cima. Então <code>padding-top: 56.25%</code> cria um espaço com altura de 56,25% da largura: 16 por 9. Como o espaço é preenchimento, o conteúdo precisa ser posto por cima com <code>position: absolute</code>. Funciona, mas é difícil de ler. Hoje, o mesmo é:</p>
+
+<pre class="file" data-file="style.css">.video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+</pre>
+
+<div class="note">
+<p><strong>Suporte:</strong> o <code>aspect-ratio</code> funciona em todos os navegadores atuais desde setembro de 2021 (o MDN o marca como <em>Baseline: amplamente disponível</em>). Use o truque do <code>padding-top</code> só se precisar atender navegadores de antes disso.</p>
+</div>
+
+<hr>
+
+<h2>6. Formas diferentes de dar formato</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Exemplo</th><th>Quando usar</th></tr>
+<tr><td><code>width</code> e <code>height</code> fixos</td><td><code>width: 300px; height: 200px;</code></td><td>Quando o tamanho nunca muda. Não acompanha a tela.</td></tr>
+<tr><td><code>aspect-ratio</code></td><td><code>width: 100%; aspect-ratio: 3 / 2;</code></td><td>Quando a largura muda (responsivo) e o formato tem de ficar. É o jeito de hoje.</td></tr>
+<tr><td>Atributos <code>width</code>/<code>height</code> no <code>&lt;img&gt;</code></td><td><code>&lt;img … width="800" height="600"&gt;</code> + <code>height: auto</code></td><td>Sempre, em toda imagem: reserva o espaço antes de carregar.</td></tr>
+<tr><td><code>aspect-ratio</code> + <code>object-fit: cover</code></td><td>miniaturas</td><td>Fotos de formatos diferentes num formato só, sem deformar.</td></tr>
+<tr><td><code>padding-top</code> em %</td><td><code>padding-top: 56.25%</code></td><td>Só para reconhecer em código antigo.</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong><code>error: CSS: Parse Error.</code> — <code>16:9</code> com dois-pontos</strong>
+<p><strong>O que aconteceu:</strong> <code>aspect-ratio: 16:9;</code>, do jeito que se fala "dezesseis por nove" nas configurações de vídeo.</p>
+<pre class="term" data-cwd="~/proporcao">$ vnu --css dois-pontos.css
+"file:/home/ana/proporcao/dois-pontos.css":2.22-2.22: error: CSS: Parse Error.
+"file:/home/ana/proporcao/dois-pontos.css":3.2-4.1: error: CSS: Parse Error.</pre>
+<p>O validador nem consegue ler a linha. No navegador, a declaração é ignorada (o calculado fica <code>auto</code>): a caixa volta a ter a altura do conteúdo, e um <code>&lt;div&gt;</code> vazio some.</p>
+<p><strong>Como consertar:</strong> barra, e não dois-pontos: <code>aspect-ratio: 16 / 9;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “aspect-ratio”: “9px” is not a “aspect-ratio” value.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>aspect-ratio: 16 / 9px;</code>. A proporção não tem unidade: são só números.</p>
+<pre class="term" data-cwd="~/proporcao">$ vnu --css unidade.css
+"file:/home/ana/proporcao/unidade.css":2.22-2.24: error: CSS: “aspect-ratio”: “9px” is not a “aspect-ratio” value.</pre>
+<p><strong>Como consertar:</strong> <code>aspect-ratio: 16 / 9;</code>. Para tamanhos em pixels, use <code>width</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “aspect-ratio”: “9” is not a “aspect-ratio” value.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>aspect-ratio: 16 9;</code>, sem a barra.</p>
+<pre class="term" data-cwd="~/proporcao">$ vnu --css sem-barra.css
+"file:/home/ana/proporcao/sem-barra.css":2.20-2.20: error: CSS: “aspect-ratio”: “9” is not a “aspect-ratio” value.</pre>
+<p><strong>Como consertar:</strong> a barra entre os dois números é obrigatória.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “aspect-ratio”: “56.25%” is not a “aspect-ratio” value.</code></strong>
+<p><strong>O que aconteceu:</strong> a Ana misturou o jeito antigo com o novo: <code>aspect-ratio: 56.25%;</code>.</p>
+<pre class="term" data-cwd="~/proporcao">$ vnu --css porcentagem.css
+"file:/home/ana/proporcao/porcentagem.css":2.17-2.22: error: CSS: “aspect-ratio”: “56.25%” is not a “aspect-ratio” value.</pre>
+<p><strong>Como consertar:</strong> escreva a proporção, não a porcentagem: <code>16 / 9</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>A foto ficou espremida</strong>
+<p><strong>O que aconteceu:</strong> <code>aspect-ratio: 1</code> numa foto deitada, sem <code>object-fit</code> (seção 2). O validador não reclama: não há erro de escrita.</p>
+<p><strong>Como consertar:</strong> <code>object-fit: cover;</code> (corta as sobras) ou <code>contain</code> (mostra a foto inteira, com faixas vazias).</p>
+</div>
+
+<div class="cenario">
+<strong>Pus aspect-ratio e nada mudou</strong>
+<p><strong>O que aconteceu:</strong> o elemento já tinha <code>width</code> e <code>height</code> (seção 4), ou o conteúdo era maior que a proporção permitia, e a caixa cresceu.</p>
+<p><strong>Como consertar:</strong> deixe um dos lados livre (tire o <code>height</code>, ou use <code>height: auto</code>); para o conteúdo grande, <code>overflow: auto</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Código</th><th>O que faz</th></tr>
+<tr><td><code>aspect-ratio: 16 / 9;</code></td><td>Largura por altura: a altura sai da largura</td></tr>
+<tr><td><code>aspect-ratio: 1;</code></td><td>Quadrado (calculado: <code>1 / 1</code>)</td></tr>
+<tr><td><code>aspect-ratio: auto;</code></td><td>O formato natural do conteúdo (o padrão)</td></tr>
+<tr><td><code>aspect-ratio: auto 4 / 3;</code></td><td>Imagem/vídeo: o formato do arquivo; até carregar (ou num <code>div</code>), 4 / 3</td></tr>
+<tr><td><code>aspect-ratio: 1; object-fit: cover;</code></td><td>Miniatura quadrada sem deformar</td></tr>
+<tr><td><code>&lt;img width="800" height="600"&gt;</code> + <code>height: auto</code></td><td>Reserva o espaço da imagem antes de carregar</td></tr>
+<tr><td><code>width</code> + <code>height</code> + <code>aspect-ratio</code></td><td>A proporção é ignorada</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Formato de vídeo</h3>
+<p>Complete com o formato de vídeo do YouTube:</p>
+<div class="ex-code">.video { aspect-ratio: <input data-answer="16 / 9|16/9" aria-label="proporção">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Sem deformar</h3>
+<p>Complete para a foto preencher o quadrado sem ficar espremida:</p>
+<div class="ex-code">.mini { aspect-ratio: 1; object-fit: <input data-answer="cover" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. Uma caixa tem <code>width: 400px</code> e <code>aspect-ratio: 4 / 3</code>. Qual é a altura dela?</p>
+<label><input type="radio" name="q3"> 400px</label>
+<label><input type="radio" name="q3"> 533px</label>
+<label><input type="radio" name="q3"> 300px</label>
+<label><input type="radio" name="q3"> 0px</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">4. Qual destas declarações é válida?</p>
+<label><input type="radio" name="q4"> <code>aspect-ratio: 3 / 2;</code></label>
+<label><input type="radio" name="q4"> <code>aspect-ratio: 3:2;</code></label>
+<label><input type="radio" name="q4"> <code>aspect-ratio: 3px / 2px;</code></label>
+<label><input type="radio" name="q4"> <code>aspect-ratio: 66%;</code></label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. A caixa tem <code>width: 100px; height: 50px; aspect-ratio: 1;</code>. Como ela fica?</p>
+<label><input type="radio" name="q5"> 100 × 100: o <code>aspect-ratio</code> vence</label>
+<label><input type="radio" name="q5"> 100 × 50: com os dois lados definidos, a proporção é ignorada</label>
+<label><input type="radio" name="q5"> 50 × 50</label>
+<label><input type="radio" name="q5"> Ela some</label>
+</div>
+
+<h3>Missão final: a galeria de quadradinhos</h3>
+
+<div class="tryhtml" data-goal="css:.galeria img{aspect-ratio}=1 / 1,css:.galeria img{object-fit}=cover,nsrc:height\s*:">
+<p class="try-task"><strong>Missão:</strong> as três fotos da galeria têm formatos diferentes. Deixe todas quadradas, com <code>aspect-ratio</code>, e sem deformar, com <code>object-fit</code>. Não use <code>height</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="galeria"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura inteiro" width="400" height="300"&gt;
+  &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo de cenoura de perto" width="400" height="400"&gt;
+  &lt;img src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana" width="400" height="250"&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.galeria img {
+  width: 140px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.galeria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.galeria img {
+  width: 140px;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+</pre>
+</div>
+
+<p>Repare que os atributos <code>width</code> e <code>height</code> continuam no HTML: eles reservam o espaço enquanto as fotos carregam, e o CSS decide o tamanho final.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>aspect-ratio: largura / altura</code> dá um formato à caixa: um lado é calculado a partir do outro. <code>16 / 9</code> (vídeo), <code>4 / 3</code> (foto), <code>1</code> (quadrado).</li>
+  <li>Em imagens, use junto <code>object-fit: cover</code>, ou a foto estica e deforma.</li>
+  <li>Os atributos <code>width</code> e <code>height</code> do <code>&lt;img&gt;</code> viram uma proporção (<code>auto 800 / 600</code>) e reservam o espaço antes de a foto chegar.</li>
+  <li>Com <code>width</code> e <code>height</code> definidos, a proporção é ignorada; com conteúdo grande, a caixa cresce (use <code>overflow</code>).</li>
+  <li>O truque antigo era <code>padding-top: 56.25%</code>. Hoje, <code>aspect-ratio</code>, Baseline desde 2021.</li>
+  <li>Erros: <code>16:9</code> (Parse Error), <code>9px</code>, <code>16 9</code> e <code>56.25%</code> não são proporções: o navegador ignora a declaração.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
