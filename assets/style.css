@@ -587,7 +587,8 @@ pre.term {
   border-bottom: 3px solid;
   border-radius: 4px 4px 0 0;
   color: #fff;
-  white-space: pre;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 .anat-parte::after {
   content: attr(data-n);
