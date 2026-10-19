@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS DevTools — inspecionando estilos com o F12 | Guia CSS</title>
+<meta name="description" content="As ferramentas do desenvolvedor (F12) para quem está começando em CSS: abrir, o painel Elements, o painel Styles com as regras de cada elemento, a declaração riscada (vencida ou inválida), editar ao vivo, o painel Computed com os valores finais e o console com o CSS que não carregou.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">DevTools (F12)</span></h1>
+
+<p class="intro">O CSS não mostra mensagens de erro na tela. Então como descobrir por que o título não ficou azul? Todo navegador de computador traz uma ferramenta para isso: as <strong>ferramentas do desenvolvedor</strong> (em inglês, <em>DevTools</em>), que abrem com a tecla <kbd>F12</kbd>. Com elas você clica em qualquer pedaço da página e vê quais regras de CSS chegaram até ele, quais perderam, quais o navegador ignorou, e ainda pode mudar o CSS ao vivo. Nesta aula você vai conhecer os quatro lugares que mais vai usar.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A abrir o F12 e a escolher um elemento da página para inspecionar.</li>
+  <li>O painel <strong>Elements</strong> (o HTML) e o painel <strong>Styles</strong> (as regras de CSS do elemento).</li>
+  <li>Os dois motivos para uma declaração aparecer <strong>riscada</strong>: perdeu para outra regra, ou o navegador não a entendeu.</li>
+  <li>A mudar o CSS ao vivo, e por que essas mudanças somem ao recarregar.</li>
+  <li>O painel <strong>Computed</strong>, com o valor final de cada propriedade, e o <strong>Console</strong>, que avisa quando o arquivo de CSS não carregou.</li>
+</ul>
+</div>
+
+<div class="note">
+<strong>Sobre os nomes nesta aula</strong>
+<p>Cada navegador desenha as suas ferramentas de um jeito, e elas mudam um pouco a cada versão. Esta aula usa os nomes em inglês do Chrome e do Edge (que têm as mesmas ferramentas). No Firefox, o painel Elements se chama Inspector, e o Styles se chama Rules. Se o seu navegador estiver em português, os nomes aparecem traduzidos. As ideias são as mesmas em todos. As figuras desta página são <strong>ilustrações</strong>, e não fotos do F12.</p>
+</div>
+
+<hr>
+
+<h2>A ideia: o raio-X da página</h2>
+<p>Olhando a página, você vê o resultado: o título preto. O F12 é um raio-X: mostra por dentro <strong>por que</strong> ele está preto. Lá aparece a regra que você escreveu, a regra padrão do navegador, a declaração que perdeu a disputa e a que tinha um erro de digitação. Em vez de adivinhar, você olha.</p>
+
+<hr>
+
+<h2>1. Abrir as ferramentas</h2>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Como</th><th>Windows e Linux</th><th>Mac</th></tr>
+<tr><td>Abrir e fechar</td><td><kbd>F12</kbd> ou <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></td><td><kbd>Cmd</kbd>+<kbd>Option</kbd>+<kbd>I</kbd></td></tr>
+<tr><td>Abrir já escolhendo um elemento com o mouse</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd></td><td><kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd></td></tr>
+<tr><td>Pelo mouse</td><td colspan="2">Clique com o botão direito no elemento e escolha <strong>Inspecionar</strong> (em inglês, <em>Inspect</em>)</td></tr>
+</table>
+</div>
+
+<p>O jeito do botão direito é o melhor para começar: as ferramentas abrem com o elemento em que você clicou já escolhido. Elas aparecem num painel ao lado ou embaixo da página (dá para mudar a posição).</p>
+<p>Funciona no Chrome, no Edge e no Firefox. No Safari, do Mac, as ferramentas do desenvolvedor precisam ser ativadas antes, nas configurações avançadas do Safari. No celular, não há F12: as ferramentas são para o computador.</p>
+
+<div class="tip">
+<strong>No editor deste guia</strong>
+<p>O quadro de resultado de cada caixa é uma página dentro da página (um <code>&lt;iframe&gt;</code>). O botão direito → <strong>Inspecionar</strong> em cima do resultado abre o F12 direto no elemento de dentro do quadro, com o CSS que você escreveu na aba <code>style.css</code>. Experimente nas caixas desta aula.</p>
+</div>
+
+<hr>
+
+<h2>2. Elements: o HTML como o navegador montou</h2>
+<p>O painel <strong>Elements</strong> mostra o HTML da página em forma de árvore: o <code>&lt;html&gt;</code>, dentro dele o <code>&lt;head&gt;</code> e o <code>&lt;body&gt;</code>, e assim por diante. As setinhas abrem e fecham cada elemento.</p>
+<ul>
+  <li>Passe o mouse sobre uma linha: o elemento correspondente fica <strong>destacado</strong> na página, com cores mostrando o conteúdo, o espaço interno e a margem.</li>
+  <li>Clique numa linha: esse elemento passa a ser o <strong>selecionado</strong>, e o resto das ferramentas mostra informações sobre ele.</li>
+</ul>
+<p>Um detalhe importante: o que aparece ali não é o seu arquivo, e sim o HTML <strong>como o navegador montou</strong>, já com os consertos que ele fez (um <code>&lt;/p&gt;</code> que faltava, um <code>&lt;tbody&gt;</code> que ele acrescentou). Se a árvore está diferente do seu código, o seu HTML tem algum problema; confira no validador.</p>
+
+<hr>
+
+<h2>3. Styles: as regras do elemento escolhido</h2>
+<p>Ao lado (ou embaixo) do Elements fica o painel <strong>Styles</strong>. Ele lista <strong>todas</strong> as regras de CSS que pegam o elemento selecionado, com as que vencem por cima. Para este CSS:</p>
+
+<pre class="file" data-file="style.css">h1 {
+  color: navy;
+}
+
+p {
+  color: dimgray;
+}
+
+h1 {
+  color: teal;
+  text-align: centre;
+}
+</pre>
+
+<p>selecionando o <code>&lt;h1&gt;</code>, o painel Styles mostra algo assim:</p>
+
+<figure>
+<div class="ex-code">h1 {                              style.css:9
+  color: teal;
+  <s>text-align: centre;</s>  ⚠
+}
+
+h1 {                              style.css:1
+  <s>color: navy;</s>
+}
+
+h1 {                   user agent stylesheet
+  display: block;
+  font-weight: bold;
+  …
+}</div>
+<figcaption>Ilustração do painel Styles com o <code>&lt;h1&gt;</code> selecionado (no F12 de verdade, as cores e os ícones são outros).</figcaption>
+</figure>
+
+<p>O que cada parte quer dizer:</p>
+<dl class="anatomy">
+  <dt>style.css:9</dt><dd>De onde vem a regra: o arquivo e a <strong>linha</strong>. É um link: clicar nele abre o arquivo naquela linha. A regra do <code>p</code> não aparece, porque não pega o <code>h1</code>.</dd>
+  <dt>user agent stylesheet</dt><dd>A folha de estilo padrão do navegador (aula <a href="html-e-css.html">HTML e CSS</a>). É dela que vem o título grande e em negrito. Ela fica por último: qualquer regra sua vence.</dd>
+  <dt>color: <s>navy</s></dt><dd><strong>Riscada sem aviso:</strong> a declaração é válida, mas <strong>perdeu</strong>. Outra regra mais forte (aqui, a do <code>teal</code>, que vem depois no arquivo) define a mesma propriedade. Quem vence e por quê: <a href="cascata.html">A Cascata</a>.</dd>
+  <dt><s>text-align: centre</s> ⚠</dt><dd><strong>Riscada com um ícone de aviso:</strong> o navegador <strong>não entendeu</strong> a declaração e a ignorou. <code>centre</code> é a grafia britânica; o CSS só conhece <code>center</code>. Passe o mouse no ícone: o navegador diz se o problema é a propriedade ou o valor.</dd>
+</dl>
+
+<p>Essa é a pergunta que o Styles responde: <strong>"minha declaração chegou até o elemento?"</strong></p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>No painel Styles, a declaração…</th><th>Quer dizer</th><th>O que fazer</th></tr>
+<tr><td>Aparece normal</td><td>Está valendo</td><td>Nada</td></tr>
+<tr><td>Aparece riscada, sem aviso</td><td>Perdeu para outra regra</td><td>Procure, mais acima no painel, quem define a mesma propriedade (<a href="especificidade.html">Especificidade</a>)</td></tr>
+<tr><td>Aparece riscada, com ícone de aviso</td><td>Propriedade ou valor inválido</td><td>Confira a grafia (ou rode o validador)</td></tr>
+<tr><td>Não aparece</td><td>A regra não pega este elemento, ou o arquivo nem carregou</td><td>Confira o seletor (<a href="seletores.html">Seletores</a>) e o Console (seção 6)</td></tr>
+</table>
+</div>
+
+<div class="tryhtml" data-goal="css:h1{text-align}=center,css:h1{color}=rgb(0, 128, 128)">
+<p class="try-task"><strong>Missão:</strong> o título devia estar centralizado. Clique com o botão direito no título do resultado, escolha <strong>Inspecionar</strong> e procure a declaração riscada com o aviso no painel Styles. Depois conserte o valor na aba <code>style.css</code> desta caixa.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: teal;
+  text-align: centre;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: teal;
+  text-align: center;
+}
+</pre>
+</div>
+
+<h3>Os estilos herdados</h3>
+<p>Mais abaixo no Styles aparecem, separadas, regras de <strong>outros</strong> elementos, os "pais" do selecionado (por exemplo, a regra do <code>body</code>). Elas estão ali porque algumas propriedades, como a fonte e a cor do texto, passam do pai para os filhos. Lá, só as propriedades herdáveis aparecem normais; as outras ficam apagadas. Aula <a href="heranca.html">Herança</a>.</p>
+
+<hr>
+
+<h2>4. Editar ao vivo</h2>
+<p>O painel Styles não é só para ler. Dá para mexer no CSS e ver a página mudar na hora:</p>
+<ul>
+  <li><strong>Mudar um valor:</strong> clique no valor (<code>teal</code>), digite outro e aperte <kbd>Enter</kbd>. Em números, as setas <kbd>↑</kbd> e <kbd>↓</kbd> do teclado aumentam e diminuem o valor.</li>
+  <li><strong>Desligar uma declaração:</strong> passe o mouse sobre ela; aparece uma caixinha de marcar ao lado. Desmarcada, a declaração fica desligada, como se estivesse num comentário (aula <a href="comentarios.html">Comentários</a>).</li>
+  <li><strong>Acrescentar uma declaração:</strong> clique no espaço vazio dentro da regra, perto da <code>}</code>, e digite a propriedade, <kbd>Tab</kbd>, o valor.</li>
+</ul>
+
+<div class="warning">
+<strong>As mudanças no F12 são temporárias</strong>
+<p>Você mudou o CSS <strong>na cópia que o navegador tem na memória</strong>, e não no seu arquivo. Ao recarregar a página, tudo volta. O F12 é o lugar de experimentar; quando achar o valor certo, <strong>copie para o <code>style.css</code></strong> e salve.</p>
+</div>
+
+<p>Isso também quer dizer que você pode mexer em qualquer site do mundo sem estragar nada: abra o F12 num site de notícias, troque a cor do título, recarregue, e ele volta ao normal. É um jeito ótimo de aprender olhando o CSS dos outros.</p>
+
+<hr>
+
+<h2>5. Computed: o valor final</h2>
+<p>O Styles mostra as regras como foram <strong>escritas</strong>, inclusive as que perderam. O painel <strong>Computed</strong> ("calculado") mostra só o <strong>resultado final</strong>: para cada propriedade, o valor que o navegador está usando, depois de resolver a disputa entre as regras, a herança e as conversões.</p>
+<p>Os valores ali já vêm convertidos: as cores aparecem como <code>rgb(…)</code> (o <code>teal</code> vira <code>rgb(0, 128, 128)</code>), os tamanhos em pixels (o <code>2em</code> do <code>&lt;h1&gt;</code> padrão vira <code>32px</code>) e o <code>bold</code> vira <code>700</code>. Há uma caixa de busca para filtrar a lista (digite <code>color</code>) e, ao abrir uma propriedade, aparece qual regra deu aquele valor.</p>
+<p>Esses mesmos valores finais estão disponíveis para o JavaScript, com <code>getComputedStyle()</code>. Uma curiosidade, para conferir no console do editor:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o console embaixo do resultado mostra os valores calculados do título. Troque <code>teal</code> por <code>tomato</code> na aba <code>style.css</code> e veja o valor mudar para <code>rgb(255, 99, 71)</code>. O tamanho é o padrão do navegador, já convertido em pixels.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;script&gt;
+  const titulo = document.querySelector("h1");
+  console.log(getComputedStyle(titulo).color);
+  console.log(getComputedStyle(titulo).fontSize);
+&lt;/script&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: teal;
+}
+</pre>
+</div>
+
+<p>No mesmo painel Computed, o Chrome mostra um desenho de caixas com a margem, a borda, o espaço interno e o tamanho do elemento (no Firefox, ele fica num painel chamado Layout). Ele vai ser útil na aula <a href="box-model.html">O Modelo de Caixa</a>.</p>
+
+<hr>
+
+<h2>6. Console: o CSS que não carregou</h2>
+<p>Se a regra nem aparece no Styles, talvez o arquivo de CSS nem tenha chegado. A aba <strong>Console</strong> do F12 mostra os arquivos que falharam. Num site publicado, com o <code>&lt;link&gt;</code> pedindo um <code>estilo.css</code> que não existe, o Chromium escreve:</p>
+
+<pre class="term" data-title="Console do F12 (texto conferido no Chromium)">Failed to load resource: the server responded with a status of 404</pre>
+
+<p>"Falha ao carregar o recurso: o servidor respondeu com o código 404" (não encontrado). O navegador mostra também o endereço do arquivo, e o texto depois do 404 varia de servidor para servidor. A aba <strong>Network</strong> ("rede") lista todos os arquivos que a página pediu, com o código de cada um: 200 é "chegou", 404 é "não existe". Aberto direto do disco (<code>file://</code>), o erro aparece com outro texto, mas no mesmo lugar.</p>
+<p>No editor do guia, o aviso aparece no console embaixo do resultado (aula <a href="onde-colocar.html">Três Jeitos de Usar CSS</a>).</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Mudei no F12, recarreguei e voltou tudo</strong>
+<p><strong>Por quê:</strong> o F12 muda a cópia na memória, e não o arquivo. É assim de propósito.</p>
+<p><strong>Como consertar:</strong> copie o valor que funcionou para o <code>style.css</code>, salve e recarregue.</p>
+</div>
+
+<div class="cenario">
+<strong>A minha regra não aparece no Styles</strong>
+<p><strong>Por quê:</strong> três suspeitos, nesta ordem: (1) o arquivo não carregou (veja o Console: nome errado no <code>href</code>, falta o <code>rel="stylesheet"</code>); (2) o seletor não pega esse elemento (você selecionou o <code>&lt;p&gt;</code>, mas a regra é do <code>h2</code>; ou o nome da classe está diferente); (3) a regra foi descartada inteira por um erro de sintaxe antes dela, como um <code>//</code> no lugar de comentário (aula <a href="comentarios.html">Comentários</a>).</p>
+<p><strong>Como consertar:</strong> confira na ordem; o validador (<code>vnu --css</code>) acha o terceiro caso.</p>
+</div>
+
+<div class="cenario">
+<strong>Está riscada, sem aviso nenhum</strong>
+<p><strong>Por quê:</strong> a declaração está certa, mas perdeu. Uma regra que vem depois, ou uma mais específica, define a mesma propriedade. No Styles, procure mais acima a mesma propriedade, não riscada: é a que venceu.</p>
+<p><strong>Como consertar:</strong> decida qual das duas deve valer e apague a outra (é o caso da missão final). Não "conserte" com <code>!important</code> (aula <a href="important.html">!important (e Por que Evitar)</a>).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Lugar</th><th>Mostra</th><th>Use para</th></tr>
+<tr><td><strong>Elements</strong> (Firefox: Inspector)</td><td>O HTML como o navegador montou</td><td>Escolher o elemento; conferir a estrutura</td></tr>
+<tr><td><strong>Styles</strong> (Firefox: Rules)</td><td>Todas as regras que pegam o elemento, com arquivo e linha</td><td>Ver o que venceu, o que perdeu (riscado) e o que é inválido (riscado com aviso); editar ao vivo</td></tr>
+<tr><td><strong>Computed</strong></td><td>O valor final de cada propriedade</td><td>Saber o valor de verdade (<code>rgb(…)</code>, <code>px</code>)</td></tr>
+<tr><td><strong>Console</strong> e <strong>Network</strong></td><td>Arquivos que não carregaram, erros de JS</td><td>Descobrir um <code>style.css</code> com o nome errado</td></tr>
+<tr><td><kbd>F12</kbd>, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></td><td colspan="2">Abrir e fechar (Mac: <kbd>Cmd</kbd>+<kbd>Option</kbd>+<kbd>I</kbd>)</td></tr>
+<tr><td>Botão direito → Inspecionar</td><td colspan="2">Abrir já no elemento clicado</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A tecla</h3>
+<p>Complete a tecla que abre as ferramentas do desenvolvedor no Windows e no Linux:</p>
+<div class="ex-code"><input data-answer="F12|f12" aria-label="tecla"></div>
+</div>
+
+<div class="exercise">
+<h3>2. O valor certo</h3>
+<p>O F12 mostrou <code>text-align: centre</code> riscado, com aviso. Complete o valor certo:</p>
+<div class="ex-code">text-align: <input data-answer="center" aria-label="valor">;</div>
+</div>
+
+<div class="exercise">
+<h3>3. O valor calculado</h3>
+<p>No painel Computed, a cor <code>teal</code> aparece convertida. Complete:</p>
+<div class="ex-code">color: rgb(0, <input data-answer="128" aria-label="verde">, 128)</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. No painel Styles, <code>color: navy</code> aparece riscado, sem ícone de aviso. O que isso quer dizer?</p>
+<label><input type="radio" name="q4"> <code>navy</code> não é uma cor válida</label>
+<label><input type="radio" name="q4"> A declaração é válida, mas perdeu para outra regra que também define <code>color</code></label>
+<label><input type="radio" name="q4"> O arquivo de CSS não carregou</label>
+<label><input type="radio" name="q4"> O navegador não suporta <code>color</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. A Ana trocou a cor no F12, gostou e recarregou a página. O que aconteceu?</p>
+<label><input type="radio" name="q5"> A cor nova ficou salva no <code>style.css</code></label>
+<label><input type="radio" name="q5"> A cor nova vale para todos os visitantes</label>
+<label><input type="radio" name="q5"> O navegador pergunta se ela quer salvar</label>
+<label><input type="radio" name="q5"> A cor voltou à antiga: a mudança no F12 é só na memória</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Onde aparece o aviso de que o <code>estilo.css</code> não foi encontrado (erro 404)?</p>
+<label><input type="radio" name="q6"> No Console (e na lista da aba Network)</label>
+<label><input type="radio" name="q6"> Na própria página, em vermelho</label>
+<label><input type="radio" name="q6"> No painel Computed</label>
+<label><input type="radio" name="q6"> Em lugar nenhum</label>
+</div>
+
+<h3>Missão final: o detetive do F12</h3>
+
+<div class="tryhtml" data-goal="css:h1{color}=rgb(0, 128, 128),css:p{font-size}=18px,css:p{color}=rgb(105, 105, 105)">
+<p class="try-task"><strong>Missão:</strong> o título devia ser verde-azulado (<code>teal</code>) e o parágrafo, cinza com letra de 18px. Inspecione o título e o parágrafo no resultado (botão direito → Inspecionar) e descubra, pelo painel Styles, o que está riscado e por quê. Conserte na aba <code>style.css</code>: uma declaração perdeu para uma regra esquecida no fim do arquivo (apague a regra esquecida), e outra tem um erro de digitação.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: teal;
+}
+
+p {
+  color: dimgray;
+  font-size: 18 px;
+}
+
+/* teste antigo */
+h1 {
+  color: black;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: teal;
+}
+
+p {
+  color: dimgray;
+  font-size: 18px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><kbd>F12</kbd> (ou botão direito → <strong>Inspecionar</strong>) abre as ferramentas do desenvolvedor no elemento escolhido.</li>
+  <li><strong>Elements</strong>: o HTML como o navegador montou. <strong>Styles</strong>: todas as regras que pegam o elemento, com arquivo e linha, e a folha padrão do navegador por último.</li>
+  <li>Riscado <strong>sem aviso</strong> = válido, mas perdeu para outra regra. Riscado <strong>com aviso</strong> = o navegador não entendeu (propriedade ou valor errado). Não aparece = o seletor não pega o elemento ou o arquivo não carregou.</li>
+  <li>Dá para editar ao vivo (valores, caixinhas de ligar e desligar), mas tudo volta ao recarregar: copie o que funcionou para o <code>style.css</code>.</li>
+  <li><strong>Computed</strong>: o valor final, já convertido (<code>rgb(0, 128, 128)</code>, <code>32px</code>). <strong>Console</strong>: o arquivo de CSS que deu 404.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
