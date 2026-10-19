@@ -28,7 +28,7 @@
   <li>A propriedade <code>color-scheme</code>, que avisa o navegador para escurecer as peças dele (campos, botões, barra de rolagem).</li>
   <li>A função <code>light-dark(claro, escuro)</code>: as duas cores numa linha só.</li>
   <li>Um botão "trocar tema" para quem quer escolher diferente do sistema.</li>
-  <li>Como ver a versão escura no editor do guia, e os erros que deixam o texto invisível.</li>
+  <li>Como ver a versão escura no editor do guia (o botão ◐), e os erros que deixam o texto invisível.</li>
 </ul>
 </div>
 
@@ -82,20 +82,15 @@
 <p>Na prática, quase todo mundo escreve só o bloco <code>dark</code>: o claro fica como as regras normais, fora do <code>@media</code>. Assim, um navegador muito antigo, que não entende a pergunta, mostra o tema claro, que funciona.</p>
 
 <h3>Como ver a versão escura aqui no guia</h3>
-<p>Experimente a caixa abaixo. Você provavelmente vai ver o tema <strong>claro</strong>, mesmo que o seu sistema esteja no modo escuro. Não é erro no seu CSS:</p>
+<p>Cada quadro do editor começa no tema <strong>claro</strong>, como uma folha branca, qualquer que seja o tema do seu sistema. Para ver a versão escura, use o botão <strong>◐</strong> na barra do quadro: ele avisa à página de dentro que a preferência agora é o escuro, e o seu <code>@media (prefers-color-scheme: dark)</code> liga na hora. Clique de novo para voltar ao claro. (O botão de tema do guia, lá em cima, só troca as cores do guia, e não as dos quadros.)</p>
 
-<div class="warning">
-<strong>O quadro do editor é sempre "de dia"</strong>
-<p>O editor do guia desenha cada exemplo como uma folha branca, avisando ao navegador que o quadro é claro. Os navegadores atuais (Chrome, Edge e Firefox) respeitam esse aviso: <strong>dentro do quadro, a resposta de <code>prefers-color-scheme: dark</code> é "não"</strong>, mesmo com o seu sistema no modo escuro (conferido no Chromium). O botão de tema do guia (o sol e a lua lá em cima) também não muda os quadros: ele troca as cores do guia, e não a preferência do seu sistema. Para ver a versão escura do seu código:</p>
-<ul>
-  <li><strong>↗ (abrir numa aba nova)</strong>: a aba nova segue a preferência do seu sistema. Deixe o sistema no modo escuro e clique em ↗.</li>
-  <li><strong>F12</strong>: as ferramentas do desenvolvedor sabem <strong>fingir</strong> a preferência, para a página inteira e todos os quadros. No Chrome e no Edge, abra o F12, aperte <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>, digite <code>prefers-color-scheme</code> e escolha a opção com <code>dark</code>. No Firefox, a aba Inspetor tem, no painel de regras, um botão de sol e um de lua. (Os nomes exatos dos menus mudam com a versão do navegador.)</li>
-</ul>
-<p>As seções 3 e 4 mostram também um jeito de pôr o claro e o escuro <strong>lado a lado</strong>, sem fingir nada.</p>
+<div class="tip">
+<strong>No seu site de verdade</strong>
+<p>Para testar sem mexer no sistema, as ferramentas do desenvolvedor (F12) sabem <strong>fingir</strong> a preferência. No Chrome e no Edge, abra o F12, aperte <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>, digite <code>prefers-color-scheme</code> e escolha a opção com <code>dark</code>. No Firefox, a aba Inspetor tem, no painel de regras, um botão de sol e um de lua. (Os nomes exatos dos menus mudam com a versão do navegador.)</p>
 </div>
 
 <div class="tryhtml">
-<p class="try-task"><strong>Experimente:</strong> esta página tem o tema claro e o escuro. Abra-a com ↗ com o seu sistema no modo escuro (ou finja o escuro no F12) e veja as cores trocarem. Depois, mude as cores do bloco <code>@media</code> e confira de novo.</p>
+<p class="try-task"><strong>Experimente:</strong> esta página tem o tema claro e o escuro. Clique em ◐ na barra do quadro e veja as cores trocarem. Depois, mude as cores do bloco <code>@media</code> e confira de novo.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;h1&gt;Receitas da Ana&lt;/h1&gt;
 &lt;p&gt;Bolo de cenoura, pão de queijo e torta de limão.&lt;/p&gt;
@@ -152,8 +147,8 @@ a {
 
 <p>Repare na cor de destaque: no claro, um laranja-escuro (<code>#c2410c</code>); no escuro, um laranja <strong>mais claro</strong> (<code>#fb923c</code>). O laranja-escuro em cima do fundo escuro ficaria apagado, difícil de ler. No tema escuro, as cores de destaque costumam ficar mais claras e menos "berrantes".</p>
 
-<div class="tryhtml" data-goal="src:@media\s*\(\s*prefers-color-scheme\s*:\s*dark\s*\)\s*\{\s*:root\s*\{[^}]*--fundo\s*:[^}]*--texto\s*:,css:body{background-color}=rgb(255, 250, 243)">
-<p class="try-task"><strong>Missão:</strong> as cores já estão em variáveis. Acrescente, depois do <code>:root</code>, um bloco <code>@media (prefers-color-scheme: dark)</code> com um <code>:root</code> dentro que mude <code>--fundo</code> para <code>#1e1b18</code> e <code>--texto</code> para <code>#f3ead9</code> (nesta ordem). O quadro vai continuar claro: confira o escuro com ↗ ou com o F12.</p>
+<div class="tryhtml" data-tema="escuro" data-goal="src:@media\s*\(\s*prefers-color-scheme\s*:\s*dark\s*\)\s*\{\s*:root\s*\{,css:body{background-color}=rgb(30, 27, 24),css:body{color}=rgb(243, 234, 217)">
+<p class="try-task"><strong>Missão:</strong> as cores já estão em variáveis. Acrescente, depois do <code>:root</code>, um bloco <code>@media (prefers-color-scheme: dark)</code> com um <code>:root</code> dentro que mude <code>--fundo</code> para <code>#1e1b18</code> e <code>--texto</code> para <code>#f3ead9</code>. Este quadro já começa no tema escuro (o ◐ está ligado): enquanto o bloco não existir, você vê as cores claras.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;h1&gt;Receitas da Ana&lt;/h1&gt;
 &lt;p&gt;Hoje tem bolo de cenoura com cobertura de chocolate.&lt;/p&gt;
@@ -413,7 +408,7 @@ h1 {
   --fundo: #fffaf3;
 }
 </pre>
-<p>Os dois blocos têm o mesmo seletor (<code>:root</code>) e a mesma especificidade. Pela <a href="cascata.html">cascata</a>, vence o que vem <strong>por último</strong>: o claro. O <code>@media</code> não dá prioridade nenhuma; ele só liga ou desliga as regras de dentro. No F12, com o escuro fingido, a aba de estilos mostra o <code>--fundo: #1e1b18</code> riscado.</p>
+<p>Os dois blocos têm o mesmo seletor (<code>:root</code>) e a mesma especificidade. Pela <a href="cascata.html">cascata</a>, vence o que vem <strong>por último</strong>: o claro. O <code>@media</code> não dá prioridade nenhuma; ele só liga ou desliga as regras de dentro. No F12, com o tema escuro ligado, a aba de estilos mostra o <code>--fundo: #1e1b18</code> riscado.</p>
 <p><strong>Como consertar:</strong> o bloco <code>@media</code> sempre <strong>depois</strong> das cores claras.</p>
 </div>
 
@@ -480,11 +475,11 @@ $ </pre>
 </div>
 
 <div class="mc" data-answer="2">
-<p class="mc-q">3. O seu sistema está no modo escuro, mas a caixa "Experimente" deste guia mostra o tema claro do seu código. Por quê?</p>
-<label><input type="radio" name="q3"> O <code>@media</code> só funciona em celulares</label>
-<label><input type="radio" name="q3"> O quadro do editor é desenhado como claro, e o navegador responde "não" à pergunta <code>dark</code> dentro dele</label>
-<label><input type="radio" name="q3"> Faltou <code>!important</code> nas cores escuras</label>
-<label><input type="radio" name="q3"> O tema escuro só aparece depois de publicar o site</label>
+<p class="mc-q">3. A Ana clicou em ◐ no quadro e nada mudou: a página continua clara. O CSS dela só tem <code>body { background-color: #fffaf3; color: #2b2118; }</code>. O que falta?</p>
+<label><input type="radio" name="q3"> Nada: o ◐ só funciona em celulares</label>
+<label><input type="radio" name="q3"> Um bloco <code>@media (prefers-color-scheme: dark)</code> com as cores escuras</label>
+<label><input type="radio" name="q3"> Um <code>!important</code> nas cores claras</label>
+<label><input type="radio" name="q3"> Publicar o site</label>
 </div>
 
 <div class="mc" data-answer="3">
@@ -561,7 +556,7 @@ $ </pre>
 </pre>
 </div>
 
-<p>Repare num detalhe: as variáveis foram definidas no <code>:root</code>, mas o <code>light-dark()</code> é decidido em <strong>cada elemento</strong> que usa a variável. Por isso o <code>.noite</code>, com <code>color-scheme: dark</code>, pega as cores escuras, e o outro cardápio, as claras. Abra com ↗ com o sistema no modo escuro: os dois cardápios ficam escuros.</p>
+<p>Repare num detalhe: as variáveis foram definidas no <code>:root</code>, mas o <code>light-dark()</code> é decidido em <strong>cada elemento</strong> que usa a variável. Por isso o <code>.noite</code>, com <code>color-scheme: dark</code>, pega as cores escuras, e o outro cardápio, as claras. Clique em ◐: o quadro passa a preferir o escuro, e os dois cardápios ficam escuros.</p>
 
 <hr>
 
@@ -572,7 +567,7 @@ $ </pre>
   <li>Guarde as cores em variáveis no <code>:root</code> e, no escuro, troque só as variáveis.</li>
   <li><code>color-scheme: light dark</code> no <code>:root</code> faz o navegador escurecer as peças dele (campos, botões, barra de rolagem) e o fundo padrão.</li>
   <li><code>light-dark(claro, escuro)</code> escolhe a cor pelo <code>color-scheme</code> do elemento: precisa do <code>color-scheme</code>, e é de 2024.</li>
-  <li>Nas caixas deste guia, o quadro responde sempre "claro": veja o escuro com ↗, fingindo no F12, ou forçando <code>color-scheme: dark</code> num pedaço.</li>
+  <li>Nas caixas deste guia, o botão ◐ liga o tema escuro do quadro. No seu site, o F12 sabe fingir a preferência.</li>
   <li>Erros comuns: valor em português (<code>escuro</code>), falta de parênteses, bloco escuro antes do claro, trocar o fundo e esquecer o texto.</li>
 </ul>
 
