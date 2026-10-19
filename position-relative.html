@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS position: relative — deslocar sem mexer nos vizinhos | Guia CSS</title>
+<meta name="description" content="position: relative para quem nunca escreveu CSS: deslocar um elemento a partir do próprio lugar com top e left, a diferença para margin, o lugar que fica guardado, os usos de verdade (ajuste fino de ícone, botão que afunda, referência para absolute) e os erros reais: top e bottom juntos, relative usado para montar layout e a página que rola para o lado.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">position: relative</span></h1>
+
+<p class="intro">O <code>position: relative</code> é o mais tranquilo dos valores de <code>position</code>: o elemento continua na fila, no fluxo normal, mas pode ser <strong>empurrado uns pixels</strong> para qualquer lado, sem que os vizinhos percebam. Nesta aula você vai ver como ele se diferencia de uma margem, para que ele serve de verdade e por que ele é o "pai" de quase todo <code>absolute</code>.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Como <code>relative</code> + <code>top</code>/<code>left</code> desloca um elemento a partir do próprio lugar.</li>
+  <li>A diferença entre <code>position: relative; top</code> e <code>margin-top</code>.</li>
+  <li>O que acontece quando <code>top</code> e <code>bottom</code> (ou <code>left</code> e <code>right</code>) brigam.</li>
+  <li>Os usos de verdade: ajuste fino, botão que afunda, referência para <code>absolute</code>.</li>
+  <li>Os erros: <code>relative</code> para montar layout e a página que rola para o lado.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador. O panorama dos cinco valores está na aula anterior, <a href="position.html">position: Como Funciona</a>.</p>
+
+<hr>
+
+<h2>A ideia: o quadro torto na parede</h2>
+<p>Um quadro pendurado num prego ficou torto, um pouco para baixo. Você não muda o prego de lugar, nem mexe nos outros quadros: só empurra aquele quadro um pouquinho. O prego, o lugar "oficial" do quadro, continua onde estava. É exatamente o <code>relative</code>: o lugar do elemento no fluxo fica guardado, e o que você vê é desenhado um pouco ao lado.</p>
+
+<hr>
+
+<h2>1. Deslocar a partir do próprio lugar</h2>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .caixa {
+    width: 120px;
+    height: 36px;
+    margin: 4px;
+    background-color: #e8ecff;
+    border: 2px solid navy;
+  }
+  .empurrada {
+    position: relative;
+    top: 20px;
+    left: 30px;
+    background-color: #fde8e1;
+    border-color: tomato;
+  }
+&lt;/style&gt;
+&lt;div class="caixa"&gt;1&lt;/div&gt;
+&lt;div class="caixa empurrada"&gt;2&lt;/div&gt;
+&lt;div class="caixa"&gt;3&lt;/div&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>position: relative</dt><dd>"Relativo": os deslocamentos contam a partir do lugar onde a caixa estaria no fluxo normal.</dd>
+  <dt>top: 20px</dt><dd>Fique a 20px <strong>do topo</strong> do seu lugar: a caixa desce 20px.</dd>
+  <dt>left: 30px</dt><dd>Fique a 30px <strong>da esquerda</strong> do seu lugar: a caixa vai 30px para a direita.</dd>
+</dl>
+
+<p>Repare: a caixa 2 desceu e foi para a direita, e ficou <strong>por cima</strong> da caixa 3. A caixa 3 não desceu para dar lugar: para ela, a caixa 2 continua no lugar original. Entre a 1 e a 2 sobrou um espaço vazio, que é a parte do lugar guardado que a caixa 2 deixou à mostra.</p>
+
+<hr>
+
+<h2>2. <code>relative</code> × <code>margin</code></h2>
+<p>"Mas a margem também empurra." Sim, mas de um jeito diferente. Compare as duas colunas: na da esquerda, a caixa 2 tem <code>margin-top: 20px</code>; na da direita, <code>position: relative; top: 20px</code>.</p>
+
+<pre class="file" data-file="comparar.html" data-resultado>&lt;style&gt;
+  .coluna {
+    display: inline-block;
+    vertical-align: top;
+    width: 150px;
+    margin-right: 8px;
+    border: 2px dashed gray;
+  }
+  .caixa {
+    width: 120px;
+    height: 36px;
+    margin: 4px;
+    background-color: #e8ecff;
+    border: 2px solid navy;
+  }
+  .margem {
+    margin-top: 20px;
+    background-color: #fde8e1;
+    border-color: tomato;
+  }
+  .relativa {
+    position: relative;
+    top: 20px;
+    background-color: #fde8e1;
+    border-color: tomato;
+  }
+&lt;/style&gt;
+&lt;div class="coluna"&gt;
+  &lt;div class="caixa"&gt;1&lt;/div&gt;
+  &lt;div class="caixa margem"&gt;2 margin-top&lt;/div&gt;
+  &lt;div class="caixa"&gt;3&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="coluna"&gt;
+  &lt;div class="caixa"&gt;1&lt;/div&gt;
+  &lt;div class="caixa relativa"&gt;2 relative&lt;/div&gt;
+  &lt;div class="caixa"&gt;3&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<ul>
+  <li>Com <strong>margin</strong>, a caixa 2 desce e <strong>empurra</strong> a 3, e a coluna tracejada fica mais alta. A página se rearruma.</li>
+  <li>Com <strong>relative</strong>, a caixa 2 desce <strong>por cima</strong> da 3, e a coluna não muda de tamanho. Nada se rearruma: o deslocamento é só visual.</li>
+</ul>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quero</th><th>Use</th></tr>
+<tr><td>Afastar um elemento dos vizinhos, com a página se rearrumando</td><td><code>margin</code> (aula <a href="margin.html">Margem</a>)</td></tr>
+<tr><td>Um ajuste visual pequeno, sem mexer em mais nada</td><td><code>position: relative</code> + <code>top</code>/<code>left</code></td></tr>
+<tr><td>Uma animação de "pulinho" ou "tremida"</td><td><code>transform: translate()</code> (aula <a href="transform.html">transform</a>), que faz o mesmo deslocamento visual e é mais leve para animar</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>3. Quando dois lados brigam</h2>
+<p>Com <code>relative</code>, o elemento só pode ir para um lado em cada direção. Se você escreve <code>top</code> e <code>bottom</code> juntos, o <strong><code>top</code> vence</strong>, e o <code>bottom</code> é ignorado. Entre <code>left</code> e <code>right</code>, vence o <code>left</code> (em textos da esquerda para a direita, como o português).</p>
+
+<pre class="file" data-file="style.css">.selo {
+  position: relative;
+  top: 10px;     /* vale: desce 10px */
+  bottom: 30px;  /* ignorado */
+  left: 10px;    /* vale: vai 10px para a direita */
+  right: 30px;   /* ignorado */
+}
+</pre>
+
+<p>No F12, a aba <em>Computed</em> mostra os quatro valores, como se todos valessem; o que manda é a regra acima. Na prática, escreva só um de cada par.</p>
+
+<hr>
+
+<h2>4. Para que serve, de verdade</h2>
+
+<h3>Ajuste fino</h3>
+<p>Um ícone ou um selo que ficou um pouco alto ou baixo em relação ao texto. Um empurrãozinho de 1 a 3px resolve, sem mexer no resto da linha:</p>
+
+<div class="tryhtml" data-goal="css:.selo{position}=relative,css:.selo{top}=-6px">
+<p class="try-task"><strong>Missão:</strong> o selo "Novo!" está alinhado com o pé das letras do título. Suba-o <strong>6px</strong> a partir de onde está, sem mudar a altura do título.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Bolo de fubá &lt;span class="selo"&gt;Novo!&lt;/span&gt;&lt;/h1&gt;
+&lt;p&gt;Com erva-doce, para o café.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.selo {
+  font-size: 0.45em;
+  padding: 2px 6px;
+  background-color: gold;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.selo {
+  position: relative;
+  top: -6px;
+  font-size: 0.45em;
+  padding: 2px 6px;
+  background-color: gold;
+}
+</pre>
+</div>
+
+<p>O valor negativo inverte o sentido: <code>top: -6px</code> sobe. O mesmo resultado com <code>bottom: 6px</code>.</p>
+
+<h3>O botão que afunda</h3>
+<p>Quando o leitor aperta um botão, ele pode "afundar" 2px, como uma tecla de verdade. O estado de "apertado" é o <code>:active</code> (aula <a href="hover-focus.html">Estados</a>):</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> clique e segure o botão: ele desce 2px enquanto o mouse está apertado, e o texto de baixo não se mexe. Troque o <code>top: 2px</code> por <code>margin-top: 2px</code> e aperte de novo: agora o parágrafo de baixo também pula.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button class="botao"&gt;Encomendar&lt;/button&gt;
+&lt;p&gt;Entrega em 2 dias.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.botao {
+  position: relative;
+  padding: 10px 18px;
+  background-color: tomato;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 4px 0 #a33a22;
+}
+
+.botao:active {
+  top: 2px;
+  box-shadow: 0 2px 0 #a33a22;
+}
+</pre>
+</div>
+
+<h3>A referência de um filho <code>absolute</code></h3>
+<p>O uso mais comum de todos: <code>position: relative</code> <strong>sem nenhum deslocamento</strong>. Visualmente, nada muda. Mas o elemento passa a ser <strong>posicionado</strong>, e um filho com <code>position: absolute</code> passa a contar o <code>top</code> e o <code>left</code> a partir dele:</p>
+
+<pre class="file" data-file="style.css">.cartao {
+  position: relative;  /* sem top nem left: só vira a referência */
+}
+
+.cartao .selo {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+</pre>
+
+<p>Essa dupla é o assunto da próxima aula, <a href="position-absolute.html">position: absolute</a>. Um elemento <code>relative</code> também passa a aceitar <code>z-index</code>, para escolher quem fica por cima (aula <a href="z-index.html">Camadas</a>).</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Montar o layout com <code>relative</code>: buracos e sobreposições</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .foto {
+    width: 150px;
+    height: 80px;
+    background-color: #e8ecff;
+    border: 2px solid navy;
+  }
+  .legenda {
+    position: relative;
+    top: -60px;
+    left: 170px;
+  }
+&lt;/style&gt;
+&lt;div class="foto"&gt;foto&lt;/div&gt;
+&lt;p class="legenda"&gt;Bolo de cenoura, R$ 35,00&lt;/p&gt;
+&lt;p&gt;Encomendas pelo telefone.&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> a legenda foi para o lado da foto, como a Ana queria. Mas, embaixo da foto, sobrou um <strong>buraco</strong> do tamanho da legenda, e o "Encomendas pelo telefone" ficou longe da foto.</p>
+<p><strong>Por quê:</strong> o <code>relative</code> só desenha a legenda em outro lugar; o lugar original dela continua reservado no fluxo. Numa tela estreita, a legenda ainda pode passar da borda direita.</p>
+<p><strong>Como consertar:</strong> para pôr coisas lado a lado, use <code>display: flex</code> no pai (aula <a href="flexbox.html">Flexbox</a>). O <code>relative</code> é para ajustes de poucos pixels.</p>
+</div>
+
+<div class="cenario">
+<strong>A página passou a rolar para o lado</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .aviso {
+    position: relative;
+    left: 120px;
+    padding: 8px;
+    background-color: gold;
+  }
+&lt;/style&gt;
+&lt;p class="aviso"&gt;Encomendas de Páscoa abertas!&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> o aviso dourado começa 120px para dentro e passa da borda direita do quadro. O pedaço da direita fica fora da área visível, e o quadro ganha rolagem para o lado.</p>
+<p><strong>Por quê:</strong> o <code>&lt;p&gt;</code> é um bloco com a largura toda. Empurrado 120px para a direita, ele termina 120px depois da borda: transborda (aula <a href="overflow.html">O que Transborda</a>). No celular, é a página inteira que escorrega para o lado.</p>
+<p><strong>Como consertar:</strong> para afastar da esquerda sem estourar a largura, use <code>margin-left: 120px</code>: a margem diminui a largura do bloco, e ele continua cabendo.</p>
+</div>
+
+<div class="cenario">
+<strong><code>top</code> e <code>bottom</code> juntos: o <code>bottom</code> some</strong>
+<p><strong>O que acontece:</strong> com <code>position: relative; top: 10px; bottom: 10px;</code>, a Ana esperava que um anulasse o outro, mas o elemento desce 10px: o <code>top</code> vence e o <code>bottom</code> é ignorado. O validador não reclama (as duas declarações são válidas), e a aba <em>Computed</em> do F12 mostra as duas.</p>
+<p><strong>Como consertar:</strong> escreva só um lado de cada direção.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>position: relative;</code></td><td>Continua no fluxo; o lugar fica guardado; vira referência para filhos <code>absolute</code></td></tr>
+<tr><td><code>top: 10px;</code></td><td>Desce 10px a partir do próprio lugar</td></tr>
+<tr><td><code>top: -10px;</code> ou <code>bottom: 10px;</code></td><td>Sobe 10px</td></tr>
+<tr><td><code>left: 10px;</code></td><td>Vai 10px para a direita</td></tr>
+<tr><td><code>top</code> + <code>bottom</code> juntos</td><td>Vale o <code>top</code></td></tr>
+<tr><td><code>left</code> + <code>right</code> juntos</td><td>Vale o <code>left</code> (texto da esquerda para a direita)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O valor</h3>
+<p>Complete o valor que desloca a partir do próprio lugar:</p>
+<div class="ex-code">.icone { position: <input data-answer="relative" aria-label="valor">; top: 2px; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Subir</h3>
+<p>Complete o número para o selo subir 4px usando <code>top</code>:</p>
+<div class="ex-code">.selo { position: relative; top: <input data-answer="-4px" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Para a direita</h3>
+<p>Complete a propriedade para o selo ir 5px para a direita:</p>
+<div class="ex-code">.selo { position: relative; <input data-answer="left" aria-label="propriedade">: 5px; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Qual a diferença entre <code>margin-top: 20px</code> e <code>position: relative; top: 20px</code>?</p>
+<label><input type="radio" name="q4"> Nenhuma</label>
+<label><input type="radio" name="q4"> A margem empurra os vizinhos; o <code>relative</code> só desenha mais abaixo, sem mexer neles</label>
+<label><input type="radio" name="q4"> O <code>relative</code> empurra os vizinhos; a margem não</label>
+<label><input type="radio" name="q4"> A margem só funciona em <code>inline</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Com <code>position: relative; top: 10px; bottom: 30px;</code>, o que acontece?</p>
+<label><input type="radio" name="q5"> Desce 10px: o <code>top</code> vence</label>
+<label><input type="radio" name="q5"> Sobe 30px: o <code>bottom</code> vence</label>
+<label><input type="radio" name="q5"> Sobe 20px: um desconta o outro</label>
+<label><input type="radio" name="q5"> A caixa estica 40px</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. Para que serve um <code>position: relative</code> sem <code>top</code> nem <code>left</code>?</p>
+<label><input type="radio" name="q6"> Para nada; dá para apagar</label>
+<label><input type="radio" name="q6"> Para centralizar o elemento</label>
+<label><input type="radio" name="q6"> Para tirar o elemento do fluxo</label>
+<label><input type="radio" name="q6"> Para o elemento virar a referência de um filho <code>absolute</code></label>
+</div>
+
+<h3>Missão final: os ajustes da página da receita</h3>
+
+<div class="tryhtml" data-goal="css:.selo{position}=relative,css:.selo{top}=-6px,css:.cartao{position}=relative,css:.cartao{top}=0px,css:.cartao{left}=0px,src:\.botao:active\s*\{[^}]*top\s*:\s*2px,css:.botao{position}=relative">
+<p class="try-task"><strong>Missão:</strong> (1) suba o selo 6px com <code>relative</code>; (2) faça o cartão virar referência para filhos <code>absolute</code>, <strong>sem deslocá-lo</strong>; (3) faça o botão afundar 2px enquanto está apertado (<code>.botao:active</code>), sem empurrar o texto de baixo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Bolo de fubá &lt;span class="selo"&gt;Novo!&lt;/span&gt;&lt;/h2&gt;
+  &lt;p&gt;Com erva-doce, para o café.&lt;/p&gt;
+  &lt;button class="botao"&gt;Encomendar&lt;/button&gt;
+  &lt;p&gt;Entrega em 2 dias.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  width: 280px;
+  padding: 12px;
+  border: 2px solid tomato;
+}
+
+.selo {
+  font-size: 0.5em;
+  padding: 2px 6px;
+  background-color: gold;
+}
+
+.botao {
+  padding: 10px 18px;
+  background-color: tomato;
+  color: white;
+  border: none;
+  border-radius: 6px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  position: relative;
+  width: 280px;
+  padding: 12px;
+  border: 2px solid tomato;
+}
+
+.selo {
+  position: relative;
+  top: -6px;
+  font-size: 0.5em;
+  padding: 2px 6px;
+  background-color: gold;
+}
+
+.botao {
+  position: relative;
+  padding: 10px 18px;
+  background-color: tomato;
+  color: white;
+  border: none;
+  border-radius: 6px;
+}
+
+.botao:active {
+  top: 2px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>position: relative</code> mantém o elemento no fluxo, com o lugar guardado, e o desenha deslocado pelo <code>top</code>/<code>bottom</code>/<code>left</code>/<code>right</code>.</li>
+  <li>O deslocamento é só visual: os vizinhos não se mexem, e o elemento pode ficar por cima deles. A margem, ao contrário, rearruma a página.</li>
+  <li><code>top</code> vence <code>bottom</code>; <code>left</code> vence <code>right</code>. Valores negativos invertem o sentido.</li>
+  <li>Bons usos: ajustes de poucos pixels, o botão que afunda no <code>:active</code> e, sem deslocamento, a referência de um filho <code>absolute</code>.</li>
+  <li>Não monte layout com <code>relative</code>: sobram buracos, e um bloco empurrado para o lado faz a página rolar para o lado.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
