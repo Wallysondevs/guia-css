@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS :hover, :focus e :active — estilos para cada estado | Guia CSS</title>
+<meta name="description" content="Pseudo-classes de estado para quem está começando: :hover (o mouse em cima), :focus e :focus-visible (o foco do teclado, com acessibilidade), :active (enquanto aperta), a ordem das regras, o celular sem mouse e os erros reais do validador W3C (::hover, :hoover, espaço depois dos dois-pontos, outline: none).">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">:hover, :focus e :active</span></h1>
+
+<p class="intro">Um botão que muda de cor quando o mouse passa em cima "parece" clicável. Um contorno em volta do link mostra a quem usa o teclado onde ele está. Até agora, cada seletor pegou um elemento sempre do mesmo jeito. Nesta aula você vai estilizar os <strong>estados</strong> de um elemento: com o mouse em cima, com o foco do teclado, no instante do clique. Tudo isso com as <strong>pseudo-classes</strong>, a palavra depois dos dois-pontos.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que é uma pseudo-classe e como se escreve (<code>a:hover</code>).</li>
+  <li><code>:hover</code>: o mouse em cima.</li>
+  <li><code>:focus</code> e <code>:focus-visible</code>: o foco do teclado, e por que ele nunca pode sumir.</li>
+  <li><code>:active</code>: enquanto o botão está apertado.</li>
+  <li>A ordem das regras e o celular, que não tem mouse.</li>
+  <li>Os erros reais do validador: <code>::hover</code>, <code>:hoover</code>, espaço depois dos dois-pontos.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador: passe o mouse, clique e use a tecla <kbd>Tab</kbd> dentro dos quadros. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: o botão do elevador</h2>
+<p>O botão do elevador conversa com você. Quando você aproxima o dedo, alguns acendem uma luz fraca. Quando aperta, ele afunda. Depois, fica aceso, mostrando que entendeu. É o mesmo botão, em <strong>estados</strong> diferentes, e cada estado tem uma aparência.</p>
+<p>No CSS, o estado entra no seletor depois de dois-pontos. <code>.botao</code> é "o botão"; <code>.botao:hover</code> é "o botão, <strong>enquanto</strong> o mouse está em cima dele". Essa palavra depois dos dois-pontos se chama <strong>pseudo-classe</strong>: funciona como uma classe que o navegador põe e tira sozinho, conforme o que o leitor faz.</p>
+
+<hr>
+
+<h2>1. <code>:hover</code>: o mouse em cima</h2>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> passe o mouse sobre o botão e sobre o link. Depois troque a cor do <code>.botao:hover</code> para <code>crimson</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;&lt;button class="botao"&gt;Comprar bolo&lt;/button&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="#"&gt;Ver todas as receitas&lt;/a&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.botao {
+  background-color: #1d4ed8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.botao:hover {
+  background-color: #1e3a8a;
+}
+
+a:hover {
+  text-decoration: none;
+  background-color: #fef3c7;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>.botao</dt><dd>O elemento: qualquer seletor serve (classe, elemento, ID).</dd>
+  <dt>:</dt><dd>Um só dois-pontos, <strong>colado</strong> no seletor, sem espaço.</dd>
+  <dt>hover</dt><dd>O estado: em inglês, "pairar", o mouse parado em cima.</dd>
+  <dt>{ background-color: #1e3a8a; }</dt><dd>Só o que <strong>muda</strong> no estado. O resto (a cor do texto, o <code>padding</code>) continua vindo da regra <code>.botao</code>.</dd>
+</dl>
+
+<p>Com o mouse em cima, o botão passa do azul (<code>#1d4ed8</code>) para um azul mais escuro (<code>#1e3a8a</code>), e o link perde o sublinhado e ganha um fundo amarelo-claro. Tirando o mouse, tudo volta. O <code>cursor: pointer</code> troca a seta pela mãozinha, como num link (aula <a href="cursor.html">Cursor e Interação</a>).</p>
+
+<div class="tip">
+<strong>Mudança suave</strong>
+<p>A troca de cor é instantânea. Para ela acontecer devagar, em alguns décimos de segundo, existe o <code>transition</code> (aula <a href="transition.html">Transições</a>).</p>
+</div>
+
+<div class="tryhtml" data-goal="hover:.botao{background-color}=rgb(21, 128, 61)">
+<p class="try-task"><strong>Missão:</strong> o botão da padaria é verde (<code>#16a34a</code>). Faça ele ficar verde-escuro, <code>#15803d</code>, quando o mouse estiver em cima. Passe o mouse no botão para conferir.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button class="botao"&gt;Encomendar&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">.botao {
+  background-color: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.botao {
+  background-color: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.botao:hover {
+  background-color: #15803d;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. <code>:focus</code>: onde o teclado está</h2>
+<p>Nem todo mundo usa mouse. Muita gente navega com a tecla <kbd>Tab</kbd>, por escolha ou por necessidade (quem não pode usar as mãos com precisão, quem não enxerga e usa leitor de tela, quem só está com pressa). O elemento escolhido pelo <kbd>Tab</kbd> está "com o <strong>foco</strong>", e a pseudo-classe <code>:focus</code> pega esse estado. Links, botões e campos de formulário podem receber o foco.</p>
+<p>Sem CSS nenhum, o navegador já desenha um <strong>contorno</strong> em volta do elemento com foco (o <code>outline</code>, aula <a href="outline.html">Contorno</a>). Com <code>:focus</code>, você troca esse contorno por um que combine com o site:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> clique no fundo branco do quadro e aperte <kbd>Tab</kbd> algumas vezes. O foco passa pelo campo, pelo botão e pelo link, e cada um ganha o contorno laranja.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;&lt;input type="text" aria-label="Seu nome" placeholder="Seu nome"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;button&gt;Enviar&lt;/button&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="#"&gt;Ler a receita&lt;/a&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">input:focus,
+button:focus,
+a:focus {
+  outline: 3px solid #f59e0b;
+  outline-offset: 2px;
+}
+</pre>
+</div>
+
+<p>O contorno laranja, de 3px, aparece afastado 2px do elemento (o <code>outline-offset</code>), um de cada vez, conforme o <kbd>Tab</kbd> avança. O <code>outline</code> é o mais usado para o foco porque não ocupa espaço: o elemento não muda de tamanho nem empurra os vizinhos.</p>
+
+<div class="warning">
+<strong>Nunca apague o foco sem pôr outro no lugar</strong>
+<p>Muita gente acha o contorno do navegador feio e escreve <code>:focus { outline: none; }</code>. Para quem usa mouse, nada muda. Para quem usa teclado, a página fica <strong>cega</strong>: ele aperta <kbd>Tab</kbd> e não sabe mais onde está. É como tirar o cursor do editor de texto. As regras de acessibilidade da web (WCAG) exigem um foco <strong>visível</strong>. Se não gostou do contorno padrão, troque por outro, como no exemplo acima; nunca por nada.</p>
+</div>
+
+<hr>
+
+<h2>3. <code>:focus-visible</code>: o foco só para quem precisa</h2>
+<p>Há um detalhe: em alguns navegadores, <strong>clicar</strong> num botão com o mouse também dá foco a ele, e o contorno do <code>:focus</code> aparece. Quem clicou com o mouse não precisa do contorno, e muita gente acha que é um defeito. A solução moderna é <code>:focus-visible</code> ("foco visível"): o navegador decide quando o foco precisa aparecer. Em geral:</p>
+<ul>
+  <li>chegou com o <kbd>Tab</kbd>: <code>:focus-visible</code> vale, o contorno aparece;</li>
+  <li>clicou num botão ou link com o mouse: <code>:focus</code> vale, mas <code>:focus-visible</code> não, e o contorno não aparece;</li>
+  <li>campo de texto: <code>:focus-visible</code> vale sempre, porque você vai digitar nele.</li>
+</ul>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> clique no botão com o mouse: não aparece contorno. Agora clique no fundo branco e chegue nele com <kbd>Tab</kbd>: o contorno aparece.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button class="botao"&gt;Comprar bolo&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">.botao {
+  background-color: #1d4ed8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 1rem;
+}
+
+.botao:focus-visible {
+  outline: 3px solid #f59e0b;
+  outline-offset: 2px;
+}
+</pre>
+</div>
+
+<div class="note">
+<strong>Suporte</strong>
+<p><code>:focus-visible</code> funciona em todos os navegadores atuais desde março de 2022 (o Safari foi o último, na versão 15.4), segundo o MDN. Em navegadores mais velhos que isso, a regra inteira é ignorada, e fica o contorno padrão do navegador, que continua visível.</p>
+</div>
+
+<h3>Qual usar</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Pseudo-classe</th><th>Vale quando</th><th>Use para</th></tr>
+<tr><td><code>:focus</code></td><td>O elemento tem o foco, venha de onde vier (teclado, mouse, toque)</td><td>Campos de formulário (a borda muda enquanto você digita)</td></tr>
+<tr><td><code>:focus-visible</code></td><td>O elemento tem o foco <strong>e</strong> o navegador acha que o contorno deve aparecer (em geral, teclado)</td><td>O contorno de foco de botões e links: a escolha padrão hoje</td></tr>
+<tr><td><code>:focus-within</code></td><td>O elemento <strong>ou algum filho</strong> tem o foco</td><td>Destacar o formulário inteiro enquanto a pessoa preenche um campo dele</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>4. <code>:active</code>: enquanto aperta</h2>
+<p><code>:active</code> ("ativo") vale no instante em que o botão do mouse está <strong>pressionado</strong> sobre o elemento (ou o dedo, na tela de toque). Soltou, acabou. É o "afundar" do botão do elevador:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> clique no botão e segure: ele escurece mais e desce 2 pixels. Solte e ele volta.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button class="botao"&gt;Comprar bolo&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">.botao {
+  background-color: #1d4ed8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.botao:hover {
+  background-color: #1e3a8a;
+}
+
+.botao:active {
+  background-color: #172554;
+  transform: translateY(2px);
+}
+</pre>
+</div>
+
+<p>O <code>transform: translateY(2px)</code> empurra o botão 2px para baixo, sem mexer nos vizinhos (aula <a href="transform.html">transform</a>).</p>
+
+<h3>A ordem importa</h3>
+<p>Enquanto você aperta, o mouse também está em cima: <code>:hover</code> e <code>:active</code> valem <strong>ao mesmo tempo</strong>. As duas regras têm a mesma especificidade (aula <a href="especificidade.html">Especificidade</a>), e aí vence a que vem <strong>depois</strong> no código. Por isso, <code>:active</code> vem sempre depois de <code>:hover</code>. Se a ordem for trocada, o <code>:hover</code> cobre o <code>:active</code> e o clique não mostra nada.</p>
+<p>Nos links, a ordem completa tem até um apelido em inglês, <strong>LVHA</strong> ("<em>LoVe HAte</em>", "amor e ódio"): <code>:link</code> (link não visitado), <code>:visited</code> (visitado), <code>:hover</code>, <code>:active</code>. A aula <a href="links.html">Estilizando Links</a> mostra os quatro.</p>
+
+<hr>
+
+<h2>5. O celular não tem mouse</h2>
+<p>Na tela de toque, não existe "o dedo parado em cima". Os navegadores de celular costumam aplicar o <code>:hover</code> quando você toca, e ele às vezes fica "grudado" até você tocar em outro lugar. Por isso:</p>
+<ul>
+  <li>use o <code>:hover</code> para <strong>enfeitar</strong>, nunca para mostrar algo importante (um menu que só abre com o mouse em cima não abre no celular);</li>
+  <li>dê ao <code>:focus-visible</code> um estilo pelo menos tão claro quanto o do <code>:hover</code>: muitas vezes os dois andam juntos (<code>.botao:hover, .botao:focus-visible { … }</code>);</li>
+  <li>para aplicar um efeito só em aparelhos com mouse, existe <code>@media (hover: hover)</code> (aula <a href="media-queries.html">Media Queries</a>).</li>
+</ul>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Dois-pontos duplos: <code>Unknown pseudo-element or pseudo-class “::hover”</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.botao::hover {
+  background: navy;
+}
+</pre>
+<p><strong>O que você vê:</strong> o botão não muda com o mouse em cima.</p>
+<p><strong>Por quê:</strong> dois-pontos duplos (<code>::</code>) são para <strong>pseudo-elementos</strong>, como <code>::before</code> (aula <a href="before-after.html">::before e ::after</a>). Não existe pseudo-elemento <code>hover</code>, e um seletor inválido faz o navegador ignorar a <strong>regra inteira</strong>, com tudo o que está dentro das chaves.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":1.9-1.13: error: CSS: Unknown pseudo-element or pseudo-class “::hover”.</pre>
+<p><strong>O que significa:</strong> "pseudo-elemento ou pseudo-classe desconhecido: <code>::hover</code>".</p>
+</div>
+
+<div class="cenario">
+<strong>Erro de digitação: <code>Unknown pseudo-element or pseudo-class “:hoover”</code></strong>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":1.8-1.13: error: CSS: Unknown pseudo-element or pseudo-class “:hoover”</pre>
+<p><strong>O que significa:</strong> a mesma mensagem, para <code>.botao:hoover</code>. A regra inteira é ignorada. Confira a grafia: <code>hover</code>, <code>focus</code>, <code>focus-visible</code>, <code>active</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Espaço depois dos dois-pontos: <code>Parse Error</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.botao: hover {
+  background: navy;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":1.9-1.13: error: CSS: Parse Error.</pre>
+<p><strong>O que significa:</strong> "erro de leitura" na coluna 9, onde começa o <code>hover</code>. Os dois-pontos sozinhos, seguidos de espaço, não formam nada que o CSS entenda. A regra inteira é ignorada.</p>
+</div>
+
+<div class="cenario">
+<strong>Espaço <strong>antes</strong> dos dois-pontos: nenhum erro, nenhum efeito</strong>
+<pre class="file" data-file="style.css · erro de propósito">.botao :hover {
+  background: navy;
+}
+</pre>
+<p><strong>O que você vê:</strong> o botão não muda com o mouse em cima.</p>
+<p><strong>Por quê:</strong> o espaço é o <a href="combinadores.html">combinador descendente</a>. <code>.botao :hover</code> quer dizer "qualquer elemento <strong>dentro</strong> do <code>.botao</code> que esteja com o mouse em cima". Um botão só com texto não tem elemento dentro, e a regra não pega ninguém. É um seletor válido, então o validador não reclama.</p>
+<p><strong>Como consertar:</strong> <code>.botao:hover</code>, tudo junto.</p>
+</div>
+
+<div class="cenario">
+<strong><code>outline: none</code> no foco: a página some para o teclado</strong>
+<pre class="file" data-file="style.css · erro de propósito">.botao:focus {
+  outline: none;
+}
+</pre>
+<p><strong>O que você vê:</strong> com o mouse, nada de diferente. Com o <kbd>Tab</kbd>, o foco chega ao botão e não aparece nenhum sinal.</p>
+<p><strong>Por quê:</strong> a regra é válida, e o validador não reclama. O problema é de <strong>acessibilidade</strong>: quem navega pelo teclado perde o rumo. A missão final conserta exatamente isso.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Pseudo-classe</th><th>Vale quando</th></tr>
+<tr><td><code>:hover</code></td><td>O mouse está em cima do elemento (no celular, depois de um toque)</td></tr>
+<tr><td><code>:focus</code></td><td>O elemento tem o foco (teclado, clique ou toque)</td></tr>
+<tr><td><code>:focus-visible</code></td><td>O elemento tem o foco e o navegador acha que ele deve aparecer (em geral, pelo teclado)</td></tr>
+<tr><td><code>:focus-within</code></td><td>O elemento ou um filho dele tem o foco</td></tr>
+<tr><td><code>:active</code></td><td>O elemento está sendo pressionado</td></tr>
+<tr><td>Ordem nos links</td><td><code>:link</code>, <code>:visited</code>, <code>:hover</code>, <code>:active</code> (LVHA)</td></tr>
+<tr><td>Escrita</td><td>Um dois-pontos, colado: <code>.botao:hover</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O mouse em cima</h3>
+<p>Complete o seletor do link com o mouse em cima:</p>
+<div class="ex-code">a:<input data-answer="hover" aria-label="pseudo-classe"> { color: crimson; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. O foco do teclado</h3>
+<p>Complete com a pseudo-classe que mostra o foco quando o leitor usa o teclado, mas não quando clica com o mouse num botão:</p>
+<div class="ex-code">.botao:<input data-answer="focus-visible" aria-label="pseudo-classe"> { outline: 3px solid orange; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Apertado</h3>
+<p>Complete com a pseudo-classe do instante do clique:</p>
+<div class="ex-code">.botao:<input data-answer="active" aria-label="pseudo-classe"> { transform: translateY(2px); }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Por que <code>.botao::hover</code> não funciona?</p>
+<label><input type="radio" name="q4"> Falta o <code>;</code></label>
+<label><input type="radio" name="q4"> O <code>hover</code> só funciona em links</label>
+<label><input type="radio" name="q4"> <code>::</code> é para pseudo-elementos; a pseudo-classe usa um dois-pontos só</label>
+<label><input type="radio" name="q4"> Funciona, mas só no Firefox</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. O que acontece com <code>:focus { outline: none; }</code> e nada mais?</p>
+<label><input type="radio" name="q5"> O validador acusa erro</label>
+<label><input type="radio" name="q5"> Quem navega pelo teclado não vê mais onde está o foco</label>
+<label><input type="radio" name="q5"> O botão deixa de ser clicável</label>
+<label><input type="radio" name="q5"> Nada muda</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. A Ana pôs <code>.botao:active</code> <strong>antes</strong> de <code>.botao:hover</code>, os dois mudando o fundo. Ao clicar, o fundo do <code>:active</code> não aparece. Por quê?</p>
+<label><input type="radio" name="q6"> <code>:active</code> não funciona em botões</label>
+<label><input type="radio" name="q6"> Faltou o <code>cursor: pointer</code></label>
+<label><input type="radio" name="q6"> <code>:hover</code> tem mais especificidade</label>
+<label><input type="radio" name="q6"> As duas valem ao mesmo tempo e têm a mesma especificidade: vence a que vem depois, o <code>:hover</code></label>
+</div>
+
+<h3>Missão final: o botão acessível</h3>
+
+<div class="tryhtml" data-goal="hover:.botao{background-color}=rgb(30, 58, 138),foco:.botao{outline-style}=solid,foco:.botao{outline-color}=rgb(245, 158, 11),nsrc:outline:\s*(none|0)\s*;">
+<p class="try-task"><strong>Missão:</strong> o botão da Ana tem dois problemas. (1) Com o mouse em cima, nada muda: faça o fundo ficar <code>#1e3a8a</code>. (2) Alguém apagou o foco com <code>outline: none</code>: apague essa regra e crie um <code>.botao:focus-visible</code> com <code>outline: 3px solid #f59e0b</code>. Para conferir, passe o mouse no botão e depois chegue nele com <kbd>Tab</kbd> (clique no fundo branco do quadro antes).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button class="botao"&gt;Encomendar bolo&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">.botao {
+  background-color: #1d4ed8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.botao:focus {
+  outline: none;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.botao {
+  background-color: #1d4ed8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.botao:hover {
+  background-color: #1e3a8a;
+}
+
+.botao:focus-visible {
+  outline: 3px solid #f59e0b;
+  outline-offset: 2px;
+}
+</pre>
+</div>
+
+<p>Com a solução, o botão escurece com o mouse em cima e ganha um contorno laranja, afastado 2px, quando chega a vez dele no <kbd>Tab</kbd>. Clicando com o mouse, o contorno não aparece.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Uma <strong>pseudo-classe</strong> é um estado que o navegador liga e desliga: <code>seletor:estado</code>, com um dois-pontos colado.</li>
+  <li><code>:hover</code>: mouse em cima. Use para enfeitar; no celular, não há mouse.</li>
+  <li><code>:focus</code>: o elemento tem o foco. <code>:focus-visible</code>: o foco que precisa aparecer (teclado), a escolha padrão para o contorno de botões e links.</li>
+  <li>Nunca <code>outline: none</code> no foco sem outro estilo visível no lugar.</li>
+  <li><code>:active</code>: enquanto aperta. Vem depois do <code>:hover</code> no código (nos links: LVHA).</li>
+  <li>Erros: <code>::hover</code> e <code>:hoover</code> (<code>Unknown pseudo-element or pseudo-class</code>), <code>: hover</code> (<code>Parse Error</code>): a regra inteira é ignorada. <code>.botao :hover</code>, com espaço, é válido, mas pega os filhos.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
