@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Grid — introdução ao layout em grade | Guia CSS</title>
+<meta name="description" content="Introdução ao CSS Grid para quem nunca usou: o que é uma grade, display: grid, a primeira grade de três colunas, as palavras do Grid (linha, coluna, célula, trilha, linha de grade), como os itens se encaixam sozinhos, Grid × Flexbox lado a lado, o F12 e as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Grid</span></h1>
+
+<p class="intro">Com Flexbox, a Ana aprendeu a arrumar itens numa fila: em linha ou em coluna. Mas a galeria de fotos da lojinha pede outra coisa: <strong>linhas e colunas ao mesmo tempo</strong>, como uma tabela, com as fotos alinhadas de cima a baixo <em>e</em> da esquerda para a direita. Para isso existe o <strong>CSS Grid</strong> (<em>grid</em> = "grade"): você desenha a grade no pai e os filhos se encaixam nas casas. Esta é a primeira de uma série de aulas sobre Grid.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que é uma grade e em que ela é diferente da fila do Flexbox.</li>
+  <li>Como ligar o Grid com <code>display: grid</code> e o que acontece quando você só faz isso.</li>
+  <li>A primeira grade de verdade: três colunas com <code>grid-template-columns</code>.</li>
+  <li>As palavras do Grid: linha, coluna, célula, trilha, linha de grade e área.</li>
+  <li>Como os itens se encaixam sozinhos, casa por casa, e o que acontece quando sobram itens.</li>
+  <li>Grid × Flexbox lado a lado, o Grid no F12 e as mensagens reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="flexbox.html">Introdução ao Flexbox</a> e <a href="gap.html">Espaço entre Itens (gap)</a>: muita coisa é igual. Os exemplos com resultado são desenhados agora pelo <strong>seu</strong> navegador. As mensagens do validador saíram do validador W3C (<code>vnu</code>), na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: a forma de gelo</h2>
+<p>Pense numa forma de gelo, ou numa caixa de ovos. As <strong>casas já existem</strong> antes de você pôr qualquer coisa: três colunas, quatro linhas. Você despeja a água e ela vai enchendo as casas, uma por uma, na ordem. Se a água acabar, sobram casas vazias. Se sobrar água, ela precisa de mais casas.</p>
+<p>O Grid funciona assim. O <strong>pai</strong> desenha as casas (quantas colunas, de que largura). Os <strong>filhos</strong> se encaixam nelas, um por casa, da esquerda para a direita e de cima para baixo, como a leitura de um texto. Compare com o Flexbox: lá não existem casas; cada item ocupa o espaço que o seu conteúdo pede, e a fila se ajeita depois. Por isso se diz que o Flexbox é <strong>uma dimensão</strong> (uma fila) e o Grid é <strong>duas</strong> (linhas e colunas juntas).</p>
+
+<hr>
+
+<h2>1. Ligando o Grid: <code>display: grid</code></h2>
+<p>Como no Flexbox, tudo começa com o <code>display</code> do pai:</p>
+
+<pre class="file" data-file="style.css">.galeria {
+  display: grid;
+}</pre>
+
+<dl class="anatomy">
+  <dt>.galeria</dt><dd>O <strong>pai</strong>. Em inglês, <em>grid container</em>, "contêiner da grade". Os filhos diretos viram <strong>itens da grade</strong> (<em>grid items</em>).</dd>
+  <dt>display</dt><dd>A propriedade que diz como o elemento se arruma (aula <a href="display.html">display</a>).</dd>
+  <dt>grid</dt><dd>O valor: "arrume os meus filhos numa grade".</dd>
+</dl>
+
+<p>Só com isso, sem dizer quantas colunas, a grade tem <strong>uma coluna só</strong>, e cada filho ganha uma linha:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="galeria"&gt;
+  &lt;div class="item"&gt;1. Bolo&lt;/div&gt;
+  &lt;div class="item"&gt;2. Torta&lt;/div&gt;
+  &lt;div class="item"&gt;3. Brigadeiro&lt;/div&gt;
+  &lt;div class="item"&gt;4. Pão de mel&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria {
+  display: grid;
+  gap: 8px;
+  border: 2px dashed gray;
+}
+
+.item {
+  padding: 12px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<p>Parece igual a quatro <code>div</code> comuns, um embaixo do outro, com a largura toda. A diferença está no <code>gap</code>: ele funciona, porque agora existe uma grade (num bloco comum, ele não faria nada). Para ver o Grid de verdade, falta desenhar as colunas.</p>
+
+<hr>
+
+<h2>2. A primeira grade: três colunas</h2>
+<p>A propriedade <code>grid-template-columns</code> ("modelo das colunas") desenha as colunas: <strong>um valor para cada coluna</strong>, separados por espaço.</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="galeria"&gt;
+  &lt;div class="item"&gt;1. Bolo&lt;/div&gt;
+  &lt;div class="item"&gt;2. Torta&lt;/div&gt;
+  &lt;div class="item"&gt;3. Brigadeiro&lt;/div&gt;
+  &lt;div class="item"&gt;4. Pão de mel&lt;/div&gt;
+  &lt;div class="item"&gt;5. Cookies&lt;/div&gt;
+  &lt;div class="item"&gt;6. Sonho&lt;/div&gt;
+  &lt;div class="item"&gt;7. Pudim&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  border: 2px dashed gray;
+}
+
+.item {
+  padding: 12px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>grid-template-columns</dt><dd>Desenha as colunas da grade.</dd>
+  <dt>1fr 1fr 1fr</dt><dd>Três valores = <strong>três colunas</strong>. O <code>fr</code> (de <em>fraction</em>, "fração") quer dizer "uma parte do espaço livre". Três colunas de <code>1fr</code> dividem a largura em três partes iguais. A unidade <code>fr</code> e as outras formas de medir colunas são o assunto da próxima aula, <a href="grid-colunas.html">Colunas (grid-template-columns e fr)</a>.</dd>
+</dl>
+
+<p>Repare no que aconteceu sem você pedir:</p>
+<ul>
+  <li>Os sete itens se encaixaram sozinhos, da esquerda para a direita, três por linha: 1, 2, 3 na primeira; 4, 5, 6 na segunda; 7 na terceira.</li>
+  <li>O navegador criou <strong>as linhas</strong> que precisava (três), sem você escrever nada sobre linhas. Cada linha tem a altura do seu conteúdo. (Como controlar as linhas é a aula <a href="grid-linhas.html">Linhas</a>.)</li>
+  <li>O Pudim, sozinho na última linha, ficou com a <strong>mesma largura</strong> dos outros, alinhado embaixo do Bolo. As colunas valem para todas as linhas.</li>
+</ul>
+<p>Troque o <code>1fr 1fr 1fr</code> por <code>1fr 1fr</code> (duas colunas) ou por <code>1fr 1fr 1fr 1fr</code> (quatro) e veja os itens se reorganizarem.</p>
+
+<h3>Experimente: a galeria em grade</h3>
+<div class="tryhtml" data-goal="css:.galeria{display}=grid,src:grid-template-columns:\s*1fr\s+1fr\s*;">
+<p class="try-task"><strong>Missão:</strong> transforme a <code>.galeria</code> numa grade de <strong>duas</strong> colunas iguais (<code>1fr 1fr</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="galeria"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate"&gt;
+  &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="O mesmo bolo, visto mais de perto"&gt;
+  &lt;img src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana"&gt;
+  &lt;img src="assets/midia/avatar-ana-192.png" alt="Avatar da Ana"&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria {
+  gap: 8px;
+}
+
+.galeria img {
+  width: 100%;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.galeria img {
+  width: 100%;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. As palavras do Grid</h2>
+<p>As próximas aulas usam alguns nomes que vale a pena aprender agora. Todos estão na grade de três colunas da seção 2:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Palavra</th><th>Em inglês</th><th>O que é</th><th>Na grade da seção 2</th></tr>
+<tr><td>Contêiner</td><td><em>grid container</em></td><td>O pai, com <code>display: grid</code></td><td>A <code>.galeria</code></td></tr>
+<tr><td>Item</td><td><em>grid item</em></td><td>Cada filho direto do pai</td><td>Os sete <code>.item</code></td></tr>
+<tr><td>Coluna</td><td><em>column</em></td><td>Uma faixa em pé</td><td>3 colunas</td></tr>
+<tr><td>Linha</td><td><em>row</em></td><td>Uma faixa deitada</td><td>3 linhas</td></tr>
+<tr><td>Trilha</td><td><em>track</em></td><td>O nome genérico de "uma coluna ou uma linha"</td><td>6 trilhas: 3 colunas + 3 linhas</td></tr>
+<tr><td>Célula</td><td><em>cell</em></td><td>Uma casa: o cruzamento de uma linha com uma coluna</td><td>9 células (2 vazias, depois do Pudim)</td></tr>
+<tr><td>Linha de grade</td><td><em>grid line</em></td><td>As "divisas" entre as trilhas, numeradas a partir de 1</td><td>4 linhas de grade verticais (1 a 4) e 4 horizontais</td></tr>
+<tr><td>Área</td><td><em>grid area</em></td><td>Um retângulo de uma ou mais células</td><td>Aula <a href="grid-areas.html">Áreas com Nome</a></td></tr>
+</table>
+</div>
+
+<div class="note">
+<strong>"Linha" quer dizer duas coisas</strong>
+<p>Em português, "linha" serve para a faixa deitada (<em>row</em>) e para a divisa entre as faixas (<em>grid line</em>). O guia diz "linha" para a faixa e "linha de grade" para a divisa. As linhas de grade são as que você vai usar para dizer "este item vai da linha 1 até a linha 3" (aula <a href="grid-posicionar.html">Posicionando Itens</a>). Três colunas têm <strong>quatro</strong> linhas de grade: uma antes de cada coluna e uma depois da última.</p>
+</div>
+
+<hr>
+
+<h2>4. Grid × Flexbox, lado a lado</h2>
+<p>Os mesmos cinco itens, com textos de tamanhos diferentes, numa caixa de 320 pixels. Em cima, Flexbox com <code>flex-wrap: wrap</code>; embaixo, Grid com três colunas:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Flexbox (flex-wrap: wrap)&lt;/p&gt;
+&lt;div class="caixa flex"&gt;
+  &lt;div class="item"&gt;Bolo&lt;/div&gt;
+  &lt;div class="item"&gt;Torta de limão&lt;/div&gt;
+  &lt;div class="item"&gt;Pão&lt;/div&gt;
+  &lt;div class="item"&gt;Brigadeiro&lt;/div&gt;
+  &lt;div class="item"&gt;Sonho&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Grid (3 colunas)&lt;/p&gt;
+&lt;div class="caixa grade"&gt;
+  &lt;div class="item"&gt;Bolo&lt;/div&gt;
+  &lt;div class="item"&gt;Torta de limão&lt;/div&gt;
+  &lt;div class="item"&gt;Pão&lt;/div&gt;
+  &lt;div class="item"&gt;Brigadeiro&lt;/div&gt;
+  &lt;div class="item"&gt;Sonho&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">p {
+  font-family: monospace;
+}
+
+.caixa {
+  width: 320px;
+  gap: 8px;
+  border: 2px dashed gray;
+}
+
+.flex {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.item {
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<p>No Flexbox, cada item tem a largura do seu texto, e a quebra de linha acontece onde der: os itens da segunda linha não ficam embaixo dos da primeira. No Grid, as colunas mandam: todos os itens têm a mesma largura, e o Brigadeiro fica exatamente embaixo do Bolo. O texto mais comprido ("Torta de limão") quebrou em duas linhas para caber na coluna, e as outras casas da mesma linha ficaram da altura dele.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Use…</th><th>Quando…</th><th>Exemplos</th></tr>
+<tr><td>Flexbox</td><td>O conteúdo decide o tamanho; uma direção só (uma fila)</td><td>Menu, barra de botões, etiquetas, cabeçalho com logo e busca</td></tr>
+<tr><td>Grid</td><td>Você decide as colunas (e as linhas); itens alinhados nas duas direções</td><td>Galeria de fotos, grade de produtos, o layout da página (cabeçalho, lateral, conteúdo, rodapé)</td></tr>
+<tr><td>Os dois juntos</td><td>Quase sempre, num site de verdade</td><td>A página é um Grid; dentro do cabeçalho (uma casa do Grid), um Flexbox</td></tr>
+</table>
+</div>
+
+<p>A aula <a href="flex-ou-grid.html">Flexbox ou Grid?</a>, no fim desta série, compara os dois com mais calma.</p>
+
+<hr>
+
+<h2>5. O Grid no F12</h2>
+<p>As linhas de grade não aparecem na página: são invisíveis. Para vê-las, use o F12. No Chrome e no Edge, na aba Elements (Elementos), ao lado de um elemento com <code>display: grid</code> aparece uma etiqueta <strong>grid</strong>; clicando nela, o navegador desenha por cima da página as linhas de grade, com os números delas. O Firefox tem uma ferramenta parecida, no painel Layout do Inspetor. É o melhor jeito de entender por que um item foi parar numa casa e não em outra.</p>
+
+<hr>
+
+<h2>6. Formas de ligar o Grid</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th><th>Quando usar</th></tr>
+<tr><td><code>display: grid</code></td><td>O pai vira uma grade e se comporta como um bloco (ocupa a largura toda)</td><td>Quase sempre</td></tr>
+<tr><td><code>display: inline-grid</code></td><td>O pai vira uma grade, mas se comporta como um elemento em linha: tem a largura do conteúdo e fica na linha do texto</td><td>Raro: uma grade pequena no meio de um texto</td></tr>
+<tr><td>Tabela (<code>&lt;table&gt;</code>)</td><td>Linhas e colunas de verdade, com significado</td><td>Para <strong>dados</strong> (preços, horários). Para layout, nunca: foi o jeito dos anos 1990, e o leitor de tela anuncia "tabela" para o que não é</td></tr>
+<tr><td><code>float</code></td><td>Colunas "flutuando" lado a lado</td><td>O jeito antigo (aula <a href="float.html">float</a>): reconheça, mas use Grid</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>CSS quase nunca mostra mensagem: o navegador ignora em silêncio o que não entende.</p>
+
+<div class="cenario">
+<strong>As colunas foram parar no item</strong>
+<p><strong>O que aconteceu:</strong> o <code>display: grid</code> e o <code>grid-template-columns</code> foram escritos na regra dos itens (<code>.item</code>), e não na do pai.</p>
+<p><strong>O que você vê:</strong> os itens continuam um embaixo do outro, com a largura toda. Cada item virou uma grade… do <strong>seu próprio</strong> conteúdo (o texto), e não há grade nenhuma arrumando os itens.</p>
+<p><strong>Como consertar:</strong> <code>display: grid</code> e <code>grid-template-columns</code> vão no <strong>pai</strong>.</p>
+</div>
+
+<div class="cenario">
+<strong>Os netos não entram na grade</strong>
+<p><strong>O que aconteceu:</strong> a galeria tem <code>display: grid</code>, mas as fotos estão dentro de um <code>&lt;div class="fotos"&gt;</code> que está dentro da galeria.</p>
+<p><strong>O que você vê:</strong> uma casa só ocupada (pelo <code>div.fotos</code>), com todas as fotos dentro dela, uma depois da outra. Só os <strong>filhos diretos</strong> viram itens da grade; os netos, não.</p>
+<p><strong>Como consertar:</strong> tire o <code>div</code> do meio, ou ponha a grade nele (o <code>.fotos</code>). Existe ainda o <code>subgrid</code>, para grades dentro de grades (aula <a href="subgrid.html">Subgrid</a>).</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “grid-template-column”: Property “grid-template-column” doesn't exist.</code></strong>
+<p><strong>O que aconteceu:</strong> o nome da propriedade sem o <strong>s</strong> do fim, ou um nome inventado (<code>grid-columns</code>).</p>
+<pre class="term" data-cwd="~/grade">$ vnu --css singular.css
+"file:/home/ana/grade/singular.css":3.29-3.31: error: CSS: “grid-template-column”: Property “grid-template-column” doesn't exist.
+$ vnu --css gridcolumns.css
+"file:/home/ana/grade/gridcolumns.css":3.17-3.17: error: CSS: “grid-columns”: Property “grid-columns” doesn't exist.</pre>
+<p>"A propriedade não existe." O navegador ignora a linha: a grade fica com uma coluna só. No F12, a declaração aparece riscada, com um ícone de aviso.</p>
+<p><strong>Como consertar:</strong> <code>grid-template-columns</code>, no plural.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “grid-template-columns”: only “0” can be a “unit”. You must put a unit after your number.</code></strong>
+<p><strong>O que aconteceu:</strong> a Ana escreveu o <strong>número de colunas</strong>, <code>grid-template-columns: 3;</code>, como quem diz "quero três".</p>
+<pre class="term" data-cwd="~/grade">$ vnu --css tres.css
+"file:/home/ana/grade/tres.css":3.26-3.26: error: CSS: “grid-template-columns”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<p>"Só o <code>0</code> pode ficar sem unidade. Você precisa pôr uma unidade depois do número." O <code>grid-template-columns</code> não recebe "quantas colunas", e sim <strong>a largura de cada uma</strong>. A declaração é ignorada.</p>
+<p><strong>Como consertar:</strong> uma largura por coluna: <code>1fr 1fr 1fr</code>. (Para não repetir, existe o <code>repeat(3, 1fr)</code>, aula <a href="grid-repeat.html">repeat, minmax e auto-fit</a>.)</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “grid-template-columns”: “,” is an incorrect operator.</code></strong>
+<p><strong>O que aconteceu:</strong> as colunas separadas por vírgula: <code>1fr, 1fr, 1fr</code>.</p>
+<pre class="term" data-cwd="~/grade">$ vnu --css virgula.css
+"file:/home/ana/grade/virgula.css":3.36-3.38: error: CSS: “grid-template-columns”: “,” is an incorrect operator.</pre>
+<p>"A vírgula é um operador incorreto (aqui)." Os valores são separados por <strong>espaço</strong>. A declaração inteira é ignorada: uma coluna só.</p>
+<p><strong>Como consertar:</strong> <code>grid-template-columns: 1fr 1fr 1fr;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “display”: “grids” is not a “display” value.</code></strong>
+<pre class="term" data-cwd="~/grade">$ vnu --css grids.css
+"file:/home/ana/grade/grids.css":2.12-2.16: error: CSS: “display”: “grids” is not a “display” value.</pre>
+<p>Um <code>s</code> a mais, e não existe grade nenhuma: os itens ficam um embaixo do outro, e o <code>grid-template-columns</code> e o <code>gap</code> da mesma regra ficam sem efeito (não dão erro: só não têm o que arrumar).</p>
+<p><strong>Como consertar:</strong> <code>display: grid;</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>display: grid;</code></td><td>O elemento vira uma grade; os filhos diretos viram itens</td></tr>
+<tr><td><code>display: inline-grid;</code></td><td>Grade que se comporta como elemento em linha</td></tr>
+<tr><td><code>grid-template-columns: 1fr 1fr 1fr;</code></td><td>Três colunas iguais (um valor por coluna)</td></tr>
+<tr><td><code>gap: 8px;</code></td><td>Espaço entre as linhas e as colunas</td></tr>
+<tr><td>Sem <code>grid-template-columns</code></td><td>Uma coluna só; uma linha por item</td></tr>
+<tr><td>Linhas</td><td>Criadas sozinhas, conforme os itens precisam (aula <a href="grid-linhas.html">Linhas</a>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Ligar a grade</h3>
+<p>Complete para o elemento virar uma grade:</p>
+<div class="ex-code">.galeria { display: <input data-answer="grid" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Quatro colunas</h3>
+<p>Complete com a propriedade que desenha as colunas:</p>
+<div class="ex-code">.galeria { display: grid; <input data-answer="grid-template-columns" aria-label="propriedade">: 1fr 1fr 1fr 1fr; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. Uma grade tem <code>grid-template-columns: 1fr 1fr 1fr</code> e 7 itens. Quantas linhas o navegador cria?</p>
+<label><input type="radio" name="q3"> 1</label>
+<label><input type="radio" name="q3"> 3</label>
+<label><input type="radio" name="q3"> 7</label>
+<label><input type="radio" name="q3"> Nenhuma: é preciso escrever as linhas</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">4. Qual a principal diferença entre Grid e Flexbox?</p>
+<label><input type="radio" name="q4"> O Grid não aceita <code>gap</code></label>
+<label><input type="radio" name="q4"> O Flexbox só funciona em coluna</label>
+<label><input type="radio" name="q4"> O Grid é mais antigo</label>
+<label><input type="radio" name="q4"> O Grid arruma em linhas e colunas ao mesmo tempo; o Flexbox, numa fila</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Quantas linhas de grade verticais tem uma grade de 3 colunas?</p>
+<label><input type="radio" name="q5"> 4</label>
+<label><input type="radio" name="q5"> 3</label>
+<label><input type="radio" name="q5"> 2</label>
+<label><input type="radio" name="q5"> 6</label>
+</div>
+
+<h3>Missão final: o cardápio em grade</h3>
+
+<div class="tryhtml" data-goal="css:.cardapio{display}=grid,src:grid-template-columns:\s*1fr\s+1fr\s+1fr\s*;,css:.cardapio{column-gap}=16px,css:.cardapio{row-gap}=16px">
+<p class="try-task"><strong>Missão:</strong> o cardápio da padaria está numa coluna só. Faça dele uma grade de <strong>três colunas iguais</strong> (<code>1fr 1fr 1fr</code>), com <code>16px</code> de espaço entre as casas.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cardapio"&gt;
+  &lt;div class="prato"&gt;Café, R$ 5&lt;/div&gt;
+  &lt;div class="prato"&gt;Pão na chapa, R$ 7&lt;/div&gt;
+  &lt;div class="prato"&gt;Suco de laranja, R$ 9&lt;/div&gt;
+  &lt;div class="prato"&gt;Bolo de cenoura, R$ 8&lt;/div&gt;
+  &lt;div class="prato"&gt;Pão de queijo, R$ 6&lt;/div&gt;
+  &lt;div class="prato"&gt;Misto quente, R$ 12&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cardapio {
+  font-family: sans-serif;
+}
+
+.prato {
+  padding: 12px;
+  border: 2px solid orange;
+  background-color: lightyellow;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cardapio {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  font-family: sans-serif;
+}
+
+.prato {
+  padding: 12px;
+  border: 2px solid orange;
+  background-color: lightyellow;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O Grid arruma os filhos em <strong>linhas e colunas ao mesmo tempo</strong> (duas dimensões); o Flexbox, numa fila (uma dimensão).</li>
+  <li><code>display: grid</code> no <strong>pai</strong>; os filhos diretos viram itens. Sem colunas definidas, é uma coluna só.</li>
+  <li><code>grid-template-columns</code> recebe <strong>uma largura por coluna</strong>, separadas por espaço: <code>1fr 1fr 1fr</code> são três colunas iguais.</li>
+  <li>Os itens se encaixam sozinhos, casa por casa; as linhas são criadas conforme a necessidade.</li>
+  <li>As palavras: trilha (linha ou coluna), célula (uma casa), linha de grade (a divisa numerada), área (um retângulo de casas).</li>
+  <li>No F12, a etiqueta <strong>grid</strong> desenha as linhas de grade por cima da página.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
