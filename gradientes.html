@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS linear-gradient — degradês | Guia CSS</title>
+<meta name="description" content="Degradês em CSS para quem está começando: linear-gradient como imagem de fundo, a direção com to right e com graus, várias cores e paradas, listras com repeating-linear-gradient, degradê transparente por cima de uma foto, o degradê em faixas no body e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Degradês (linear-gradient)</span></h1>
+
+<p class="intro">Um degradê (em inglês, <em>gradient</em>) é a passagem suave de uma cor para outra: o céu do pôr do sol, do laranja ao amarelo. No CSS, ele é feito pela função <code>linear-gradient()</code> ("degradê linear", em linha reta), e não precisa de nenhum arquivo de imagem: o próprio navegador desenha. Nesta aula você vai fazer o botão da lojinha com um leve degradê, listras de toalha de piquenique e escurecer a foto do bolo para o título ficar legível.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Por que o degradê é uma <strong>imagem</strong>, e vai no <code>background-image</code> (e não no <code>background-color</code>).</li>
+  <li>Como escolher a direção: <code>to right</code>, <code>to bottom right</code> e os graus (<code>45deg</code>).</li>
+  <li>Como usar várias cores e dizer onde cada uma começa (as paradas).</li>
+  <li>Como fazer listras, com corte seco e com <code>repeating-linear-gradient()</code>.</li>
+  <li>Como pôr um degradê transparente por cima de uma foto.</li>
+  <li>O degradê que vira faixas no <code>body</code>, e os erros reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Antes, veja <a href="background-image.html">Imagem de Fundo</a> e <a href="background-size.html">Tamanho do Fundo</a>. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana.</p>
+
+<hr>
+
+<h2>A ideia: uma imagem que o navegador pinta</h2>
+<p>Imagine a Ana pintando uma parede com rolo: ela começa com tinta vermelha numa ponta, vai misturando amarelo aos poucos e termina com amarelo puro na outra ponta. No meio, as cores se misturam sozinhas. Ela só decide <strong>as cores</strong> e <strong>a direção</strong>. O <code>linear-gradient()</code> é isso.</p>
+
+<p>O detalhe importante: para o CSS, o degradê é uma <strong>imagem</strong>, igual a um <code>.jpg</code>, só que gerada na hora. Por isso ele entra no <code>background-image</code>, no lugar do <code>url()</code>, e obedece a tudo o que você viu nas aulas de imagem de fundo (tamanho, posição, repetição, várias imagens).</p>
+
+<hr>
+
+<h2>1. O primeiro degradê</h2>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="faixa"&gt;Promoção da semana&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.faixa {
+  background-image: linear-gradient(tomato, gold);
+  height: 120px;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>background-image</dt><dd>A propriedade da <strong>imagem</strong> de fundo. O degradê é uma imagem.</dd>
+  <dt>linear-gradient(</dt><dd>A função do degradê em linha reta. Como no <code>url(</code>, o nome vem colado no parêntese.</dd>
+  <dt>tomato, gold</dt><dd>As cores, separadas por vírgula, na ordem em que aparecem. São pelo menos duas. Qualquer forma de cor serve: nome, hex, <code>rgb()</code>, <code>hsl()</code>.</dd>
+  <dt>)</dt><dd>Fecha a função.</dd>
+</dl>
+
+<p>Sem dizer a direção, o degradê vai <strong>de cima para baixo</strong>: tomate no alto, amarelo-ouro embaixo, e todos os tons de laranja no meio. Ele ocupa a caixa inteira: de 120 pixels de altura, as cores se espalham pelos 120.</p>
+
+<hr>
+
+<h2>2. A direção</h2>
+<p>A direção vem antes das cores, separada delas por vírgula. Há duas formas de escrever: com palavras (<code>to</code> + o lado) e com graus. As caixas abaixo têm as mesmas duas cores; só muda a direção, escrita dentro de cada uma:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa d1"&gt;&lt;code&gt;(nada) = to bottom&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa d2"&gt;&lt;code&gt;to right&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa d3"&gt;&lt;code&gt;to top&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa d4"&gt;&lt;code&gt;to bottom right&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa d5"&gt;&lt;code&gt;45deg&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa d6"&gt;&lt;code&gt;90deg&lt;/code&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  width: 200px;
+  height: 100px;
+  border: 1px solid gray;
+  margin-bottom: 8px;
+}
+
+.caixa code {
+  background-color: white;
+}
+
+.d1 {
+  background-image: linear-gradient(tomato, gold);
+}
+
+.d2 {
+  background-image: linear-gradient(to right, tomato, gold);
+}
+
+.d3 {
+  background-image: linear-gradient(to top, tomato, gold);
+}
+
+.d4 {
+  background-image: linear-gradient(to bottom right, tomato, gold);
+}
+
+.d5 {
+  background-image: linear-gradient(45deg, tomato, gold);
+}
+
+.d6 {
+  background-image: linear-gradient(90deg, tomato, gold);
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Direção</th><th>O degradê vai…</th></tr>
+<tr><td>(nenhuma) ou <code>to bottom</code></td><td>de cima para baixo: a primeira cor em cima</td></tr>
+<tr><td><code>to right</code></td><td>da esquerda para a direita</td></tr>
+<tr><td><code>to top</code></td><td>de baixo para cima: o tomate fica embaixo</td></tr>
+<tr><td><code>to left</code></td><td>da direita para a esquerda</td></tr>
+<tr><td><code>to bottom right</code></td><td>na diagonal, do canto de cima, à esquerda, para o canto de baixo, à direita</td></tr>
+<tr><td><code>0deg</code></td><td>para cima (igual a <code>to top</code>)</td></tr>
+<tr><td><code>90deg</code></td><td>para a direita (igual a <code>to right</code>)</td></tr>
+<tr><td><code>180deg</code></td><td>para baixo (igual a <code>to bottom</code>)</td></tr>
+<tr><td><code>45deg</code></td><td>na diagonal, para cima e para a direita: o tomate no canto de baixo, à esquerda</td></tr>
+</table>
+</div>
+
+<p>Os graus são como os ponteiros de um relógio: <code>0deg</code> aponta para o 12 (para cima), e o número cresce no sentido horário: <code>90deg</code> é o 3, <code>180deg</code> é o 6, <code>270deg</code> é o 9. O <code>deg</code> vem de <em>degree</em>, "grau", e é obrigatório (seção "Quando dá errado").</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Quando usar</th></tr>
+<tr><td>Palavras (<code>to right</code>)</td><td>Na maioria das vezes: lê-se como português. E <code>to bottom right</code> acerta o canto da caixa, qualquer que seja o formato dela.</td></tr>
+<tr><td>Graus (<code>135deg</code>)</td><td>Quando você quer um ângulo exato, que não é para um lado nem para um canto.</td></tr>
+</table>
+</div>
+
+<p>O navegador guarda o degradê com as cores em <code>rgb()</code>: <code>linear-gradient(to right, tomato, gold)</code> vira <code>linear-gradient(to right, rgb(255, 99, 71), rgb(255, 215, 0))</code>. Como <code>to bottom</code> é a direção inicial, ele some do valor calculado: <code>to bottom</code> e <code>180deg</code> são guardados sem direção nenhuma (lido no Chromium).</p>
+
+<div class="tryhtml" data-goal="css:.faixa{background-image}=linear-gradient(to right, rgb(255, 99, 71), rgb(255, 215, 0))">
+<p class="try-task"><strong>Missão:</strong> a faixa de promoção está com fundo liso. Troque por um degradê de <code>tomato</code> a <code>gold</code>, da <strong>esquerda para a direita</strong>, escrito com <code>to right</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="faixa"&gt;Promoção: bolo de cenoura com 10% de desconto&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.faixa {
+  background-color: tomato;
+  padding: 16px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.faixa {
+  background-color: tomato;
+  background-image: linear-gradient(to right, tomato, gold);
+  padding: 16px;
+}
+</pre>
+</div>
+
+<p>Repare que a solução mantém o <code>background-color: tomato</code>. O degradê fica por cima da cor (é uma imagem), então ela não aparece; mas, se algum navegador antigo não entender o degradê, a faixa continua tomate, e o texto continua legível.</p>
+
+<hr>
+
+<h2>3. Várias cores e as paradas</h2>
+<p>Você pode pôr quantas cores quiser. Sem dizer onde cada uma fica, o navegador as espalha por igual: com três cores, a do meio fica a 50%. Para escolher o lugar, escreva uma <strong>parada</strong> (<em>color stop</em>) depois da cor: uma porcentagem ou um tamanho.</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa a"&gt;&lt;code&gt;tomato, gold, seagreen&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa b"&gt;&lt;code&gt;tomato 30%, gold 70%&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa c"&gt;&lt;code&gt;tomato 50%, gold 50%&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa d"&gt;&lt;code&gt;três faixas&lt;/code&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  height: 80px;
+  border: 1px solid gray;
+  margin-bottom: 8px;
+}
+
+.caixa code {
+  background-color: white;
+}
+
+.a {
+  background-image: linear-gradient(to right, tomato, gold, seagreen);
+}
+
+.b {
+  background-image: linear-gradient(to right, tomato 30%, gold 70%);
+}
+
+.c {
+  background-image: linear-gradient(to right, tomato 50%, gold 50%);
+}
+
+.d {
+  background-image: linear-gradient(to right, seagreen 33%, white 33% 66%, tomato 66%);
+}
+</pre>
+</div>
+
+<ul>
+  <li><strong>a:</strong> três cores espalhadas por igual: tomate na esquerda, ouro no meio, verde na direita.</li>
+  <li><strong>b:</strong> o tomate é <strong>puro</strong> até 30% da largura, a mistura acontece entre 30% e 70%, e dali em diante é ouro puro. As paradas dizem onde cada cor está inteira.</li>
+  <li><strong>c:</strong> as duas cores param no mesmo lugar (50%): não sobra espaço para misturar, e a passagem vira um <strong>corte seco</strong>. Metade tomate, metade ouro.</li>
+  <li><strong>d:</strong> com cortes secos, três faixas: verde, branco e tomate. O <code>white 33% 66%</code> é uma cor com <strong>duas</strong> paradas: branco puro de 33% a 66%.</li>
+</ul>
+
+<p>O degradê com corte seco é um jeito de desenhar faixas e bandeiras sem imagem nenhuma.</p>
+
+<hr>
+
+<h2>4. Listras: <code>repeating-linear-gradient()</code></h2>
+<p>A irmã <code>repeating-linear-gradient()</code> ("degradê linear que se repete") repete as paradas até o fim da caixa. Com cortes secos, ela faz listras, como numa toalha de piquenique ou na fita de "em obras":</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="toalha"&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.toalha {
+  background-image: repeating-linear-gradient(45deg, tomato 0 10px, gold 10px 20px);
+  height: 120px;
+}
+</pre>
+</div>
+
+<p>As paradas dizem: tomate de 0 a 10 pixels, ouro de 10 a 20 pixels. Depois dos 20, o padrão recomeça, e assim até cobrir a caixa: listras diagonais de 10 pixels, alternando tomate e ouro. Mude o <code>45deg</code> para <code>90deg</code> (listras em pé) e os tamanhos para <code>0 20px</code> e <code>20px 40px</code> (listras mais largas).</p>
+
+<hr>
+
+<h2>5. Degradê transparente por cima de uma foto</h2>
+<p>Na aula <a href="background-image.html">Imagem de Fundo</a>, o título em cima da foto precisava de ajuda para ter contraste. O degradê é essa ajuda. Como ele é uma imagem, entra numa <strong>lista</strong> de imagens, em primeiro lugar (por cima da foto), com cores que vão de um preto meio transparente ao <code>transparent</code>:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="capa"&gt;
+  &lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.capa {
+  background-color: saddlebrown;
+  background-image:
+    linear-gradient(rgb(0 0 0 / 70%), transparent),
+    url("assets/midia/bolo-800.jpg");
+  background-size: cover;
+  background-position: center;
+  color: white;
+  height: 250px;
+}
+</pre>
+</div>
+
+<p>A parte de cima da foto fica escurecida, e a escuridão vai sumindo em direção ao bolo. O título branco, no alto, ganha um fundo escuro por trás e fica fácil de ler, e o bolo continua bonito. Apague a linha do <code>linear-gradient</code> (e a vírgula depois dele) para comparar: as letras brancas quase somem sobre a parede clara.</p>
+
+<p>O <code>background-size: cover</code> e o <code>background-position: center</code> valem para as duas imagens da lista. O degradê não liga: ele sempre se estica para a caixa inteira.</p>
+
+<hr>
+
+<h2>6. O degradê em faixas no <code>body</code></h2>
+<p>Um degradê de fundo na página inteira parece fácil: <code>body { background-image: linear-gradient(lightyellow, tomato); }</code>. Mas, numa página curta, o resultado é estranho:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> aqui, o quadro tem a altura do conteúdo, e o efeito quase não aparece. Clique no botão ↗ do quadro para abrir o resultado numa aba nova, numa janela alta. Depois, apague o <code>/*</code> e o <code>*/</code> da primeira regra e abra de novo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">/* html {
+  min-height: 100%;
+} */
+
+body {
+  background-image: linear-gradient(lightyellow, tomato);
+}
+</pre>
+</div>
+
+<p>Na aba nova, sem o conserto, o degradê aparece em <strong>faixas</strong>: do amarelo ao tomate na altura do título e do parágrafo, e de novo, e de novo, até o fim da janela. Por quê? O fundo do <code>body</code> pinta a janela inteira (aula <a href="background-color.html">Cor de Fundo</a>), mas o <strong>tamanho</strong> da imagem é medido pela página, que tem só a altura do conteúdo, uns 114 pixels. O degradê tem 114 pixels de altura e se repete, como toda imagem de fundo.</p>
+
+<p>Com <code>html { min-height: 100%; }</code>, a página passa a ter no mínimo a altura da janela, e o degradê vai de cima a baixo uma vez só. Outra saída é <code>background-repeat: no-repeat</code> com <code>background-color: tomato</code>: depois do fim do degradê, a cor continua.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Erro de propósito:</strong> as cinco caixas deviam ter degradês. Todas ficaram sem fundo, só com a borda cinza. Leia os cenários e conserte.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa um"&gt;um&lt;/div&gt;
+&lt;div class="caixa dois"&gt;dois&lt;/div&gt;
+&lt;div class="caixa tres"&gt;três&lt;/div&gt;
+&lt;div class="caixa quatro"&gt;quatro&lt;/div&gt;
+&lt;div class="caixa cinco"&gt;cinco&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  height: 80px;
+  border: 1px solid gray;
+}
+
+.um {
+  background-color: linear-gradient(tomato, gold);
+}
+
+.dois {
+  background-image: linear-gradient(to right tomato, gold);
+}
+
+.tres {
+  background-image: linear-gradient(to rigth, tomato, gold);
+}
+
+.quatro {
+  background-image: linear-gradient(90, tomato, gold);
+}
+
+.cinco {
+  background-image: linear-gradient(right, tomato, gold);
+}
+</pre>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-color”: “linear-gradient(tomato, gold)” is not a “background-color” value.</code></strong>
+<p><strong>O que aconteceu:</strong> o degradê foi para o <code>background-color</code>. Parece lógico ("é uma cor de fundo"), mas o degradê é uma <strong>imagem</strong>, e o <code>background-color</code> só aceita uma cor. A declaração é ignorada.</p>
+<pre class="term" data-cwd="~/degrade">$ vnu --css style.css
+"file:/home/ana/degrade/style.css":7.49-7.49: error: CSS: “background-color”: “linear-gradient(tomato, gold)” is not a “background-color” value.</pre>
+<p><strong>Como consertar:</strong> <code>background-image: linear-gradient(tomato, gold);</code>, ou o atalho <code>background: linear-gradient(tomato, gold);</code>, que entende as duas coisas.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-image”: “tomato” is not a “linear-gradient” value.</code></strong>
+<p><strong>O que aconteceu:</strong> faltou a vírgula entre a direção e a primeira cor: <code>to right tomato</code>. O navegador leu tudo como uma direção só e não entendeu.</p>
+<pre class="term" data-cwd="~/degrade">$ vnu --css style.css
+"file:/home/ana/degrade/style.css":11.58-11.58: error: CSS: “background-image”: “tomato” is not a “linear-gradient” value.</pre>
+<p><strong>Como consertar:</strong> <code>linear-gradient(to right, tomato, gold)</code>: vírgula depois da direção e entre as cores. Dentro de uma parada não há vírgula (<code>tomato 30%</code>).</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-image”: “rigth” is not a “linear-gradient” value.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>rigth</code>, com as letras trocadas.</p>
+<pre class="term" data-cwd="~/degrade">$ vnu --css style.css
+"file:/home/ana/degrade/style.css":15.59-15.59: error: CSS: “background-image”: “rigth” is not a “linear-gradient” value.</pre>
+<p><strong>Como consertar:</strong> <code>right</code>: r-i-g-h-t.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-image”: only “0” can be a “90”. You must put a unit after your number.</code></strong>
+<p><strong>O que aconteceu:</strong> o ângulo sem a unidade: <code>90</code> no lugar de <code>90deg</code>.</p>
+<pre class="term" data-cwd="~/degrade">$ vnu --css style.css
+"file:/home/ana/degrade/style.css":19.53-19.53: error: CSS: “background-image”: only “0” can be a “90”. You must put a unit after your number.</pre>
+<p>"Você precisa pôr uma unidade depois do número." (A primeira parte da frase, "só <code>0</code> pode ser um <code>90</code>", é torta; ela quer dizer que só o zero pode ficar sem unidade.) No CSS, um número que é um tamanho ou um ângulo sempre leva a unidade.</p>
+<p><strong>Como consertar:</strong> <code>90deg</code>, colado.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-image”: The first argument to the “linear-gradient” function should be “to right”, not “right”.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>linear-gradient(right, …)</code>, sem o <code>to</code>. É a escrita <strong>antiga</strong>, dos degradês com prefixo (<code>-webkit-linear-gradient(right, …)</code>), que você ainda encontra em tutoriais velhos. Hoje, sem o <code>to</code>, o degradê é ignorado.</p>
+<pre class="term" data-cwd="~/degrade">$ vnu --css style.css
+"file:/home/ana/degrade/style.css":23.56-23.56: error: CSS: “background-image”: The first argument to the “linear-gradient” function should be “to right”, not “right”.</pre>
+<p>"O primeiro argumento da função <code>linear-gradient</code> deveria ser <code>to right</code>, e não <code>right</code>." Repare: na escrita antiga, <code>right</code> dizia de onde o degradê <strong>saía</strong>; com o <code>to</code>, diz para onde ele <strong>vai</strong>.</p>
+<p><strong>Como consertar:</strong> <code>to right</code>. E nada de prefixo <code>-webkit-</code>: todos os navegadores de hoje entendem o <code>linear-gradient()</code> sem ele.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>background-image: linear-gradient(tomato, gold);</code></td><td>Degradê de cima para baixo</td></tr>
+<tr><td><code>linear-gradient(to right, …)</code></td><td>Da esquerda para a direita (<code>to left</code>, <code>to top</code>, <code>to bottom</code>)</td></tr>
+<tr><td><code>linear-gradient(to bottom right, …)</code></td><td>Para o canto de baixo, à direita</td></tr>
+<tr><td><code>linear-gradient(45deg, …)</code></td><td>Ângulo: <code>0deg</code> para cima, <code>90deg</code> para a direita, no sentido horário</td></tr>
+<tr><td><code>tomato 30%, gold 70%</code></td><td>Paradas: onde cada cor está pura</td></tr>
+<tr><td><code>tomato 50%, gold 50%</code></td><td>Corte seco, sem mistura</td></tr>
+<tr><td><code>white 33% 66%</code></td><td>Uma cor com duas paradas: uma faixa</td></tr>
+<tr><td><code>repeating-linear-gradient(45deg, tomato 0 10px, gold 10px 20px)</code></td><td>Repete o padrão: listras</td></tr>
+<tr><td><code>linear-gradient(rgb(0 0 0 / 70%), transparent), url("foto.jpg")</code></td><td>Escurece a foto por cima</td></tr>
+<tr><td><code>html { min-height: 100%; }</code></td><td>Evita o degradê em faixas no <code>body</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A propriedade certa</h3>
+<p>Complete com a propriedade que aceita um degradê:</p>
+<div class="ex-code">.faixa {
+  <input data-answer="background-image|background" aria-label="propriedade">: linear-gradient(tomato, gold);
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. Para a direita</h3>
+<p>Complete a direção com palavras:</p>
+<div class="ex-code">.faixa {
+  background-image: linear-gradient(<input data-answer="to right" aria-label="direção">, tomato, gold);
+}</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. Para onde vai o degradê <code>linear-gradient(0deg, tomato, gold)</code>?</p>
+<label><input type="radio" name="q3"> Para a direita</label>
+<label><input type="radio" name="q3"> Para baixo</label>
+<label><input type="radio" name="q3"> Para cima: tomate embaixo, ouro em cima</label>
+<label><input type="radio" name="q3"> Não tem direção: <code>0deg</code> desliga o degradê</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Qual escrita faz metade tomate, metade ouro, sem mistura?</p>
+<label><input type="radio" name="q4"> <code>linear-gradient(to right, tomato, gold)</code></label>
+<label><input type="radio" name="q4"> <code>linear-gradient(to right, tomato 50%, gold 50%)</code></label>
+<label><input type="radio" name="q4"> <code>linear-gradient(to right, tomato 0%, gold 100%)</code></label>
+<label><input type="radio" name="q4"> <code>linear-gradient(to right, tomato / gold)</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Num degradê com várias imagens, <code>linear-gradient(…), url("bolo.jpg")</code>, o que fica por cima?</p>
+<label><input type="radio" name="q5"> O degradê, porque é a primeira imagem da lista</label>
+<label><input type="radio" name="q5"> A foto, porque é um arquivo de verdade</label>
+<label><input type="radio" name="q5"> Os dois se misturam meio a meio</label>
+<label><input type="radio" name="q5"> Só o degradê aparece; a foto é ignorada</label>
+</div>
+
+<h3>Missão final: o botão e a capa</h3>
+
+<div class="tryhtml" data-goal="css:.botao{background-image}=linear-gradient(rgb(255, 99, 71), rgb(178, 34, 34)),src:background-image:\s*linear-gradient\([^;]*\)\s*\,\s*url\(,nsrc:background-color:\s*linear,css:.capa h1{color}=rgb(255, 255, 255)">
+<p class="try-task"><strong>Missão:</strong> (1) O <code>.botao</code> deve ter um degradê de <code>tomato</code> (em cima) para <code>firebrick</code> (embaixo). (2) A <code>.capa</code> deve ter, <strong>por cima</strong> da foto, um degradê de <code>rgb(0 0 0 / 70%)</code> para <code>transparent</code>, e o título branco. Há um erro na regra do botão.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="capa"&gt;
+  &lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;a class="botao" href="#receita"&gt;Ver a receita&lt;/a&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.capa {
+  background-color: saddlebrown;
+  background-image: url("assets/midia/bolo-800.jpg");
+  background-size: cover;
+  background-position: center;
+  height: 250px;
+}
+
+.botao {
+  background-color: linear-gradient(tomato, firebrick);
+  color: white;
+  padding: 8px 16px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.capa {
+  background-color: saddlebrown;
+  background-image:
+    linear-gradient(rgb(0 0 0 / 70%), transparent),
+    url("assets/midia/bolo-800.jpg");
+  background-size: cover;
+  background-position: center;
+  height: 250px;
+}
+
+.capa h1 {
+  color: white;
+}
+
+.botao {
+  background-color: firebrick;
+  background-image: linear-gradient(tomato, firebrick);
+  color: white;
+  padding: 8px 16px;
+}
+</pre>
+</div>
+
+<p>No botão, o degradê vai para o <code>background-image</code>; o <code>background-color: firebrick</code> fica de reserva. Na capa, o degradê entra <strong>antes</strong> do <code>url()</code> na lista, para ficar por cima.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O degradê é uma <strong>imagem</strong> desenhada pelo navegador: vai no <code>background-image</code> (ou no atalho <code>background</code>), nunca no <code>background-color</code>.</li>
+  <li><code>linear-gradient(direção, cor1, cor2, …)</code>. Sem direção, vai para baixo. Direção com palavras (<code>to right</code>, <code>to bottom right</code>) ou graus (<code>90deg</code>, com a unidade).</li>
+  <li>Paradas dizem onde cada cor está pura; duas cores na mesma parada fazem um corte seco. <code>repeating-linear-gradient()</code> repete o padrão: listras.</li>
+  <li>Um degradê transparente na frente de um <code>url()</code> escurece a foto e dá contraste ao texto.</li>
+  <li>No <code>body</code> de uma página curta, o degradê se repete em faixas: <code>html { min-height: 100%; }</code> resolve.</li>
+  <li>Erros comuns: degradê no <code>background-color</code>, vírgula esquecida, <code>rigth</code>, ângulo sem <code>deg</code> e a escrita antiga sem <code>to</code>. O navegador ignora; o validador aponta.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
