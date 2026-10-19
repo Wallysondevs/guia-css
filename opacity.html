@@ -194,7 +194,7 @@
 <p>Toda transparência deixa o fundo "vazar", e isso <strong>reduz o contraste</strong>. Um texto preto com <code>opacity: 0.3</code> vira, na prática, um cinza-claro sobre o branco: bonito no "design", ilegível para muita gente. Use <code>opacity</code> baixa só em coisas que não precisam ser lidas (uma foto de fundo, um produto esgotado que também tem a palavra "esgotado" escrita). A aula <a href="acessibilidade.html">CSS e Acessibilidade</a> mostra como medir.</p>
 
 <div class="tryhtml">
-<p class="try-task"><strong>Experimente:</strong> mude o <code>0.5</code> da <code>opacity</code> e o <code>50%</code> do alfa. Repare que, no primeiro parágrafo, o texto desbota junto; no segundo, não.</p>
+<p class="try-task"><strong>Experimente:</strong> mude o <code>0.3</code> da <code>opacity</code> e o <code>30%</code> do alfa. Repare que, no primeiro parágrafo, o texto desbota junto (fica azulado, apagado); no segundo, continua preto.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;div class="cartaz"&gt;
   &lt;p class="um"&gt;Com opacity&lt;/p&gt;
@@ -208,11 +208,11 @@
 
 .um {
   background-color: white;
-  opacity: 0.5;
+  opacity: 0.3;
 }
 
 .dois {
-  background-color: rgb(255 255 255 / 50%);
+  background-color: rgb(255 255 255 / 30%);
 }
 </pre>
 </div>
