@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Negrito e Itálico — font-weight e font-style | Guia CSS</title>
+<meta name="description" content="Negrito e itálico no CSS para quem nunca escreveu CSS: font-weight com normal, bold e os números de 100 a 900 lado a lado, bolder e lighter, como tirar o negrito dos títulos, font-style italic e oblique, a diferença entre strong/em e o CSS, e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Negrito e Itálico (font-weight e font-style)</span></h1>
+
+<p class="intro">Negrito chama atenção; itálico dá ênfase ou marca um nome de livro. No CSS, são duas propriedades: <code>font-weight</code> ("peso da fonte"), que deixa a letra mais grossa ou mais fina, e <code>font-style</code> ("estilo da fonte"), que a deixa inclinada. Nesta aula você vê os pesos de 100 a 900 lado a lado, aprende a <strong>tirar</strong> o negrito que os títulos já trazem e descobre quando usar CSS e quando usar o <code>&lt;strong&gt;</code> do HTML.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li><code>font-weight: bold</code> e <code>normal</code>, e por que o navegador guarda <code>700</code> e <code>400</code>.</li>
+  <li>Os pesos numéricos, de 100 (fininho) a 900 (bem grosso), desenhados lado a lado.</li>
+  <li>Como tirar o negrito de títulos e cabeçalhos de tabela.</li>
+  <li><code>bolder</code> e <code>lighter</code>, e o <code>&lt;strong&gt;</code> dentro de um texto já em negrito.</li>
+  <li><code>font-style: italic</code>, <code>oblique</code> e <code>normal</code>.</li>
+  <li>A diferença entre significado (<code>&lt;strong&gt;</code>, <code>&lt;em&gt;</code>) e aparência (CSS).</li>
+  <li>Os erros reais do validador: <code>negrito</code>, <code>700px</code>, <code>font-style: bold</code>…</li>
+</ul>
+</div>
+
+<p>Os quadros "Resultado" e as caixas "Experimente" são desenhados agora pelo <strong>seu</strong> navegador. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: a caneta e o marcador</h2>
+<p>Escrevendo à mão, a Ana tem uma caneta fina, uma caneta normal e um marcador grosso: a mesma letra, com traços de <strong>peso</strong> diferente. É o <code>font-weight</code>. E, quando ela escreve mais depressa, a letra <em>inclina</em> para a direita: é o itálico, o <code>font-style</code>. Peso e inclinação são independentes: dá para ter negrito, itálico, os dois ou nenhum.</p>
+
+<hr>
+
+<h2>1. <code>font-weight</code>: <code>normal</code> e <code>bold</code></h2>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Bolo de cenoura com cobertura de chocolate.&lt;/p&gt;
+&lt;p class="preco"&gt;R$ 35,00&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.preco {
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>font-weight</dt><dd>A propriedade: o peso (a grossura do traço) da letra.</dd>
+  <dt>bold</dt><dd>"Negrito". O navegador guarda como o número <code>700</code>.</dd>
+  <dt>normal</dt><dd>O peso comum do texto. Guardado como <code>400</code>.</dd>
+</dl>
+
+<p>Na caixa, troque <code>bold</code> por <code>normal</code>: o preço volta a ser igual ao texto. O valor calculado (F12, aba <em>Computed</em>) nunca mostra a palavra: <code>bold</code> aparece como <code>700</code>, e <code>normal</code> como <code>400</code>.</p>
+
+<hr>
+
+<h2>2. Os pesos de 100 a 900</h2>
+<p>Além das duas palavras, o <code>font-weight</code> aceita números. Os mais usados são as centenas, cada uma com um nome que você vai encontrar nos sites de fontes:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Número</th><th>Nome comum</th><th>Em português</th></tr>
+<tr><td><code>100</code></td><td>Thin</td><td>Fininho</td></tr>
+<tr><td><code>200</code></td><td>Extra Light</td><td>Extra leve</td></tr>
+<tr><td><code>300</code></td><td>Light</td><td>Leve</td></tr>
+<tr><td><code>400</code></td><td>Regular / Normal</td><td>Normal (= <code>normal</code>)</td></tr>
+<tr><td><code>500</code></td><td>Medium</td><td>Médio</td></tr>
+<tr><td><code>600</code></td><td>Semi Bold</td><td>Seminegrito</td></tr>
+<tr><td><code>700</code></td><td>Bold</td><td>Negrito (= <code>bold</code>)</td></tr>
+<tr><td><code>800</code></td><td>Extra Bold</td><td>Extranegrito</td></tr>
+<tr><td><code>900</code></td><td>Black</td><td>Pesado</td></tr>
+</table>
+</div>
+
+<p>Mas há um porém: o navegador só desenha um peso que a <strong>fonte tem</strong>. A maioria das fontes do sistema tem só o normal e o negrito. Veja os nove pesos com a fonte padrão do seu navegador:</p>
+
+<pre class="file" data-file="pesos-sistema.html" data-resultado>&lt;style&gt;
+  p { font-family: sans-serif; margin: 2px 0; }
+  .w100 { font-weight: 100; }
+  .w200 { font-weight: 200; }
+  .w300 { font-weight: 300; }
+  .w400 { font-weight: 400; }
+  .w500 { font-weight: 500; }
+  .w600 { font-weight: 600; }
+  .w700 { font-weight: 700; }
+  .w800 { font-weight: 800; }
+  .w900 { font-weight: 900; }
+&lt;/style&gt;
+&lt;p class="w100"&gt;100 Bolo de cenoura&lt;/p&gt;
+&lt;p class="w200"&gt;200 Bolo de cenoura&lt;/p&gt;
+&lt;p class="w300"&gt;300 Bolo de cenoura&lt;/p&gt;
+&lt;p class="w400"&gt;400 Bolo de cenoura&lt;/p&gt;
+&lt;p class="w500"&gt;500 Bolo de cenoura&lt;/p&gt;
+&lt;p class="w600"&gt;600 Bolo de cenoura&lt;/p&gt;
+&lt;p class="w700"&gt;700 Bolo de cenoura&lt;/p&gt;
+&lt;p class="w800"&gt;800 Bolo de cenoura&lt;/p&gt;
+&lt;p class="w900"&gt;900 Bolo de cenoura&lt;/p&gt;
+</pre>
+
+<p>Provavelmente você vê só dois ou três pesos diferentes: os números baixos saem como o normal, os altos como o negrito. Quando falta o peso pedido, o navegador usa o mais próximo que existe. Agora, a mesma lista com a fonte <strong>Roboto</strong>, baixada do Google Fonts com todos os pesos (aula <a href="fontes-web.html">Fontes da Internet</a>; precisa de internet):</p>
+
+<pre class="file" data-file="pesos-roboto.html" data-resultado>&lt;link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&amp;display=swap" rel="stylesheet"&gt;
+&lt;style&gt;
+  p { font-family: "Roboto", sans-serif; margin: 2px 0; }
+  .w100 { font-weight: 100; }
+  .w200 { font-weight: 200; }
+  .w300 { font-weight: 300; }
+  .w400 { font-weight: 400; }
+  .w500 { font-weight: 500; }
+  .w600 { font-weight: 600; }
+  .w700 { font-weight: 700; }
+  .w800 { font-weight: 800; }
+  .w900 { font-weight: 900; }
+&lt;/style&gt;
+&lt;p class="w100"&gt;100 Bolo de cenoura&lt;/p&gt;
+&lt;p class="w200"&gt;200 Bolo de cenoura&lt;/p&gt;
+&lt;p class="w300"&gt;300 Bolo de cenoura&lt;/p&gt;
+&lt;p class="w400"&gt;400 Bolo de cenoura&lt;/p&gt;
+&lt;p class="w500"&gt;500 Bolo de cenoura&lt;/p&gt;
+&lt;p class="w600"&gt;600 Bolo de cenoura&lt;/p&gt;
+&lt;p class="w700"&gt;700 Bolo de cenoura&lt;/p&gt;
+&lt;p class="w800"&gt;800 Bolo de cenoura&lt;/p&gt;
+&lt;p class="w900"&gt;900 Bolo de cenoura&lt;/p&gt;
+</pre>
+
+<p>Agora cada linha é um pouco mais grossa que a anterior, do traço fininho do 100 ao traço pesado do 900 (entre os pesos mais altos, a diferença é pequena, mas existe). Esta Roboto é uma <strong>fonte variável</strong> (<code>wght@100..900</code>): um arquivo só com todos os pesos, inclusive os intermediários, como <code>550</code>. Com ela, qualquer número de 1 a 1000 funciona.</p>
+
+<div class="tip">
+<strong>Leveza com cuidado</strong>
+<p>Pesos 100 e 200 ficam elegantes em títulos grandes, mas são difíceis de ler em texto pequeno, principalmente em cinza claro. Para o texto do site, fique entre 400 e 500.</p>
+</div>
+
+<hr>
+
+<h2>3. Tirando o negrito</h2>
+<p>Alguns elementos já vêm em negrito do navegador: os títulos <code>&lt;h1&gt;</code> a <code>&lt;h6&gt;</code>, os cabeçalhos de tabela <code>&lt;th&gt;</code>, o <code>&lt;strong&gt;</code> e o <code>&lt;b&gt;</code>. Todos têm o valor calculado <code>700</code>. Para um título mais leve, é só pedir:</p>
+
+<pre class="file" data-file="titulo-leve.html" data-resultado>&lt;style&gt;
+  .leve {
+    font-weight: 300;
+  }
+&lt;/style&gt;
+&lt;h1&gt;Título padrão: 700&lt;/h1&gt;
+&lt;h1 class="leve"&gt;Título leve: 300&lt;/h1&gt;
+</pre>
+
+<p>O segundo título ficou com traço mais fino. (Se a sua fonte padrão não tiver o peso 300, ele sai no peso normal, 400: ainda assim, sem negrito.)</p>
+
+<div class="tryhtml" data-goal="css:h1{font-weight}=400,css:.preco{font-weight}=700">
+<p class="try-task"><strong>Missão:</strong> no cardápio, o título está pesado demais e o preço, que importa, está fraco. Deixe o <code>h1</code> com peso <code>normal</code> e o <code>.preco</code> em negrito (<code>bold</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Cardápio da Padaria&lt;/h1&gt;
+&lt;p&gt;Pão de queijo (6 unidades)&lt;/p&gt;
+&lt;p class="preco"&gt;R$ 12,00&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: hsl(12 73% 45%);
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: hsl(12 73% 45%);
+  font-weight: normal;
+}
+
+.preco {
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>4. <code>bolder</code> e <code>lighter</code>: relativos ao pai</h2>
+<p>Duas palavras escolhem o peso <strong>a partir do pai</strong>: <code>bolder</code> ("mais negrito") e <code>lighter</code> ("mais leve"). O <code>&lt;strong&gt;</code> do navegador usa justamente <code>bolder</code>. Por isso acontece isto:</p>
+
+<pre class="file" data-file="bolder.html" data-resultado>&lt;style&gt;
+  .aviso {
+    font-weight: bold;
+  }
+&lt;/style&gt;
+&lt;p&gt;Texto normal com um &lt;strong&gt;strong&lt;/strong&gt;.&lt;/p&gt;
+&lt;p class="aviso"&gt;Aviso em negrito com um &lt;strong&gt;strong&lt;/strong&gt; dentro.&lt;/p&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Onde está o <code>&lt;strong&gt;</code></th><th>Peso do pai</th><th>Peso calculado do <code>&lt;strong&gt;</code></th></tr>
+<tr><td>No parágrafo normal</td><td><code>400</code></td><td><code>700</code></td></tr>
+<tr><td>No aviso em negrito</td><td><code>700</code></td><td><code>900</code></td></tr>
+</table>
+</div>
+
+<p>No segundo parágrafo, o <code>&lt;strong&gt;</code> pediu "mais negrito que o pai" e ganhou <code>900</code>. Com a fonte padrão, que quase sempre só tem um negrito, ele parece igual ao resto do aviso; com uma fonte que tem o peso 900, fica ainda mais grosso. E <code>lighter</code> dentro de um pai <code>700</code> dá <code>400</code>.</p>
+
+<hr>
+
+<h2>5. <code>font-style</code>: o itálico</h2>
+
+<pre class="file" data-file="italico.html" data-resultado>&lt;style&gt;
+  .normal { font-style: normal; }
+  .italico { font-style: italic; }
+  .obliquo { font-style: oblique; }
+&lt;/style&gt;
+&lt;p class="normal"&gt;normal: Bolo de cenoura da vó Lúcia&lt;/p&gt;
+&lt;p class="italico"&gt;italic: Bolo de cenoura da vó Lúcia&lt;/p&gt;
+&lt;p class="obliquo"&gt;oblique: Bolo de cenoura da vó Lúcia&lt;/p&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que faz</th></tr>
+<tr><td><code>normal</code></td><td>Letra em pé. Serve para <strong>tirar</strong> o itálico de quem já vem inclinado.</td></tr>
+<tr><td><code>italic</code></td><td>"Itálico": usa a versão itálica da fonte, desenhada à parte (repare no <strong>a</strong> e no <strong>f</strong>, que mudam de forma em muitas fontes com serifa).</td></tr>
+<tr><td><code>oblique</code></td><td>"Oblíquo": a letra normal, só que inclinada. Aceita o ângulo: <code>oblique 10deg</code>.</td></tr>
+</table>
+</div>
+
+<p>No Resultado, a segunda e a terceira linha provavelmente saíram iguais: quando a fonte não tem uma versão oblíqua própria (quase nenhuma tem), o navegador usa a itálica também para o <code>oblique</code>. E, se a fonte não tiver nem a itálica, o navegador inclina a normal por conta própria (um "itálico falso"). Na prática, use <code>italic</code>. Os elementos <code>&lt;em&gt;</code>, <code>&lt;i&gt;</code>, <code>&lt;cite&gt;</code> e <code>&lt;address&gt;</code> já vêm em itálico; <code>font-style: normal</code> os deixa em pé.</p>
+
+<hr>
+
+<h2>6. Significado ou aparência?</h2>
+<p>O HTML tem elementos que <strong>parecem</strong> negrito e itálico, mas que dizem outra coisa (aula de formatação de texto do <a href="https://wallysondevs.github.io/guia-html/">Guia HTML</a>):</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você quer…</th><th>Use</th><th>Por quê</th></tr>
+<tr><td>Dizer "isto é importante" (um aviso, um alerta)</td><td><code>&lt;strong&gt;</code></td><td>É <strong>significado</strong>: leitores de tela e o Google entendem a importância</td></tr>
+<tr><td>Dar ênfase na fala ("eu <em>disse</em> 200 gramas")</td><td><code>&lt;em&gt;</code></td><td>Significado: muda o sentido da frase</td></tr>
+<tr><td>Só deixar o preço, o nome do produto ou um título mais grosso</td><td>CSS: <code>font-weight</code> numa classe</td><td>É <strong>aparência</strong>: o texto não ficou mais importante, só mais visível</td></tr>
+<tr><td>Só inclinar uma legenda ou uma citação</td><td>CSS: <code>font-style: italic</code></td><td>Aparência</td></tr>
+</table>
+</div>
+<p>Uma boa pergunta: "se o site perdesse todo o CSS, esse negrito ainda faria falta?" Se sim, é <code>&lt;strong&gt;</code>; se não, é CSS.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Um valor inválido é ignorado em silêncio: o texto fica com o peso e o estilo de antes. As linhas abaixo queriam negrito ou itálico:</p>
+
+<pre class="file" data-file="erros.html · erro de propósito" data-resultado>&lt;style&gt;
+  .a { font-weight: negrito; }
+  .b { font-weight: 700px; }
+  .c { font-weight: 1200; }
+  .d { font-style: bold; }
+  .e { font-weight: italic; }
+&lt;/style&gt;
+&lt;p class="a"&gt;font-weight: negrito&lt;/p&gt;
+&lt;p class="b"&gt;font-weight: 700px&lt;/p&gt;
+&lt;p class="c"&gt;font-weight: 1200&lt;/p&gt;
+&lt;p class="d"&gt;font-style: bold&lt;/p&gt;
+&lt;p class="e"&gt;font-weight: italic&lt;/p&gt;
+</pre>
+
+<p>As cinco ficaram normais, em pé e sem negrito.</p>
+
+<div class="cenario">
+<strong><code>error: CSS: “font-weight”: “negrito” is not a “font-weight” value.</code></strong>
+<p><strong>O que aconteceu:</strong> o valor em português: <code>font-weight: negrito;</code>. O mesmo acontece com <code>font-style: italico;</code>.</p>
+<pre class="term" data-cwd="~/negrito">$ vnu --css palavra.css
+"file:/home/ana/negrito/palavra.css":2.16-2.22: error: CSS: “font-weight”: “negrito” is not a “font-weight” value.
+$ vnu --css italico.css
+"file:/home/ana/negrito/italico.css":2.15-2.21: error: CSS: “font-style”: “italico” is not a “font-style” value.</pre>
+<p><strong>Como consertar:</strong> os valores são em inglês: <code>bold</code>, <code>italic</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “font-weight”: “700px” is not a “font-weight” value.</code></strong>
+<p><strong>O que aconteceu:</strong> uma unidade no peso: <code>font-weight: 700px;</code>. O peso é um número puro, sem unidade (ao contrário do <code>font-size</code>).</p>
+<pre class="term" data-cwd="~/negrito">$ vnu --css px.css
+"file:/home/ana/negrito/px.css":2.16-2.20: error: CSS: “font-weight”: “700px” is not a “font-weight” value.</pre>
+<p><strong>Como consertar:</strong> <code>font-weight: 700;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “font-weight”: “1200” is not valid, only values lower than or equal to “1000.0” are allowed.</code></strong>
+<p><strong>O que aconteceu:</strong> um peso fora do intervalo: <code>font-weight: 1200;</code> (ou <code>0</code>).</p>
+<pre class="term" data-cwd="~/negrito">$ vnu --css grande.css
+"file:/home/ana/negrito/grande.css":2.16-2.19: error: CSS: “font-weight”: “1200” is not valid, only values lower than or equal to “1000.0” are allowed.
+$ vnu --css zero.css
+"file:/home/ana/negrito/zero.css":2.16-2.16: error: CSS: “font-weight”: “0” is not valid, only values greater than or equal to “1.0” are allowed.</pre>
+<p>"Só são permitidos valores até 1000" e "a partir de 1". Diferente do <code>rgb()</code> e da <code>opacity</code>, aqui o navegador <strong>não</strong> corta no limite: ele ignora a declaração inteira.</p>
+<p><strong>Como consertar:</strong> um número de 1 a 1000; no dia a dia, as centenas de 100 a 900.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “font-style”: “bold” is not a “font-style” value.</code></strong>
+<p><strong>O que aconteceu:</strong> as propriedades trocadas: <code>font-style: bold;</code> (ou <code>font-weight: italic;</code>). Negrito é <strong>peso</strong>; itálico é <strong>estilo</strong>.</p>
+<pre class="term" data-cwd="~/negrito">$ vnu --css style-bold.css
+"file:/home/ana/negrito/style-bold.css":2.15-2.18: error: CSS: “font-style”: “bold” is not a “font-style” value.
+$ vnu --css weight-italic.css
+"file:/home/ana/negrito/weight-italic.css":2.16-2.21: error: CSS: “font-weight”: “italic” is not a “font-weight” value.</pre>
+<p><strong>Como consertar:</strong> <code>font-weight: bold;</code> para negrito, <code>font-style: italic;</code> para itálico. Para os dois, as duas declarações.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th><th>Valor calculado</th></tr>
+<tr><td><code>font-weight: normal;</code></td><td>Peso normal (tira o negrito)</td><td><code>400</code></td></tr>
+<tr><td><code>font-weight: bold;</code></td><td>Negrito</td><td><code>700</code></td></tr>
+<tr><td><code>font-weight: 100</code> … <code>900</code></td><td>Do fininho ao pesado; só aparece se a fonte tiver o peso</td><td>o número</td></tr>
+<tr><td><code>font-weight: bolder;</code> / <code>lighter;</code></td><td>Mais / menos peso que o pai</td><td>ex.: pai 700 → <code>900</code> / <code>400</code></td></tr>
+<tr><td><code>font-style: italic;</code></td><td>Itálico</td><td><code>italic</code></td></tr>
+<tr><td><code>font-style: oblique 10deg;</code></td><td>A letra normal inclinada</td><td><code>oblique 10deg</code></td></tr>
+<tr><td><code>font-style: normal;</code></td><td>Letra em pé (tira o itálico do <code>&lt;em&gt;</code>)</td><td><code>normal</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O negrito em número</h3>
+<p>Complete com o número que equivale a <code>bold</code>:</p>
+<div class="ex-code">.preco { font-weight: <input data-answer="700" aria-label="peso">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. A propriedade do itálico</h3>
+<p>Complete com a propriedade que deixa o texto em itálico:</p>
+<div class="ex-code">.legenda { <input data-answer="font-style" aria-label="propriedade">: italic; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. Como deixar um <code>&lt;h2&gt;</code> sem negrito?</p>
+<label><input type="radio" name="q3"> <code>font-style: normal;</code></label>
+<label><input type="radio" name="q3"> <code>font-weight: 0;</code></label>
+<label><input type="radio" name="q3"> <code>font-weight: normal;</code></label>
+<label><input type="radio" name="q3"> Não dá: títulos são sempre negrito</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">4. A Ana pôs <code>font-weight: 300</code> e o texto não ficou mais fino. O motivo mais provável:</p>
+<label><input type="radio" name="q4"> A fonte usada não tem o peso 300, e o navegador usou o mais próximo (o normal)</label>
+<label><input type="radio" name="q4"> O certo seria <code>300px</code></label>
+<label><input type="radio" name="q4"> 300 é mais grosso que o normal</label>
+<label><input type="radio" name="q4"> <code>font-weight</code> não aceita números</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Num aviso, a frase "não use fermento vencido" é um alerta de verdade. O que usar?</p>
+<label><input type="radio" name="q5"> Um <code>&lt;span&gt;</code> com <code>font-weight: bold</code></label>
+<label><input type="radio" name="q5"> <code>&lt;strong&gt;</code>, porque a importância é significado</label>
+<label><input type="radio" name="q5"> <code>font-style: bold</code></label>
+<label><input type="radio" name="q5"> Um <code>&lt;h1&gt;</code></label>
+</div>
+
+<h3>Missão final: a ficha da receita</h3>
+
+<div class="tryhtml" data-goal="css:h1{font-weight}=300,css:.rendimento{font-weight}=700,css:.citacao{font-style}=italic,css:em{font-style}=normal">
+<p class="try-task"><strong>Missão:</strong> nada do <code>style.css</code> funcionou. Conserte: o <code>h1</code> leve (<code>300</code>), o <code>.rendimento</code> em negrito, a <code>.citacao</code> em itálico e o <code>em</code> (que já vem em itálico) em pé, com <code>normal</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;p class="rendimento"&gt;Rende 12 fatias.&lt;/p&gt;
+&lt;p class="citacao"&gt;"O segredo é bater a cenoura com o óleo." (vó Lúcia)&lt;/p&gt;
+&lt;p&gt;Asse por &lt;em&gt;exatamente&lt;/em&gt; 40 minutos.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  font-weight: 300px;
+}
+
+.rendimento {
+  font-style: bold;
+}
+
+.citacao {
+  font-style: italico;
+}
+
+em {
+  font-weight: normal;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  font-weight: 300;
+}
+
+.rendimento {
+  font-weight: bold;
+}
+
+.citacao {
+  font-style: italic;
+}
+
+em {
+  font-style: normal;
+}
+</pre>
+</div>
+
+<p>Os quatro erros: unidade no peso, as duas propriedades trocadas (<code>font-style: bold</code> e, no <code>em</code>, <code>font-weight</code> no lugar de <code>font-style</code>) e o valor em português. Repare no último: <code>font-weight: normal</code> era um CSS válido, mas mexia na coisa errada, por isso nada mudou.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>font-weight</code> é o peso da letra: <code>normal</code> (400), <code>bold</code> (700) ou um número de 1 a 1000, sem unidade.</li>
+  <li>O navegador só desenha os pesos que a fonte tem; as fontes do sistema costumam ter só 400 e 700. Fontes variáveis têm todos.</li>
+  <li>Títulos, <code>&lt;th&gt;</code>, <code>&lt;strong&gt;</code> e <code>&lt;b&gt;</code> já vêm com 700: <code>font-weight: normal</code> tira o negrito.</li>
+  <li><code>bolder</code>/<code>lighter</code> partem do peso do pai: um <code>&lt;strong&gt;</code> dentro de texto 700 vira 900.</li>
+  <li><code>font-style</code>: <code>italic</code>, <code>oblique</code> ou <code>normal</code> (que tira o itálico do <code>&lt;em&gt;</code>).</li>
+  <li>Importância e ênfase são HTML (<code>&lt;strong&gt;</code>, <code>&lt;em&gt;</code>); só aparência é CSS.</li>
+  <li>Valor em português, unidade no peso, número fora de 1–1000 ou propriedades trocadas: a declaração é ignorada.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
