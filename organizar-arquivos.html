@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Organizando os Arquivos — seções, pastas, vários link e @import | Guia CSS</title>
+<meta name="description" content="Como organizar os arquivos de CSS para quem está começando: um arquivo com seções e sumário, a pasta css com reset, base, layout e componentes (vista com tree), vários link na ordem certa, @import e por que ele fica no topo, nomes de arquivo, e os erros reais: caminho errado, @import depois de uma regra e a ordem trocada.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Organizando os Arquivos</span></h1>
+
+<p class="intro">O <code>style.css</code> da Ana começou com dez linhas. Hoje tem oitocentas: o reset, as cores, o menu, os cartões, o formulário, o rodapé, tudo misturado. Para mudar o botão, ela rola o arquivo inteiro procurando. Nesta aula você vai ver como arrumar o CSS de um site que cresceu: primeiro com <strong>seções</strong> dentro de um arquivo só, depois com <strong>vários arquivos</strong> numa pasta, e as duas formas de juntá-los na página (<code>&lt;link&gt;</code> e <code>@import</code>), com a ordem que importa.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Organizar um arquivo só com seções, comentários e um sumário.</li>
+  <li>Dividir o CSS numa pasta: <code>reset</code>, <code>base</code>, <code>layout</code> e <code>componentes</code>.</li>
+  <li>Ligar vários arquivos com vários <code>&lt;link&gt;</code>, e por que a ordem importa.</li>
+  <li><code>@import</code>: como funciona, por que fica no topo, e por que deixa a página mais lenta.</li>
+  <li>Bons nomes de arquivo.</li>
+  <li>Os erros reais: caminho errado, <code>@import</code> fora do lugar e a ordem trocada.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador; nas caixas desta aula, as abas viram arquivos numa pasta, como num site de verdade (inclusive <code>css/base.css</code>, dentro da pasta <code>css</code>). As saídas do terminal e do validador W3C (<code>vnu</code>) são da máquina fictícia da Ana (<code>ana@notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: a despensa da padaria</h2>
+<p>Numa despensa bagunçada, a farinha está atrás do detergente, e o fermento, em três lugares. Para arrumar, a Ana faz duas coisas: <strong>prateleiras com etiqueta</strong> (farinhas, laticínios, limpeza) e uma <strong>ordem de uso</strong> (o que entra primeiro na receita fica mais à mão). O CSS se arruma do mesmo jeito: cada coisa num lugar com nome, e uma ordem, porque no CSS a ordem decide quem vence (aula <a href="cascata.html">Cascata</a>).</p>
+
+<hr>
+
+<h2>1. Um arquivo só, com seções</h2>
+<p>Para um site pequeno, um arquivo só é o melhor: um <code>&lt;link&gt;</code>, um download. O que falta é <strong>ordem</strong> dentro dele. Comentários (aula <a href="comentarios.html">Comentários</a>) viram as etiquetas das prateleiras:</p>
+
+<pre class="file" data-file="style.css">/* ==========================================
+   Receitas da Ana — style.css
+   1. Reset
+   2. Base (cores, fontes, textos)
+   3. Layout (cabeçalho, conteúdo, rodapé)
+   4. Componentes (botão, cartão, menu)
+   ========================================== */
+
+/* 1. Reset ================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 2. Base ================================== */
+:root {
+  --cor-principal: tomato;
+}
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+
+/* 3. Layout ================================ */
+.topo {
+  padding: 16px;
+}
+
+/* 4. Componentes =========================== */
+.botao {
+  background-color: var(--cor-principal);
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>O sumário no topo</dt><dd>Quem abre o arquivo vê, em cinco linhas, o que tem nele e em que ordem.</dd>
+  <dt>/* 1. Reset ==== */</dt><dd>Um cabeçalho de seção bem visível. Para ir até ele, use a busca do editor (<kbd>Ctrl</kbd>+<kbd>F</kbd>) com "1. Reset".</dd>
+  <dt>A ordem das seções</dt><dd>Do mais geral para o mais específico: primeiro o que vale para tudo (reset, base), depois a estrutura (layout), por fim as peças (componentes). Assim, uma regra de componente vem depois e pode ajustar uma regra geral.</dd>
+</dl>
+
+<p>Essa ordem, do geral para o específico, é a mesma em qualquer organização, num arquivo ou em vinte.</p>
+
+<hr>
+
+<h2>2. Vários arquivos numa pasta</h2>
+<p>Quando o arquivo fica grande demais, ou várias pessoas mexem nele ao mesmo tempo, cada seção vira um arquivo. A pasta do site da Ana ficou assim:</p>
+
+<pre class="term" data-cwd="~">$ tree padaria
+padaria
+├── css
+│   ├── base.css
+│   ├── componentes
+│   │   ├── botao.css
+│   │   ├── cartao.css
+│   │   └── menu.css
+│   ├── layout.css
+│   └── reset.css
+├── img
+│   └── bolo.jpg
+├── index.html
+└── receitas.html
+
+4 directories, 9 files</pre>
+
+<p>O <code>tree</code> ("árvore") mostra as pastas e os arquivos em forma de árvore: <code>4 directories, 9 files</code> é "4 pastas, 9 arquivos" (a própria <code>padaria</code> conta como pasta). O <code>tree</code> lista os nomes em ordem alfabética, não na ordem de uso. O que vai em cada arquivo:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Arquivo</th><th>O que tem</th><th>Exemplo</th></tr>
+<tr><td><code>css/reset.css</code></td><td>O reset (aula <a href="reset.html">Reset e Normalize</a>)</td><td><code>box-sizing</code>, <code>body { margin: 0; }</code></td></tr>
+<tr><td><code>css/base.css</code></td><td>Variáveis e estilos dos elementos, sem classes</td><td><code>:root { --cor-principal: … }</code>, <code>body</code>, <code>h1</code>, <code>a</code></td></tr>
+<tr><td><code>css/layout.css</code></td><td>As grandes áreas da página</td><td><code>.topo</code>, <code>.conteudo</code>, <code>.rodape</code>, o grid da página</td></tr>
+<tr><td><code>css/componentes/*.css</code></td><td>Um arquivo por bloco (aula <a href="bem.html">BEM</a>)</td><td><code>cartao.css</code> só com <code>.cartao</code>, <code>.cartao__titulo</code>…</td></tr>
+</table>
+</div>
+
+<p>A vantagem: para mudar o botão, a Ana abre <code>botao.css</code>, que tem trinta linhas, e não procura num arquivo de oitocentas.</p>
+
+<hr>
+
+<h2>3. Ligando os arquivos: vários <code>&lt;link&gt;</code></h2>
+<p>Cada arquivo ganha um <code>&lt;link&gt;</code> no <code>&lt;head&gt;</code>, <strong>na ordem do geral para o específico</strong>:</p>
+
+<pre class="file" data-file="index.html">&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;Receitas da Ana&lt;/title&gt;
+  &lt;link rel="stylesheet" href="css/reset.css"&gt;
+  &lt;link rel="stylesheet" href="css/base.css"&gt;
+  &lt;link rel="stylesheet" href="css/layout.css"&gt;
+  &lt;link rel="stylesheet" href="css/componentes/cartao.css"&gt;
+&lt;/head&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>href="css/reset.css"</dt><dd>Um caminho relativo: "a pasta <code>css</code>, ao lado desta página, e o arquivo <code>reset.css</code> dentro dela" (os caminhos são os do Guia HTML, <a href="https://wallysondevs.github.io/guia-html/caminhos.html">Caminhos Relativos e Absolutos</a>).</dd>
+  <dt>A ordem dos &lt;link&gt;</dt><dd>Para o navegador, os arquivos se juntam <strong>um depois do outro</strong>, como se fossem um só, na ordem dos <code>&lt;link&gt;</code>. Entre duas regras de mesma especificidade, vence a do arquivo de baixo. Por isso o reset vem primeiro e os componentes por último.</dd>
+</dl>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> esta caixa tem quatro abas, como quatro arquivos: a página e três CSS dentro da pasta <code>css</code>. O <code>base.css</code> deixa os títulos <code>navy</code>, e o <code>cartao.css</code>, que vem depois, deixa o título do cartão <code>tomato</code>. Troque a ordem dos dois últimos <code>&lt;link&gt;</code> e veja o título do cartão ficar azul-marinho.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="css/reset.css"&gt;
+&lt;link rel="stylesheet" href="css/base.css"&gt;
+&lt;link rel="stylesheet" href="css/cartao.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;article class="cartao"&gt;
+  &lt;h2 class="cartao__titulo"&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="css/reset.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 16px;
+}
+</pre>
+<pre class="script" data-file="css/base.css">h1,
+h2,
+.cartao__titulo {
+  color: navy;
+  font-family: sans-serif;
+}
+</pre>
+<pre class="script" data-file="css/cartao.css">.cartao {
+  padding: 16px;
+  border: 2px solid tomato;
+}
+
+.cartao__titulo {
+  margin: 0;
+  color: tomato;
+}
+</pre>
+</div>
+
+<p>No Chromium, com a ordem original, o título do cartão sai cor de tomate (<code>rgb(255, 99, 71)</code> no estilo calculado). Com o <code>cartao.css</code> antes do <code>base.css</code>, sai azul-marinho (<code>rgb(0, 0, 128)</code>): as duas regras <code>.cartao__titulo</code> têm a mesma especificidade, e a que vem depois vence.</p>
+
+<div class="tryhtml" data-goal="sel:link[href='css/botao.css'],css:.botao{background-color}=rgb(255, 99, 71)">
+<p class="try-task"><strong>Missão:</strong> a Ana criou o arquivo <code>css/botao.css</code> (está na aba), mas o botão continua sem estilo: falta ligar o arquivo. Acrescente o <code>&lt;link&gt;</code> que falta no <code>index.html</code>, depois do <code>base.css</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="css/base.css"&gt;
+&lt;h1&gt;Encomendas&lt;/h1&gt;
+&lt;button class="botao"&gt;Encomendar&lt;/button&gt;
+</pre>
+<pre class="script" data-file="css/base.css">body {
+  font-family: sans-serif;
+}
+</pre>
+<pre class="script" data-file="css/botao.css">.botao {
+  padding: 8px 16px;
+  border: none;
+  background-color: tomato;
+  color: white;
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="css/base.css"&gt;
+&lt;link rel="stylesheet" href="css/botao.css"&gt;
+&lt;h1&gt;Encomendas&lt;/h1&gt;
+&lt;button class="botao"&gt;Encomendar&lt;/button&gt;
+</pre>
+</div>
+
+<hr>
+
+<h2>4. A outra forma: <code>@import</code></h2>
+<p>Em vez de vários <code>&lt;link&gt;</code> no HTML, um arquivo CSS pode puxar outros:</p>
+
+<pre class="file" data-file="css/style.css">@import url("reset.css");
+@import url("base.css");
+@import url("componentes/cartao.css");
+
+/* regras deste arquivo, se houver */
+</pre>
+
+<dl class="anatomy">
+  <dt>@import</dt><dd>"Importar": uma regra com arroba que traz outro arquivo CSS para este ponto.</dd>
+  <dt>url("reset.css")</dt><dd>O caminho do arquivo, relativo ao <strong>arquivo CSS</strong> onde o <code>@import</code> está (e não à página). Como o <code>style.css</code> está dentro de <code>css/</code>, <code>"reset.css"</code> é <code>css/reset.css</code>.</dd>
+  <dt>No topo</dt><dd>Os <code>@import</code> têm de vir <strong>antes de qualquer regra</strong> do arquivo. Depois de uma regra, o navegador ignora o <code>@import</code> (veja <a href="#errado">Quando dá errado</a>).</dd>
+</dl>
+
+<p>Aí a página precisa de um <code>&lt;link&gt;</code> só, para o <code>css/style.css</code>. Parece mais arrumado, mas tem um custo: o navegador só descobre os arquivos importados <strong>depois</strong> de baixar e ler o <code>style.css</code>. Com vários <code>&lt;link&gt;</code> no HTML, ele vê todos de uma vez e baixa ao mesmo tempo. Com <code>@import</code>, baixa em etapas, e a página demora mais para aparecer (aula <a href="performance.html">CSS Rápido</a>).</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> aqui a página liga só o <code>css/style.css</code>, e ele importa o <code>reset.css</code> e o <code>base.css</code>. Apague a linha do <code>@import</code> do <code>base.css</code> e veja o título perder a cor.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="css/style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Tudo veio de um &lt;code&gt;&amp;lt;link&amp;gt;&lt;/code&gt; só.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="css/style.css">@import url("reset.css");
+@import url("base.css");
+
+p {
+  color: dimgray;
+}
+</pre>
+<pre class="script" data-file="css/reset.css">body {
+  margin: 0;
+  padding: 16px;
+}
+</pre>
+<pre class="script" data-file="css/base.css">h1 {
+  color: tomato;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Vantagem</th><th>Desvantagem</th><th>Quando usar</th></tr>
+<tr><td>Um arquivo, com seções</td><td>Um download só; simples</td><td>Fica longo</td><td>Sites pequenos e médios</td></tr>
+<tr><td>Vários <code>&lt;link&gt;</code></td><td>Arquivos pequenos; o navegador baixa todos ao mesmo tempo</td><td>Cada página repete a lista de <code>&lt;link&gt;</code></td><td>Sites maiores, sem ferramenta</td></tr>
+<tr><td><code>@import</code></td><td>Um <code>&lt;link&gt;</code> só no HTML</td><td>Downloads em etapas: mais lento</td><td>Projetos que passam por uma ferramenta que junta tudo antes de publicar</td></tr>
+<tr><td>Ferramenta que junta (um "empacotador")</td><td>Você escreve em vários arquivos; o site recebe um só, compactado</td><td>Precisa instalar e rodar a ferramenta</td><td>Projetos profissionais</td></tr>
+</table>
+</div>
+
+<div class="tip">
+<strong><code>@import</code> com camada</strong>
+<p>O <code>@import</code> aceita uma camada da cascata: <code>@import url("reset.css") layer(reset);</code>. Tudo o que vem do arquivo entra na camada <code>reset</code>, que perde para as outras (aula <a href="layer.html">@layer</a>). É uma forma de garantir que o reset nunca vença, mesmo fora de ordem.</p>
+</div>
+
+<hr>
+
+<h2>5. Nomes de arquivo</h2>
+<p>As mesmas regras dos nomes de página do Guia HTML:</p>
+<ul>
+  <li><strong>Minúsculas, sem acento, sem espaço</strong>, palavras com hífen: <code>cartao-receita.css</code>, e não <code>Cartão Receita.css</code>. Num servidor de verdade, <code>Base.css</code> e <code>base.css</code> são arquivos diferentes.</li>
+  <li><strong>O nome diz o que tem dentro</strong>: <code>botao.css</code> tem o bloco <code>.botao</code>. Nada de <code>novo.css</code>, <code>teste2.css</code>, <code>style-final-agora-vai.css</code>.</li>
+  <li><strong>Uma pasta <code>css/</code></strong> separada das imagens (<code>img/</code>) e dos scripts (<code>js/</code>).</li>
+</ul>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>O caminho errado: o CSS não carrega</strong>
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o arquivo está em <code>css/base.css</code>, mas o <code>&lt;link&gt;</code> aponta para <code>base.css</code>, sem a pasta. Veja a mensagem no console embaixo do quadro e conserte o <code>href</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="base.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+</pre>
+<pre class="script" data-file="css/base.css">h1 {
+  color: tomato;
+}
+</pre>
+</div>
+<p><strong>O que o leitor vê:</strong> o título preto, sem estilo nenhum. Num site publicado, o navegador pede <code>base.css</code> ao servidor, recebe um "404: não encontrado" e segue sem o CSS. No editor do guia, o console do quadro avisa: <code>Não foi possível carregar "base.css" (&lt;link&gt;). Confira o nome e o caminho do arquivo.</code></p>
+<p><strong>Por quê:</strong> o caminho é relativo à página: <code>base.css</code> é "o arquivo ao lado da página", e ele está dentro de <code>css/</code>. O validador não acusa, porque ele não confere se o arquivo existe. No F12, a aba <em>Network</em> ("Rede") mostra o pedido em vermelho, com o código 404.</p>
+<p><strong>Como consertar:</strong> <code>href="css/base.css"</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>@import</code> depois de uma regra: <code>@import are not allowed after any valid statement</code></strong>
+<pre class="file" data-file="css/errado.css · erro de propósito">h1 {
+  color: navy;
+}
+@import url("reset.css");
+</pre>
+<pre class="term" data-cwd="~/padaria">$ vnu --css css/errado.css
+"file:/home/ana/padaria/css/errado.css":4.26-5.1: error: CSS: @import are not allowed after any valid statement other than @charset and @import.</pre>
+<p><strong>O que significa:</strong> "<code>@import</code> não é permitido depois de nenhuma instrução válida, a não ser <code>@charset</code> e outros <code>@import</code>". Ou seja: os <code>@import</code> vêm primeiro.</p>
+<p><strong>O que o leitor vê:</strong> o arquivo importado não é carregado, e tudo o que ele tinha some da página. O resto do arquivo (o <code>h1</code>) continua valendo. No Chromium, com o <code>reset.css</code> (que tem <code>body { margin: 0; }</code>) importado depois da regra do <code>h1</code>, o <code>body</code> continuou com <code>margin-top: 8px</code>, a margem do navegador; com o <code>@import</code> na primeira linha, ficou <code>0px</code>.</p>
+<p><strong>Como consertar:</strong> leve os <code>@import</code> para as primeiras linhas.</p>
+</div>
+
+<div class="cenario">
+<strong>A ordem dos <code>&lt;link&gt;</code> trocada: o reset desfaz o seu estilo</strong>
+<pre class="file" data-file="index.html · erro de propósito">&lt;link rel="stylesheet" href="css/base.css"&gt;
+&lt;link rel="stylesheet" href="css/reset.css"&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> se o <code>base.css</code> tem <code>body { margin: 2rem; }</code> e o <code>reset.css</code> tem <code>body { margin: 0; }</code>, a página fica sem margem: o reset, carregado depois, venceu. Nenhuma mensagem aparece; no F12, o <code>margin: 2rem</code> do <code>base.css</code> aparece riscado. É o mesmo erro da aula <a href="reset.html">Reset e Normalize</a>, agora entre arquivos.</p>
+<p><strong>Como consertar:</strong> do geral para o específico: reset, base, layout, componentes.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita / pasta</th><th>Para quê</th></tr>
+<tr><td><code>/* 1. Reset ===== */</code></td><td>Seções num arquivo só, com sumário no topo</td></tr>
+<tr><td><code>css/reset.css</code>, <code>base.css</code>, <code>layout.css</code>, <code>componentes/</code></td><td>Uma organização comum em pastas</td></tr>
+<tr><td><code>&lt;link rel="stylesheet" href="css/base.css"&gt;</code></td><td>Liga um arquivo; vários <code>&lt;link&gt;</code> se juntam na ordem em que aparecem</td></tr>
+<tr><td><code>@import url("base.css");</code></td><td>Traz outro arquivo para dentro de um CSS; só no topo; caminho relativo ao CSS</td></tr>
+<tr><td><code>@import url("reset.css") layer(reset);</code></td><td>Importa dentro de uma camada da cascata</td></tr>
+<tr><td>Ordem</td><td>Do geral para o específico: reset → base → layout → componentes</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O caminho</h3>
+<p>O <code>base.css</code> está dentro da pasta <code>css</code>. Complete o <code>&lt;link&gt;</code> da página:</p>
+<div class="ex-code">&lt;link rel="stylesheet" href="<input data-answer="css/base.css" aria-label="caminho">"&gt;</div>
+</div>
+
+<div class="exercise">
+<h3>2. Importar</h3>
+<p>Complete a regra que traz o <code>reset.css</code> para dentro de outro CSS:</p>
+<div class="ex-code"><input data-answer="@import" aria-label="regra"> url("reset.css");</div>
+</div>
+
+<div class="exercise">
+<h3>3. O primeiro</h3>
+<p>Dos arquivos <code>componentes.css</code>, <code>reset.css</code> e <code>layout.css</code>, qual é ligado primeiro?</p>
+<div class="ex-code"><input data-answer="reset.css|reset" aria-label="arquivo"></div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Dois arquivos têm <code>.cartao__titulo</code> com cores diferentes. Qual cor aparece?</p>
+<label><input type="radio" name="q4"> A do arquivo com o nome em ordem alfabética primeiro</label>
+<label><input type="radio" name="q4"> A do arquivo cujo <code>&lt;link&gt;</code> vem depois</label>
+<label><input type="radio" name="q4"> A do arquivo maior</label>
+<label><input type="radio" name="q4"> Nenhuma: o navegador mostra preto</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Por que o <code>@import</code> pode deixar a página mais lenta que vários <code>&lt;link&gt;</code>?</p>
+<label><input type="radio" name="q5"> Porque os arquivos importados ficam maiores</label>
+<label><input type="radio" name="q5"> Porque o <code>@import</code> não usa cache</label>
+<label><input type="radio" name="q5"> Porque o navegador só descobre os arquivos importados depois de baixar e ler o primeiro, e baixa em etapas</label>
+<label><input type="radio" name="q5"> Porque o <code>@import</code> só funciona no fim do arquivo</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. O <code>tree</code> do terminal mostra os arquivos…</p>
+<label><input type="radio" name="q6"> Em forma de árvore, com as pastas e o que há dentro delas</label>
+<label><input type="radio" name="q6"> Na ordem em que a página os carrega</label>
+<label><input type="radio" name="q6"> Só os arquivos CSS</label>
+<label><input type="radio" name="q6"> Com o conteúdo de cada um</label>
+</div>
+
+<h3>Missão final: a ordem certa</h3>
+
+<div class="tryhtml" data-goal="css:body{margin-top}=32px,css:.cartao__titulo{color}=rgb(255, 99, 71)">
+<p class="try-task"><strong>Missão:</strong> os três <code>&lt;link&gt;</code> estão na ordem errada: o reset tira a margem que o <code>base.css</code> deu ao <code>body</code>, e o <code>base.css</code> pinta o título do cartão de azul-marinho por cima do <code>cartao.css</code>. Ponha os <code>&lt;link&gt;</code> na ordem do geral para o específico: reset, base, cartão.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="css/cartao.css"&gt;
+&lt;link rel="stylesheet" href="css/base.css"&gt;
+&lt;link rel="stylesheet" href="css/reset.css"&gt;
+&lt;article class="cartao"&gt;
+  &lt;h2 class="cartao__titulo"&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="css/reset.css">body {
+  margin: 0;
+}
+</pre>
+<pre class="script" data-file="css/base.css">body {
+  margin: 2rem;
+  font-family: sans-serif;
+}
+
+.cartao__titulo {
+  color: navy;
+}
+</pre>
+<pre class="script" data-file="css/cartao.css">.cartao {
+  padding: 16px;
+  border: 2px solid tomato;
+}
+
+.cartao__titulo {
+  margin: 0;
+  color: tomato;
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="css/reset.css"&gt;
+&lt;link rel="stylesheet" href="css/base.css"&gt;
+&lt;link rel="stylesheet" href="css/cartao.css"&gt;
+&lt;article class="cartao"&gt;
+  &lt;h2 class="cartao__titulo"&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;/article&gt;
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Site pequeno: um arquivo só, com um sumário no topo e seções marcadas por comentários.</li>
+  <li>Site maior: uma pasta <code>css/</code> com <code>reset.css</code>, <code>base.css</code>, <code>layout.css</code> e um arquivo por componente. O <code>tree</code> mostra a árvore.</li>
+  <li>Vários <code>&lt;link&gt;</code> se juntam na ordem em que aparecem; entre regras iguais, vence o arquivo de baixo. Ordem: do geral para o específico.</li>
+  <li><code>@import url("arquivo.css");</code> só no topo do CSS, com o caminho relativo ao próprio CSS. Funciona, mas baixa em etapas: prefira vários <code>&lt;link&gt;</code> (ou uma ferramenta que junte tudo).</li>
+  <li>Nomes em minúsculas, sem acento nem espaço, dizendo o que há dentro.</li>
+  <li>Caminho errado: o CSS não carrega e o validador não avisa; o console do editor e a aba <em>Network</em> do F12, sim.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
