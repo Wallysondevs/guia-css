@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Cores Modernas — oklch() e color-mix() | Guia CSS</title>
+<meta name="description" content="Cores modernas em CSS para quem está começando: por que o hsl engana os olhos, a função oklch() com luminosidade, croma e matiz, paletas trocando só um número, transparência, a mistura de cores com color-mix() e os erros que deixam a cor branca ou preta, com o resultado desenhado no seu navegador.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Cores Modernas</span></h1>
+
+<p class="intro">Você já escreve cores por nome, em hexadecimal, com <code>rgb()</code> e com <code>hsl()</code>. Elas funcionam, mas têm um defeito: trocar a "luz" de uma cor não dá o resultado que os olhos esperam. Nesta aula você vai conhecer duas ferramentas novas do CSS: a função <code>oklch()</code>, que descreve a cor do jeito que os olhos a percebem, e a função <code>color-mix()</code>, que mistura duas cores como tintas num potinho.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Por que, no <code>hsl()</code>, um amarelo e um azul com a "mesma luz" não parecem igualmente claros.</li>
+  <li>Como escrever <code>oklch(L C H)</code>, número por número.</li>
+  <li>Como montar uma paleta (do clarinho ao escuro) mudando só um número.</li>
+  <li>Como pôr transparência numa cor <code>oklch</code>.</li>
+  <li>Como misturar cores com <code>color-mix()</code>: escurecer, clarear e deixar transparente uma cor que está numa variável.</li>
+  <li>Os erros que deixam a cor quase branca ou de volta à cor herdada.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="cores-hsl.html">hsl()</a> e <a href="variaveis.html">Variáveis</a>. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana. Os quadrados coloridos são desenhados agora pelo seu navegador.</p>
+
+<hr>
+
+<h2>A ideia: duas tintas com "a mesma luz"</h2>
+<p>A Ana quer pintar etiquetas da lojinha com cores diferentes, mas igualmente claras, para o texto preto ficar legível em todas. Na aula <a href="cores-hsl.html">hsl()</a>, o terceiro número é a "luminosidade". Então ela escreve todas com <code>50%</code> de luminosidade, trocando só a cor:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .etiqueta { display: inline-block; width: 90px; padding: 16px 0; text-align: center; color: black; }
+&lt;/style&gt;
+&lt;div class="etiqueta" style="background-color: hsl(60 100% 50%)"&gt;amarelo&lt;/div&gt;
+&lt;div class="etiqueta" style="background-color: hsl(120 100% 50%)"&gt;verde&lt;/div&gt;
+&lt;div class="etiqueta" style="background-color: hsl(180 100% 50%)"&gt;ciano&lt;/div&gt;
+&lt;div class="etiqueta" style="background-color: hsl(240 100% 50%)"&gt;azul&lt;/div&gt;
+&lt;div class="etiqueta" style="background-color: hsl(300 100% 50%)"&gt;roxo&lt;/div&gt;
+</pre>
+
+<p>Todas têm "luminosidade 50%", mas não parecem: o amarelo e o ciano são claríssimos; o azul é tão escuro que o texto preto quase some. O <code>hsl()</code> é uma conta feita em cima do <code>rgb()</code>, e não leva em conta que os nossos olhos veem o amarelo muito mais claro que o azul.</p>
+
+<p>Agora as mesmas etiquetas com <code>oklch()</code>, todas com a mesma luminosidade (<code>0.8</code>) e a mesma intensidade (<code>0.15</code>), trocando só o terceiro número, a cor:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .etiqueta { display: inline-block; width: 90px; padding: 16px 0; text-align: center; color: black; }
+&lt;/style&gt;
+&lt;div class="etiqueta" style="background-color: oklch(0.8 0.15 100)"&gt;amarelo&lt;/div&gt;
+&lt;div class="etiqueta" style="background-color: oklch(0.8 0.15 145)"&gt;verde&lt;/div&gt;
+&lt;div class="etiqueta" style="background-color: oklch(0.8 0.15 195)"&gt;ciano&lt;/div&gt;
+&lt;div class="etiqueta" style="background-color: oklch(0.8 0.15 265)"&gt;azul&lt;/div&gt;
+&lt;div class="etiqueta" style="background-color: oklch(0.8 0.15 330)"&gt;roxo&lt;/div&gt;
+</pre>
+
+<p>Agora as cinco parecem igualmente claras, e o texto preto se lê bem em todas. É essa a promessa do <code>oklch</code>: o primeiro número é a luz <strong>como os olhos a veem</strong>.</p>
+
+<hr>
+
+<h2>1. <code>oklch()</code>, número por número</h2>
+
+<pre class="file" data-file="style.css">h1 {
+  color: oklch(0.55 0.17 45);
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>oklch(</dt><dd>O nome vem de <strong>L</strong>, <strong>C</strong> e <strong>H</strong>, as três medidas. O "ok" é do <em>Oklab</em>, o modelo de cores em que ela se baseia, criado em 2020 para combinar com a visão humana.</dd>
+  <dt>0.55</dt><dd><strong>L</strong>, de <em>lightness</em>, "luminosidade": de <code>0</code> (preto) a <code>1</code> (branco). Também pode ser escrita em porcentagem: <code>55%</code> é o mesmo que <code>0.55</code>.</dd>
+  <dt>0.17</dt><dd><strong>C</strong>, de <em>chroma</em>, "croma": a <strong>intensidade</strong> da cor. <code>0</code> é cinza; quanto maior, mais viva. Na prática, vai até uns <code>0.37</code>; a maioria das cores bonitas fica entre <code>0.05</code> e <code>0.2</code>.</dd>
+  <dt>45</dt><dd><strong>H</strong>, de <em>hue</em>, "matiz": <strong>qual</strong> cor, num círculo de 0 a 360 graus, como no <code>hsl()</code>. Mas os ângulos são outros: no <code>oklch</code>, perto de 30 é vermelho, 45 é laranja-avermelhado, 70 é laranja, 100 é amarelo, 145 é verde, 265 é azul e 330 é roxo.</dd>
+  <dt>)</dt><dd>Os três números são separados por <strong>espaço</strong>, sem vírgula.</dd>
+</dl>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Mudando…</th><th>O que acontece</th><th>Exemplo</th></tr>
+<tr><td>L (o 1º)</td><td>a cor fica mais clara ou mais escura, sem mudar de "família"</td><td><code>oklch(0.9 0.17 45)</code> é um pêssego clarinho; <code>oklch(0.35 0.17 45)</code>, um vermelho-escuro, quase vinho</td></tr>
+<tr><td>C (o 2º)</td><td>a cor fica mais viva ou mais acinzentada</td><td><code>oklch(0.55 0 45)</code> é um cinza; <code>oklch(0.55 0.2 45)</code>, um laranja forte</td></tr>
+<tr><td>H (o 3º)</td><td>troca de cor, mantendo a luz e a intensidade</td><td><code>oklch(0.55 0.17 145)</code> é um verde com a mesma "força" do laranja</td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> mude um número de cada vez e veja o que acontece com o título. Tente o croma <code>0</code>, depois a luminosidade <code>0.9</code>, depois o matiz <code>265</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;p&gt;Bolos, pães e doces caseiros.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: oklch(0.55 0.17 45);
+}
+</pre>
+</div>
+
+<h3>O que o F12 mostra</h3>
+<p>Na aula <a href="cores-rgb.html">rgb()</a>, você viu que o navegador transforma <code>tomato</code> ou <code>#c2410c</code> em <code>rgb(…)</code> no valor calculado (aba Computed do F12). Com o <code>oklch</code> é diferente: o valor calculado <strong>continua</strong> <code>oklch</code>. Conferido no Chromium:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você escreve</th><th>Valor calculado</th></tr>
+<tr><td><code>oklch(0.55 0.17 45)</code></td><td><code>oklch(0.55 0.17 45)</code></td></tr>
+<tr><td><code>oklch(55% 0.17 45)</code></td><td><code>oklch(0.55 0.17 45)</code> (a porcentagem vira número)</td></tr>
+<tr><td><code>oklch(0.7 40% 50)</code></td><td><code>oklch(0.7 0.16 50)</code> (no croma, <code>100%</code> vale <code>0.4</code>)</td></tr>
+<tr><td><code>oklch(0.5 0.15 50deg)</code></td><td><code>oklch(0.5 0.15 50)</code> (o ângulo pode ter <code>deg</code>, "graus")</td></tr>
+</table>
+</div>
+
+<div class="tryhtml" data-goal="css:h1{color}=oklch(0.55 0.17 145),nsrc:#[0-9a-f]{3\,6}">
+<p class="try-task"><strong>Missão:</strong> a seção de verduras da lojinha precisa de um título verde. Troque o <code>#2f7d32</code> por uma cor <code>oklch</code> com luminosidade <code>0.55</code>, croma <code>0.17</code> e matiz <code>145</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Verduras fresquinhas&lt;/h1&gt;
+&lt;p&gt;Alface, couve e cheiro-verde da horta.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: #2f7d32;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: oklch(0.55 0.17 145);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. Uma paleta mudando só um número</h2>
+<p>Um site precisa de várias versões da mesma cor: um fundo clarinho, uma borda média, um botão forte, um texto escuro. Com <code>oklch</code>, basta manter o croma e o matiz e mudar a luminosidade:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .tom { display: inline-block; width: 80px; padding: 14px 0; text-align: center; font-family: monospace; }
+&lt;/style&gt;
+&lt;div class="tom" style="background-color: oklch(0.95 0.04 45)"&gt;0.95&lt;/div&gt;
+&lt;div class="tom" style="background-color: oklch(0.85 0.08 45)"&gt;0.85&lt;/div&gt;
+&lt;div class="tom" style="background-color: oklch(0.7 0.14 45)"&gt;0.7&lt;/div&gt;
+&lt;div class="tom" style="background-color: oklch(0.55 0.17 45); color: white"&gt;0.55&lt;/div&gt;
+&lt;div class="tom" style="background-color: oklch(0.4 0.13 45); color: white"&gt;0.4&lt;/div&gt;
+&lt;div class="tom" style="background-color: oklch(0.25 0.08 45); color: white"&gt;0.25&lt;/div&gt;
+</pre>
+
+<p>Seis tons da mesma família laranja, do creme quase branco ao marrom-escuro, e os degraus de luz parecem iguais. (O croma diminui nas pontas: cores muito claras ou muito escuras não conseguem ser tão vivas.)</p>
+
+<p>Com variáveis, a paleta inteira fica num lugar só. Para mudar a "cor da marca" do site, você troca um número, o matiz:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque o <code>--matiz</code> de <code>45</code> para <code>145</code> (verde) ou <code>265</code> (azul). O cartão inteiro muda de cor e continua harmônico.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Com cobertura de chocolate. Serve 10 pessoas.&lt;/p&gt;
+  &lt;a class="botao" href="#receita"&gt;Ver receita&lt;/a&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --matiz: 45;
+}
+
+.cartao {
+  background-color: oklch(0.95 0.04 var(--matiz));
+  border: 2px solid oklch(0.85 0.08 var(--matiz));
+  color: oklch(0.25 0.08 var(--matiz));
+  padding: 8px 16px 16px;
+  border-radius: 8px;
+}
+
+.botao {
+  display: inline-block;
+  background-color: oklch(0.55 0.17 var(--matiz));
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Transparência</h2>
+<p>Como no <code>rgb()</code> e no <code>hsl()</code>, a transparência (o canal <strong>alfa</strong>, aula <a href="opacity.html">Transparência</a>) vem no fim, depois de uma barra:</p>
+
+<pre class="file" data-file="style.css">.aviso {
+  background-color: oklch(0.7 0.15 50 / 50%);
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>oklch(0.7 0.15 50</dt><dd>A cor, como antes.</dd>
+  <dt>/ 50%</dt><dd>Uma barra e o alfa: <code>50%</code> (ou <code>0.5</code>) deixa a cor meio transparente. <code>100%</code> (ou nada) é opaca. O valor calculado fica <code>oklch(0.7 0.15 50 / 0.5)</code>.</dd>
+</dl>
+
+<hr>
+
+<h2>4. Cores que a tela não mostra</h2>
+<p>Com <code>oklch</code> dá para escrever cores mais vivas que as do <code>rgb()</code>. Telas mais novas (a maioria dos celulares e notebooks recentes) mostram uma gama de cores maior, chamada <strong>P3</strong>. Uma cor como <code>oklch(0.9 0.4 150)</code>, um verde fortíssimo, não existe numa tela comum.</p>
+<p>O navegador não dá erro: ele desenha a cor <strong>mais parecida</strong> que a tela consegue. Numa tela comum, você vê um verde bem vivo; numa tela P3, um verde ainda mais vivo. Para não ter surpresa, fique com o croma até uns <code>0.2</code>: essas cores aparecem iguais em quase todas as telas.</p>
+
+<hr>
+
+<h2>5. <code>color-mix()</code>: misturando duas cores</h2>
+<p>A segunda ferramenta nova funciona como misturar tintas num potinho: um pouco de laranja com um pouco de preto dá um laranja mais escuro.</p>
+
+<pre class="file" data-file="style.css">.botao:hover {
+  background-color: color-mix(in oklch, #c2410c, black 20%);
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>color-mix(</dt><dd>"mistura de cores": a função.</dd>
+  <dt>in oklch,</dt><dd>"no espaço de cores oklch": <strong>como</strong> fazer a conta da mistura. Os mais usados são <code>in oklch</code> e <code>in srgb</code> (o espaço do <code>rgb()</code>). Depois vem uma vírgula.</dd>
+  <dt>#c2410c,</dt><dd>A primeira cor (pode ser qualquer cor, inclusive <code>var(--destaque)</code>).</dd>
+  <dt>black 20%</dt><dd>A segunda cor e quanto dela entra: 20% de preto e, por conta, 80% da primeira. Sem porcentagem nenhuma, é meio a meio.</dd>
+</dl>
+
+<p>O espaço de cores muda o resultado. Veja vermelho com azul, meio a meio, nos dois espaços:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .tinta { display: inline-block; width: 120px; padding: 14px 4px; text-align: center; color: white; font-family: monospace; }
+&lt;/style&gt;
+&lt;div class="tinta" style="background-color: red"&gt;red&lt;/div&gt;
+&lt;div class="tinta" style="background-color: color-mix(in srgb, red, blue)"&gt;in srgb&lt;/div&gt;
+&lt;div class="tinta" style="background-color: color-mix(in oklch, red, blue)"&gt;in oklch&lt;/div&gt;
+&lt;div class="tinta" style="background-color: blue"&gt;blue&lt;/div&gt;
+</pre>
+
+<p>No <code>srgb</code>, a mistura dá um roxo escuro e apagado (as contas do <code>rgb</code> fazem a média dos números, e o meio fica "sujo"). No <code>oklch</code>, dá um magenta vivo, com a luz no meio do caminho entre as duas. Para clarear e escurecer, os dois funcionam bem; para misturar duas cores vivas, o <code>oklch</code> costuma ficar mais bonito.</p>
+
+<h3>Os três usos do dia a dia</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Para</th><th>Escreva</th></tr>
+<tr><td>escurecer</td><td><code>color-mix(in oklch, var(--destaque), black 20%)</code></td></tr>
+<tr><td>clarear</td><td><code>color-mix(in oklch, var(--destaque), white 40%)</code></td></tr>
+<tr><td>deixar transparente</td><td><code>color-mix(in srgb, var(--destaque) 30%, transparent)</code>: 30% de cor e 70% de "nada"</td></tr>
+</table>
+</div>
+
+<p>O grande truque é a variável: a cor da marca fica <strong>uma vez</strong> no <code>:root</code>, e o hover, a borda e o fundo clarinho saem dela. Troque a variável e tudo acompanha.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> passe o mouse nos botões. Depois troque o <code>--destaque</code> por <code>oklch(0.5 0.15 265)</code>: os três botões e os hovers mudam juntos.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button type="button" class="botao"&gt;Comprar&lt;/button&gt;
+&lt;button type="button" class="botao claro"&gt;Favoritar&lt;/button&gt;
+&lt;button type="button" class="botao fantasma"&gt;Compartilhar&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --destaque: #c2410c;
+}
+
+.botao {
+  background-color: var(--destaque);
+  color: white;
+  border: 2px solid var(--destaque);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.botao:hover {
+  background-color: color-mix(in oklch, var(--destaque), black 20%);
+}
+
+.claro {
+  background-color: color-mix(in oklch, var(--destaque), white 70%);
+  color: var(--destaque);
+}
+
+.fantasma {
+  background-color: color-mix(in srgb, var(--destaque) 15%, transparent);
+  color: var(--destaque);
+}
+</pre>
+</div>
+
+<div class="note">
+<strong>Suporte</strong>
+<p><code>oklch()</code> e <code>color-mix()</code> funcionam no Chrome e no Edge desde a versão 111, no Firefox desde a 113 e no Safari desde a 15.4 (<code>oklch</code>) e a 16.2 (<code>color-mix</code>): todos de 2023 em diante, segundo o MDN. Num navegador mais velho, a declaração é ignorada. Se precisar, escreva antes uma cor de reserva: <code>color: #c2410c;</code> e, embaixo, <code>color: oklch(0.55 0.17 45);</code>.</p>
+<p>Navegadores mais novos aceitam <code>color-mix()</code> sem o <code>in …</code> (o Chromium usa <code>oklab</code>, um primo do <code>oklch</code>), mas os mais antigos, não. Escreva sempre o <code>in oklch</code> ou o <code>in srgb</code>.</p>
+</div>
+
+<div class="tip">
+<strong>Para ir além: cores relativas</strong>
+<p>Uma sintaxe ainda mais nova pega uma cor e muda só um dos números: <code>oklch(from var(--destaque) calc(l + 0.1) c h)</code> quer dizer "a cor do destaque, com a luminosidade 0.1 maior". O <code>from</code> abre a cor, e <code>l</code>, <code>c</code> e <code>h</code> são os números dela. Funciona no Chrome e no Edge desde a versão 122, no Firefox desde a 128 e no Safari desde a 18 (2024). As contas com <code>calc()</code> estão na aula <a href="calc.html">calc()</a>.</p>
+</div>
+
+<hr>
+
+<h2>Formas de escrever cor, e qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Exemplo</th><th>Quando usar</th></tr>
+<tr><td>nome</td><td><code>tomato</code></td><td>testes rápidos e exemplos</td></tr>
+<tr><td>hexadecimal</td><td><code>#c2410c</code></td><td>copiar cores de um programa de desenho ou de um manual de marca</td></tr>
+<tr><td><code>rgb()</code> / <code>hsl()</code></td><td><code>hsl(20 88% 40%)</code></td><td>código antigo; ajustes rápidos de transparência</td></tr>
+<tr><td><code>oklch()</code></td><td><code>oklch(0.55 0.17 45)</code></td><td>montar paletas, temas e variações de luz que parecem certas aos olhos</td></tr>
+<tr><td><code>color-mix()</code></td><td><code>color-mix(in oklch, var(--destaque), black 20%)</code></td><td>tirar variações (hover, fundo clarinho, transparência) de uma cor que está numa variável</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>A cor ficou clarinha, quase branca (e o validador não reclama)</strong>
+<p><strong>O que aconteceu:</strong> a luminosidade foi escrita como no <code>hsl()</code>, sem o <code>%</code>: <code>oklch(55 0.17 45)</code>.</p>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .certo { background-color: oklch(55% 0.17 45); }
+  .errado { background-color: oklch(55 0.17 45); }
+  div { padding: 12px; border: 1px solid gray; margin-bottom: 6px; }
+&lt;/style&gt;
+&lt;div class="certo"&gt;oklch(55% 0.17 45)&lt;/div&gt;
+&lt;div class="errado"&gt;oklch(55 0.17 45)&lt;/div&gt;
+</pre>
+<p>A luminosidade vai de <code>0</code> a <code>1</code>. O <code>55</code> é muito mais que <code>1</code>, e o navegador o corta para <code>1</code>, a luz máxima: o valor calculado vira <code>oklch(1 0.17 45)</code>. Em vez do laranja forte, aparece um creme desbotado, quase branco (no Chromium, um amarelo-claro; o tom exato muda de navegador para navegador). O validador aceita, porque um número grande não é proibido; o número só fica fora da faixa.</p>
+<p><strong>Como consertar:</strong> <code>0.55</code> ou <code>55%</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: Invalid RGB function.</code></strong>
+<p><strong>O que aconteceu:</strong> vírgulas entre os números: <code>oklch(0.55, 0.17, 45)</code>.</p>
+<pre class="term" data-cwd="~/cores">$ vnu --css virgula.css
+"file:/home/ana/cores/virgula.css":2.30-2.30: error: CSS: “color”: Invalid RGB function.</pre>
+<p>"Função RGB inválida." A mensagem fala em RGB, mas o problema é a vírgula: o <code>oklch()</code> só aceita espaços. O navegador ignora a declaração inteira, e o título volta para a cor herdada (normalmente preta).</p>
+<p><strong>Como consertar:</strong> <code>oklch(0.55 0.17 45)</code>, com espaços.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-color”: “#c2410c” is not a “*invalid*” value.</code></strong>
+<p><strong>O que aconteceu:</strong> faltou a vírgula depois do espaço de cores: <code>color-mix(in oklch #c2410c, black)</code>.</p>
+<pre class="term" data-cwd="~/cores">$ vnu --css semvirg.css
+"file:/home/ana/cores/semvirg.css":2.54-2.54: error: CSS: “background-color”: “#c2410c” is not a “*invalid*” value.</pre>
+<p>Uma mensagem estranha, mas o lugar (coluna 54, onde começa o <code>#c2410c</code>) aponta o problema: o validador esperava a vírgula antes da primeira cor. O navegador ignora a declaração.</p>
+<p><strong>Como consertar:</strong> <code>color-mix(in oklch, #c2410c, black)</code>: vírgula depois do <code>in oklch</code> e entre as cores.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: … only values lower than or equal to “100” are allowed.</code></strong>
+<p><strong>O que aconteceu:</strong> uma porcentagem acima de 100 na mistura: <code>color-mix(in oklch, #c2410c 120%, black)</code>.</p>
+<pre class="term" data-cwd="~/cores">$ vnu --css pct.css
+"file:/home/ana/cores/pct.css":2.60-2.60: error: CSS: “background-color”: “#c2410c 120%” is not valid, only values lower than or equal to “100” are allowed.</pre>
+<p>"Só valores menores ou iguais a 100 são permitidos." Não dá para pôr mais que o pote inteiro de uma cor.</p>
+<p><strong>Como consertar:</strong> porcentagens de 0% a 100%. Para "mais escuro", aumente a parte do <code>black</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: “0.55” is not a “color” value.</code></strong>
+<p><strong>O que aconteceu:</strong> o nome da função foi digitado errado: <code>okclh(0.55 0.17 45)</code>.</p>
+<pre class="term" data-cwd="~/cores">$ vnu --css okclh.css
+"file:/home/ana/cores/okclh.css":2.28-2.28: error: CSS: “color”: “0.55” is not a “color” value.</pre>
+<p>O validador não conhece <code>okclh</code> e reclama do primeiro número. O navegador ignora a declaração. Lembre a ordem pelas letras: <strong>L</strong>uz, <strong>C</strong>roma, <strong>H</strong> (matiz), sempre nesta ordem.</p>
+<p><strong>Como consertar:</strong> <code>oklch</code>: o-k-l-c-h.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>oklch(L C H)</code></td><td>Cor por luminosidade (0 a 1), croma (0 a ~0.37) e matiz (0 a 360)</td></tr>
+<tr><td><code>oklch(55% 0.17 45)</code></td><td>Luminosidade em porcentagem (igual a <code>0.55</code>)</td></tr>
+<tr><td><code>oklch(0.7 0.15 50 / 50%)</code></td><td>Com transparência</td></tr>
+<tr><td><code>oklch(0.55 0 0)</code></td><td>Croma 0: um cinza</td></tr>
+<tr><td><code>color-mix(in oklch, A, B)</code></td><td>Meio a meio de A e B</td></tr>
+<tr><td><code>color-mix(in oklch, A, black 20%)</code></td><td>A, 20% mais perto do preto (escurecer)</td></tr>
+<tr><td><code>color-mix(in oklch, A, white 40%)</code></td><td>A, 40% mais perto do branco (clarear)</td></tr>
+<tr><td><code>color-mix(in srgb, A 30%, transparent)</code></td><td>A, com 30% de opacidade</td></tr>
+<tr><td><code>oklch(from A calc(l + 0.1) c h)</code></td><td>Cor relativa: A com mais luz (2024)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Um cinza</h3>
+<p>Complete para ter um cinza médio (sem cor nenhuma):</p>
+<div class="ex-code">color: oklch(0.6 <input data-answer="0" aria-label="croma"> 45);</div>
+</div>
+
+<div class="exercise">
+<h3>2. O espaço da mistura</h3>
+<p>Complete para misturar no espaço <code>oklch</code>:</p>
+<div class="ex-code">background-color: color-mix(<input data-answer="in oklch" aria-label="espaço de cores">, var(--destaque), white 40%);</div>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">3. Qual número do <code>oklch(0.55 0.17 45)</code> você muda para deixar a cor mais clara, sem mudar de "família"?</p>
+<label><input type="radio" name="q3"> O primeiro, <code>0.55</code> (a luminosidade)</label>
+<label><input type="radio" name="q3"> O segundo, <code>0.17</code> (o croma)</label>
+<label><input type="radio" name="q3"> O terceiro, <code>45</code> (o matiz)</label>
+<label><input type="radio" name="q3"> Nenhum: precisa de <code>color-mix()</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">4. A Ana escreveu <code>color: oklch(70 0.15 145);</code> e o texto ficou quase branco, difícil de ler. Por quê?</p>
+<label><input type="radio" name="q4"> O <code>oklch</code> não funciona em textos</label>
+<label><input type="radio" name="q4"> O matiz 145 é branco</label>
+<label><input type="radio" name="q4"> Faltaram as vírgulas</label>
+<label><input type="radio" name="q4"> A luminosidade vai de 0 a 1; o 70 foi cortado para 1, a luz máxima</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. O que dá <code>color-mix(in srgb, var(--destaque) 30%, transparent)</code>?</p>
+<label><input type="radio" name="q5"> A cor do destaque 30% mais escura</label>
+<label><input type="radio" name="q5"> A cor do destaque com 30% de opacidade (bem transparente)</label>
+<label><input type="radio" name="q5"> Uma cor sempre preta</label>
+<label><input type="radio" name="q5"> Um erro, porque <code>transparent</code> não é cor</label>
+</div>
+
+<h3>Missão final: os botões da lojinha</h3>
+
+<div class="tryhtml" data-goal="src:--destaque\s*:\s*oklch\(\s*0?\.55\s+0?\.17\s+45\s*\),css:.botao{background-color}=oklch(0.55 0.17 45),src:\.botao:hover\s*\{[^}]*color-mix\(\s*in\s+oklch\s*\,\s*var\(--destaque\)\s*\,\s*black\s+20%\s*\),src:\.claro\s*\{[^}]*color-mix\(\s*in\s+oklch\s*\,\s*var\(--destaque\)\s*\,\s*white\s+70%\s*\),nsrc:#[0-9a-f]{3\,6}">
+<p class="try-task"><strong>Missão:</strong> os botões usam três hexadecimais soltos. (1) Ponha no <code>--destaque</code> a cor <code>oklch(0.55 0.17 45)</code>. (2) No <code>.botao:hover</code>, use <code>color-mix(in oklch, var(--destaque), black 20%)</code>. (3) No <code>.claro</code>, use <code>color-mix(in oklch, var(--destaque), white 70%)</code>. No fim, não pode sobrar nenhum hexadecimal.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button type="button" class="botao"&gt;Comprar&lt;/button&gt;
+&lt;button type="button" class="botao claro"&gt;Favoritar&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --destaque: #c2410c;
+}
+
+.botao {
+  background-color: var(--destaque);
+  color: white;
+  border: 0;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.botao:hover {
+  background-color: #9a3412;
+}
+
+.claro {
+  background-color: #f6d3c2;
+  color: var(--destaque);
+}
+</pre>
+<pre class="solucao" data-file="style.css">:root {
+  --destaque: oklch(0.55 0.17 45);
+}
+
+.botao {
+  background-color: var(--destaque);
+  color: white;
+  border: 0;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.botao:hover {
+  background-color: color-mix(in oklch, var(--destaque), black 20%);
+}
+
+.claro {
+  background-color: color-mix(in oklch, var(--destaque), white 70%);
+  color: var(--destaque);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>No <code>hsl()</code>, a "luminosidade" não bate com o que os olhos veem: amarelo e azul com o mesmo número parecem muito diferentes.</li>
+  <li><code>oklch(L C H)</code>: luminosidade de 0 a 1 (ou %), croma (intensidade, 0 é cinza) e matiz (0 a 360). Números separados por espaço.</li>
+  <li>Mudar só o L dá uma paleta da mesma cor; mudar só o H troca de cor mantendo a mesma "força".</li>
+  <li>Transparência: <code>oklch(0.7 0.15 50 / 50%)</code>. No F12, o valor calculado continua em <code>oklch</code>.</li>
+  <li><code>color-mix(in oklch, A, B 20%)</code> mistura cores: com <code>black</code> escurece, com <code>white</code> clareia, com <code>transparent</code> deixa transparente. Ótimo com variáveis.</li>
+  <li>Erros comuns: luminosidade <code>55</code> em vez de <code>0.55</code> (fica quase branco, e o validador não avisa), vírgulas no <code>oklch</code>, vírgula faltando no <code>color-mix</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
