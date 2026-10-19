@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS :has() — escolher o pai pelo que ele tem dentro | Guia CSS</title>
+<meta name="description" content="A pseudo-classe :has() para quem está começando: escolher um elemento pelo que ele tem dentro (o cartão que tem imagem), pelo irmão que vem depois (h2:has(+ p)), pelo estado de um campo (label:has(input:checked)) e pela quantidade de itens, com :not(:has()), a especificidade, o suporte dos navegadores e os erros que o validador W3C não vê.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">:has()</span></h1>
+
+<p class="intro">Até aqui, todo seletor andava num sentido só: de fora para dentro. <code>.cartao img</code> escolhe a imagem <em>dentro</em> do cartão; nunca o cartão. Durante vinte anos, "pintar o cartão que <strong>tem</strong> uma imagem" foi um pedido famoso e impossível, resolvido com classes extras ou JavaScript. A <code>:has()</code> resolve no CSS: ela escolhe um elemento pelo que <strong>ele tem dentro</strong> (ou logo depois dele). Por isso ganhou o apelido de "seletor do pai".</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Escolher um elemento pelo que ele tem dentro: <code>.cartao:has(img)</code>.</li>
+  <li>Só filhos diretos (<code>:has(&gt; …)</code>) e o irmão que vem depois (<code>:has(+ …)</code>).</li>
+  <li>Reagir ao estado de um campo: <code>label:has(input:checked)</code>.</li>
+  <li>O contrário, com <code>:not(:has(…))</code>, e a quantidade de itens.</li>
+  <li>A especificidade e o suporte dos navegadores.</li>
+  <li>Os erros que o validador <strong>não</strong> vê.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens do validador W3C (<code>vnu</code>) foram colhidas na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: as caixas da mudança</h2>
+<p>Na mudança, a Ana escreve na caixa: "<strong>frágil</strong>". Ela não escreve isso em cada copo; escreve na caixa, porque a caixa <strong>tem</strong> copos dentro. Quem carrega olha a caixa por fora e já sabe como tratar.</p>
+<p>A <code>:has()</code> faz o mesmo: ela olha <strong>dentro</strong> do elemento e, se achar o que procura, a regra vale para <strong>o elemento de fora</strong>. "A caixa que tem copo" vira <code>.caixa:has(.copo)</code>, e quem recebe o estilo é a caixa.</p>
+
+<hr>
+
+<h2>1. O cartão que tem imagem</h2>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> os dois cartões têm a mesma classe, mas só o que tem imagem ganhou a borda e o fundo. Apague o <code>&lt;img&gt;</code> do primeiro e veja a borda sumir; ponha uma imagem no segundo e veja ela aparecer.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="cartao"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="200" height="150"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;/article&gt;
+&lt;article class="cartao"&gt;
+  &lt;h2&gt;Pão de queijo&lt;/h2&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.cartao:has(img) {
+  border: 2px solid tomato;
+  background-color: #fff3e0;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>.cartao</dt><dd>Quem <strong>recebe</strong> o estilo: o cartão.</dd>
+  <dt>:has(</dt><dd>"Que <strong>tem</strong>…" (<em>has</em> = "tem"). Colado, sem espaço.</dd>
+  <dt>img</dt><dd>O que procurar <strong>dentro</strong> do cartão: uma imagem, em qualquer profundidade (filha, neta…).</dd>
+  <dt>)</dt><dd>Fecha o parêntese.</dd>
+</dl>
+
+<p>Repare: o cartão do bolo ganha a borda cor de tomate e o fundo creme; o do pão de queijo, que só tem o título, continua sem borda. A <strong>imagem</strong> não muda nada: quem muda é o cartão, o "pai".</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Quem recebe o estilo</th></tr>
+<tr><td><code>.cartao img</code></td><td>A <strong>imagem</strong> que está dentro de um cartão</td></tr>
+<tr><td><code>.cartao:has(img)</code></td><td>O <strong>cartão</strong> que tem uma imagem dentro</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>2. Filho direto e irmão de depois</h2>
+<p>Dentro da <code>:has()</code>, o seletor pode começar com um combinador (aula <a href="combinadores.html">Combinadores</a>). O ponto de partida é o próprio elemento:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Escolhe</th></tr>
+<tr><td><code>.cartao:has(img)</code></td><td>O cartão com uma imagem em qualquer lugar dentro dele</td></tr>
+<tr><td><code>.cartao:has(&gt; img)</code></td><td>O cartão com uma imagem como <strong>filha direta</strong> (não neta)</td></tr>
+<tr><td><code>h2:has(+ p)</code></td><td>O <code>h2</code> que tem um <code>p</code> <strong>logo depois</strong> dele</td></tr>
+<tr><td><code>h2:has(~ ul)</code></td><td>O <code>h2</code> que tem um <code>ul</code> em algum lugar depois dele, no mesmo pai</td></tr>
+</table>
+</div>
+
+<p>O <code>:has(+ …)</code> é um "seletor do irmão de antes", outra coisa que o CSS não tinha. Veja: o título com um subtítulo logo depois perde a margem de baixo, para os dois ficarem juntos:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o primeiro <code>h2</code> tem um <code>p.subtitulo</code> logo depois e fica colado nele; o segundo, não. Apague o <code>p.subtitulo</code> e veja o espaço voltar.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p class="subtitulo"&gt;A receita da avó&lt;/p&gt;
+&lt;p&gt;Rende 12 fatias.&lt;/p&gt;
+&lt;h2&gt;Pão de queijo&lt;/h2&gt;
+&lt;p&gt;Rende 30 unidades.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h2:has(+ .subtitulo) {
+  margin-bottom: 0;
+}
+
+.subtitulo {
+  margin-top: 0;
+  color: dimgray;
+  font-style: italic;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Reagir a um campo de formulário</h2>
+<p>A <code>:has()</code> pode procurar um elemento num <strong>estado</strong>: <code>:checked</code> (marcado), <code>:focus</code> (com o cursor), <code>:invalid</code> (com valor errado). Assim, o que está <strong>em volta</strong> do campo reage a ele, sem JavaScript.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> marque e desmarque os sabores: a linha inteira fica dourada quando a caixinha está marcada. Depois clique no campo de observações e veja a caixa em volta dele ganhar a borda azul.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;form&gt;
+  &lt;p&gt;&lt;label&gt;&lt;input type="checkbox" name="sabor" value="cenoura" checked&gt; Cenoura&lt;/label&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;label&gt;&lt;input type="checkbox" name="sabor" value="fuba"&gt; Fubá&lt;/label&gt;&lt;/p&gt;
+  &lt;div class="campo"&gt;
+    &lt;label&gt;Observações &lt;input type="text" name="obs"&gt;&lt;/label&gt;
+  &lt;/div&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">label:has(input:checked) {
+  background-color: gold;
+  font-weight: bold;
+}
+
+.campo {
+  padding: 0.5rem;
+  border: 2px solid silver;
+}
+
+.campo:has(input:focus) {
+  border-color: navy;
+}
+</pre>
+</div>
+
+<p>"Cenoura" já começa marcada, então a linha dela já aparece dourada e em negrito. O <code>label</code> não tem estado nenhum; quem tem é o <code>input</code> dentro dele, e a <code>:has()</code> leva a informação para fora.</p>
+
+<div class="tryhtml" data-goal="css:form p:first-of-type label{background-color}=rgb(144, 238, 144),css:form p:last-of-type label{background-color}=rgba(0, 0, 0, 0),src:label:has\(">
+<p class="try-task"><strong>Missão:</strong> na escolha de entrega, a opção marcada fica com o fundo <code>lightgreen</code>. Escreva a regra com <code>label:has(…)</code>; não ponha classes no HTML.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;form&gt;
+  &lt;p&gt;&lt;label&gt;&lt;input type="radio" name="entrega" value="buscar" checked&gt; Vou buscar na lojinha&lt;/label&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;label&gt;&lt;input type="radio" name="entrega" value="casa"&gt; Entregar em casa&lt;/label&gt;&lt;/p&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">label {
+  padding: 0.3rem;
+}
+</pre>
+<pre class="solucao" data-file="style.css">label {
+  padding: 0.3rem;
+}
+
+label:has(input:checked) {
+  background-color: lightgreen;
+}
+</pre>
+</div>
+
+<p>Depois de cumprir a missão, clique em "Entregar em casa": o fundo verde muda de linha.</p>
+
+<hr>
+
+<h2>4. O contrário e a quantidade</h2>
+
+<h3>Quem <strong>não</strong> tem: <code>:not(:has(…))</code></h3>
+<p>Junte com a <a href="not-is-where.html"><code>:not()</code></a>: <code>.cartao:not(:has(img))</code> é "o cartão que não tem imagem". Bom para dar um fundo colorido ao cartão que ficaria sem graça.</p>
+
+<h3>Listas compridas: <code>:has(&gt; li:nth-child(4))</code></h3>
+<p>Se a lista tem um quarto item, ela tem <strong>quatro ou mais</strong>. Com isso, o CSS consegue mudar o desenho conforme a quantidade:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> a primeira lista tem 3 itens e fica numa coluna; a segunda tem 5 e se divide em duas. Apague dois itens da segunda e veja ela voltar a uma coluna.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h3&gt;Bolo de fubá&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;Fubá&lt;/li&gt;
+  &lt;li&gt;Ovos&lt;/li&gt;
+  &lt;li&gt;Leite&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Bolo de cenoura&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;Cenouras&lt;/li&gt;
+  &lt;li&gt;Ovos&lt;/li&gt;
+  &lt;li&gt;Óleo&lt;/li&gt;
+  &lt;li&gt;Açúcar&lt;/li&gt;
+  &lt;li&gt;Farinha&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">ul {
+  width: 300px;
+}
+
+ul:has(&gt; li:nth-child(4)) {
+  columns: 2;
+}
+</pre>
+</div>
+
+<p>O <code>columns: 2</code> divide o conteúdo em duas colunas, como num jornal. O <code>:nth-child(4)</code> é da aula <a href="nth-child.html">:first-child, :last-child e :nth-child</a>.</p>
+
+<hr>
+
+<h2>5. Especificidade e suporte</h2>
+<p>Na conta da <a href="especificidade.html">especificidade</a>, a <code>:has()</code> funciona como a <code>:is()</code>: vale o seletor <strong>mais forte</strong> de dentro dela. <code>.cartao:has(img)</code> é 0, 1, 1 (a classe do cartão mais o <code>img</code>); <code>.cartao:has(.foto)</code> é 0, 2, 0.</p>
+
+<div class="note">
+<strong>Suporte da <code>:has()</code></strong>
+<p>Funciona nos navegadores atuais: Safari desde a versão 15.4 (março de 2022), Chrome e Edge desde a 105 (agosto de 2022) e Firefox desde a <strong>121</strong> (dezembro de 2023), o último a chegar (dados do MDN, outubro de 2026). Num navegador mais velho, a regra com <code>:has()</code> é ignorada inteira. Por isso, use a <code>:has()</code> para <strong>melhorar</strong> a página, e não para fazê-la funcionar: sem a borda do cartão, a receita continua legível. Para testar se o navegador entende, existe <code>@supports selector(:has(a))</code> (aula <a href="supports.html">@supports e Compatibilidade</a>).</p>
+</div>
+
+<div class="tip">
+<strong>E o desempenho?</strong>
+<p>Para saber se um elemento "tem" alguma coisa, o navegador precisa olhar dentro dele, e refazer a conta quando o conteúdo muda. Os navegadores otimizaram isso, e numa página comum você não sente diferença. Só evite regras muito largas, como <code>body:has(…)</code> ou <code>:has(*)</code> sem nada na frente, numa página enorme que muda o tempo todo.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Espaço antes do <code>:has</code>: o estilo vai para outro elemento</strong>
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .cartao :has(img) {
+    border: 2px solid tomato;
+  }
+&lt;/style&gt;
+&lt;article class="cartao"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="200" height="150"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;/article&gt;
+</pre>
+<p><strong>O que você vê:</strong> nenhuma borda.</p>
+<p><strong>Por quê:</strong> com o espaço, o seletor quer dizer "um elemento <strong>dentro</strong> do cartão que tem uma imagem dentro dele". A imagem é filha direta do cartão, e não há nada entre os dois, então ninguém casa. O validador não reclama: o seletor é válido.</p>
+<p><strong>Como consertar:</strong> cole: <code>.cartao:has(img)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>:has()</code> dentro de <code>:has()</code>: o validador aceita, o navegador não</strong>
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .vitrine:has(.cartao:has(img)) {
+    border: 2px solid tomato;
+  }
+&lt;/style&gt;
+&lt;div class="vitrine"&gt;
+  &lt;article class="cartao"&gt;
+    &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="200" height="150"&gt;
+  &lt;/article&gt;
+&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> nenhuma borda em volta da vitrine.</p>
+<p><strong>Por quê:</strong> a regra do CSS proíbe uma <code>:has()</code> dentro de outra (o navegador poderia entrar numa conta sem fim). O navegador considera o seletor inválido e joga a regra fora. O <code>vnu</code> 26.10.12 <strong>não</strong> conhece essa proibição: para o mesmo arquivo, ele não mostra nada. Pseudo-elementos dentro da <code>:has()</code> (<code>p:has(::before)</code>) também são proibidos, e o validador também fica quieto.</p>
+<p><strong>Como consertar:</strong> aqui, uma <code>:has()</code> com o caminho inteiro basta: <code>.vitrine:has(.cartao img)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>:has()</code> vazia: <code>Parse Error</code></strong>
+<pre class="term" data-cwd="~/site">$ cat vazio.css
+.cartao:has() {
+  color: red;
+}
+$ vnu --css vazio.css
+"file:/home/ana/site/vazio.css":1.13-1.13: error: CSS: Parse Error.
+"file:/home/ana/site/vazio.css":1.13-1.13: error: CSS: Parse Error.</pre>
+<p><strong>O que significa:</strong> "erro de análise" na coluna 13, o <code>)</code>: a <code>:has()</code> precisa de alguma coisa entre os parênteses. (O validador repete a mesma linha duas vezes.) O navegador ignora a regra inteira.</p>
+<p><strong>Como consertar:</strong> diga o que procurar: <code>.cartao:has(img)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Um erro dentro da <code>:has()</code> derruba a regra</strong>
+<p><strong>O que acontece:</strong> diferente da <a href="not-is-where.html"><code>:is()</code></a>, a lista dentro da <code>:has()</code> <strong>não perdoa</strong>: em <code>.cartao:has(img, a:hoverr)</code>, o erro de digitação no <code>:hoverr</code> faz o navegador ignorar a regra inteira, e o cartão com imagem também fica sem estilo. O validador avisa: <code>Unknown pseudo-element or pseudo-class “:hoverr”</code>.</p>
+<p><strong>Como consertar:</strong> corrija o nome (<code>:hover</code>), ou separe em duas regras.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Escolhe</th></tr>
+<tr><td><code>A:has(B)</code></td><td>O <code>A</code> que tem um <code>B</code> dentro (em qualquer profundidade)</td></tr>
+<tr><td><code>A:has(&gt; B)</code></td><td>O <code>A</code> que tem um <code>B</code> como filho direto</td></tr>
+<tr><td><code>A:has(+ B)</code></td><td>O <code>A</code> que tem um <code>B</code> logo depois</td></tr>
+<tr><td><code>A:has(~ B)</code></td><td>O <code>A</code> que tem um <code>B</code> depois, no mesmo pai</td></tr>
+<tr><td><code>label:has(input:checked)</code></td><td>O rótulo da caixinha marcada</td></tr>
+<tr><td><code>A:not(:has(B))</code></td><td>O <code>A</code> que <strong>não</strong> tem <code>B</code></td></tr>
+<tr><td><code>ul:has(&gt; li:nth-child(4))</code></td><td>A lista com 4 itens ou mais</td></tr>
+<tr><td>Especificidade</td><td>A do seletor mais forte de dentro (como <code>:is()</code>)</td></tr>
+<tr><td>Proibido dentro</td><td>Outra <code>:has()</code> e pseudo-elementos (o <code>vnu</code> não avisa)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O cartão com foto</h3>
+<p>Complete para escolher o cartão que tem uma imagem:</p>
+<div class="ex-code">.cartao:<input data-answer="has" aria-label="pseudo-classe">(img) { border: 2px solid tomato; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. A caixinha marcada</h3>
+<p>Complete o estado da caixinha:</p>
+<div class="ex-code">label:has(input:<input data-answer="checked" aria-label="estado">) { background-color: gold; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Logo depois</h3>
+<p>Complete o combinador para escolher o <code>h2</code> que tem um <code>p</code> <strong>logo depois</strong>:</p>
+<div class="ex-code">h2:has(<input data-answer="+" aria-label="combinador"> p) { margin-bottom: 0; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Em <code>.cartao:has(img) { border: 2px solid tomato; }</code>, quem ganha a borda?</p>
+<label><input type="radio" name="q4"> A imagem</label>
+<label><input type="radio" name="q4"> O cartão que tem a imagem</label>
+<label><input type="radio" name="q4"> Todos os cartões</label>
+<label><input type="radio" name="q4"> O elemento depois do cartão</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. Qual seletor escolhe o cartão que <strong>não</strong> tem imagem?</p>
+<label><input type="radio" name="q5"> <code>.cartao:has(:not(img))</code></label>
+<label><input type="radio" name="q5"> <code>.cartao :not(img)</code></label>
+<label><input type="radio" name="q5"> <code>.cartao:has(!img)</code></label>
+<label><input type="radio" name="q5"> <code>.cartao:not(:has(img))</code></label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">6. A Ana escreveu <code>.vitrine:has(.cartao:has(img))</code>. O validador não reclamou, mas nada mudou. Por quê?</p>
+<label><input type="radio" name="q6"> Faltou o espaço antes do <code>:has</code></label>
+<label><input type="radio" name="q6"> A <code>:has()</code> só funciona no Firefox</label>
+<label><input type="radio" name="q6"> Uma <code>:has()</code> dentro de outra é proibida; o navegador ignora a regra, e o validador não sabe disso</label>
+<label><input type="radio" name="q6"> Precisa de <code>!important</code></label>
+</div>
+
+<h3>Missão final: a vitrine da lojinha</h3>
+
+<div class="tryhtml" data-goal="css:.vitrine .cartao:nth-of-type(1){border-top-color}=rgb(255, 99, 71),css:.vitrine .cartao:nth-of-type(3){border-top-color}=rgb(255, 99, 71),css:.vitrine .cartao:nth-of-type(2){border-top-style}=none,css:.vitrine .cartao:nth-of-type(2){background-color}=rgb(255, 243, 224),css:.vitrine .cartao:nth-of-type(1){background-color}=rgba(0, 0, 0, 0),src::has\(,nsrc:class=&quot;cartao [^&quot;]">
+<p class="try-task"><strong>Missão:</strong> sem mexer no HTML, (1) os cartões <strong>com</strong> imagem ganham <code>border: 2px solid tomato;</code>; (2) os cartões <strong>sem</strong> imagem ganham o fundo <code>#fff3e0</code> (e nenhuma borda).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;article class="cartao"&gt;
+    &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="200" height="150"&gt;
+    &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;/article&gt;
+  &lt;article class="cartao"&gt;
+    &lt;h2&gt;Pão de queijo&lt;/h2&gt;
+    &lt;p&gt;Foto em breve.&lt;/p&gt;
+  &lt;/article&gt;
+  &lt;article class="cartao"&gt;
+    &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Fatia quadrada de bolo de cenoura" width="150" height="150"&gt;
+    &lt;h2&gt;Bolo em pedaços&lt;/h2&gt;
+  &lt;/article&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.cartao:has(img) {
+  border: 2px solid tomato;
+}
+
+.cartao:not(:has(img)) {
+  background-color: #fff3e0;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>A:has(B)</code> escolhe o <code>A</code> que <strong>tem</strong> um <code>B</code> dentro: o estilo vai para o de fora, o "pai".</li>
+  <li>Com combinador: <code>:has(&gt; B)</code> (filho direto), <code>:has(+ B)</code> (logo depois), <code>:has(~ B)</code> (depois, no mesmo pai).</li>
+  <li>Com estados: <code>label:has(input:checked)</code>, <code>.campo:has(input:focus)</code>. Com <code>:not()</code>: <code>.cartao:not(:has(img))</code>. Com contagem: <code>ul:has(&gt; li:nth-child(4))</code>.</li>
+  <li>Especificidade: a do seletor mais forte de dentro. Suporte: todos os navegadores atuais (o Firefox só desde a 121, dezembro de 2023); use para melhorar, não para fazer funcionar.</li>
+  <li>Espaço antes do <code>:has</code> muda o sentido. <code>:has()</code> dentro de <code>:has()</code> e pseudo-elementos lá dentro são ignorados pelo navegador, e o <code>vnu</code> não avisa. <code>:has()</code> vazia dá <code>Parse Error</code>. Um seletor errado dentro dela derruba a regra.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
