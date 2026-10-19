@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS gap — espaço entre os itens do Flexbox e do Grid | Guia CSS</title>
+<meta name="description" content="A propriedade gap para quem está começando: por que margin nos itens deixa espaço sobrando nas bordas, como gap põe espaço só entre os itens, row-gap e column-gap, o atalho com dois valores, onde gap funciona e onde não faz nada, e as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">gap</span></h1>
+
+<p class="intro">Os cartões da lojinha da Ana estão lado a lado com Flexbox, mas grudados uns nos outros. O primeiro impulso é dar uma <code>margin</code> (margem) a cada cartão. Funciona… mais ou menos: aparece espaço também nas pontas, onde a Ana não queria. A propriedade <code>gap</code> (em inglês, "vão", "intervalo") resolve isso com uma linha só no pai: ela põe espaço <strong>entre</strong> os itens, e só entre eles.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Por que <code>margin</code> nos itens deixa espaço sobrando nas bordas da caixa.</li>
+  <li>Como escrever <code>gap</code>, parte por parte, e onde ele vai (no pai).</li>
+  <li><code>row-gap</code> e <code>column-gap</code>: um espaço entre as linhas, outro entre as colunas, e o atalho com dois valores.</li>
+  <li>Onde o <code>gap</code> funciona (Flexbox, Grid) e onde ele não faz nada.</li>
+  <li>Outros jeitos de espaçar (<code>margin</code>, <code>justify-content</code>) e quando usar cada um.</li>
+  <li>Os erros mais comuns e as mensagens reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="flexbox.html">Introdução ao Flexbox</a>, <a href="margin.html">Margem (margin)</a> e <a href="flex-wrap.html">Quebrando Linha (flex-wrap)</a>. Os exemplos com resultado são desenhados agora pelo <strong>seu</strong> navegador. As mensagens do validador saíram do validador W3C (<code>vnu</code>), na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: o rejunte do piso</h2>
+<p>Num piso de cerâmica, entre um azulejo e outro existe o <strong>rejunte</strong>: aquela faixa fininha, sempre da mesma largura. Repare que o rejunte fica só <strong>entre</strong> os azulejos: ninguém põe rejunte entre o último azulejo e a parede. E quem decide a largura do rejunte é o pedreiro, para o piso todo, e não cada azulejo.</p>
+<p>O <code>gap</code> é esse rejunte. Ele é escrito <strong>uma vez, no pai</strong>, e o navegador põe o mesmo espaço entre cada par de itens vizinhos. A <code>margin</code>, ao contrário, é um espaço que <strong>cada item</strong> leva em volta de si, para todos os lados, inclusive para o lado da parede.</p>
+
+<hr>
+
+<h2>1. O problema da <code>margin</code></h2>
+<p>Três cartões, cada um com <code>margin: 8px</code> (8 pixels de margem dos quatro lados):</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;div class="produto"&gt;Bolo&lt;/div&gt;
+  &lt;div class="produto"&gt;Brigadeiro&lt;/div&gt;
+  &lt;div class="produto"&gt;Sonho&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.vitrine {
+  display: flex;
+  width: 320px;
+  border: 2px dashed gray;
+}
+
+.produto {
+  margin: 8px;
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<p>Olhe os espaços com atenção:</p>
+<ul>
+  <li><strong>Entre</strong> dois cartões, o espaço é de <strong>16 pixels</strong>: os 8 da direita do Bolo mais os 8 da esquerda do Brigadeiro. (No Flexbox, as margens vizinhas se somam; elas não se "fundem" como as margens de cima e de baixo de dois parágrafos.)</li>
+  <li>Entre o Bolo e a borda tracejada, o espaço é de <strong>8 pixels</strong>, e também em cima e embaixo.</li>
+</ul>
+<p>Ou seja: os espaços não são iguais, e as pontas ganharam um espaço que ninguém pediu. Dá para consertar com contas e regras extras (seção 5), mas existe um jeito direto.</p>
+
+<hr>
+
+<h2>2. A solução: <code>gap</code> no pai</h2>
+<p>Tire a <code>margin</code> dos cartões e escreva uma linha na <code>.vitrine</code>:</p>
+
+<pre class="file" data-file="style.css">.vitrine {
+  display: flex;
+  gap: 16px;
+}</pre>
+
+<dl class="anatomy">
+  <dt>.vitrine</dt><dd>O seletor: o <strong>pai</strong> (o elemento com <code>display: flex</code>). Como o rejunte, o <code>gap</code> é decidido por quem arruma os itens, e não por cada item.</dd>
+  <dt>gap</dt><dd>A propriedade: o "vão" entre os itens vizinhos.</dd>
+  <dt>16px</dt><dd>O tamanho do vão. Aceita as unidades de tamanho de sempre: <code>px</code>, <code>rem</code>, <code>em</code>, <code>%</code> (aula <a href="unidades.html">Unidades</a>). <code>1rem</code> é uma boa escolha: acompanha o tamanho da letra que o leitor escolheu no navegador.</dd>
+  <dt>;</dt><dd>Fecha a declaração.</dd>
+</dl>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;div class="produto"&gt;Bolo&lt;/div&gt;
+  &lt;div class="produto"&gt;Brigadeiro&lt;/div&gt;
+  &lt;div class="produto"&gt;Sonho&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.vitrine {
+  display: flex;
+  gap: 16px;
+  width: 320px;
+  border: 2px dashed gray;
+}
+
+.produto {
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<p>Agora o espaço entre os cartões é de 16 pixels, igual nos dois vãos, e o Bolo encosta na borda tracejada: nas pontas, nada. Se você quiser um respiro entre os cartões e a borda, isso é tarefa do <code>padding</code> do pai (aula <a href="padding.html">Espaço Interno</a>): um cuida da parede, o outro do rejunte.</p>
+
+<h3>Experimente: trocar a margem pelo gap</h3>
+<div class="tryhtml" data-goal="css:.cardapio{column-gap}=16px,css:.item{margin-left}=0px">
+<p class="try-task"><strong>Missão:</strong> no cardápio da padaria, os itens estão separados com <code>margin</code>. Apague a <code>margin</code> do <code>.item</code> e ponha <code>gap: 16px</code> no <code>.cardapio</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cardapio"&gt;
+  &lt;div class="item"&gt;Café&lt;/div&gt;
+  &lt;div class="item"&gt;Pão na chapa&lt;/div&gt;
+  &lt;div class="item"&gt;Suco&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cardapio {
+  display: flex;
+  border: 2px solid navy;
+}
+
+.item {
+  margin: 8px;
+  padding: 8px;
+  background-color: lightyellow;
+  font-family: sans-serif;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cardapio {
+  display: flex;
+  gap: 16px;
+  border: 2px solid navy;
+}
+
+.item {
+  padding: 8px;
+  background-color: lightyellow;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Um espaço para as linhas, outro para as colunas</h2>
+<p>Quando os itens quebram em várias linhas (<code>flex-wrap: wrap</code>), existem dois tipos de vão: o que fica <strong>entre as linhas</strong> (em cima e embaixo) e o que fica <strong>entre as colunas</strong> (dos lados). O <code>gap</code> com um valor só usa o mesmo tamanho para os dois. Para tamanhos diferentes, existem três escritas:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>gap: 16px;</code></td><td>16 pixels entre as linhas <strong>e</strong> entre as colunas</td></tr>
+<tr><td><code>gap: 20px 8px;</code></td><td>Dois valores: o <strong>primeiro</strong> é entre as linhas (<code>row-gap</code>), o <strong>segundo</strong>, entre as colunas (<code>column-gap</code>)</td></tr>
+<tr><td><code>row-gap: 20px;</code></td><td>Só o vão entre as linhas (<em>row</em> = "linha")</td></tr>
+<tr><td><code>column-gap: 8px;</code></td><td>Só o vão entre as colunas (<em>column</em> = "coluna")</td></tr>
+</table>
+</div>
+
+<p>Abaixo, a mesma vitrine duas vezes: com <code>gap: 1rem</code> (16 pixels nos dois sentidos) e com <code>gap: 20px 8px</code>:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;gap: 1rem&lt;/p&gt;
+&lt;div class="vitrine igual"&gt;
+  &lt;div class="produto"&gt;Bolo&lt;/div&gt;
+  &lt;div class="produto"&gt;Brigadeiro&lt;/div&gt;
+  &lt;div class="produto"&gt;Sonho&lt;/div&gt;
+  &lt;div class="produto"&gt;Cookies&lt;/div&gt;
+  &lt;div class="produto"&gt;Pão&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;gap: 20px 8px&lt;/p&gt;
+&lt;div class="vitrine diferente"&gt;
+  &lt;div class="produto"&gt;Bolo&lt;/div&gt;
+  &lt;div class="produto"&gt;Brigadeiro&lt;/div&gt;
+  &lt;div class="produto"&gt;Sonho&lt;/div&gt;
+  &lt;div class="produto"&gt;Cookies&lt;/div&gt;
+  &lt;div class="produto"&gt;Pão&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">p {
+  font-family: monospace;
+}
+
+.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  width: 320px;
+  border: 2px dashed gray;
+}
+
+.igual {
+  gap: 1rem;
+}
+
+.diferente {
+  gap: 20px 8px;
+}
+
+.produto {
+  width: 100px;
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<p>Na primeira, o espaço entre os cartões é o mesmo para os lados e para baixo. Na segunda, as linhas ficaram mais afastadas (20 pixels) e os cartões da mesma linha, mais perto (8 pixels). Para lembrar a ordem: é a mesma do <code>margin: 20px 8px</code>, primeiro o "em cima e embaixo", depois o "dos lados".</p>
+
+<div class="note">
+<strong>O que o F12 mostra</strong>
+<p><code>gap</code> é um <strong>atalho</strong> para <code>row-gap</code> + <code>column-gap</code>. Na aba Computed do F12 (e no <code>getComputedStyle</code> do JavaScript), aparecem as duas propriedades longas, já em pixels: com <code>gap: 1rem</code>, <code>row-gap</code> e <code>column-gap</code> valem <code>16px</code> (com a letra padrão de 16 pixels). Sem nenhum <code>gap</code>, as duas valem <code>normal</code>, que no Flexbox quer dizer zero.</p>
+</div>
+
+<hr>
+
+<h2>4. Onde o <code>gap</code> funciona</h2>
+<p>O <code>gap</code> só tem efeito em elementos que arrumam os filhos num layout próprio:</p>
+<ul>
+  <li><code>display: flex</code> (e <code>inline-flex</code>): o vão entre os itens flex;</li>
+  <li><code>display: grid</code> (e <code>inline-grid</code>): o vão entre as linhas e colunas da grade (aula <a href="grid.html">Introdução ao Grid</a>);</li>
+  <li>textos em várias colunas (<code>columns</code>): o <code>column-gap</code> é o espaço entre as colunas de texto.</li>
+</ul>
+<p>Num elemento comum (<code>display: block</code>), o <code>gap</code> é aceito, mas não faz nada (veja <a href="#errado">Quando dá errado</a>).</p>
+
+<div class="note">
+<strong>Suporte nos navegadores</strong>
+<p>O <code>gap</code> no Grid existe há muito tempo. No <strong>Flexbox</strong>, ele chegou mais tarde: Chrome e Edge 84, Firefox 63, Safari 14.1 (iPhone/iPad: 14.5), todos de 2021 para trás. Segundo o caniuse.com, mais de 97% dos navegadores em uso já entendem. Em tutoriais antigos, você vai ver o Flexbox espaçado com <code>margin</code> justamente porque, na época, o <code>gap</code> não funcionava nele. E vai ver <code>grid-gap</code>, o nome antigo do <code>gap</code> no Grid: ainda funciona, mas use <code>gap</code>.</p>
+</div>
+
+<hr>
+
+<h2>5. Formas de fazer a mesma coisa</h2>
+<p>Espaço entre itens tem vários caminhos. Veja os mais comuns, do mais antigo ao mais direto:</p>
+
+<pre class="file" data-file="style.css">/* 1. margin em todos os itens: espaço dobrado no meio e sobra nas pontas */
+.produto {
+  margin: 8px;
+}
+
+/* 2. margin só a partir do segundo item (o "+" é o irmão de antes) */
+.produto + .produto {
+  margin-left: 16px;
+}
+
+/* 3. o espaço que sobra, distribuído entre os itens */
+.vitrine {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* 4. gap: o mesmo vão entre todos, nada nas pontas */
+.vitrine {
+  display: flex;
+  gap: 16px;
+}</pre>
+
+<p>O jeito 2 usa o combinador de irmão (aula <a href="combinadores.html">Descendente, Filho e Irmãos</a>): "todo <code>.produto</code> que vem logo depois de outro <code>.produto</code>". Funciona numa linha só, mas, quando os itens quebram de linha, o primeiro item da linha de baixo também ganha a margem e fica desalinhado. O jeito 3 não é um espaço fixo: o <code>justify-content: space-between</code> (aula <a href="justify-content.html">justify-content</a>) empurra o primeiro item para uma ponta, o último para a outra, e o vão é o que sobrar. Com poucos itens numa caixa larga, o vão fica enorme.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Espaço nas pontas?</th><th>Quando usar</th></tr>
+<tr><td><code>gap</code> no pai</td><td>Não</td><td><strong>Quase sempre</strong>, em Flexbox e Grid: um vão fixo e igual entre todos</td></tr>
+<tr><td><code>justify-content: space-between</code></td><td>Não</td><td>Quando os itens devem ir até as pontas e o vão pode variar (logo à esquerda, menu à direita). Dá para juntar com <code>gap</code>, que vira o vão mínimo</td></tr>
+<tr><td><code>margin</code> num item</td><td>Depende</td><td>Para afastar <strong>um</strong> item específico (o botão "Sair" mais longe dos outros), e não para espaçar todos</td></tr>
+<tr><td><code>.item + .item { margin-left }</code></td><td>Não</td><td>O jeito antigo, de antes do <code>gap</code> no Flexbox: reconheça, mas prefira o <code>gap</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>CSS quase nunca mostra mensagem: o navegador ignora em silêncio o que não entende. Estes são os tropeços mais comuns com <code>gap</code>.</p>
+
+<div class="cenario">
+<strong>O <code>gap</code> não faz nada: o pai não é flex nem grid</strong>
+<p><strong>O que aconteceu:</strong> a Ana escreveu <code>gap: 16px</code> numa <code>div</code> comum, esperando separar os parágrafos de dentro:</p>
+<pre class="file" data-file="style.css · erro de propósito">.receita {
+  gap: 16px;
+}</pre>
+<p><strong>O que você vê:</strong> nada muda. O curioso: o validador não reclama, e o F12 mostra o <code>gap: 16px</code> normalmente no painel Styles (Estilos), sem riscar; na aba Computed, o <code>row-gap</code> aparece como <code>16px</code>. A declaração é válida, só não tem efeito, porque num bloco comum não existem "itens" para separar.</p>
+<p><strong>Como consertar:</strong> ponha <code>display: flex</code> (com <code>flex-direction: column</code>, para continuar um embaixo do outro) ou <code>display: grid</code> no mesmo elemento. Ou, se a ideia era só afastar os parágrafos, use <code>margin</code> neles.</p>
+</div>
+
+<div class="cenario">
+<strong>Espaço maior do que o esperado: <code>gap</code> + <code>margin</code></strong>
+<p><strong>O que aconteceu:</strong> a Ana pôs <code>gap: 16px</code> na vitrine, mas esqueceu a antiga <code>margin: 8px</code> nos cartões.</p>
+<p><strong>O que você vê:</strong> os dois se <strong>somam</strong>: entre os cartões ficam 8 + 16 + 8 = 32 pixels, e as pontas continuam com 8. Parece que o <code>gap</code> "não obedece".</p>
+<p><strong>Como consertar:</strong> escolha um. Ao adotar o <code>gap</code>, apague a <code>margin</code> que espaçava os itens. No F12, clique num cartão: o desenho da caixa (o box model, na aba Computed) mostra a margem que sobrou.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “gap”: Too many values or values are not recognized.</code></strong>
+<p><strong>O que aconteceu:</strong> três valores, como se fosse uma <code>margin</code>: <code>gap: 10px 20px 30px;</code>.</p>
+<pre class="term" data-cwd="~/flex">$ vnu --css gap3.css
+"file:/home/ana/flex/gap3.css":3.18-3.21: error: CSS: “gap”: Too many values or values are not recognized.</pre>
+<p>"Valores demais, ou valores não reconhecidos." O <code>gap</code> aceita um ou dois valores (linhas e colunas). O navegador ignora a declaração inteira: o vão volta a zero.</p>
+<p><strong>Como consertar:</strong> no máximo dois valores: <code>gap: 10px 20px;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “gap”: “,” is an incorrect operator.</code></strong>
+<p><strong>O que aconteceu:</strong> os dois valores separados por vírgula: <code>gap: 10px, 20px;</code>.</p>
+<pre class="term" data-cwd="~/flex">$ vnu --css gapvirg.css
+"file:/home/ana/flex/gapvirg.css":3.14-3.17: error: CSS: “gap”: “,” is an incorrect operator.</pre>
+<p>"A vírgula é um operador incorreto (aqui)." Em CSS, os valores de um atalho são separados por <strong>espaço</strong>. A declaração é ignorada.</p>
+<p><strong>Como consertar:</strong> <code>gap: 10px 20px;</code>, sem vírgula.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “gap”: “-10px” negative values are not allowed.</code></strong>
+<p><strong>O que aconteceu:</strong> a Ana quis "juntar mais" os itens com um vão negativo: <code>gap: -10px;</code>.</p>
+<pre class="term" data-cwd="~/flex">$ vnu --css gapneg.css
+"file:/home/ana/flex/gapneg.css":3.9-3.12: error: CSS: “gap”: “-10px” negative values are not allowed.</pre>
+<p>"Valores negativos não são permitidos." O menor vão possível é zero; a declaração é ignorada.</p>
+<p><strong>Como consertar:</strong> para encostar os itens, <code>gap: 0</code> (ou apague o <code>gap</code>). Para sobrepor de propósito, o caminho é outro: <code>margin</code> negativa num item.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “gap”: Missing a semicolon before the property name “padding”.</code></strong>
+<p><strong>O que aconteceu:</strong> faltou o <code>;</code> depois do <code>gap</code>:</p>
+<pre class="file" data-file="style.css · erro de propósito">.fila {
+  display: flex;
+  gap: 1rem
+  padding: 8px;
+}</pre>
+<pre class="term" data-cwd="~/flex">$ vnu --css gapsemponto.css
+"file:/home/ana/flex/gapsemponto.css":4.3-4.9: error: CSS: “gap”: Missing a semicolon before the property name “padding”.</pre>
+<p>"Falta um ponto e vírgula antes da propriedade <code>padding</code>." Sem o <code>;</code>, o navegador lê <code>gap: 1rem padding: 8px</code> como uma coisa só, que não faz sentido, e joga fora as <strong>duas</strong> declarações: some o vão e some o <code>padding</code>.</p>
+<p><strong>Como consertar:</strong> <code>;</code> no fim de toda declaração, até na última.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>gap: 16px;</code></td><td>Vão de 16 pixels entre as linhas e entre as colunas</td></tr>
+<tr><td><code>gap: 20px 8px;</code></td><td>20 entre as linhas, 8 entre as colunas</td></tr>
+<tr><td><code>row-gap: 20px;</code></td><td>Só entre as linhas</td></tr>
+<tr><td><code>column-gap: 8px;</code></td><td>Só entre as colunas</td></tr>
+<tr><td><code>gap: 0;</code></td><td>Sem vão (itens encostados)</td></tr>
+<tr><td>Onde vai</td><td>No <strong>pai</strong> com <code>display: flex</code> ou <code>grid</code>; nas pontas, nada (para isso, <code>padding</code> no pai)</td></tr>
+<tr><td><code>grid-gap</code></td><td>Nome antigo do <code>gap</code> no Grid; ainda funciona, mas use <code>gap</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O vão</h3>
+<p>Complete para deixar 12 pixels entre os itens:</p>
+<div class="ex-code">.menu { display: flex; <input data-answer="gap" aria-label="propriedade">: 12px; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Só entre as linhas</h3>
+<p>Complete com a propriedade que mexe só no vão entre as linhas:</p>
+<div class="ex-code">.galeria { display: flex; flex-wrap: wrap; <input data-answer="row-gap" aria-label="propriedade">: 24px; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. Em <code>gap: 20px 8px;</code>, o que vale 8 pixels?</p>
+<label><input type="radio" name="q3"> O vão entre as linhas</label>
+<label><input type="radio" name="q3"> O vão entre as colunas</label>
+<label><input type="radio" name="q3"> O espaço entre os itens e a borda do pai</label>
+<label><input type="radio" name="q3"> A largura de cada item</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Com <code>gap: 16px</code> no pai flex, quanto espaço fica entre o primeiro item e a borda esquerda do pai?</p>
+<label><input type="radio" name="q4"> 16 pixels</label>
+<label><input type="radio" name="q4"> 8 pixels</label>
+<label><input type="radio" name="q4"> Nenhum: o <code>gap</code> só fica entre os itens</label>
+<label><input type="radio" name="q4"> Depende do número de itens</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. A Ana escreveu <code>.receita { gap: 16px; }</code> numa <code>div</code> comum e nada mudou. Por quê?</p>
+<label><input type="radio" name="q5"> O <code>gap</code> só funciona em pais com <code>display: flex</code> ou <code>grid</code></label>
+<label><input type="radio" name="q5"> Faltou a unidade</label>
+<label><input type="radio" name="q5"> O <code>gap</code> precisa de dois valores</label>
+<label><input type="radio" name="q5"> O <code>gap</code> vai nos filhos, não no pai</label>
+</div>
+
+<h3>Missão final: a galeria de fotos</h3>
+
+<div class="tryhtml" data-goal="css:.galeria{row-gap}=24px,css:.galeria{column-gap}=8px,css:.galeria{padding-left}=8px,css:.foto{margin-top}=0px">
+<p class="try-task"><strong>Missão:</strong> arrume a galeria de fotos do blog. (1) Apague a <code>margin</code> das fotos. (2) No <code>.galeria</code>, ponha 24 pixels entre as linhas e 8 entre as colunas (com um <code>gap</code> de dois valores). (3) Dê <code>padding: 8px</code> à galeria, para as fotos não encostarem na borda.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="galeria"&gt;
+  &lt;img class="foto" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="120" height="90"&gt;
+  &lt;img class="foto" src="assets/midia/bolo-quadrado-400.jpg" alt="O mesmo bolo, visto mais de perto" width="90" height="90"&gt;
+  &lt;img class="foto" src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana" width="144" height="90"&gt;
+  &lt;img class="foto" src="assets/midia/avatar-ana-192.png" alt="Avatar da Ana" width="90" height="90"&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria {
+  display: flex;
+  flex-wrap: wrap;
+  width: 300px;
+  border: 2px solid navy;
+}
+
+.foto {
+  margin: 6px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.galeria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px 8px;
+  width: 300px;
+  padding: 8px;
+  border: 2px solid navy;
+}
+</pre>
+</div>
+
+<p>Troque o <code>24px</code> por <code>8px</code> e veja a galeria virar um mosaico com o mesmo vão em todos os lados. Ou escreva só <code>gap: 8px</code>: é a mesma coisa.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>gap</code>, escrito no <strong>pai</strong> flex ou grid, põe o mesmo espaço entre cada par de itens vizinhos, e nada nas pontas.</li>
+  <li><code>margin</code> nos itens soma espaço no meio (8 + 8) e deixa sobra nas pontas; serve para afastar um item específico, não para espaçar todos.</li>
+  <li><code>gap: 20px 8px</code>: primeiro entre as linhas (<code>row-gap</code>), depois entre as colunas (<code>column-gap</code>).</li>
+  <li>Espaço entre os itens e a borda é <code>padding</code> do pai.</li>
+  <li>Num bloco comum, o <code>gap</code> é aceito, mas não faz nada. Três valores, vírgula ou valor negativo: o validador reclama e o navegador ignora.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
