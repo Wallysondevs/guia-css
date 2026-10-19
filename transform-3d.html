@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Transformações em 3D — perspective, rotateX, rotateY e o cartão que vira | Guia CSS</title>
+<meta name="description" content="Transformações em 3D no CSS para quem está começando: perspective, rotateX, rotateY, translateZ, perspective-origin, transform-style: preserve-3d e backface-visibility, montando um cartão que vira de verdade, com o resultado desenhado no seu navegador e os erros mais comuns.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Transformações em 3D</span></h1>
+
+<p class="intro">Na aula <a href="transform.html">transform</a>, tudo acontecia no plano da tela: mover para os lados, girar como o ponteiro de um relógio. Agora os elementos vão ganhar <strong>profundidade</strong>: girar como uma porta que abre, como uma página de livro que vira, chegar mais perto ou mais longe de quem olha. No fim, você monta um cartão de receita que vira e mostra o verso.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Os três eixos: X (deitado), Y (em pé) e Z (saindo da tela).</li>
+  <li><code>rotateX()</code>, <code>rotateY()</code> e <code>translateZ()</code>.</li>
+  <li>Por que, sem <code>perspective</code>, o 3D parece achatado, e como escolher a distância.</li>
+  <li><code>perspective-origin</code>: de onde o olho está olhando.</li>
+  <li><code>transform-style: preserve-3d</code> e <code>backface-visibility: hidden</code>, as duas peças do cartão que vira.</li>
+  <li>Os erros que deixam tudo achatado ou mostram o texto espelhado.</li>
+</ul>
+</div>
+
+<p>Antes, veja <a href="transform.html">transform</a>: as funções, a ordem e o <code>transform-origin</code> valem aqui também. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana.</p>
+
+<hr>
+
+<h2>A ideia: a porta e o olho</h2>
+<p>Pense na porta da cozinha da Ana. Ela gira em volta das dobradiças, que formam uma linha <strong>em pé</strong>. Quando ela abre, o lado de longe fica <strong>menor</strong> aos seus olhos, e o lado de perto, maior. É isso que dá a sensação de profundidade.</p>
+<p>A tela é plana. Para desenhar a porta abrindo, o navegador precisa saber <strong>onde está o seu olho</strong>: se você está colado na porta, o lado de perto parece enorme e o de longe, minúsculo; se está do outro lado da cozinha, a diferença é pequena. Essa distância do olho até a tela é a <code>perspective</code> ("perspectiva").</p>
+
+<p>Os três eixos:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Eixo</th><th>Direção</th><th>Girar em volta dele é como…</th></tr>
+<tr><td><strong>X</strong></td><td>deitado, da esquerda para a direita</td><td>a tampa de um notebook abrindo ou fechando</td></tr>
+<tr><td><strong>Y</strong></td><td>em pé, de cima para baixo</td><td>uma porta abrindo, uma página de livro virando</td></tr>
+<tr><td><strong>Z</strong></td><td>saindo da tela, na direção do seu nariz</td><td>o ponteiro de um relógio: é o <code>rotate()</code> comum, da aula anterior</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. <code>rotateY()</code> sem e com <code>perspective</code></h2>
+<p>Veja o mesmo giro de 50 graus em volta do eixo Y, três vezes: sem perspectiva, com o olho longe (<code>1000px</code>) e com o olho perto (<code>200px</code>). A linha tracejada é o lugar original.</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .cena { display: inline-block; margin: 16px 24px; outline: 2px dashed gray; }
+  .porta { width: 120px; height: 90px; background-color: #c2410c; color: white; font: 13px monospace; display: grid; place-items: center; transform: rotateY(50deg); }
+  .longe { perspective: 1000px; }
+  .perto { perspective: 200px; }
+&lt;/style&gt;
+&lt;div class="cena"&gt;&lt;div class="porta"&gt;sem perspective&lt;/div&gt;&lt;/div&gt;
+&lt;div class="cena longe"&gt;&lt;div class="porta"&gt;1000px&lt;/div&gt;&lt;/div&gt;
+&lt;div class="cena perto"&gt;&lt;div class="porta"&gt;200px&lt;/div&gt;&lt;/div&gt;
+</pre>
+
+<p>Sem perspectiva, a caixa só ficou <strong>mais estreita</strong>: parece amassada, e não girada. Com <code>1000px</code>, o lado direito (que foi para longe) ficou um pouco mais baixo que o esquerdo, e já parece uma porta. Com <code>200px</code>, o efeito é exagerado: o lado de perto cresce para fora da linha tracejada e o de longe encolhe bastante.</p>
+
+<dl class="anatomy">
+  <dt>.cena { perspective: 1000px; }</dt><dd>A <strong>distância do olho</strong> até a tela, posta no <strong>pai</strong> dos elementos 3D. Vale para todos os filhos. Quanto <strong>menor</strong> o número, mais perto o olho e mais forte o efeito. Entre <code>600px</code> e <code>1200px</code> fica natural.</dd>
+  <dt>.porta { transform: rotateY(50deg); }</dt><dd>Gira em volta do eixo Y (em pé). Como no <code>rotate()</code>, a unidade é <code>deg</code> ou <code>turn</code>, e o giro é em volta do <strong>centro</strong> (veja o <code>transform-origin</code> na aula anterior).</dd>
+</dl>
+
+<h3>A outra forma: a função <code>perspective()</code></h3>
+<p>Em vez de pôr a perspectiva no pai, dá para pô-la <strong>dentro</strong> do <code>transform</code> do próprio elemento, como a <strong>primeira</strong> função:</p>
+<pre class="file" data-file="style.css">.porta {
+  transform: perspective(600px) rotateY(50deg);
+}
+</pre>
+<p>O resultado parece o mesmo para um elemento sozinho. A diferença aparece com vários: a <strong>propriedade</strong> no pai cria um olho só para a cena inteira (os elementos da direita são vistos de lado, os do meio, de frente); a <strong>função</strong> dá a cada elemento o seu próprio olho, bem na frente dele. Para uma cena com várias peças, use a propriedade no pai.</p>
+
+<hr>
+
+<h2>2. <code>rotateX()</code>, <code>rotateY()</code> e <code>rotateZ()</code></h2>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .cena { display: inline-block; margin: 16px 20px; outline: 2px dashed gray; perspective: 400px; }
+  .caixa { width: 110px; height: 80px; background-color: #2f7d32; color: white; font: 13px monospace; display: grid; place-items: center; }
+&lt;/style&gt;
+&lt;div class="cena"&gt;&lt;div class="caixa" style="transform: rotateX(50deg)"&gt;rotateX(50deg)&lt;/div&gt;&lt;/div&gt;
+&lt;div class="cena"&gt;&lt;div class="caixa" style="transform: rotateY(50deg)"&gt;rotateY(50deg)&lt;/div&gt;&lt;/div&gt;
+&lt;div class="cena"&gt;&lt;div class="caixa" style="transform: rotateZ(50deg)"&gt;rotateZ(50deg)&lt;/div&gt;&lt;/div&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Função</th><th>O que você vê</th></tr>
+<tr><td><code>rotateX(50deg)</code></td><td>a parte de cima "deita" para trás, para longe de você, e fica mais estreita que a de baixo, como a tampa de um notebook abrindo</td></tr>
+<tr><td><code>rotateY(50deg)</code></td><td>o lado direito vai para trás, como uma porta</td></tr>
+<tr><td><code>rotateZ(50deg)</code></td><td>o giro comum, no plano da tela: igual a <code>rotate(50deg)</code>; a perspectiva não muda nada</td></tr>
+<tr><td><code>rotate3d(1, 1, 0, 45deg)</code></td><td>gira em volta de um eixo inclinado (aqui, a diagonal entre X e Y). Pouco usado</td></tr>
+</table>
+</div>
+
+<p>Ângulos negativos giram para o outro lado: <code>rotateY(-50deg)</code> manda o lado <strong>esquerdo</strong> para trás. E a propriedade separada <code>rotate</code> (aula anterior) também aceita um eixo: <code>rotate: y 50deg;</code> é o mesmo que <code>rotateY(50deg)</code>.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> mude o <code>rotateY</code> para <code>rotateX</code>, use ângulos negativos, e diminua a <code>perspective</code> para <code>150px</code> ou aumente para <code>2000px</code>. Depois apague a linha <code>perspective</code> e veja a caixa ficar "amassada".</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cena"&gt;
+  &lt;div class="placa"&gt;Padaria da Ana&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cena {
+  perspective: 500px;
+  padding: 30px;
+}
+
+.placa {
+  width: 220px;
+  padding: 30px 0;
+  background-color: #c2410c;
+  color: white;
+  text-align: center;
+  font-size: 1.3rem;
+  transform: rotateY(40deg);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. <code>translateZ()</code>: mais perto ou mais longe</h2>
+<p>O <code>translate</code> da aula anterior movia para os lados (X) e para cima e para baixo (Y). O <code>translateZ()</code> move na direção do seu nariz: positivo vem <strong>para perto</strong>, negativo vai <strong>para longe</strong>. Com perspectiva, perto parece maior e longe parece menor:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .cena { display: inline-block; margin: 20px 30px; outline: 2px dashed gray; perspective: 400px; }
+  .caixa { width: 100px; height: 70px; background-color: #1d4ed8; color: white; font: 13px monospace; display: grid; place-items: center; }
+&lt;/style&gt;
+&lt;div class="cena"&gt;&lt;div class="caixa" style="transform: translateZ(-150px)"&gt;-150px&lt;/div&gt;&lt;/div&gt;
+&lt;div class="cena"&gt;&lt;div class="caixa"&gt;0&lt;/div&gt;&lt;/div&gt;
+&lt;div class="cena"&gt;&lt;div class="caixa" style="transform: translateZ(100px)"&gt;100px&lt;/div&gt;&lt;/div&gt;
+</pre>
+
+<p>A primeira caixa foi para longe e ficou menor que a linha tracejada; a do meio não se mexeu; a última veio para perto e ficou maior. Sem <code>perspective</code>, o <code>translateZ</code> não mostra diferença nenhuma: sem olho, não existe "perto".</p>
+
+<hr>
+
+<h2>4. <code>perspective-origin</code>: de onde o olho olha</h2>
+<p>O olho fica, por padrão, bem na frente do <strong>centro</strong> da cena. O <code>perspective-origin</code> ("origem da perspectiva") muda essa posição, como se você desse um passo para o lado ou subisse numa cadeira. Ele vai no mesmo elemento da <code>perspective</code>:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .cena { display: inline-block; margin: 16px 24px; outline: 2px dashed gray; perspective: 300px; }
+  .caixa { width: 110px; height: 80px; background-color: #7e22ce; color: white; font: 12px monospace; display: grid; place-items: center; transform: rotateX(45deg); }
+&lt;/style&gt;
+&lt;div class="cena" style="perspective-origin: center"&gt;&lt;div class="caixa"&gt;center&lt;/div&gt;&lt;/div&gt;
+&lt;div class="cena" style="perspective-origin: top"&gt;&lt;div class="caixa"&gt;top&lt;/div&gt;&lt;/div&gt;
+&lt;div class="cena" style="perspective-origin: bottom"&gt;&lt;div class="caixa"&gt;bottom&lt;/div&gt;&lt;/div&gt;
+</pre>
+
+<p>As três têm o mesmo <code>rotateX(45deg)</code>. Muda só a altura do olho: no centro, em cima da cena ou embaixo dela. Com o olho em cima (<code>top</code>), você vê a tampa mais "de frente", e ela parece mais alta; com o olho embaixo (<code>bottom</code>), mais de lado, e ela parece mais achatada. A diferença é pequena aqui; com <code>perspective</code> menor, ela cresce. Os valores são os mesmos do <code>transform-origin</code>: <code>top</code>, <code>left</code>, <code>bottom right</code>, <code>50% 0%</code>…</p>
+
+<hr>
+
+<h2>5. O cartão que vira</h2>
+<p>Agora o projeto da aula: um cartão de receita com a foto na frente e os ingredientes no verso. Quando o mouse passa, ele vira como uma carta de baralho. São quatro peças:</p>
+
+<ol class="passo">
+  <li><strong>A cena</strong> (<code>.cena</code>) com <code>perspective</code>: o olho.</li>
+  <li><strong>O cartão</strong> (<code>.cartao</code>) com <code>transform-style: preserve-3d</code>: ele gira, levando junto a frente e o verso <strong>em 3D</strong>.</li>
+  <li><strong>A frente e o verso</strong> (<code>.lado</code>), um em cima do outro, com <code>backface-visibility: hidden</code>: cada um some quando está de costas para você.</li>
+  <li><strong>O verso</strong> já começa virado (<code>rotateY(180deg)</code>), de costas. Quando o cartão gira meia volta, ele fica de frente.</li>
+</ol>
+
+<dl class="anatomy">
+  <dt>transform-style: preserve-3d;</dt><dd>"estilo da transformação: preservar o 3D". Por padrão (<code>flat</code>, "achatado"), um elemento 3D <strong>achata</strong> os filhos no plano dele, como uma foto. Com <code>preserve-3d</code>, os filhos continuam com a profundidade deles, e o verso de costas continua de costas. Vai no <strong>pai</strong> que gira.</dd>
+  <dt>backface-visibility: hidden;</dt><dd>"visibilidade da face de trás: escondida". Quando o elemento está virado de costas para você, ele não é desenhado. Sem isso, você veria o verso espelhado através da frente.</dd>
+</dl>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> passe o mouse no cartão. Depois, para entender cada peça: (1) apague a linha <code>transform-style</code> e passe o mouse de novo; (2) volte com ela e apague a <code>backface-visibility</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cena"&gt;
+  &lt;div class="cartao"&gt;
+    &lt;div class="lado frente"&gt;
+      &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="200" height="150"&gt;
+      &lt;p&gt;Bolo de cenoura&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class="lado verso"&gt;
+      &lt;p&gt;3 cenouras, 4 ovos, 2 xícaras de farinha, 2 de açúcar e 1 de óleo.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cena {
+  perspective: 800px;
+  width: 220px;
+  margin: 10px;
+}
+
+.cartao {
+  position: relative;
+  height: 220px;
+  transform-style: preserve-3d;
+}
+
+.cena:hover .cartao {
+  transform: rotateY(180deg);
+}
+
+.lado {
+  position: absolute;
+  inset: 0;
+  padding: 10px;
+  border-radius: 8px;
+  backface-visibility: hidden;
+}
+
+.frente {
+  background-color: #fffaf3;
+  border: 1px solid #c2410c;
+}
+
+.frente img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.verso {
+  background-color: #c2410c;
+  color: white;
+  transform: rotateY(180deg);
+}
+</pre>
+</div>
+
+<p>Repare em três detalhes. O <code>:hover</code> fica na <strong>cena</strong>, e não no cartão: enquanto o cartão gira, a área dele "foge" do mouse, e o efeito ficaria piscando. A frente e o verso estão um em cima do outro graças ao <code>position: absolute</code> com <code>inset: 0</code> (aula <a href="position-absolute.html">position: absolute</a>). E a virada é instantânea: para virar devagar, falta a aula seguinte, <a href="transition.html">Transições</a>, que deixa este cartão girando suave.</p>
+
+<div class="note">
+<strong>Suporte</strong>
+<p><code>perspective</code>, <code>rotateX</code>/<code>rotateY</code>, <code>translateZ</code> e <code>transform-style</code> funcionam em todos os navegadores há mais de dez anos. A <code>backface-visibility</code> só funciona sem prefixo no Safari desde a versão 15.4 (2022, segundo o MDN); antes, ele precisava de <code>-webkit-backface-visibility</code>. Se o seu público tem iPhones muito antigos, escreva as duas linhas.</p>
+</div>
+
+<hr>
+
+<h2>O que o F12 mostra</h2>
+<p>Como na aula anterior, o <code>transform</code> calculado vira uma matriz, agora a <code>matrix3d(…)</code>, com <strong>dezesseis</strong> números. Por exemplo, o cartão virado, com <code>rotateY(180deg)</code>, aparece como <code>matrix3d(-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1)</code> (conferido no Chromium): o primeiro <code>-1</code> é a largura "espelhada", e o <code>-1</code> do meio é a profundidade virada. Com ângulos quebrados, aparecem senos e cossenos, e não vale a pena ler; use a aba Styles (Estilos), que mostra o que você escreveu. As outras propriedades aparecem como você escreveu: <code>perspective: 800px</code>, <code>transform-style: preserve-3d</code>, <code>backface-visibility: hidden</code>.</p>
+
+<div class="tryhtml" data-goal="css:.cena{perspective}=800px,css:.cartao{transform-style}=preserve-3d,css:.verso{backface-visibility}=hidden,css:.frente{backface-visibility}=hidden,src:\.cena:hover\s+\.cartao\s*\{[^}]*rotateY\(\s*180deg\s*\)">
+<p class="try-task"><strong>Missão:</strong> o cartão do pão de queijo não vira direito. Complete as quatro peças: (1) <code>perspective: 800px</code> na <code>.cena</code>; (2) <code>transform-style: preserve-3d</code> no <code>.cartao</code>; (3) <code>backface-visibility: hidden</code> no <code>.lado</code>; (4) no <code>.cena:hover .cartao</code>, o giro de meia volta em Y: <code>transform: rotateY(180deg)</code>. Passe o mouse para conferir.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cena"&gt;
+  &lt;div class="cartao"&gt;
+    &lt;div class="lado frente"&gt;&lt;p&gt;Pão de queijo&lt;/p&gt;&lt;/div&gt;
+    &lt;div class="lado verso"&gt;&lt;p&gt;Polvilho, queijo meia cura, ovos, leite e óleo.&lt;/p&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cena {
+  width: 220px;
+  margin: 10px;
+}
+
+.cartao {
+  position: relative;
+  height: 140px;
+}
+
+.cena:hover .cartao {
+}
+
+.lado {
+  position: absolute;
+  inset: 0;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.frente {
+  background-color: #fffaf3;
+  border: 1px solid #c2410c;
+  font-size: 1.4rem;
+}
+
+.verso {
+  background-color: #c2410c;
+  color: white;
+  transform: rotateY(180deg);
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cena {
+  width: 220px;
+  margin: 10px;
+  perspective: 800px;
+}
+
+.cartao {
+  position: relative;
+  height: 140px;
+  transform-style: preserve-3d;
+}
+
+.cena:hover .cartao {
+  transform: rotateY(180deg);
+}
+
+.lado {
+  position: absolute;
+  inset: 0;
+  padding: 10px;
+  border-radius: 8px;
+  backface-visibility: hidden;
+}
+
+.frente {
+  background-color: #fffaf3;
+  border: 1px solid #c2410c;
+  font-size: 1.4rem;
+}
+
+.verso {
+  background-color: #c2410c;
+  color: white;
+  transform: rotateY(180deg);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Formas de fazer, e qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Quando usar</th></tr>
+<tr><td><code>perspective: 800px</code> no pai</td><td>o normal: um olho só para a cena, vale para todos os filhos 3D</td></tr>
+<tr><td><code>transform: perspective(800px) rotateY(…)</code></td><td>um elemento sozinho, sem pai próprio; a função vem sempre <strong>primeiro</strong></td></tr>
+<tr><td><code>transform: rotateY(…)</code> sem perspectiva</td><td>quando você quer só "estreitar" a caixa (raro); para profundidade, não</td></tr>
+<tr><td><code>rotate: y 50deg</code></td><td>a propriedade separada, independente do <code>transform</code> (aula anterior)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>O giro parece "amassado", sem profundidade</strong>
+<p><strong>O que aconteceu:</strong> faltou a <code>perspective</code>, ou ela foi posta no <strong>próprio</strong> elemento que gira, e não no pai:</p>
+<pre class="file" data-file="style.css · erro de propósito">.porta {
+  perspective: 800px;
+  transform: rotateY(50deg);
+}
+</pre>
+<p>A <strong>propriedade</strong> <code>perspective</code> vale para os <strong>filhos</strong> do elemento, e não para ele mesmo. Aqui, a porta gira sem olho nenhum e só fica mais estreita, como a primeira caixa da seção 1. O validador não reclama: as duas linhas estão certas, só estão no lugar errado.</p>
+<p><strong>Como consertar:</strong> passe a <code>perspective</code> para o pai (<code>.cena</code>), ou use a função dentro do <code>transform</code>: <code>transform: perspective(800px) rotateY(50deg);</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O cartão mostra o lado errado, espelhado</strong>
+<p><strong>O que aconteceu:</strong> faltou uma das duas peças do cartão (conferido no Chromium, com o cartão da seção 5):</p>
+<ul>
+  <li><strong>Sem <code>transform-style: preserve-3d</code></strong> no <code>.cartao</code>: parado, ele mostra a frente, certinha. Mas, quando vira, mostra a <strong>frente espelhada</strong> (a foto e o "Bolo de cenoura" ao contrário), e o verso nunca aparece. O cartão achatou os filhos numa "foto" só, e o que gira é essa foto.</li>
+  <li><strong>Sem <code>backface-visibility: hidden</code></strong>: parado, ele já mostra o <strong>verso espelhado</strong>, por cima da frente (o verso vem depois no HTML e é desenhado por último). Ao virar, o verso aparece certo. O lado de costas continua sendo desenhado, só que ao contrário.</li>
+</ul>
+<p>Faça os dois testes do "Experimente" da seção 5 para ver cada caso no seu navegador.</p>
+<p><strong>Como consertar:</strong> <code>preserve-3d</code> no pai que gira e <code>hidden</code> nos dois lados.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “perspective”: only “0” can be a “unit”. You must put a unit after your number.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>perspective: 600;</code>, sem unidade.</p>
+<pre class="term" data-cwd="~/t3d">$ vnu --css persp.css
+"file:/home/ana/t3d/persp.css":2.16-2.18: error: CSS: “perspective”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<p>A perspectiva é uma distância e precisa de unidade. O navegador ignora a declaração, e o giro fica amassado.</p>
+<p><strong>Como consertar:</strong> <code>perspective: 600px;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “transform-style”: Unknown dimension.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>transform-style: 3d;</code>, um valor inventado.</p>
+<pre class="term" data-cwd="~/t3d">$ vnu --css style3d.css
+"file:/home/ana/t3d/style3d.css":2.20-2.21: error: CSS: “transform-style”: Unknown dimension.</pre>
+<p>"Dimensão desconhecida": o validador leu <code>3d</code> como o número 3 com uma unidade <code>d</code>, que não existe. Os únicos valores são <code>flat</code> e <code>preserve-3d</code>. Do mesmo jeito, <code>backface-visibility: none</code> dá <code>“none” is not a “backface-visibility” value</code>: os valores são <code>visible</code> e <code>hidden</code>.</p>
+<p><strong>Como consertar:</strong> <code>transform-style: preserve-3d;</code> e <code>backface-visibility: hidden;</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>perspective: 800px;</code></td><td>No pai: a distância do olho (menor = efeito mais forte)</td></tr>
+<tr><td><code>perspective-origin: top left;</code></td><td>No pai: de onde o olho olha (padrão: <code>center</code>)</td></tr>
+<tr><td><code>transform: perspective(800px) …</code></td><td>A perspectiva no próprio elemento (sempre a primeira função)</td></tr>
+<tr><td><code>rotateX(…deg)</code></td><td>Gira em volta do eixo deitado (tampa de notebook)</td></tr>
+<tr><td><code>rotateY(…deg)</code></td><td>Gira em volta do eixo em pé (porta, página de livro)</td></tr>
+<tr><td><code>rotateZ(…deg)</code></td><td>O giro comum, igual a <code>rotate()</code></td></tr>
+<tr><td><code>translateZ(…px)</code></td><td>Para perto (positivo) ou para longe (negativo)</td></tr>
+<tr><td><code>rotate: y 50deg;</code></td><td>A propriedade separada, com eixo</td></tr>
+<tr><td><code>transform-style: preserve-3d;</code></td><td>No pai que gira: os filhos mantêm a profundidade</td></tr>
+<tr><td><code>backface-visibility: hidden;</code></td><td>Esconde o elemento quando está de costas</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A porta</h3>
+<p>Complete para girar como uma porta, em volta do eixo em pé:</p>
+<div class="ex-code">transform: <input data-answer="rotateY" aria-label="função">(60deg);</div>
+</div>
+
+<div class="exercise">
+<h3>2. Preservar o 3D</h3>
+<p>Complete o valor que faz os filhos manterem a profundidade:</p>
+<div class="ex-code">transform-style: <input data-answer="preserve-3d" aria-label="valor">;</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. Qual <code>perspective</code> dá o efeito 3D mais exagerado?</p>
+<label><input type="radio" name="q3"> <code>2000px</code></label>
+<label><input type="radio" name="q3"> <code>150px</code></label>
+<label><input type="radio" name="q3"> <code>800px</code></label>
+<label><input type="radio" name="q3"> Todas iguais</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. A Ana escreveu <code>perspective: 800px</code> e <code>transform: rotateY(50deg)</code> na mesma regra, no mesmo elemento. O que acontece?</p>
+<label><input type="radio" name="q4"> O efeito 3D aparece normalmente</label>
+<label><input type="radio" name="q4"> O validador mostra um erro</label>
+<label><input type="radio" name="q4"> A caixa só fica mais estreita: a propriedade <code>perspective</code> vale para os filhos, e não para o próprio elemento</label>
+<label><input type="radio" name="q4"> A caixa some</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. No cartão que vira, quando o mouse passa, aparece a frente espelhada, e o verso nunca aparece. O que falta?</p>
+<label><input type="radio" name="q5"> <code>transform-style: preserve-3d</code> no cartão</label>
+<label><input type="radio" name="q5"> <code>perspective-origin: center</code></label>
+<label><input type="radio" name="q5"> <code>translateZ(0)</code></label>
+<label><input type="radio" name="q5"> <code>rotateZ(180deg)</code></label>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Os eixos: X deitado (tampa de notebook), Y em pé (porta), Z saindo da tela (o <code>rotate</code> comum).</li>
+  <li><code>rotateX()</code>, <code>rotateY()</code> e <code>translateZ()</code> só parecem 3D com <strong>perspectiva</strong>.</li>
+  <li><code>perspective: 800px</code> vai no <strong>pai</strong> e é a distância do olho: menor, mais exagerado. A função <code>perspective()</code> vai no começo do <code>transform</code> do próprio elemento.</li>
+  <li><code>perspective-origin</code> muda de onde o olho olha.</li>
+  <li>O cartão que vira: perspectiva na cena, <code>preserve-3d</code> no cartão, <code>backface-visibility: hidden</code> nos lados e o verso começando em <code>rotateY(180deg)</code>.</li>
+  <li>No F12, o <code>transform</code> 3D vira <code>matrix3d(…)</code> com 16 números; leia na aba Styles.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
