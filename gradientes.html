@@ -263,8 +263,8 @@
 <h2>6. O degradê em faixas no <code>body</code></h2>
 <p>Um degradê de fundo na página inteira parece fácil: <code>body { background-image: linear-gradient(lightyellow, tomato); }</code>. Mas, numa página curta, o resultado é estranho:</p>
 
-<div class="tryhtml">
-<p class="try-task"><strong>Experimente:</strong> aqui, o quadro tem a altura do conteúdo, e o efeito quase não aparece. Clique no botão ↗ do quadro para abrir o resultado numa aba nova, numa janela alta. Depois, apague o <code>/*</code> e o <code>*/</code> da primeira regra e abra de novo.</p>
+<div class="tryhtml" data-altura="300">
+<p class="try-task"><strong>Experimente:</strong> aqui, o quadro tem 300px de altura fixa, mais alto que o conteúdo, como uma janela de verdade. Veja as faixas. Depois, apague o <code>/*</code> e o <code>*/</code> da primeira regra. (O botão ↗ abre o resultado numa aba nova, com a altura da sua janela.)</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;h1&gt;Receitas da Ana&lt;/h1&gt;
 &lt;p&gt;Bolo de cenoura.&lt;/p&gt;
@@ -279,7 +279,7 @@ body {
 </pre>
 </div>
 
-<p>Na aba nova, sem o conserto, o degradê aparece em <strong>faixas</strong>: do amarelo ao tomate na altura do título e do parágrafo, e de novo, e de novo, até o fim da janela. Por quê? O fundo do <code>body</code> pinta a janela inteira (aula <a href="background-color.html">Cor de Fundo</a>), mas o <strong>tamanho</strong> da imagem é medido pela página, que tem só a altura do conteúdo, uns 114 pixels. O degradê tem 114 pixels de altura e se repete, como toda imagem de fundo.</p>
+<p>Sem o conserto, o degradê aparece em <strong>faixas</strong>: do amarelo ao tomate na altura do título e do parágrafo, e de novo, e de novo, até o fim da janela. Por quê? O fundo do <code>body</code> pinta a janela inteira (aula <a href="background-color.html">Cor de Fundo</a>), mas o <strong>tamanho</strong> da imagem é medido pela página, que tem só a altura do conteúdo, uns 114 pixels. O degradê tem 114 pixels de altura e se repete, como toda imagem de fundo.</p>
 
 <p>Com <code>html { min-height: 100%; }</code>, a página passa a ter no mínimo a altura da janela, e o degradê vai de cima a baixo uma vez só. Outra saída é <code>background-repeat: no-repeat</code> com <code>background-color: tomato</code>: depois do fim do degradê, a cor continua.</p>
 
@@ -430,8 +430,8 @@ body {
 
 <h3>Missão final: o botão e a capa</h3>
 
-<div class="tryhtml" data-goal="css:.botao{background-image}=linear-gradient(rgb(255, 99, 71), rgb(178, 34, 34)),src:background-image:\s*linear-gradient\([^;]*\)\s*\,\s*url\(,nsrc:background-color:\s*linear,css:.capa h1{color}=rgb(255, 255, 255)">
-<p class="try-task"><strong>Missão:</strong> (1) O <code>.botao</code> deve ter um degradê de <code>tomato</code> (em cima) para <code>firebrick</code> (embaixo). (2) A <code>.capa</code> deve ter, <strong>por cima</strong> da foto, um degradê de <code>rgb(0 0 0 / 70%)</code> para <code>transparent</code>, e o título branco. Há um erro na regra do botão.</p>
+<div class="tryhtml" data-goal="css:.botao{background-image}=linear-gradient(rgb(178, 34, 34), rgb(139, 0, 0)),src:background-image:\s*linear-gradient\([^;]*\)\s*\,\s*url\(,nsrc:background-color:\s*linear,css:.capa h1{color}=rgb(255, 255, 255)">
+<p class="try-task"><strong>Missão:</strong> (1) O <code>.botao</code> deve ter um degradê de <code>firebrick</code> (em cima) para <code>darkred</code> (embaixo), escuros o bastante para as letras brancas. (2) A <code>.capa</code> deve ter, <strong>por cima</strong> da foto, um degradê de <code>rgb(0 0 0 / 70%)</code> para <code>transparent</code>, e o título branco. Há um erro na regra do botão.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;div class="capa"&gt;
   &lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
@@ -447,7 +447,7 @@ body {
 }
 
 .botao {
-  background-color: linear-gradient(tomato, firebrick);
+  background-color: linear-gradient(firebrick, darkred);
   color: white;
   padding: 8px 16px;
 }
@@ -468,7 +468,7 @@ body {
 
 .botao {
   background-color: firebrick;
-  background-image: linear-gradient(tomato, firebrick);
+  background-image: linear-gradient(firebrick, darkred);
   color: white;
   padding: 8px 16px;
 }
