@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Design Responsivo — uma página que se adapta a qualquer tela | Guia CSS</title>
+<meta name="description" content="O que é design responsivo, para quem está começando: por que uma página de largura fixa quebra no celular (a rolagem para o lado), os ingredientes de um site que se adapta (meta viewport, larguras fluidas com max-width e porcentagem, imagens flexíveis, flex-wrap e media queries), as larguras de tela mais comuns, como testar no editor e no F12, e os erros que causam a rolagem horizontal.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Design Responsivo</span></h1>
+
+<p class="intro">A mesma página da Ana é aberta num celular de 375 pixels de largura, num tablet de 768 e num computador de 1440. Mais da metade das visitas de um site comum vem do celular. Uma página <strong>responsiva</strong> é a que se ajeita sozinha em cada uma dessas telas: no celular, uma coluna, letra legível e nada saindo pelo lado; no computador, o espaço aproveitado. Esta aula explica a ideia e mostra o problema que ela resolve. As próximas ensinam cada ferramenta.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que é design responsivo, e o que acontece com uma página de largura fixa no celular.</li>
+  <li>Os ingredientes: a meta viewport, larguras fluidas, imagens flexíveis, itens que quebram linha e as media queries.</li>
+  <li>A troca de <code>width</code> fixo por <code>max-width</code>, a primeira coisa a fazer.</li>
+  <li>As larguras de tela mais comuns, e por que não decorar uma lista de aparelhos.</li>
+  <li>Como testar: os botões de largura do quadro do guia e o modo de dispositivo do F12.</li>
+  <li>As causas mais comuns da rolagem para o lado.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador. Nesta aula e nas próximas, muitos quadros já começam numa largura fixa, como a tela de um celular, e a barra do quadro tem botões para trocar a largura (veja a seção 1).</p>
+
+<hr>
+
+<h2>A ideia: a roupa que serve em todo mundo</h2>
+<p>Uma camiseta de tamanho único, sem elástico, fica apertada em uns e sobra em outros. Uma roupa de malha estica e encolhe e serve em quase todo mundo; e quando a diferença é grande demais (uma criança e um adulto), a costureira faz um ajuste: dobra a barra, muda o corte.</p>
+<p>O design responsivo é a roupa de malha: as caixas <strong>esticam e encolhem</strong> com a tela (larguras fluidas). E, onde esticar não basta, o CSS faz <strong>ajustes</strong> a partir de certas larguras (as media queries): três colunas viram uma, o menu vira uma lista.</p>
+<p>O nome vem de um artigo de 2010 do designer Ethan Marcotte, "Responsive Web Design". Antes dele, era comum fazer <strong>dois sites</strong>: o normal e um "m.site" para celular. Hoje é um site só, com um HTML e um CSS que se adaptam.</p>
+
+<hr>
+
+<h2>1. O problema: a página de largura fixa</h2>
+<p>Muitas páginas antigas tinham uma largura fixa, pensada para o monitor da época: 960 pixels. Veja essa página num quadro de <strong>375 pixels</strong>, a largura de um celular comum:</p>
+
+<div class="tryhtml" data-largura="375">
+<p class="try-task"><strong>Experimente:</strong> o quadro começa com 375 px. Role o resultado para o lado: o texto sai da tela. Depois use os botões da barra do quadro: <strong>768</strong> (um tablet) e <strong>cheia</strong> (a largura toda da caixa, como uma janela de computador).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+  &lt;p&gt;Bolos caseiros, pão de queijo e café coado, todo sábado, na Rua das Flores. Encomendas pelo site até quinta-feira.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+  width: 960px;
+  background-color: #fff3e0;
+  padding: 1rem;
+}
+</pre>
+</div>
+
+<p>Em 375 px, o fundo creme e o texto seguem para a direita, para fora do quadro: aparece uma barra de rolagem <strong>horizontal</strong>, e o leitor precisa arrastar a página para o lado a cada linha. É o erro mais comum de uma página que não é responsiva.</p>
+
+<div class="tip">
+<strong>Os botões de largura do quadro</strong>
+<p>A barra de cada quadro do Guia CSS tem três botões: <strong>375</strong> (largura de um celular), <strong>768</strong> (um tablet) e <strong>cheia</strong> (a largura toda da caixa, que no computador fica perto da de uma janela pequena). Ao lado, o quadro mostra quantos pixels de largura a página lá dentro está enxergando. Para a página, o quadro é a janela: as porcentagens, as unidades de tela e as media queries respondem à largura dele. Quando uma missão começa numa largura, ela é conferida nessa largura.</p>
+</div>
+
+<hr>
+
+<h2>2. Os ingredientes</h2>
+<p>Uma página responsiva usa quatro ingredientes, e cada um tem a sua aula:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Ingrediente</th><th>O que faz</th><th>Aula</th></tr>
+<tr><td>A <strong>meta viewport</strong> no HTML</td><td>Pede ao celular para usar a largura de verdade da tela, sem "fingir" que é um computador</td><td><a href="viewport.html">A Meta Viewport</a></td></tr>
+<tr><td><strong>Larguras fluidas</strong></td><td>Caixas com <code>max-width</code>, <code>%</code>, <code>fr</code>, Flexbox e Grid, que acompanham a tela</td><td>esta, <a href="flex-wrap.html">flex-wrap</a>, <a href="grid-repeat.html">auto-fit</a></td></tr>
+<tr><td><strong>Imagens flexíveis</strong></td><td><code>max-width: 100%</code>: a imagem nunca é mais larga que a caixa</td><td><a href="imagens-responsivas.html">Imagens que se Adaptam</a></td></tr>
+<tr><td><strong>Media queries</strong></td><td>Ajustes a partir de uma largura: "de 700 px para cima, duas colunas"</td><td><a href="media-queries.html">Media Queries</a> e <a href="mobile-first.html">Mobile First</a></td></tr>
+</table>
+</div>
+
+<p>A ordem importa: primeiro a página tem de <strong>caber</strong> (meta viewport, larguras fluidas, imagens flexíveis). Só depois vêm os ajustes de layout (media queries). Muita coisa nem precisa de media query: um bom <code>max-width</code> e um <code>flex-wrap</code> resolvem sozinhos.</p>
+
+<hr>
+
+<h2>3. Largura fluida: <code>max-width</code> no lugar de <code>width</code></h2>
+<p>A troca mais simples, e a que mais resolve: em vez de "a página tem 960 px", diga "a página tem <strong>no máximo</strong> 960 px".</p>
+
+<div class="tryhtml" data-largura="375">
+<p class="try-task"><strong>Experimente:</strong> em 375 px, a página cabe na tela. Clique em <strong>cheia</strong>: a página cresce até 960 px e para, centralizada pelo <code>margin: 0 auto</code>, se a caixa for larga o bastante.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+  &lt;p&gt;Bolos caseiros, pão de queijo e café coado, todo sábado, na Rua das Flores. Encomendas pelo site até quinta-feira.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+  max-width: 960px;
+  margin: 0 auto;
+  background-color: #fff3e0;
+  padding: 1rem;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>max-width: 960px;</dt><dd>"Largura máxima" (aula <a href="width-height.html">Largura e Altura</a>). A caixa ocupa a largura que tiver disponível, mas nunca passa de 960 px. Numa tela de 375 px, ela fica com a largura da tela; num monitor de 1440, para em 960 e não vira uma linha de texto comprida demais para ler.</dd>
+  <dt>margin: 0 auto;</dt><dd>Divide a sobra igualmente dos dois lados: a página fica no centro quando a tela é mais larga que 960 px (aula <a href="centralizar.html">Centralizando</a>).</dd>
+</dl>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Em 375 px</th><th>Em 1440 px</th><th>Use?</th></tr>
+<tr><td><code>width: 960px</code></td><td>Sai da tela: rolagem para o lado</td><td>960 px</td><td>Não, para a página</td></tr>
+<tr><td><code>width: 100%</code></td><td>A tela toda</td><td>A tela toda: linhas de texto compridas demais</td><td>Às vezes</td></tr>
+<tr><td><code>max-width: 960px</code></td><td>A tela toda</td><td>960 px</td><td><strong>Sim</strong>: o melhor dos dois</td></tr>
+<tr><td><code>width: min(100%, 960px)</code></td><td>A tela toda</td><td>960 px</td><td>Também (aula <a href="clamp.html">min(), max() e clamp()</a>)</td></tr>
+</table>
+</div>
+
+<div class="tryhtml" data-largura="375" data-goal="css:.pagina{max-width}=720px,css:.pagina{width}=339px,nsrc:(^|[\s;{])width:\s*720px,nsrc:!important">
+<p class="try-task"><strong>Missão:</strong> o blog da Ana tem a página com <code>width: 720px</code> e, no celular, o texto sai da tela. Troque por uma largura <strong>máxima</strong> de 720 px, para a página caber nos 375 px do quadro.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="pagina"&gt;
+  &lt;h1&gt;Blog da Ana&lt;/h1&gt;
+  &lt;p&gt;Hoje testei a receita de pão de queijo com metade do polvilho azedo. Ficou mais macio e menos crocante.&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+  width: 720px;
+  margin: 0 auto;
+  border-left: 4px solid tomato;
+  padding-left: 1rem;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.pagina {
+  max-width: 720px;
+  margin: 0 auto;
+  border-left: 4px solid tomato;
+  padding-left: 1rem;
+}
+</pre>
+</div>
+
+<p>Depois de cumprir, clique em <strong>cheia</strong> e de volta em <strong>375</strong>: a página acompanha o quadro, sem nunca passar de 720 px.</p>
+
+<hr>
+
+<h2>4. Responsivo sem media query: <code>flex-wrap</code></h2>
+<p>Muitos layouts se adaptam sozinhos, só com caixas que <strong>quebram a linha</strong> quando não cabem. Três cartões com uma largura mínima e <code>flex-wrap: wrap</code> ficam lado a lado numa tela larga e um embaixo do outro no celular:</p>
+
+<div class="tryhtml" data-largura="375">
+<p class="try-task"><strong>Experimente:</strong> em 375 px, um cartão por linha. Clique em <strong>768</strong> e depois em <strong>cheia</strong>: os cartões sobem para o lado, sem nenhuma regra nova.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;div class="cartao"&gt;Bolo de cenoura&lt;/div&gt;
+  &lt;div class="cartao"&gt;Pão de queijo&lt;/div&gt;
+  &lt;div class="cartao"&gt;Café coado&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.vitrine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.cartao {
+  flex: 1 1 200px;
+  padding: 2rem 1rem;
+  background-color: #fff3e0;
+  border: 2px solid tomato;
+}
+</pre>
+</div>
+
+<p>O <code>flex: 1 1 200px</code> diz "comece com 200 px, cresça para ocupar a sobra" (aula <a href="flex-grow.html">flex-grow, flex-shrink e flex-basis</a>), e o <code>flex-wrap: wrap</code> manda para a linha de baixo o cartão que não cabe (aula <a href="flex-wrap.html">flex-wrap</a>). Em 375 px, cabe só um por linha; em 768, os três cabem lado a lado. O Grid tem um truque parecido, o <code>repeat(auto-fit, minmax(200px, 1fr))</code> (aula <a href="grid-repeat.html">repeat, minmax e auto-fit</a>).</p>
+
+<hr>
+
+<h2>5. As larguras de tela</h2>
+<p>Há milhares de aparelhos, e cada ano aparecem novos. Em vez de decorar modelos, pense em <strong>faixas</strong>:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Faixa</th><th>Largura (em pixels de CSS)</th><th>Exemplos</th></tr>
+<tr><td>Celular</td><td>de 320 a uns 430</td><td>Celulares em pé; 360, 375, 390 e 412 são muito comuns</td></tr>
+<tr><td>Tablet / celular deitado</td><td>de uns 600 a uns 1024</td><td>Tablets em pé (768, 820), celulares deitados</td></tr>
+<tr><td>Notebook e computador</td><td>de 1024 para cima</td><td>1280, 1366, 1440, 1920</td></tr>
+</table>
+</div>
+
+<p>Esses são <strong>pixels de CSS</strong>, e não os pontinhos da tela. Um celular com tela de 1170 pontos de largura diz para o CSS que tem 390 px: cada pixel de CSS usa três pontos da tela, para a letra ficar nítida e do tamanho certo para o dedo. A meta viewport é a peça que faz o celular usar esses 390, e não fingir ser um computador (próxima aula).</p>
+
+<div class="note">
+<strong>Quebre onde o conteúdo pede, e não onde o aparelho manda</strong>
+<p>Os pontos em que o layout muda (os <strong>breakpoints</strong>, "pontos de quebra") não precisam ser 375 e 768. Faça assim: abra a página e vá alargando a janela. Quando o layout começa a ficar ruim (linha de texto comprida demais, espaço vazio sobrando, cartões espremidos), ali é o ponto. Um site testado assim funciona até em aparelhos que ainda não existem.</p>
+</div>
+
+<h3>Testar no navegador de verdade</h3>
+<ul>
+  <li><strong>Arraste a borda da janela</strong> do navegador, deixando-a estreita e larga. É o teste mais rápido.</li>
+  <li><strong>Modo de dispositivo do F12:</strong> no Chrome e no Edge, o F12 tem um botão com o desenho de um celular e um tablet (atalho <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd>), que mostra a página na largura de um aparelho escolhido numa lista. O Firefox tem o "Modo de design responsivo" (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd> também). Os nomes dos menus mudam de versão para versão.</li>
+  <li><strong>Um celular de verdade</strong>, sempre que der: o toque, o tamanho da letra e o teclado aparecendo só se sentem nele.</li>
+</ul>
+
+<hr>
+
+<h2 id="errado">Quando dá errado: a rolagem para o lado</h2>
+<p>O sintoma é sempre o mesmo: no celular, a página "balança" para o lado, ou aparece uma barra de rolagem horizontal. A causa é <strong>um</strong> elemento mais largo que a tela. Os suspeitos de sempre:</p>
+
+<div class="cenario">
+<strong>Uma imagem maior que a tela</strong>
+<pre class="file" data-file="index.html" data-resultado data-largura="375">&lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="800" height="600"&gt;
+</pre>
+<p><strong>O que você vê:</strong> em 375 px, a foto de 800 px sai pela direita, cortada, e o quadro ganha a rolagem horizontal.</p>
+<p><strong>Por quê:</strong> por padrão, a imagem é desenhada no tamanho dela, sem olhar a caixa. Nenhum validador reclama: o HTML está certo.</p>
+<p><strong>Como consertar:</strong> <code>img { max-width: 100%; height: auto; }</code>, a regra que quase todo site tem (aula <a href="imagens-responsivas.html">Imagens que se Adaptam</a>).</p>
+</div>
+
+<div class="cenario">
+<strong>Uma palavra ou um endereço comprido</strong>
+<pre class="file" data-file="index.html" data-resultado data-largura="375">&lt;p&gt;Receita completa em https://lojinha.example/receitas/bolo_de_cenoura_com_cobertura_de_chocolate.html&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> o endereço desce para a linha de baixo, mas nem ela basta: ele passa da borda direita do quadro, cortado, e aparece a rolagem para o lado.</p>
+<p><strong>Por quê:</strong> o navegador só quebra a linha nos espaços e em poucos sinais, como o hífen. Este endereço não tem espaço nem hífen (as palavras estão separadas por <code>_</code>), então vira uma "palavra" só, mais larga que a tela.</p>
+<p><strong>Como consertar:</strong> <code>overflow-wrap: anywhere;</code> no parágrafo (aula <a href="texto-longo.html">Texto que Não Cabe</a>). Melhor ainda: um link com um texto curto no lugar do endereço.</p>
+</div>
+
+<div class="cenario">
+<strong>Uma largura fixa escondida</strong>
+<p><strong>O que acontece:</strong> a página tem <code>max-width</code>, mas uma tabela, um formulário ou um cartão lá dentro tem <code>width: 500px</code> (ou <code>min-width</code>). Basta um elemento assim para a página inteira ganhar a rolagem.</p>
+<p><strong>Como achar:</strong> no F12, no modo de dispositivo, passe o mouse pelos elementos na aba <em>Elements</em>/<em>Elementos</em>: o que passa da borda direita da tela é o culpado. Troque o <code>width</code> fixo por <code>max-width</code>, ou deixe o elemento rolar sozinho, por dentro (<code>overflow-x: auto</code>, aula <a href="overflow.html">overflow</a>).</p>
+</div>
+
+<div class="warning">
+<strong>Não esconda o problema com <code>overflow-x: hidden</code> no <code>body</code></strong>
+<p>Pôr <code>body { overflow-x: hidden; }</code> some com a barra de rolagem, mas o elemento continua largo demais: o pedaço que sobra fica cortado, e o leitor nem sabe que ele existe. Ache o elemento e conserte a largura dele.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Ingrediente</th><th>Código típico</th></tr>
+<tr><td>Meta viewport (no <code>&lt;head&gt;</code>)</td><td><code>&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;</code></td></tr>
+<tr><td>Página fluida</td><td><code>.pagina { max-width: 960px; margin: 0 auto; }</code></td></tr>
+<tr><td>Imagem flexível</td><td><code>img { max-width: 100%; height: auto; }</code></td></tr>
+<tr><td>Itens que quebram linha</td><td><code>display: flex; flex-wrap: wrap;</code> + <code>flex: 1 1 200px</code></td></tr>
+<tr><td>Ajuste a partir de uma largura</td><td><code>@media (min-width: 700px) { … }</code></td></tr>
+<tr><td>Larguras comuns</td><td>celular 320–430, tablet 600–1024, computador 1024+</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. No máximo</h3>
+<p>Complete para a página ter <strong>no máximo</strong> 960 px:</p>
+<div class="ex-code">.pagina { <input data-answer="max-width" aria-label="propriedade">: 960px; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Quebrar a linha</h3>
+<p>Complete para os cartões irem para a linha de baixo quando não couberem:</p>
+<div class="ex-code">.vitrine { display: flex; flex-wrap: <input data-answer="wrap" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. A imagem</h3>
+<p>Complete para a imagem nunca passar da largura da caixa:</p>
+<div class="ex-code">img { max-width: <input data-answer="100%" aria-label="valor">; height: auto; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Uma página tem <code>.pagina { width: 960px; }</code>. O que acontece num celular de 375 px (com a meta viewport)?</p>
+<label><input type="radio" name="q4"> A página encolhe sozinha para 375 px</label>
+<label><input type="radio" name="q4"> O navegador mostra um erro</label>
+<label><input type="radio" name="q4"> A página sai pela direita e aparece a rolagem para o lado</label>
+<label><input type="radio" name="q4"> Nada: 960 px cabem em qualquer tela</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Onde devem ficar os pontos de quebra (breakpoints) de um layout?</p>
+<label><input type="radio" name="q5"> Exatamente nas larguras do iPhone e do iPad mais novos</label>
+<label><input type="radio" name="q5"> Onde o conteúdo começa a ficar ruim quando a janela muda de largura</label>
+<label><input type="radio" name="q5"> Em 500 px, sempre</label>
+<label><input type="radio" name="q5"> Em todas as larguras, de 10 em 10 pixels</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. No celular, a página balança para o lado. Qual é o melhor primeiro passo?</p>
+<label><input type="radio" name="q6"> <code>body { overflow-x: hidden; }</code></label>
+<label><input type="radio" name="q6"> Diminuir o tamanho da letra da página toda</label>
+<label><input type="radio" name="q6"> Fazer um segundo site só para celular</label>
+<label><input type="radio" name="q6"> Achar o elemento mais largo que a tela (imagem, endereço, largura fixa) e consertar a largura dele</label>
+</div>
+
+<h3>Missão final: a vitrine que cabe no celular</h3>
+
+<div class="tryhtml" data-largura="375" data-goal="css:.vitrine{flex-wrap}=wrap,css:.vitrine{max-width}=900px,css:img{max-width}=100%,css:.cartao:first-child img{width}=323px,nsrc:(^|[\s;{])width:\s*900px,nsrc:overflow-x">
+<p class="try-task"><strong>Missão:</strong> em 375 px, a vitrine da Ana sai da tela por três motivos. (1) A <code>.vitrine</code> tem <code>width: 900px</code>: troque por uma largura máxima. (2) Os cartões não quebram a linha: ponha <code>flex-wrap: wrap</code>. (3) A foto de 400 px é maior que o cartão: dê às imagens <code>max-width: 100%</code> (com <code>height: auto</code>). Sem <code>overflow-x</code>. Depois, clique em <strong>cheia</strong> e veja os cartões lado a lado.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;div class="cartao"&gt;
+    &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="400" height="300"&gt;
+    &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;/div&gt;
+  &lt;div class="cartao"&gt;
+    &lt;h2&gt;Pão de queijo&lt;/h2&gt;
+    &lt;p&gt;Sai do forno às oito.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.vitrine {
+  width: 900px;
+  margin: 0 auto;
+  display: flex;
+  gap: 1rem;
+}
+
+.cartao {
+  flex: 1 1 250px;
+  padding: 1rem;
+  border: 2px solid tomato;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.vitrine {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.cartao {
+  flex: 1 1 250px;
+  padding: 1rem;
+  border: 2px solid tomato;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><strong>Design responsivo</strong>: um site só, que se adapta a qualquer largura de tela (termo de Ethan Marcotte, 2010).</li>
+  <li>Os ingredientes: a meta viewport, larguras fluidas (<code>max-width</code>, <code>%</code>, Flexbox, Grid), imagens flexíveis (<code>max-width: 100%</code>) e media queries para os ajustes.</li>
+  <li>Primeiro passo: <code>max-width</code> no lugar de <code>width</code> fixo. Muita coisa se adapta sem media query, com <code>flex-wrap</code> ou <code>auto-fit</code>.</li>
+  <li>Larguras em pixels de CSS: celular de 320 a 430, tablet de 600 a 1024, computador acima. Quebre onde o conteúdo pede.</li>
+  <li>Teste nos botões 375 / 768 / cheia do quadro, arrastando a janela, no modo de dispositivo do F12 e num celular de verdade.</li>
+  <li>Rolagem para o lado = um elemento mais largo que a tela (imagem, endereço comprido, largura fixa). Conserte o elemento; não esconda com <code>overflow-x: hidden</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
