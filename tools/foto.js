@@ -11,7 +11,8 @@
      --caixa N           a N-ésima caixa .tryhtml da página (1 = a primeira; padrão)
      --resultado N       o N-ésimo pre.file[data-resultado] da página
      --solucao           a caixa com a solução (padrão: o código inicial)
-     --largura PX        largura do quadro (padrão: o data-largura da caixa, senão 800)
+     --largura PX        largura do quadro (padrão: o data-largura da caixa, senão a largura que o
+                         quadro tem no guia numa janela de 1100 px, como no testador: 728 px)
      --altura PX         altura da foto (padrão: a altura do conteúdo, até 4000)
      --estado hover:SEL  força :hover no primeiro SEL (e nos pais), como o mouse em cima
      --estado foco:SEL   força :focus e :focus-visible no SEL (e :focus-within nos pais)
@@ -34,7 +35,8 @@ const PASTA = path.join(process.env.HOME, "rascunho/css/fotos");
 
 function uso(msg) {
   if (msg) console.error("foto.js: " + msg);
-  console.error(fs.readFileSync(__filename, "utf8").split("\n").slice(1, 26).map((l) => l.replace(/^\s?\*?\s?/, "")).join("\n"));
+  const src = fs.readFileSync(__filename, "utf8");
+  console.error(src.slice(src.indexOf("/*") + 2, src.indexOf("*/")).replace(/^ {3}/gm, ""));
   process.exit(2);
 }
 function args() {
@@ -133,7 +135,8 @@ async function main() {
     // largura e tema
     const larg = await pg.evaluate((ehRes, i, l, tema) => {
       const HS = window.HtmlSim, c = ehRes ? null : HS.caixas[i], q = ehRes ? HS.resultados[i].quadro : c.quadro;
-      const final = l || q.largura || 800;
+      // padrão: o data-largura, senão a largura que o quadro tem na página do guia (janela de 1100 px, como no testador)
+      const final = l || q.largura || q.frame.contentWindow.innerWidth || 728;
       if (c) c.largura(final); else q.definirLargura(final);
       if (tema) { if (c) c.tema(tema === "escuro"); else q.definirTema(tema === "escuro"); }
       return final;
@@ -189,7 +192,6 @@ async function main() {
     }, ehRes, idx, o.altura || 0);
     await pg.setViewport({ width: larg, height: Math.max(40, alt) });
     await new Promise((ok) => setTimeout(ok, 200));
-    if (process.env.FOTO_DEBUG) console.log("DEBUG", await pg.evaluate((i) => { const f = window.HtmlSim.caixas[i].quadro.frame, d = f.contentDocument; const b = d.querySelector(".botao"); const e = document.elementFromPoint(20, 20); return [b && getComputedStyle(b).backgroundColor, b && b.matches(":hover"), d.getAnimations().map((a) => a.playState + " " + a.currentTime), e && e.className, f.getBoundingClientRect().toJSON(), document.querySelectorAll("iframe").length]; }, idx));
     fs.mkdirSync(PASTA, { recursive: true });
     const nome = o.nome || [path.basename(rel, ".html").replace(/^__foto__$/, "rascunho"), ehRes ? "res" + o.resultado : "caixa" + o.caixa, o.solucao ? "solucao" : "", larg + "px"]
       .concat(o.estados.map((e) => e.tipo + "-" + e.sel.replace(/[^\w-]+/g, "")), o.tema === "escuro" ? ["escuro"] : [], o.menosMov ? ["menosmov"] : []).filter(Boolean).join("-");

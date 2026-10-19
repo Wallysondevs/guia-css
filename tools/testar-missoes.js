@@ -38,10 +38,16 @@ const NOME_LAB = "css-nativo";
 /* Erros FALSOS do vnu 26.10.12 com CSS moderno (o validador de CSS dele é antigo): o CSS
    funciona nos navegadores de 2025–2026, mas o vnu acusa erro. O testador mostra como AVISO. */
 const VNU_FALSOS = [
-  [/Property “(container|container-type|container-name)” doesn't exist/, "@container / container-type"],
-  [/Unrecognized at-rule “@(container|property|starting-style|view-transition|position-try|font-palette-values)”/, "at-rule moderna"],
+  // conferido em 19/10/2026: o vnu 26.10.12 aceita aninhamento (&), @layer, @scope, :has(), :is(),
+  // oklch()/oklab()/lch(), color-mix(), rgb(from …), light-dark(), round(), dvh/svh, subgrid, text-wrap…
+  [/Property “(container|container-type|container-name|field-sizing|interpolate-size|anchor-name|anchor-scope|position-anchor|position-area|position-try|position-try-fallbacks|position-try-order|position-visibility|view-transition-name|view-transition-class|animation-timeline|animation-range|animation-range-start|animation-range-end|scroll-timeline|scroll-timeline-name|scroll-timeline-axis|view-timeline|view-timeline-name|view-timeline-axis|view-timeline-inset|timeline-scope|transition-behavior|text-box|text-box-trim|text-box-edge|reading-flow|reading-order)” doesn't exist/, "propriedade moderna"],
+  [/Unrecognized at-rule “@(container|property|starting-style|view-transition|position-try|font-palette-values|function)”/, "at-rule moderna"],
+  [/“(color\()?(display-p3|srgb|srgb-linear|a98-rgb|prophoto-rgb|rec2020|xyz|xyz-d50|xyz-d65)\b[^”]*” is not a “[\w-]+” value/, "color() com espaço de cor"],
+  [/“(anchor|anchor-size)\(|“anchor-center”/, "posicionamento por âncora"],
 ];
-function vnuFalso(m) { for (const [re, o] of VNU_FALSOS) if (re.test(m.message || "")) return o; return null; }
+// "Unknown dimension" é falso quando o valor usa as unidades de contêiner (cqi, cqw…)
+function vnuFalsoUnidade(m) { return /Unknown dimension/.test(m.message || "") && /\d(cqi|cqb|cqw|cqh|cqmin|cqmax)\b/.test(m.extract || "") ? "unidade de contêiner (cq…)" : null; }
+function vnuFalso(m) { for (const [re, o] of VNU_FALSOS) if (re.test(m.message || "")) return o; return vnuFalsoUnidade(m); }
 
 function puppeteer() {
   for (const p of [path.join(__dirname, "node_modules/puppeteer-core"), path.join(process.env.HOME, "rascunho/coord/cdp/node_modules/puppeteer-core")]) {
@@ -436,7 +442,7 @@ async function main() {
           if (falsos.length) aviso(d.alvo.rot + " — W3C (" + d.nome + "): erro FALSO do vnu 26.10.12, que ainda não conhece este CSS moderno (funciona nos navegadores; não é falha):\n" + falsos.map((m) => "      " + linhaVnu(d.nome, m, d.v)).join("\n"));
           const cab = d.alvo.rot + " — W3C (" + d.nome + (d.fragmento ? ", fragmento dentro do esqueleto mínimo" : "") + ")";
           const corpo = mostrar.map((m) => "      " + linhaVnu(d.nome, m, d.v)).join("\n");
-          if (d.tipo === "solução" && erros.length) { nVnu++; falha(cab + ": a solução não é HTML válido\n" + corpo); }
+          if (d.tipo === "solução" && erros.length) { nVnu++; falha(cab + ": a solução não passa no validador W3C\n" + corpo); }
           else if (mostrar.length) saida.push("  · " + cab + (erros.length ? " (exemplo com erro? normal no \"quando dá errado\")" : "") + "\n" + corpo);
           else if (verboso) saida.push("  ✓ " + cab + ": válido" + (falsos.length ? " (fora os erros falsos do aviso acima)" : ""));
         });
