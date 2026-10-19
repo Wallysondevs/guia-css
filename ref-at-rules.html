@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Regras @ — @media, @font-face, @keyframes, @layer e as outras | Guia CSS</title>
+<meta name="description" content="Referência das regras @ do CSS (at-rules): @media, @container, @supports, @import, @layer, @scope, @font-face, @keyframes, @property, @starting-style, @page, @counter-style e outras. Para que serve cada uma, como se escreve, as condições de @media mais usadas, o suporte dos navegadores e os erros que fazem uma regra inteira sumir.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Regras @</span></h1>
+
+<p class="intro">Quase todo o CSS é feito de regras "seletor + declarações". As <strong>regras @</strong> (<em>at-rules</em>, "regras arroba") são diferentes: começam com <code>@</code> e dão <strong>instruções</strong> ao navegador. "Só aplique isto em telas pequenas" (<code>@media</code>), "baixe esta fonte" (<code>@font-face</code>), "esta é uma animação" (<code>@keyframes</code>). Esta página lista todas, com um exemplo e a aula de cada uma.</p>
+
+<div class="note">
+<strong>Como usar esta página</strong>
+<ul>
+  <li>Procure com <kbd>Ctrl</kbd>+<kbd>F</kbd> pelo nome (<code>@media</code>, <code>@layer</code>).</li>
+  <li>O comportamento nos erros foi conferido no Chromium, lendo as regras que o navegador guardou (<code>document.styleSheets</code>). As mensagens são do validador W3C (<code>vnu</code> 26.10.12).</li>
+  <li>O suporte vem dos dados do MDN (outubro de 2026). As regras recentes estão marcadas com <strong>novo</strong>.</li>
+</ul>
+</div>
+
+<p>Atalhos: <a href="#formatos">Os dois formatos</a> · <a href="#condicionais">Condicionais</a> · <a href="#media">Condições do @media</a> · <a href="#organizacao">Organização</a> · <a href="#recursos">Fontes, animações e outros</a> · <a href="#validador">O que o validador conhece</a> · <a href="#errado">Quando dá errado</a></p>
+
+<hr>
+
+<h2 id="formatos">Os dois formatos</h2>
+<p>Pense num caderno de receitas. Algumas anotações são uma linha só ("veja também o caderno da vó": <code>@import</code>). Outras são um bloco inteiro de receitas que só vale num caso ("para festas": <code>@media</code>).</p>
+<pre class="file" data-file="anatomia">@import url("tema.css");          /* formato 1: uma linha, termina em ; */
+
+@media (max-width: 600px) {        /* formato 2: um bloco entre { } */
+  .menu {
+    flex-direction: column;
+  }
+}</pre>
+<dl class="anatomy">
+  <dt>@import</dt><dd>O nome da regra: <code>@</code> grudado no nome.</dd>
+  <dt>url("tema.css");</dt><dd>No formato de uma linha, o que vem depois do nome termina com <code>;</code>.</dd>
+  <dt>(max-width: 600px)</dt><dd>A <strong>condição</strong> (ou o "prelúdio"): quando ou para quem o bloco vale.</dd>
+  <dt>{ … }</dt><dd>O bloco. Dentro de <code>@media</code>, <code>@supports</code>, <code>@container</code> e <code>@layer</code> vão <strong>regras inteiras</strong> (seletor + chaves). Dentro de <code>@font-face</code> e <code>@page</code>, só declarações. Dentro de <code>@keyframes</code>, as etapas da animação.</dd>
+  <dt>}</dt><dd>Repare nas <strong>duas</strong> chaves de fechamento no fim: uma fecha o <code>.menu</code>, a outra fecha o <code>@media</code>. Esquecer a segunda é um dos erros mais comuns (<a href="#errado">veja abaixo</a>).</dd>
+</dl>
+
+<h2 id="condicionais">Regras condicionais: "só se…"</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Regra</th><th>O bloco vale quando…</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td><code>@media</code></td><td>a <strong>tela</strong> (ou a impressora) cumpre a condição: largura, orientação, tema escuro, menos movimento…</td><td><code>@media (min-width: 48rem) { … }</code></td><td><a href="media-queries.html">Media Queries</a>, <a href="mobile-first.html">Mobile First</a></td></tr>
+<tr><td><code>@container</code></td><td>o <strong>contêiner</strong> (um ancestral com <code>container-type</code>) cumpre a condição: um cartão que muda conforme o espaço que ele tem, não a tela</td><td><code>@container (min-width: 30rem) { … }</code></td><td><a href="container-queries.html">Container Queries</a></td></tr>
+<tr><td><code>@supports</code></td><td>o navegador <strong>entende</strong> uma propriedade, um valor ou um seletor</td><td><code>@supports (display: grid) { … }</code> · <code>@supports selector(:has(a)) { … }</code> · <code>@supports not (…)</code></td><td><a href="supports.html">@supports</a></td></tr>
+</table>
+</div>
+<div class="note"><strong>Suporte:</strong> <code>@media</code> e <code>@supports</code> funcionam em todos. <code>@container</code>: Chrome 105, Firefox 110, Safari 16. O <code>@supports selector()</code>: Chrome 83, Firefox 69, Safari 14.1.</div>
+
+<h3 id="media">As condições mais usadas do <code>@media</code></h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Condição</th><th>Verdadeira quando…</th><th>Aula</th></tr>
+<tr><td><code>(min-width: 48rem)</code></td><td>a janela tem <strong>pelo menos</strong> 48rem de largura (mobile first: "daqui para cima")</td><td><a href="mobile-first.html">Mobile First</a></td></tr>
+<tr><td><code>(max-width: 600px)</code></td><td>a janela tem <strong>no máximo</strong> 600px</td><td><a href="media-queries.html">Media Queries</a></td></tr>
+<tr><td><code>(width &gt;= 48rem)</code>, <code>(400px &lt;= width &lt;= 800px)</code></td><td>o mesmo, com sinais de comparação (a "sintaxe de intervalo"): Chrome 104, Firefox 102, Safari 16.4</td><td><a href="media-queries.html">Media Queries</a></td></tr>
+<tr><td><code>(orientation: landscape)</code> / <code>portrait</code></td><td>a janela está deitada / em pé</td><td><a href="media-queries.html">Media Queries</a></td></tr>
+<tr><td><code>(prefers-color-scheme: dark)</code></td><td>a pessoa escolheu o tema escuro no sistema</td><td><a href="tema-escuro.html">Tema Escuro</a></td></tr>
+<tr><td><code>(prefers-reduced-motion: reduce)</code></td><td>a pessoa pediu menos animação no sistema</td><td><a href="reduced-motion.html">Menos Movimento</a></td></tr>
+<tr><td><code>(hover: hover)</code>, <code>(pointer: coarse)</code></td><td>o aparelho tem mouse que "passa por cima" / o ponteiro é impreciso (um dedo)</td><td><a href="hover-focus.html">Estados</a></td></tr>
+<tr><td><code>(min-resolution: 2x)</code></td><td>a tela é de alta densidade</td><td><a href="media-queries.html">Media Queries</a></td></tr>
+<tr><td><code>print</code> / <code>screen</code></td><td>na impressão / na tela. <code>@media print { … }</code></td><td><a href="impressao.html">Impressão</a></td></tr>
+<tr><td><code>A and B</code>, <code>A, B</code>, <code>not A</code></td><td>as duas / qualquer uma (a vírgula é "ou") / o contrário. <code>screen and (min-width: 48rem)</code></td><td><a href="media-queries.html">Media Queries</a></td></tr>
+</table>
+</div>
+
+<h2 id="organizacao">Regras de organização</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Regra</th><th>Para quê</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td><code>@import</code></td><td>puxa outro arquivo CSS para dentro deste. Tem de vir <strong>no começo</strong>, antes de qualquer regra (só <code>@charset</code> e <code>@layer</code> podem vir antes). Cada <code>@import</code> é mais um download em sequência: num site publicado, prefira vários <code>&lt;link&gt;</code> no HTML.</td><td><code>@import url("tema.css") layer(tema);</code></td><td><a href="organizar-arquivos.html">Organizando os Arquivos</a>, <a href="performance.html">CSS Rápido</a></td></tr>
+<tr><td><code>@layer</code></td><td>cria <strong>camadas</strong> na cascata: uma camada declarada depois vence as de antes, não importa a especificidade</td><td><code>@layer reset, base, componentes;</code> e <code>@layer base { … }</code></td><td><a href="layer.html">@layer</a></td></tr>
+<tr><td><code>@scope</code> <strong>novo</strong></td><td>limita as regras a um pedaço da página (de <code>.cartao</code> até, opcionalmente, um limite)</td><td><code>@scope (.cartao) to (.rodape) { img { … } }</code></td><td><a href="scope.html">@scope</a></td></tr>
+<tr><td><code>@charset</code></td><td>diz a codificação do arquivo. Hoje, com tudo em UTF-8, quase nunca é preciso; se usar, é a primeira linha, exatamente <code>@charset "utf-8";</code></td><td><code>@charset "utf-8";</code></td><td>—</td></tr>
+<tr><td><code>@namespace</code></td><td>para CSS de documentos XML e SVG com espaços de nome; quase nunca em páginas HTML</td><td><code>@namespace svg url(http://www.w3.org/2000/svg);</code></td><td>—</td></tr>
+</table>
+</div>
+<div class="note"><strong>Suporte:</strong> <code>@layer</code>: Chrome 99, Firefox 97, Safari 15.4. <code>@scope</code> chegou por último: Chrome 118, Firefox <strong>146</strong>, Safari <strong>26.4</strong>; em navegadores mais antigos o bloco inteiro é ignorado.</div>
+
+<h2 id="recursos">Fontes, animações e outras definições</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Regra</th><th>Define…</th><th>Exemplo</th><th>Aula</th></tr>
+<tr><td><code>@font-face</code></td><td>uma fonte para baixar: o nome que você vai usar no <code>font-family</code> e o arquivo</td><td><code>@font-face { font-family: "Lato"; src: url("lato.woff2") format("woff2"); font-display: swap; }</code></td><td><a href="fontes-web.html">@font-face</a></td></tr>
+<tr><td><code>@keyframes</code></td><td>as etapas de uma animação (<code>from</code>, <code>to</code> ou porcentagens), com um nome que o <code>animation</code> usa</td><td><code>@keyframes pulo { from { … } 50% { … } to { … } }</code></td><td><a href="animation.html">Animações</a></td></tr>
+<tr><td><code>@property</code></td><td>uma variável com <strong>tipo</strong> (ângulo, cor, tamanho), valor inicial e herança. Com tipo, o navegador consegue animar a variável.</td><td><code>@property --giro { syntax: "&lt;angle&gt;"; inherits: false; initial-value: 0deg; }</code></td><td><a href="variaveis.html">Variáveis</a></td></tr>
+<tr><td><code>@starting-style</code> <strong>novo</strong></td><td>o estilo de "antes de aparecer": permite animar a entrada de um elemento que acabou de surgir (de <code>display: none</code> para visível, um <code>&lt;dialog&gt;</code> abrindo)</td><td><code>@starting-style { .aviso { opacity: 0; } }</code></td><td><a href="transition.html">Transições</a></td></tr>
+<tr><td><code>@page</code></td><td>a folha na impressão: margens, tamanho</td><td><code>@page { margin: 2cm; }</code></td><td><a href="impressao.html">Impressão</a></td></tr>
+<tr><td><code>@counter-style</code></td><td>um estilo de numeração próprio para listas</td><td><code>@counter-style estrela { system: cyclic; symbols: "★"; suffix: " "; }</code></td><td><a href="listas.html">Listas</a></td></tr>
+<tr><td><code>@font-feature-values</code>, <code>@font-palette-values</code></td><td>nomes para recursos especiais de uma fonte / paletas de cores de fontes coloridas</td><td>—</td><td>—</td></tr>
+<tr><td><code>@view-transition</code> <strong>novo</strong></td><td>liga a transição animada entre páginas do mesmo site</td><td><code>@view-transition { navigation: auto; }</code></td><td>—</td></tr>
+<tr><td><code>@position-try</code> <strong>novo</strong></td><td>posições alternativas para um elemento ancorado (uma dica que troca de lado quando não cabe)</td><td>—</td><td>—</td></tr>
+</table>
+</div>
+<div class="note"><strong>Suporte:</strong> <code>@font-face</code>, <code>@keyframes</code> e <code>@page</code> funcionam em todos. <code>@property</code>: Chrome 85, Safari 16.4 e Firefox <strong>128</strong>. <code>@starting-style</code>: Chrome 117, Firefox 129, Safari 17.5. <code>@counter-style</code>: Chrome 91, Firefox 33, Safari 17. <code>@view-transition</code>: Chrome 126 e Safari 18.2, <strong>ainda não no Firefox</strong>. <code>@position-try</code>: Chrome 125, Firefox 147, Safari 26. <code>@function</code> (funções feitas por você) e <code>@custom-media</code> ainda estão em teste: não use num site de verdade.</div>
+
+<h2 id="validador">O que o validador W3C conhece</h2>
+<p>Testadas uma por uma no <code>vnu</code> 26.10.12, com CSS correto:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Passaram sem mensagem</th><th>Deram erro, mas estão certas</th></tr>
+<tr><td><code>@media</code> (inclusive <code>width &gt;= 600px</code>), <code>@supports</code> (inclusive <code>selector()</code>), <code>@import … layer()</code>, <code>@layer</code>, <code>@scope</code>, <code>@font-face</code>, <code>@keyframes</code>, <code>@page</code>, <code>@counter-style</code>, <code>@charset</code></td><td><code>@container</code>, <code>@property</code>, <code>@starting-style</code>, <code>@view-transition</code>: todas com <code>error: CSS: Unrecognized at-rule “@container”</code> (e o nome de cada uma)</td></tr>
+</table>
+</div>
+<p><em>Unrecognized at-rule</em> = "regra @ não reconhecida". Nas quatro da direita, o erro é do validador, que ainda não as conhece; os navegadores da nota acima entendem. Mas a mesma mensagem aparece quando o nome está <strong>errado</strong> (<code>@keyframe</code>, sem o "s"): confira a grafia antes de culpar o validador.</p>
+
+<h2 id="experimente">Experimente</h2>
+<p>Quatro regras @ juntas. Mude a largura da janela do navegador (ou abra o resultado numa aba nova com ↗ e estreite a janela) para ver o <code>@media</code> agir; troque o <code>display: grid</code> do <code>@supports</code> por algo que não existe, como <code>display: gradezinha</code>, e veja o bloco ser ignorado:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Padaria da Ana &lt;span class="selo"&gt;novo!&lt;/span&gt;&lt;/h1&gt;
+&lt;div class="vitrine"&gt;
+  &lt;p&gt;Pão francês&lt;/p&gt;
+  &lt;p&gt;Pão de queijo&lt;/p&gt;
+  &lt;p&gt;Sonho&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">@layer base, destaque;
+
+@layer destaque {
+  h1 { color: saddlebrown; }
+}
+
+@layer base {
+  h1 { color: gray; }
+  .vitrine p { padding: 0.5rem; background-color: wheat; }
+}
+
+@supports (display: grid) {
+  .vitrine {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 30rem) {
+  .vitrine { grid-template-columns: 1fr; }
+}
+
+@keyframes pulo {
+  from { transform: translateY(0); }
+  to { transform: translateY(-4px); }
+}
+
+.selo {
+  display: inline-block;
+  font-size: 0.9rem;
+  color: white;
+  background-color: tomato;
+  padding: 0 0.25rem;
+  animation: pulo 0.5s ease-in-out infinite alternate;
+}
+</pre>
+</div>
+<p>Repare no título: a camada <code>base</code> o pinta de cinza, mas a camada <code>destaque</code> foi declarada <strong>depois</strong> na primeira linha (<code>@layer base, destaque;</code>), então vence, mesmo vindo antes no arquivo. Ele fica marrom.</p>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Erros numa regra @ costumam fazer um <strong>bloco inteiro</strong> sumir, e às vezes levam junto regras que estavam certas. Tudo abaixo foi conferido no Chromium:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrito</th><th>O que o navegador fez</th><th>O validador</th></tr>
+<tr><td><code>@media screen and(max-width: 600px) { … }</code> (sem espaço depois do <code>and</code>)</td><td>guardou como <code>@media not all</code>: o bloco <strong>nunca</strong> vale, em tela nenhuma. Grudado no parêntese, <code>and(</code> vira o nome de uma "função" que não existe.</td><td><code>Parse Error.</code></td></tr>
+<tr><td><code>@media (max-widht: 600px) { … }</code> (nome da condição errado)</td><td>guardou o bloco, mas a condição desconhecida é sempre falsa: o bloco nunca vale</td><td><strong>nenhuma mensagem</strong></td></tr>
+<tr><td><code>@media (max-width: 600px)</code> sem a <code>{</code>, seguido de <code>h1 { … }</code></td><td>"engoliu" o <code>h1</code> como parte da condição: ficou um <code>@media not all { }</code> vazio, e a regra do <code>h1</code> sumiu. A regra seguinte voltou a funcionar.</td><td><code>Parse Error.</code></td></tr>
+<tr><td><code>@media (…) {</code> sem a <code>}</code> final, com mais regras depois</td><td>as regras seguintes ficaram <strong>dentro</strong> do <code>@media</code>: só valem quando a condição vale. Se o <code>@media</code> é a última coisa do arquivo, o navegador fecha sozinho e nada muda (mas o validador reclama).</td><td><code>Parse Error.</code></td></tr>
+<tr><td><code>h1 { … }</code> e depois <code>@import url("tema.css");</code></td><td>ignorou o <code>@import</code>: o arquivo nem é baixado</td><td><code>@import are not allowed after any valid statement other than @charset and @import.</code></td></tr>
+<tr><td><code>@keyframe pulo { … }</code> (sem o "s")</td><td>ignorou o bloco; a animação <code>pulo</code> não existe e nada se mexe</td><td><code>Unrecognized at-rule “@keyframe”</code></td></tr>
+</table>
+</div>
+
+<div class="cenario">
+<strong>Como achar no F12</strong>
+<ul>
+  <li>No painel <strong>Styles</strong> (Estilos) da aba <strong>Elements</strong>, as regras que vêm de um <code>@media</code> aparecem com a condição escrita em cima. Se a regra que você esperava não aparece, a condição não está valendo (ou foi descartada).</li>
+  <li>Para testar larguras, use o modo de aparelhos do F12 (o ícone de celular e tablet) e arraste a largura.</li>
+  <li>Para testar <code>prefers-color-scheme</code> e <code>prefers-reduced-motion</code> sem mudar o sistema, o Chrome tem a aba <strong>Rendering</strong> (no menu ⋮ do F12, "More tools"), com opções para simular essas preferências.</li>
+</ul>
+<p>Os nomes exatos dos menus mudam de versão para versão do navegador; a ideia é a mesma.</p>
+</div>
+
+<pre class="term" data-cwd="~/ref/arroba">$ vnu --css importdepois.css
+"file:/home/ana/ref/arroba/importdepois.css":2.25-3.1: error: CSS: @import are not allowed after any valid statement other than @charset and @import.
+$ vnu --css keyframe.css
+"file:/home/ana/ref/arroba/keyframe.css":1.1-1.9: error: CSS: Unrecognized at-rule “@keyframe”</pre>
+<p><em>@import are not allowed after any valid statement other than @charset and @import</em> = "o <code>@import</code> não é permitido depois de nenhuma regra válida, a não ser <code>@charset</code> e <code>@import</code>". (O <code>@layer</code> sem bloco, como <code>@layer base, tema;</code>, também pode vir antes, pelo padrão.)</p>
+
+<h2>Missão</h2>
+<div class="tryhtml" data-goal="src:@keyframes\s+pulo\s*\{,css:.selo{animation-name}=pulo,src:@media\s*\(\s*prefers-reduced-motion:\s*reduce\s*\)\s*\{[^}]*\.selo\s*\{[^}]*animation">
+<p class="try-task"><strong>Missão:</strong> o selo "novo!" devia pular, mas não se mexe. (1) Conserte o nome da regra @ da animação. (2) Seja gentil com quem pediu menos movimento: acrescente um <code>@media (prefers-reduced-motion: reduce)</code> que desliga a animação do <code>.selo</code> (<code>animation: none;</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Padaria da Ana &lt;span class="selo"&gt;novo!&lt;/span&gt;&lt;/h1&gt;
+</pre>
+<pre class="script" data-file="style.css">@keyframe pulo {
+  from { transform: translateY(0); }
+  to { transform: translateY(-4px); }
+}
+
+.selo {
+  display: inline-block;
+  color: white;
+  background-color: tomato;
+  animation: pulo 0.5s ease-in-out infinite alternate;
+}
+</pre>
+<pre class="solucao" data-file="style.css">@keyframes pulo {
+  from { transform: translateY(0); }
+  to { transform: translateY(-4px); }
+}
+
+.selo {
+  display: inline-block;
+  color: white;
+  background-color: tomato;
+  animation: pulo 0.5s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selo {
+    animation: none;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Regras @ começam com <code>@</code>: algumas terminam em <code>;</code> (<code>@import</code>, <code>@layer a, b;</code>), outras têm um bloco <code>{ }</code>.</li>
+  <li>Condicionais: <code>@media</code> (a tela), <code>@container</code> (o contêiner), <code>@supports</code> (o navegador entende?).</li>
+  <li>Organização: <code>@import</code> (sempre no começo), <code>@layer</code>, <code>@scope</code>.</li>
+  <li>Definições: <code>@font-face</code>, <code>@keyframes</code>, <code>@property</code>, <code>@starting-style</code>, <code>@page</code>, <code>@counter-style</code>.</li>
+  <li>Um erro numa regra @ derruba o bloco inteiro: <code>and(</code> sem espaço, chave esquecida, nome errado.</li>
+  <li>O <code>vnu</code> 26.10.12 ainda não conhece <code>@container</code>, <code>@property</code>, <code>@starting-style</code> e <code>@view-transition</code>: o erro <em>Unrecognized at-rule</em> nelas é do validador.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
