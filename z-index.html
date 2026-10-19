@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS z-index — quem fica por cima quando os elementos se sobrepõem | Guia CSS</title>
+<meta name="description" content="z-index em CSS para quem está começando: quem fica por cima quando dois elementos se sobrepõem, a ordem do HTML, por que o z-index só vale em elemento posicionado, valores negativos, o contexto de empilhamento que prende um menu atrás do banner e as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">z-index</span></h1>
+
+<p class="intro">Com <code>position</code>, os elementos podem ficar um em cima do outro: um selo sobre a foto, uma barra fixa sobre o texto, um menu que se abre sobre o banner. Quando dois se sobrepõem, alguém tem de ficar <strong>por cima</strong>. Quem decide é o navegador, com uma regra simples, e você pode mudar a decisão com a propriedade <code>z-index</code> ("índice z", a ordem das camadas). Nesta aula você vai empilhar cartões, trazer um para a frente, mandar outro para trás e entender a armadilha mais famosa do CSS: o <code>z-index: 9999</code> que não funciona.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A ordem natural das camadas: quem vem depois no HTML fica por cima.</li>
+  <li>Como o <code>z-index</code> muda essa ordem, com números maiores na frente.</li>
+  <li>Por que o <code>z-index</code> não faz nada num elemento sem <code>position</code>.</li>
+  <li>O que um <code>z-index</code> negativo faz.</li>
+  <li>O <strong>contexto de empilhamento</strong>: por que um número enorme às vezes não traz o elemento para a frente.</li>
+  <li>As mensagens reais do validador.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador. Esta aula usa <code>position: relative</code> e <code>position: absolute</code> para sobrepor os elementos; se precisar, reveja <a href="position-relative.html">position: relative</a> e <a href="position-absolute.html">position: absolute</a>.</p>
+
+<hr>
+
+<h2>A ideia: folhas de papel na mesa</h2>
+<p>Espalhe três folhas de papel na mesa, uma por cima da outra. A última que você pôs fica por cima de todas. Se quiser outra folha na frente, você a puxa para o topo da pilha.</p>
+<p>A tela do computador tem largura (o eixo <strong>x</strong>, da esquerda para a direita) e altura (o eixo <strong>y</strong>, de cima para baixo). O <code>z-index</code> trabalha num terceiro eixo, o <strong>z</strong>, que sai da tela em direção aos seus olhos. Um número maior é uma folha mais perto de você.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Na mesa</th><th>Na página</th></tr>
+<tr><td>A ordem em que as folhas foram postas</td><td>A ordem dos elementos no HTML</td></tr>
+<tr><td>Puxar uma folha para o topo da pilha</td><td>Dar a ela um <code>z-index</code> maior</td></tr>
+<tr><td>Uma pasta com folhas dentro</td><td>Um <strong>contexto de empilhamento</strong> (seção 4)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. Sem z-index: quem vem depois fica por cima</h2>
+<p>Três cartões da lojinha da Ana, posicionados para se sobreporem. Nenhum tem <code>z-index</code>:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o cartão C, o último no HTML, está por cima de todos, e o A, o primeiro, por baixo. Mude a ordem das linhas no <code>index.html</code> (ponha o A por último) e veja o A passar para a frente.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="mesa"&gt;
+  &lt;p class="cartao a"&gt;A · 1º no HTML&lt;/p&gt;
+  &lt;p class="cartao b"&gt;B · 2º no HTML&lt;/p&gt;
+  &lt;p class="cartao c"&gt;C · 3º no HTML&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.mesa {
+  position: relative;
+  height: 200px;
+}
+
+.cartao {
+  position: absolute;
+  width: 180px;
+  height: 100px;
+  margin: 0;
+  padding: 8px;
+  color: white;
+  font-weight: bold;
+}
+
+.a { top: 0; left: 0; background-color: tomato; }
+.b { top: 40px; left: 60px; background-color: seagreen; }
+.c { top: 80px; left: 120px; background-color: navy; }
+</pre>
+</div>
+
+<p>Essa é a ordem natural: entre elementos posicionados, <strong>quem vem depois no HTML é desenhado por cima</strong>. E um elemento posicionado (com <code>position</code> diferente de <code>static</code>) fica por cima dos que não são posicionados, como você viu com a barra fixa da aula <a href="position-fixed.html">position: fixed</a>.</p>
+
+<hr>
+
+<h2>2. O z-index muda a ordem</h2>
+<p>Para trazer o cartão A para a frente sem mexer no HTML, dê a ele um <code>z-index</code> maior que o dos outros:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o A, com <code>z-index: 1</code>, passou para a frente dos outros dois, que não têm <code>z-index</code>. Dê <code>z-index: 2</code> ao B e veja quem fica na frente.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="mesa"&gt;
+  &lt;p class="cartao a"&gt;A · z-index: 1&lt;/p&gt;
+  &lt;p class="cartao b"&gt;B · sem z-index&lt;/p&gt;
+  &lt;p class="cartao c"&gt;C · sem z-index&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.mesa {
+  position: relative;
+  height: 200px;
+}
+
+.cartao {
+  position: absolute;
+  width: 180px;
+  height: 100px;
+  margin: 0;
+  padding: 8px;
+  color: white;
+  font-weight: bold;
+}
+
+.a { top: 0; left: 0; background-color: tomato; z-index: 1; }
+.b { top: 40px; left: 60px; background-color: seagreen; }
+.c { top: 80px; left: 120px; background-color: navy; }
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>z-index</dt><dd>A propriedade da camada. O nome vem do eixo <strong>z</strong>, o que sai da tela.</dd>
+  <dt>1</dt><dd>Um número <strong>inteiro</strong>: <code>1</code>, <code>10</code>, <code>-1</code>. Não tem unidade (nada de <code>px</code>) e não pode ter vírgula. Quanto <strong>maior</strong>, mais perto de você.</dd>
+  <dt>auto</dt><dd>O valor padrão: "sem camada própria". O elemento fica na ordem natural, como se fosse <code>z-index: 0</code> na hora de comparar.</dd>
+</dl>
+
+<p>As regras de comparação, entre irmãos posicionados:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Quem fica por cima</th></tr>
+<tr><td>Números diferentes</td><td>O de <code>z-index</code> maior</td></tr>
+<tr><td>Números iguais (ou os dois sem <code>z-index</code>)</td><td>O que vem depois no HTML</td></tr>
+<tr><td><code>z-index: 1</code> contra sem <code>z-index</code></td><td>O de <code>z-index: 1</code>: qualquer número positivo vence o <code>auto</code></td></tr>
+</table>
+</div>
+
+<p>Os cartões lado a lado, cada um com o seu valor escrito. A ordem no HTML é A, B, C, mas os números invertem a pilha:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .mesa { position: relative; height: 200px; }
+  .cartao { position: absolute; width: 180px; height: 100px; margin: 0; padding: 8px; color: white; font-weight: bold; }
+  .cartao { text-align: right; }
+  .a { top: 0; left: 0; background-color: tomato; z-index: 3; }
+  .b { top: 40px; left: 120px; background-color: seagreen; z-index: 2; }
+  .c { top: 80px; left: 240px; background-color: navy; z-index: 1; }
+&lt;/style&gt;
+&lt;div class="mesa"&gt;
+  &lt;p class="cartao a"&gt;A · z-index: 3&lt;/p&gt;
+  &lt;p class="cartao b"&gt;B · z-index: 2&lt;/p&gt;
+  &lt;p class="cartao c"&gt;C · z-index: 1&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<div class="tryhtml" data-goal="css:.b{z-index}=5,css:.b{position}=absolute">
+<p class="try-task"><strong>Missão:</strong> o cartão B, verde, é a promoção do dia e precisa ficar na frente dos outros dois. Sem mudar o HTML, dê a ele <code>z-index: 5</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="mesa"&gt;
+  &lt;p class="cartao a"&gt;Bolo de fubá&lt;/p&gt;
+  &lt;p class="cartao b"&gt;Promoção: torta de limão&lt;/p&gt;
+  &lt;p class="cartao c"&gt;Pudim&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.mesa {
+  position: relative;
+  height: 200px;
+}
+
+.cartao {
+  position: absolute;
+  width: 180px;
+  height: 100px;
+  margin: 0;
+  padding: 8px;
+  color: white;
+  font-weight: bold;
+}
+
+.a { top: 0; left: 0; background-color: tomato; }
+.b { top: 40px; left: 60px; background-color: seagreen; }
+.c { top: 80px; left: 120px; background-color: navy; }
+</pre>
+<pre class="solucao" data-file="style.css">.mesa {
+  position: relative;
+  height: 200px;
+}
+
+.cartao {
+  position: absolute;
+  width: 180px;
+  height: 100px;
+  margin: 0;
+  padding: 8px;
+  color: white;
+  font-weight: bold;
+}
+
+.a { top: 0; left: 0; background-color: tomato; }
+.b { top: 40px; left: 60px; background-color: seagreen; z-index: 5; }
+.c { top: 80px; left: 120px; background-color: navy; }
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Só vale em elemento posicionado</h2>
+<p>O <code>z-index</code> só funciona em elementos com <code>position</code> <code>relative</code>, <code>absolute</code>, <code>fixed</code> ou <code>sticky</code>. Num elemento com a posição normal (<code>static</code>), ele é <strong>ignorado</strong>, sem nenhum aviso. A exceção são os itens de um Flexbox ou de um Grid (aulas <a href="flexbox.html">Introdução ao Flexbox</a> e <a href="grid.html">Introdução ao Grid</a>), que aceitam <code>z-index</code> mesmo sem <code>position</code>.</p>
+
+<p>Um selo "Novo!" que a Ana quer pôr <strong>sobre</strong> a foto do bolo. A foto vem depois no HTML e tem <code>position: relative</code>, então fica por cima do selo:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o selo tem <code>z-index: 10</code>, mas está escondido atrás da foto (só aparecem as beiradas que sobram, em cima e à esquerda). Ponha <code>position: relative;</code> no <code>.selo</code> e veja-o passar para a frente.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="selo"&gt;Novo!&lt;/p&gt;
+&lt;img class="foto" src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="240" height="180"&gt;
+</pre>
+<pre class="script" data-file="style.css">.selo {
+  z-index: 10;
+  width: 60px;
+  margin: 0;
+  padding: 6px;
+  background-color: gold;
+  font-weight: bold;
+}
+
+.foto {
+  position: relative;
+  top: -20px;
+  left: 20px;
+}
+</pre>
+</div>
+
+<p>Conferimos no Chromium: o valor calculado do <code>z-index</code> do selo continua sendo <code>10</code>. O navegador aceita a declaração (ela é válida), só não tem o que fazer com ela num elemento <code>static</code>. Por isso o F12 <strong>não</strong> risca a linha, como faria com um erro de digitação. Alguns navegadores (o Firefox, por exemplo) mostram ao lado dela uma dica de que a propriedade não tem efeito ali.</p>
+
+<hr>
+
+<h2>4. O contexto de empilhamento: as pastas</h2>
+<p>Agora a armadilha. A Ana tem uma barra de topo com um menu que se abre para baixo, e logo depois um banner. O menu fica <strong>atrás</strong> do banner, e nem <code>z-index: 9999</code> resolve:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o menu (fundo branco, com borda) está cortado pelo banner laranja, apesar do <code>z-index: 9999</code>. Mude o <code>z-index</code> do <code>.topo</code> de <code>1</code> para <code>3</code> e veja o menu inteiro aparecer.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  Receitas da Ana
+  &lt;ul class="menu"&gt;
+    &lt;li&gt;Bolos&lt;/li&gt;
+    &lt;li&gt;Doces&lt;/li&gt;
+    &lt;li&gt;Salgados&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/header&gt;
+&lt;div class="banner"&gt;Semana do bolo: 20% de desconto&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.topo {
+  position: relative;
+  z-index: 1;
+  background-color: navy;
+  color: white;
+  padding: 12px;
+}
+
+.menu {
+  position: absolute;
+  z-index: 9999;
+  top: 30px;
+  left: 12px;
+  margin: 0;
+  padding: 8px 24px;
+  background-color: white;
+  color: black;
+  border: 1px solid gray;
+}
+
+.banner {
+  position: relative;
+  z-index: 2;
+  height: 120px;
+  padding: 12px;
+  background-color: darkorange;
+}
+</pre>
+</div>
+
+<p>Por que o <code>9999</code> perde para o <code>2</code>? Volte às folhas na mesa, agora com <strong>pastas</strong>:</p>
+<ul>
+  <li>Um elemento posicionado <strong>com</strong> um <code>z-index</code> (qualquer número, até <code>0</code>) vira uma <strong>pasta</strong>: um <strong>contexto de empilhamento</strong>. Tudo o que está dentro dele é empilhado <strong>dentro da pasta</strong>.</li>
+  <li>O <code>.topo</code> (<code>z-index: 1</code>) é uma pasta; o <code>.banner</code> (<code>z-index: 2</code>) é outra pasta, por cima dela.</li>
+  <li>O menu está <strong>dentro</strong> da pasta do <code>.topo</code>. O <code>9999</code> dele só vale lá dentro: ele fica na frente do texto do <code>.topo</code>, mas a pasta inteira continua embaixo da pasta do banner. Uma folha não sai da pasta, por maior que seja o número.</li>
+</ul>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Elemento</th><th><code>z-index</code></th><th>Comparado com quem</th></tr>
+<tr><td><code>.topo</code></td><td>1</td><td>Com o <code>.banner</code> (os dois estão no <code>body</code>): perde para o 2</td></tr>
+<tr><td><code>.menu</code> (dentro do <code>.topo</code>)</td><td>9999</td><td>Só com o que está dentro do <code>.topo</code></td></tr>
+<tr><td><code>.banner</code></td><td>2</td><td>Com o <code>.topo</code>: vence o 1, e cobre tudo o que está dentro dele</td></tr>
+</table>
+</div>
+
+<p><strong>Como resolver:</strong> compare as pastas, e não as folhas. Dê ao <strong>pai</strong> do menu (o <code>.topo</code>) um <code>z-index</code> maior que o do banner, ou tire o <code>z-index</code> do <code>.topo</code> (sem ele, o <code>.topo</code> deixa de ser pasta e o <code>9999</code> do menu passa a ser comparado direto com o <code>2</code> do banner).</p>
+
+<h3>O que mais cria uma pasta</h3>
+<p>Não é só o <code>z-index</code>. Algumas propriedades, mesmo sem <code>position</code>, também criam um contexto de empilhamento, e por isso aparecem em tantas perguntas de "meu z-index não funciona":</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>Cria uma pasta quando</th></tr>
+<tr><td><code>position</code> + <code>z-index</code></td><td><code>relative</code>/<code>absolute</code> com um <code>z-index</code> que não seja <code>auto</code></td></tr>
+<tr><td><code>position: fixed</code> ou <code>sticky</code></td><td>Sempre, mesmo sem <code>z-index</code></td></tr>
+<tr><td><code>opacity</code></td><td>Menor que <code>1</code> (aula <a href="opacity.html">Transparência</a>)</td></tr>
+<tr><td><code>transform</code>, <code>filter</code></td><td>Qualquer valor diferente de <code>none</code></td></tr>
+<tr><td>Item de Flexbox ou Grid</td><td>Com um <code>z-index</code> que não seja <code>auto</code></td></tr>
+<tr><td><code>isolation: isolate</code></td><td>Sempre: serve justamente para criar uma pasta de propósito</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>5. z-index negativo: para trás</h2>
+<p>Um número negativo manda o elemento para trás dos elementos normais (não posicionados) do mesmo contexto. Serve, por exemplo, para uma forma decorativa atrás de um título:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o círculo amarelo fica atrás do texto do título, apesar de vir depois dele no HTML. Troque <code>-1</code> por <code>1</code>: o círculo cobre as letras. Depois volte para <code>-1</code> e troque a linha <code>isolation: isolate;</code> por <code>background-color: wheat;</code>: sem a pasta, o círculo vai para trás do fundo do título e quase some.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1 class="titulo"&gt;Receitas da Ana &lt;span class="bola"&gt;&lt;/span&gt;&lt;/h1&gt;
+</pre>
+<pre class="script" data-file="style.css">.titulo {
+  position: relative;
+  isolation: isolate;
+  padding: 24px;
+}
+
+.bola {
+  position: absolute;
+  z-index: -1;
+  top: 8px;
+  left: 8px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: gold;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>z-index: -1;</dt><dd>Põe o círculo atrás do conteúdo normal da pasta em que ele está: o texto do título.</dd>
+  <dt>isolation: isolate;</dt><dd>Faz do título uma pasta. Sem isso, o <code>-1</code> mandaria o círculo para trás de tudo, até do fundo de um pai com cor de fundo, e ele poderia sumir. Com a pasta, o círculo vai para trás <strong>só</strong> do texto do título.</dd>
+</dl>
+
+<hr>
+
+<h2>Boas práticas: uma escala de camadas</h2>
+<p>Num site de verdade, os números se acumulam: alguém põe <code>z-index: 100</code>, outra pessoa precisa passar por cima e põe <code>999</code>, depois <code>9999</code>… Em vez dessa corrida, combine poucos degraus e use sempre os mesmos:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Camada</th><th><code>z-index</code></th></tr>
+<tr><td>Conteúdo normal, selos sobre fotos</td><td><code>1</code></td></tr>
+<tr><td>Menus que se abrem</td><td><code>10</code></td></tr>
+<tr><td>Barra de topo fixa ou grudada</td><td><code>100</code></td></tr>
+<tr><td>Janela de aviso por cima de tudo</td><td><code>1000</code></td></tr>
+</table>
+</div>
+<p>Com as variáveis do CSS (aula <a href="variaveis.html">Variáveis</a>), dá para dar nomes a esses degraus. E, quando um número enorme "não funciona", o problema quase nunca é o número: é uma pasta (seção 4).</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong><code>z-index</code> sem <code>position</code>: nada muda</strong>
+<pre class="file" data-file="style.css · erro de propósito">.selo {
+  z-index: 10;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> o selo continua atrás da foto (seção 3). O validador não reclama: o código é válido.</p>
+<p><strong>Por quê:</strong> num elemento <code>static</code>, o <code>z-index</code> não tem efeito.</p>
+<p><strong>Como consertar:</strong> <code>position: relative;</code> no mesmo elemento (ele continua no mesmo lugar, mas passa a aceitar o <code>z-index</code>).</p>
+</div>
+
+<div class="cenario">
+<strong><code>z-index: 9999</code> e o elemento continua atrás</strong>
+<p><strong>O que o leitor vê:</strong> o menu cortado pelo banner (seção 4).</p>
+<p><strong>Por quê:</strong> um ancestral do elemento é uma pasta (tem <code>position</code> + <code>z-index</code>, <code>opacity</code> menor que 1, <code>transform</code>, <code>filter</code>…), e essa pasta inteira está abaixo da outra.</p>
+<p><strong>Como achar:</strong> no F12, suba pelos ancestrais do elemento procurando essas propriedades. O primeiro que tiver uma delas é a pasta; compare o <code>z-index</code> <strong>dela</strong> com o do elemento que cobre.</p>
+<p><strong>Como consertar:</strong> aumente o <code>z-index</code> do ancestral (a pasta), ou tire dele o que cria a pasta.</p>
+</div>
+
+<div class="cenario">
+<strong>Número com vírgula: <code>This number should be an integer</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.selo {
+  position: relative;
+  z-index: 1.5;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.12-3.14: error: CSS: “z-index”: This number should be an integer.</pre>
+<p><strong>O que significa:</strong> "este número deveria ser um inteiro". O navegador ignora a declaração e o elemento fica com <code>auto</code>, na ordem natural.</p>
+<p><strong>Como consertar:</strong> use inteiros: <code>z-index: 2;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Com unidade: <code>“10px” is not a “z-index” value</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.selo {
+  position: relative;
+  z-index: 10px;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.12-3.15: error: CSS: “z-index”: “10px” is not a “z-index” value.</pre>
+<p><strong>O que significa:</strong> "<code>10px</code> não é um valor de <code>z-index</code>". O <code>z-index</code> é uma posição na pilha, e não uma medida: não leva <code>px</code>. A declaração é ignorada.</p>
+<p><strong>Como consertar:</strong> <code>z-index: 10;</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>z-index: auto;</code></td><td>O padrão: ordem natural (quem vem depois no HTML fica por cima)</td></tr>
+<tr><td><code>z-index: 2;</code></td><td>Fica na frente dos irmãos com número menor ou <code>auto</code></td></tr>
+<tr><td><code>z-index: -1;</code></td><td>Vai para trás do conteúdo normal do contexto</td></tr>
+<tr><td>Precisa de</td><td><code>position</code> diferente de <code>static</code> (ou ser item de Flexbox/Grid)</td></tr>
+<tr><td>Valores</td><td>Só inteiros, sem unidade</td></tr>
+<tr><td>Contexto de empilhamento</td><td>Os filhos só disputam lugar dentro do pai; o pai disputa com os vizinhos dele</td></tr>
+<tr><td><code>isolation: isolate;</code></td><td>Cria um contexto de empilhamento de propósito</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A propriedade</h3>
+<p>Complete para o cartão ficar na frente dos outros:</p>
+<div class="ex-code">.promo { position: relative; <input data-answer="z-index" aria-label="propriedade">: 5; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. O que falta</h3>
+<p>Este <code>z-index</code> não faz nada. Complete a declaração que falta:</p>
+<div class="ex-code">.selo { <input data-answer="position" aria-label="propriedade">: relative; z-index: 10; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Para trás</h3>
+<p>Complete com um número que mande a forma para trás do texto:</p>
+<div class="ex-code">.bola { position: absolute; z-index: <input data-answer="-1" aria-label="número">; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Dois elementos posicionados, sem <code>z-index</code>, se sobrepõem. Qual fica por cima?</p>
+<label><input type="radio" name="q4"> O que vem primeiro no HTML</label>
+<label><input type="radio" name="q4"> O que vem depois no HTML</label>
+<label><input type="radio" name="q4"> O maior</label>
+<label><input type="radio" name="q4"> Nenhum: eles ficam lado a lado</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. Um menu com <code>z-index: 9999</code> está dentro de um <code>header</code> com <code>position: relative; z-index: 1;</code>, e um banner vizinho tem <code>z-index: 2</code>. O menu fica…</p>
+<label><input type="radio" name="q5"> na frente do banner, porque 9999 é maior que 2</label>
+<label><input type="radio" name="q5"> na frente, mas só no Chrome</label>
+<label><input type="radio" name="q5"> invisível</label>
+<label><input type="radio" name="q5"> atrás do banner, porque quem é comparado com o banner é o <code>header</code> (1 contra 2)</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Qual destes valores de <code>z-index</code> o validador aceita?</p>
+<label><input type="radio" name="q6"> <code>-3</code></label>
+<label><input type="radio" name="q6"> <code>2.5</code></label>
+<label><input type="radio" name="q6"> <code>10px</code></label>
+<label><input type="radio" name="q6"> <code>alto</code></label>
+</div>
+
+<h3>Missão final: o menu atrás do banner</h3>
+
+<div class="tryhtml" data-goal="css:.topo{z-index}=3,css:.menu{position}=absolute,css:.banner{z-index}=2">
+<p class="try-task"><strong>Missão:</strong> o menu da Ana continua cortado pelo banner. Sem mexer no menu nem no banner, mude só o <code>z-index</code> da <strong>pasta</strong> certa para <code>3</code>, para o menu aparecer inteiro.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  Receitas da Ana
+  &lt;ul class="menu"&gt;
+    &lt;li&gt;Bolos&lt;/li&gt;
+    &lt;li&gt;Doces&lt;/li&gt;
+    &lt;li&gt;Salgados&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/header&gt;
+&lt;div class="banner"&gt;Semana do bolo: 20% de desconto&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.topo {
+  position: relative;
+  z-index: 1;
+  background-color: navy;
+  color: white;
+  padding: 12px;
+}
+
+.menu {
+  position: absolute;
+  z-index: 9999;
+  top: 30px;
+  left: 12px;
+  margin: 0;
+  padding: 8px 24px;
+  background-color: white;
+  color: black;
+  border: 1px solid gray;
+}
+
+.banner {
+  position: relative;
+  z-index: 2;
+  height: 120px;
+  padding: 12px;
+  background-color: darkorange;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.topo {
+  position: relative;
+  z-index: 3;
+  background-color: navy;
+  color: white;
+  padding: 12px;
+}
+
+.menu {
+  position: absolute;
+  z-index: 9999;
+  top: 30px;
+  left: 12px;
+  margin: 0;
+  padding: 8px 24px;
+  background-color: white;
+  color: black;
+  border: 1px solid gray;
+}
+
+.banner {
+  position: relative;
+  z-index: 2;
+  height: 120px;
+  padding: 12px;
+  background-color: darkorange;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Quando elementos se sobrepõem, a ordem natural é: os posicionados por cima dos normais, e, entre eles, quem vem depois no HTML fica por cima.</li>
+  <li><code>z-index</code> muda essa ordem: inteiro, sem unidade, maior = mais à frente. O padrão é <code>auto</code>.</li>
+  <li>Só vale em elemento posicionado (<code>relative</code>, <code>absolute</code>, <code>fixed</code>, <code>sticky</code>) ou em item de Flexbox/Grid. Num <code>static</code>, é ignorado sem aviso.</li>
+  <li>Negativo manda para trás do conteúdo normal; com <code>isolation: isolate</code> no pai, só para trás do pai.</li>
+  <li>Contexto de empilhamento = pasta: os filhos só disputam lugar dentro dela. Um <code>9999</code> não sai de uma pasta que está embaixo; compare o <code>z-index</code> dos pais.</li>
+  <li>Validador: <code>This number should be an integer</code> para <code>1.5</code>. Use uma escala de poucos degraus em vez de uma corrida de números.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
