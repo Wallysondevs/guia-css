@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Seletor Universal — o asterisco (*) | Guia CSS</title>
+<meta name="description" content="O seletor universal do CSS para quem nunca escreveu CSS: o asterisco * pega todos os elementos. Para que ele serve (box-sizing, zerar margens, enxergar as caixas com outline), * dentro de outros seletores (.cartao *), por que ele perde para qualquer outra regra e o que acontece quando dá errado (links que perdem a cor, listas sem recuo).">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Seletor Universal (*)</span></h1>
+
+<p class="intro">Até aqui, cada seletor escolhia alguém: todos os parágrafos (<code>p</code>), os elementos com uma etiqueta (<code>.destaque</code>), um elemento só (<code>#topo</code>). O <strong>seletor universal</strong>, o asterisco <code>*</code>, não escolhe: ele pega <strong>todos</strong> os elementos da página, sem exceção. É uma ferramenta poderosa e, por isso mesmo, usada em poucos lugares bem conhecidos.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que o <code>*</code> pega (inclusive o <code>&lt;html&gt;</code> e o <code>&lt;body&gt;</code>).</li>
+  <li>Os três usos clássicos: <code>box-sizing</code> para todos, zerar margens e enxergar as caixas da página.</li>
+  <li>O <code>*</code> junto de outros seletores: <code>.cartao *</code>.</li>
+  <li>Por que o <code>*</code> perde para qualquer outra regra.</li>
+  <li>A diferença entre <code>* { color: … }</code> e <code>body { color: … }</code>, e o que dá errado quando se exagera.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código.</p>
+
+<hr>
+
+<h2>A ideia: "atenção, todo mundo"</h2>
+<p>Na escola, a diretora pode chamar um aluno pelo nome (o ID), uma turma inteira pela camiseta (a classe), ou pegar o microfone e dizer: <strong>"atenção, todo mundo"</strong>. Esse aviso chega a todos: alunos, professores, a cantina. O <code>*</code> é o "todo mundo" do CSS.</p>
+
+<hr>
+
+<h2>1. O primeiro <code>*</code></h2>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  * {
+    color: darkslateblue;
+  }
+&lt;/style&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura com &lt;strong&gt;cobertura de chocolate&lt;/strong&gt;.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Farinha&lt;/li&gt;
+  &lt;li&gt;Cenoura&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>*</dt><dd>O asterisco: "qualquer elemento". Não precisa de nada no HTML: nenhum <code>class</code>, nenhum <code>id</code>.</dd>
+  <dt>{ color: darkslateblue; }</dt><dd>A declaração vai para <strong>cada</strong> elemento da página, um por um: o <code>&lt;h1&gt;</code>, o <code>&lt;p&gt;</code>, o <code>&lt;strong&gt;</code>, o <code>&lt;ul&gt;</code>, cada <code>&lt;li&gt;</code>, e também o <code>&lt;html&gt;</code>, o <code>&lt;body&gt;</code> e até os elementos invisíveis do <code>&lt;head&gt;</code>.</dd>
+</dl>
+
+<p>Todo o texto ficou azul-ardósia, inclusive as bolinhas da lista. Para trocar a cor do texto do site inteiro, porém, existe um jeito melhor (veja a <a href="#body">seção 4</a>).</p>
+
+<hr>
+
+<h2>2. Enxergando as caixas: <code>* { outline: … }</code></h2>
+<p>Todo elemento da página é uma <strong>caixa</strong> retangular (aula <a href="box-model.html">O Modelo de Caixa</a>). Normalmente você não vê essas caixas. Um truque muito usado para estudar ou consertar um layout é desenhar um contorno em <strong>todas</strong> elas de uma vez:</p>
+
+<div class="tryhtml" data-goal="css:h1{outline-style}=solid,css:li{outline-style}=solid,css:strong{outline-style}=solid,src:(^|[\s,}])\*\s*\{">
+<p class="try-task"><strong>Missão:</strong> no <code>style.css</code>, escreva uma regra com o seletor <code>*</code> e a declaração <code>outline: 1px solid crimson;</code>. Repare em quantas caixas aparecem, até em volta do <code>&lt;strong&gt;</code> no meio da frase.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura com &lt;strong&gt;cobertura de chocolate&lt;/strong&gt;.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Farinha&lt;/li&gt;
+  &lt;li&gt;Cenoura&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">/* escreva a regra aqui */
+</pre>
+<pre class="solucao" data-file="style.css">* {
+  outline: 1px solid crimson;
+}
+</pre>
+</div>
+
+<p>Aparece uma caixa para cada elemento: a do <code>&lt;h1&gt;</code>, a do <code>&lt;p&gt;</code>, a do <code>&lt;strong&gt;</code> dentro dele, a do <code>&lt;ul&gt;</code> e uma para cada <code>&lt;li&gt;</code>. Em volta de tudo, o contorno do <code>&lt;body&gt;</code>. O <code>&lt;html&gt;</code> também ganha o seu, mas ele ocupa o quadro inteiro e o contorno fica por fora, onde não se vê. Os espaços entre as caixas são as margens. O <code>outline</code> (contorno) é usado aqui, em vez de <code>border</code>, porque ele <strong>não ocupa espaço</strong>: as caixas não mudam de tamanho nem de lugar (aula <a href="outline.html">Contorno</a>). Quando terminar de investigar, apague a regra.</p>
+
+<hr>
+
+<h2>3. O uso mais comum: <code>box-sizing</code> para todos</h2>
+<p>Quase todo site moderno começa o CSS com esta regra:</p>
+<pre class="file" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+</pre>
+<p>Ela muda a forma como o navegador calcula a largura das caixas, para <strong>todos</strong> os elementos (e para os pseudo-elementos <code>::before</code> e <code>::after</code>, que o <code>*</code> sozinho não pega). O porquê está na aula <a href="box-sizing.html">box-sizing: border-box</a>. Por enquanto, repare na forma: três seletores separados por vírgula (aula <a href="seletor-grupo.html">Agrupando Seletores</a>), o primeiro deles o <code>*</code>.</p>
+
+<p>Outro uso comum é zerar as margens que o navegador põe por conta própria:</p>
+<pre class="file" data-file="style.css">* {
+  margin: 0;
+}
+</pre>
+<p>Isso faz parte dos <strong>resets</strong> (aula <a href="reset.html">Reset e Normalize</a>). Mas cuidado: depois dele, você tem de devolver o espaço que quiser, elemento por elemento (veja <a href="#errado">Quando dá errado</a>).</p>
+
+<hr>
+
+<h2 id="body">4. <code>* { color }</code> × <code>body { color }</code></h2>
+<p>Para mudar a cor do texto do site inteiro, as duas regras parecem iguais. Não são:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> com <code>body</code>, o texto ficou azul-ardósia, mas o link continua com a cor de link, azul e sublinhado. Troque <code>body</code> por <code>*</code> e veja o link ficar da mesma cor do texto, sem parecer link.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Veja também o &lt;a href="bolo.html"&gt;bolo de fubá&lt;/a&gt;.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  color: darkslateblue;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th><code>body { color: … }</code></th><th><code>* { color: … }</code></th></tr>
+<tr><td>Como a cor chega nos filhos</td><td>Por <a href="heranca.html">herança</a>: o filho só herda se ninguém der outra cor a ele</td><td>Direto em cada elemento, como se cada um tivesse a regra</td></tr>
+<tr><td>Links</td><td>Continuam com a cor de link do navegador</td><td>Ficam com a mesma cor do texto</td></tr>
+<tr><td>Qual usar</td><td><strong>Este</strong>, para o estilo geral do texto</td><td>Evite para cores e fontes</td></tr>
+</table>
+</div>
+
+<p>Por que o link muda? O navegador tem o seu próprio CSS, que diz "links são azuis". Com <code>body</code>, a sua cor só chega no link por herança, e uma cor herdada perde para qualquer regra que fale do elemento diretamente, inclusive a do navegador. Com <code>*</code>, a sua regra fala diretamente do <code>&lt;a&gt;</code>, e uma regra sua vence a do navegador. Os detalhes estão nas aulas <a href="cascata.html">A Cascata</a> e <a href="heranca.html">Herança</a>.</p>
+
+<hr>
+
+<h2>5. O <code>*</code> dentro de outros seletores</h2>
+<p>O <code>*</code> também aparece como parte de seletores maiores, sempre com o sentido de "qualquer elemento":</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Quer dizer</th></tr>
+<tr><td><code>.cartao *</code></td><td>Qualquer elemento <strong>dentro</strong> de um <code>.cartao</code>, em qualquer nível</td></tr>
+<tr><td><code>.cartao &gt; *</code></td><td>Só os <strong>filhos diretos</strong> do <code>.cartao</code> (aula <a href="combinadores.html">Combinadores</a>)</td></tr>
+<tr><td><code>*.destaque</code></td><td>Qualquer elemento com a classe <code>destaque</code>: o mesmo que <code>.destaque</code>. O <code>*</code> fica subentendido quando você não escreve o elemento</td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> <code>.cartao *</code> pintou de verde todos os elementos dentro do cartão: o título, o parágrafo e o <code>&lt;em&gt;</code> dentro do parágrafo. O parágrafo de fora não mudou. Troque por <code>.cartao &gt; *</code>: o resultado parece igual, porque o <code>&lt;em&gt;</code> herda a cor do pai. Agora acrescente <code>font-style: normal;</code> e compare as duas versões.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Bolo de fubá&lt;/h2&gt;
+  &lt;p&gt;Fofinho, com &lt;em&gt;erva-doce&lt;/em&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Parágrafo fora do cartão.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao * {
+  color: darkgreen;
+}
+</pre>
+</div>
+
+<p>Com <code>.cartao * { font-style: normal; }</code>, o <code>&lt;em&gt;</code> perde o itálico, porque a regra fala dele. Com <code>.cartao &gt; *</code>, só o <code>&lt;h2&gt;</code> e o <code>&lt;p&gt;</code> recebem a regra; o <code>&lt;em&gt;</code>, neto do cartão, continua em itálico.</p>
+
+<hr>
+
+<h2>6. O <code>*</code> perde para todo mundo</h2>
+<p>O <code>*</code> é o seletor mais <strong>fraco</strong> que existe: a força dele é zero (aula <a href="especificidade.html">Especificidade</a>). Qualquer outra regra que fale do mesmo elemento, até um simples <code>p</code>, ganha dele, não importa a ordem:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  p {
+    color: darkred;
+  }
+  * {
+    color: darkslateblue;
+  }
+&lt;/style&gt;
+&lt;h2&gt;Novidades&lt;/h2&gt;
+&lt;p&gt;Receita nova toda sexta-feira!&lt;/p&gt;
+</pre>
+
+<p>O título ficou azul-ardósia (só o <code>*</code> fala dele), e o parágrafo ficou vermelho-escuro: <code>p</code> venceu, mesmo com o <code>*</code> vindo depois. É por isso que o <code>*</code> é bom para "valores de base": ele põe um padrão, e qualquer regra mais específica muda o que quiser.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong><code>* { padding: 0; }</code>: as bolinhas da lista saem da caixa</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  * {
+    margin: 0;
+    padding: 0;
+  }
+&lt;/style&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Ingredientes:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Farinha&lt;/li&gt;
+  &lt;li&gt;Cenoura&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<p><strong>O que você vê:</strong> tudo grudado no canto, sem espaço entre o título, o parágrafo e a lista. E as bolinhas da lista sumiram.</p>
+<p><strong>Por quê:</strong> o navegador põe margens no <code>&lt;h1&gt;</code>, no <code>&lt;p&gt;</code> e no <code>&lt;ul&gt;</code>, e um recuo (<code>padding</code>) à esquerda da lista, onde ficam as bolinhas. Com <code>margin: 0</code> e <code>padding: 0</code> para todos, as margens somem, o corpo da página encosta na borda e as bolinhas, que ficam <strong>fora</strong> do <code>&lt;li&gt;</code>, vão parar fora da área visível.</p>
+<p><strong>Como consertar:</strong> se zerar, devolva o que precisa: <code>ul { padding-left: 1.5rem; }</code>, <code>p { margin-bottom: 1rem; }</code>. Ou não zere o <code>padding</code> de todos: a maioria dos resets modernos zera só a <code>margin</code> (aula <a href="reset.html">Reset e Normalize</a>).</p>
+</div>
+
+<div class="cenario">
+<strong><code>* { color }</code> apagou a cara de link</strong>
+<p><strong>O que você vê:</strong> com <code>* { color: darkslateblue; }</code>, os links ficam da mesma cor do texto. Só o sublinhado denuncia que são links (e, se outra regra tirar o sublinhado, nada mais).</p>
+<p><strong>Por quê:</strong> o <code>*</code> fala diretamente do <code>&lt;a&gt;</code> e vence a cor de link do navegador (<a href="#body">seção 4</a>).</p>
+<p><strong>Como consertar:</strong> cor geral no <code>body</code>, e uma regra própria para os links, se quiser outra cor (aula <a href="links.html">Estilizando Links</a>).</p>
+</div>
+
+<div class="cenario">
+<strong>Escreveu <code>all</code> ou <code>todos</code> no lugar do <code>*</code></strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  all {
+    color: darkslateblue;
+  }
+&lt;/style&gt;
+&lt;p&gt;Receita nova toda sexta-feira!&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> nada muda. <code>all</code> não é uma palavra especial nesse lugar: é um seletor de elemento, que procura um <code>&lt;all&gt;</code> na página. O validador de CSS não reclama, porque o seletor é válido. O "todos" do CSS é só o <code>*</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>O que pega</th><th>Uso típico</th></tr>
+<tr><td><code>*</code></td><td>Todos os elementos</td><td>Valores de base: <code>box-sizing</code>, <code>margin: 0</code></td></tr>
+<tr><td><code>*, *::before, *::after</code></td><td>Todos, mais os pseudo-elementos</td><td><code>box-sizing: border-box</code></td></tr>
+<tr><td><code>* { outline: 1px solid … }</code></td><td>Todos</td><td>Enxergar as caixas (temporário)</td></tr>
+<tr><td><code>.cartao *</code></td><td>Tudo dentro do <code>.cartao</code></td><td>Mudar todos os descendentes</td></tr>
+<tr><td><code>.cartao &gt; *</code></td><td>Os filhos diretos do <code>.cartao</code></td><td>Espaço entre os itens de um bloco</td></tr>
+<tr><td>Força</td><td colspan="2">Zero: perde para qualquer outro seletor</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O símbolo</h3>
+<p>Complete o seletor que pega todos os elementos da página:</p>
+<div class="ex-code"><input data-answer="*" aria-label="seletor"> {
+  margin: 0;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. Dentro do cartão</h3>
+<p>Escreva o seletor que pega <strong>qualquer</strong> elemento dentro de um elemento com a classe <code>cartao</code>:</p>
+<div class="ex-code"><input data-answer=".cartao *" aria-label="seletor"> {
+  color: darkgreen;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>3. Enxergar as caixas</h3>
+<p>Qual propriedade desenha um contorno que <strong>não</strong> ocupa espaço, bom para enxergar as caixas sem mexer no layout?</p>
+<div class="ex-code">* {
+  <input data-answer="outline" aria-label="propriedade">: 1px solid crimson;
+}</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Com <code>* { color: navy; }</code> e, depois, <code>h1 { color: crimson; }</code>, de que cor fica o <code>&lt;h1&gt;</code>?</p>
+<label><input type="radio" name="q4"> Azul-marinho, porque o <code>*</code> pega tudo</label>
+<label><input type="radio" name="q4"> Vermelho, porque <code>h1</code> é mais forte que <code>*</code></label>
+<label><input type="radio" name="q4"> Preto, porque as regras se anulam</label>
+<label><input type="radio" name="q4"> Depende do navegador</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Para mudar a cor de todo o texto do site, qual é a melhor regra?</p>
+<label><input type="radio" name="q5"> <code>* { color: darkslateblue; }</code></label>
+<label><input type="radio" name="q5"> <code>all { color: darkslateblue; }</code></label>
+<label><input type="radio" name="q5"> <code>body { color: darkslateblue; }</code></label>
+<label><input type="radio" name="q5"> Uma classe em cada parágrafo</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Por que a regra do <code>box-sizing</code> escreve <code>*, *::before, *::after</code>, e não só <code>*</code>?</p>
+<label><input type="radio" name="q6"> Porque o <code>*</code> sozinho não pega os pseudo-elementos <code>::before</code> e <code>::after</code></label>
+<label><input type="radio" name="q6"> Porque o <code>*</code> sozinho não pega o <code>&lt;body&gt;</code></label>
+<label><input type="radio" name="q6"> Para a regra ficar mais forte</label>
+<label><input type="radio" name="q6"> Por costume: não faz diferença</label>
+</div>
+
+<h3>Missão final: o começo do CSS da Ana</h3>
+
+<div class="tryhtml" data-goal="css:.cartao{box-sizing}=border-box,css:h1{margin-top}=0px,css:ul{margin-top}=0px,css:p{margin-bottom}=16px,src:\*\s*,\s*\*::before\s*,\s*\*::after">
+<p class="try-task"><strong>Missão:</strong> monte o começo do CSS que quase todo site usa. (1) Uma regra para <code>*, *::before, *::after</code> com <code>box-sizing: border-box;</code>. (2) Uma regra <code>*</code> com <code>margin: 0;</code>. (3) Devolva o espaço embaixo dos parágrafos: <code>p { margin-bottom: 16px; }</code>. Ligue o contorno da seção 2 se quiser ver as caixas.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Doces e salgados de fim de semana.&lt;/p&gt;
+&lt;div class="cartao"&gt;
+  &lt;p&gt;Bolo de fubá&lt;/p&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+  &lt;li&gt;Pão de queijo&lt;/li&gt;
+  &lt;li&gt;Brigadeiro&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  border: 2px solid gray;
+  padding: 8px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+p {
+  margin-bottom: 16px;
+}
+
+.cartao {
+  border: 2px solid gray;
+  padding: 8px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>*</code> pega todos os elementos da página, do <code>&lt;html&gt;</code> ao último <code>&lt;li&gt;</code>. Não pega os pseudo-elementos: por isso <code>*, *::before, *::after</code>.</li>
+  <li>Usos clássicos: <code>box-sizing: border-box</code> para todos, <code>margin: 0</code> nos resets e <code>outline</code> temporário para enxergar as caixas.</li>
+  <li>Dentro de outros seletores: <code>.cartao *</code> (tudo dentro), <code>.cartao &gt; *</code> (filhos diretos). <code>*.destaque</code> é o mesmo que <code>.destaque</code>.</li>
+  <li>A força do <code>*</code> é zero: qualquer outra regra ganha dele.</li>
+  <li>Para cor e fonte do site, use <code>body</code>, e não <code>*</code>: com <code>*</code>, os links perdem a cor de link.</li>
+  <li>Zerou tudo? Devolva o espaço que precisa, principalmente o recuo das listas.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
