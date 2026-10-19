@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS text-shadow — sombra nas letras | Guia CSS</title>
+<meta name="description" content="A propriedade text-shadow para quem nunca escreveu CSS: deslocamento, desfoque e cor, sombra dura e suave, brilho, contorno e várias sombras separadas por vírgula, texto legível sobre foto, o valor calculado e os erros comuns (número sem unidade, quarto valor de box-shadow, vírgula esquecida).">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">text-shadow</span></h1>
+
+<p class="intro">Uma sombra discreta destaca um título; um brilho colorido chama atenção para uma promoção; uma sombra escura deixa um texto branco legível em cima de uma foto. Tudo isso é <code>text-shadow</code>, "sombra do texto": uma cópia das letras, desenhada atrás delas, deslocada, borrada e colorida do jeito que você pedir. Nesta aula você vai montar sombras peça por peça, empilhar várias e reconhecer os erros que fazem a sombra simplesmente não aparecer.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>As partes da sombra: deslocamento para o lado, para baixo, desfoque e cor.</li>
+  <li>Sombra dura, sombra suave, brilho e sombra para cima e para a esquerda (valores negativos).</li>
+  <li>Várias sombras de uma vez, separadas por vírgula (e o contorno feito com quatro sombras).</li>
+  <li>O uso mais útil: texto legível em cima de uma foto.</li>
+  <li>Como o navegador guarda o valor (o valor calculado).</li>
+  <li>Os erros comuns, com as mensagens do validador W3C: número sem unidade, um valor a mais e a vírgula esquecida.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. Os valores calculados foram conferidos no Chromium; as mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a lanterna atrás das letras</h2>
+<p>Recorte letras de papelão e ponha uma lanterna na frente delas: a sombra aparece na parede de trás, com o mesmo formato das letras. Mova a lanterna e a sombra vai para o lado ou para baixo. Afaste a parede e a sombra fica <strong>borrada</strong>, sem contorno nítido.</p>
+<p>O <code>text-shadow</code> faz isso com três números e uma cor: quanto a sombra anda para o lado, quanto anda para baixo, quanto ela borra e de que cor ela é.</p>
+
+<hr>
+
+<h2>1. A primeira sombra</h2>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  h1 {
+    text-shadow: 2px 2px 4px gray;
+  }
+&lt;/style&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>text-shadow</dt><dd>A propriedade: "sombra do texto".</dd>
+  <dt>2px</dt><dd>O <strong>primeiro</strong> número: quanto a sombra anda para a <strong>direita</strong>. Negativo anda para a esquerda.</dd>
+  <dt>2px</dt><dd>O <strong>segundo</strong>: quanto ela anda para <strong>baixo</strong>. Negativo anda para cima.</dd>
+  <dt>4px</dt><dd>O <strong>terceiro</strong> (opcional): o <strong>desfoque</strong>, quanto a sombra borra. Sem ele, ou com <code>0</code>, a sombra fica com a borda dura.</dd>
+  <dt>gray</dt><dd>A <strong>cor</strong> (opcional). Pode vir no começo ou no fim. Sem ela, a sombra usa a cor do próprio texto.</dd>
+  <dt>;</dt><dd>Fecha a declaração.</dd>
+</dl>
+
+<p>O valor inicial é <code>none</code>: nenhuma sombra. Os números precisam de unidade (<code>px</code>, <code>em</code>); só o <code>0</code> pode ficar sem.</p>
+
+<hr>
+
+<h2>2. Os jeitos de sombrear, lado a lado</h2>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  h2 {
+    font-family: sans-serif;
+  }
+  .dura { text-shadow: 2px 2px gray; }
+  .suave { text-shadow: 2px 2px 4px gray; }
+  .brilho { text-shadow: 0 0 8px tomato; }
+  .para-cima { text-shadow: -2px -2px 0 navy; }
+  .sem-cor { color: tomato; text-shadow: 2px 2px 4px; }
+&lt;/style&gt;
+&lt;h2 class="dura"&gt;2px 2px gray: dura&lt;/h2&gt;
+&lt;h2 class="suave"&gt;2px 2px 4px gray: suave&lt;/h2&gt;
+&lt;h2 class="brilho"&gt;0 0 8px tomato: brilho&lt;/h2&gt;
+&lt;h2 class="para-cima"&gt;-2px -2px 0 navy: para cima&lt;/h2&gt;
+&lt;h2 class="sem-cor"&gt;2px 2px 4px: sem cor&lt;/h2&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que aparece</th></tr>
+<tr><td><code>2px 2px gray</code></td><td>Uma cópia cinza, nítida, um pouco para a direita e para baixo: parece letra em relevo</td></tr>
+<tr><td><code>2px 2px 4px gray</code></td><td>A mesma sombra, borrada: mais discreta e natural</td></tr>
+<tr><td><code>0 0 8px tomato</code></td><td>Sem deslocamento, só desfoque: um <strong>brilho</strong> em volta das letras</td></tr>
+<tr><td><code>-2px -2px 0 navy</code></td><td>Números negativos: a sombra vai para a esquerda e para cima</td></tr>
+<tr><td><code>2px 2px 4px</code> (sem cor)</td><td>A sombra pega a cor do texto (<code>tomato</code>)</td></tr>
+</table>
+</div>
+
+<div class="tryhtml" data-goal="css:h1{text-shadow}=rgb(128, 128, 128) 2px 2px 4px">
+<p class="try-task"><strong>Missão:</strong> dê ao título uma sombra cinza (<code>gray</code>) que anda 2px para a direita, 2px para baixo e borra 4px. Depois de cumprir, brinque com os números.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;p&gt;Pão quentinho às 7 da manhã.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: navy;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: navy;
+  text-shadow: 2px 2px 4px gray;
+}
+</pre>
+</div>
+
+<h3>O valor calculado</h3>
+<p>Na aba <strong>Computed</strong> (Calculado) do F12, o navegador guarda a sombra do jeito dele: a cor vem <strong>primeiro</strong>, em <code>rgb()</code>, e todos os números ganham unidade. No Chromium:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você escreve</th><th>Valor calculado</th></tr>
+<tr><td><code>2px 2px gray</code></td><td><code>rgb(128, 128, 128) 2px 2px 0px</code> (o desfoque que faltou vira <code>0px</code>)</td></tr>
+<tr><td><code>0 0 8px tomato</code></td><td><code>rgb(255, 99, 71) 0px 0px 8px</code></td></tr>
+<tr><td><code>2px 2px 4px</code>, com <code>color: tomato</code></td><td><code>rgb(255, 99, 71) 2px 2px 4px</code> (a cor do texto)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>3. Várias sombras: separe com vírgula</h2>
+<p>Uma única declaração pode ter várias sombras, separadas por <strong>vírgula</strong>. A primeira da lista fica <strong>por cima</strong> das outras:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  h2 {
+    font-family: sans-serif;
+    font-size: 40px;
+  }
+  .duas {
+    text-shadow: 2px 2px 0 gold, 4px 4px 0 tomato;
+  }
+  .contorno {
+    color: white;
+    text-shadow:
+      -1px -1px 0 black,
+       1px -1px 0 black,
+      -1px  1px 0 black,
+       1px  1px 0 black;
+  }
+&lt;/style&gt;
+&lt;h2 class="duas"&gt;duas sombras&lt;/h2&gt;
+&lt;h2 class="contorno"&gt;contorno&lt;/h2&gt;
+</pre>
+
+<ul>
+  <li><strong>Duas sombras:</strong> uma dourada encostada nas letras e uma cor de tomate mais longe, como camadas.</li>
+  <li><strong>Contorno:</strong> letras brancas com quatro sombras pretas, uma para cada diagonal. Juntas, elas desenham uma borda fina em volta de cada letra. Quebrar a lista em várias linhas, como no exemplo, é permitido e ajuda a ler.</li>
+</ul>
+
+<hr>
+
+<h2>4. O uso mais útil: texto legível sobre uma foto</h2>
+<p>Texto branco em cima de uma foto fica bonito onde a foto é escura e some onde ela é clara. Uma sombra escura e borrada cria um "halo" que separa as letras do fundo. Compare os dois títulos (o fundo com a foto usa <code>background-image</code>, aula <a href="background-image.html">Imagem de Fundo</a>):</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .capa {
+    background-image: url("assets/midia/bolo-800.jpg");
+    background-size: cover;
+    background-position: center;
+    padding: 40px 16px;
+  }
+  .capa h2 {
+    color: white;
+    font-family: sans-serif;
+    font-size: 40px;
+    margin: 0;
+  }
+  .capa .com-sombra {
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+  }
+&lt;/style&gt;
+&lt;div class="capa"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;h2 class="com-sombra"&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;/div&gt;
+</pre>
+
+<p>No primeiro título, o "Bolo de", em cima da parte clara da foto, quase desaparece. No segundo, com a sombra preta de 80% (<code>rgba(0, 0, 0, 0.8)</code>, aula <a href="opacity.html">Transparência</a>), as letras se destacam do começo ao fim. A sombra ajuda, mas não faz milagre: se o fundo for muito claro, escureça a foto também.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quero</th><th>Sombra</th></tr>
+<tr><td>Título com um destaque discreto</td><td><code>1px 1px 2px gray</code></td></tr>
+<tr><td>Texto claro legível sobre foto</td><td><code>0 2px 6px rgba(0, 0, 0, 0.8)</code></td></tr>
+<tr><td>Brilho em volta (neon, promoção)</td><td><code>0 0 8px tomato</code></td></tr>
+<tr><td>Contorno nas letras</td><td>Quatro sombras de <code>1px</code> sem desfoque</td></tr>
+<tr><td>Sombra na <strong>caixa</strong>, não nas letras</td><td>Outra propriedade: <code>box-shadow</code> (aula <a href="box-shadow.html">Sombra</a>)</td></tr>
+</table>
+</div>
+
+<div class="warning">
+<strong>Com moderação</strong>
+<p>Sombras fortes ou muito borradas em texto pequeno embaçam as letras e cansam a leitura. Use <code>text-shadow</code> em títulos e chamadas curtas, não em parágrafos. E a sombra não conta como contraste para quem enxerga pouco: a cor do texto e a do fundo ainda precisam combinar bem.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Num erro de sombra, o navegador ignora a declaração inteira: o texto aparece <strong>sem nenhuma sombra</strong>, e o valor calculado fica <code>none</code> (conferido no Chromium). No F12, no painel <strong>Styles</strong> (Estilos), a declaração aparece riscada, com um ícone de aviso. Três erros comuns, num só arquivo:</p>
+
+<pre class="term" data-cwd="~/site">$ cat style.css
+h1 {
+  text-shadow: 2 2 4 black;
+}
+h2 {
+  text-shadow: 2px 2px 4px 2px black;
+}
+h3 {
+  text-shadow: 2px 2px 4px gray 4px 4px tomato;
+}
+$ vnu --css style.css
+"file:/home/ana/site/style.css":2.22-2.26: error: CSS: “text-shadow”: only “0” can be a “length”. You must put a unit after your number.
+"file:/home/ana/site/style.css":5.32-5.36: error: CSS: “text-shadow”: Too many values or values are not recognized.
+"file:/home/ana/site/style.css":8.41-8.46: error: CSS: “text-shadow”: Too many values or values are not recognized.</pre>
+
+<div class="cenario">
+<strong>Número sem unidade: <code>only “0” can be a “length”</code></strong>
+<p><strong>Por quê:</strong> <code>2 2 4</code> não diz se são pixels, <code>em</code> ou outra coisa. O validador explica: "só o <code>0</code> pode ser um comprimento sem unidade. Você precisa pôr uma unidade depois do número".</p>
+<p><strong>Como consertar:</strong> <code>text-shadow: 2px 2px 4px black;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Um número a mais, copiado do <code>box-shadow</code></strong>
+<p><strong>Por quê:</strong> a sombra da caixa, <code>box-shadow</code>, aceita um quarto número, o "espalhamento" (<em>spread</em>). A sombra do texto não tem esse número. Com <code>2px 2px 4px 2px</code>, o validador diz "valores demais, ou valores não reconhecidos".</p>
+<p><strong>Como consertar:</strong> no máximo três números: <code>2px 2px 4px black</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>A vírgula esquecida entre duas sombras</strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  h2 {
+    font-family: sans-serif;
+    text-shadow: 2px 2px 4px gray 4px 4px tomato;
+  }
+&lt;/style&gt;
+&lt;h2&gt;Bolo de fubá&lt;/h2&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> o título sem sombra nenhuma. Não é que só a segunda sombra falhou: a declaração inteira foi ignorada.</p>
+<p><strong>Por quê:</strong> sem a vírgula, o navegador lê uma sombra só com cinco números e duas cores, e isso não existe. A mensagem é a mesma: <code>Too many values or values are not recognized</code>, apontando a linha 8, coluna 41 do arquivo acima, onde mora o <code>tomato</code> que sobrou.</p>
+<p><strong>Como consertar:</strong> <code>text-shadow: 2px 2px 4px gray, 4px 4px tomato;</code>.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:h2{text-shadow}=rgb(255, 215, 0) 2px 2px 0px\, rgb(255, 99, 71) 4px 4px 0px">
+<p class="try-task"><strong>Missão:</strong> a Ana queria duas sombras no título (uma dourada, <code>gold</code>, e uma <code>tomato</code>), mas não aparece nenhuma. Conserte a declaração.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Promoção de aniversário&lt;/h2&gt;
+</pre>
+<pre class="script" data-file="style.css">h2 {
+  font-family: sans-serif;
+  font-size: 36px;
+  text-shadow: 2px 2px 0 gold 4px 4px 0 tomato;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h2 {
+  font-family: sans-serif;
+  font-size: 36px;
+  text-shadow: 2px 2px 0 gold, 4px 4px 0 tomato;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>text-shadow: none;</code></td><td>Nenhuma sombra (valor inicial)</td></tr>
+<tr><td><code>text-shadow: X Y;</code></td><td>Sombra nítida, X para a direita e Y para baixo, na cor do texto</td></tr>
+<tr><td><code>text-shadow: X Y DESFOQUE COR;</code></td><td>A forma completa; a cor pode vir antes</td></tr>
+<tr><td><code>text-shadow: 0 0 8px tomato;</code></td><td>Brilho em volta</td></tr>
+<tr><td>Números negativos</td><td>Para a esquerda (X) e para cima (Y)</td></tr>
+<tr><td><code>sombra1, sombra2</code></td><td>Várias sombras; a primeira fica por cima</td></tr>
+<tr><td>Herança</td><td>Sim: os filhos herdam a sombra</td></tr>
+<tr><td>Não tem</td><td>O quarto número (<em>spread</em>) do <code>box-shadow</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O brilho</h3>
+<p>Complete para um brilho cor de tomate, sem deslocamento:</p>
+<div class="ex-code">h1 { text-shadow: 0 0 8px <input data-answer="tomato" aria-label="cor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Para cima</h3>
+<p>Complete o segundo número para a sombra subir 2px:</p>
+<div class="ex-code">h1 { text-shadow: 2px <input data-answer="-2px" aria-label="deslocamento vertical"> 0 gray; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. O separador</h3>
+<p>Que caractere separa duas sombras?</p>
+<div class="ex-code">text-shadow: 1px 1px gold<input data-answer="," aria-label="separador"> 2px 2px tomato;</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Em <code>text-shadow: 3px 5px 2px navy;</code>, o que é o <code>5px</code>?</p>
+<label><input type="radio" name="q4"> O desfoque</label>
+<label><input type="radio" name="q4"> O deslocamento para a direita</label>
+<label><input type="radio" name="q4"> O deslocamento para baixo</label>
+<label><input type="radio" name="q4"> A grossura da sombra</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. De que cor é a sombra de <code>p { color: green; text-shadow: 1px 1px 2px; }</code>?</p>
+<label><input type="radio" name="q5"> Preta</label>
+<label><input type="radio" name="q5"> Verde, a cor do texto</label>
+<label><input type="radio" name="q5"> Cinza</label>
+<label><input type="radio" name="q5"> Nenhuma: sem cor, não há sombra</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. O que acontece com <code>text-shadow: 2px 2px 4px 2px black;</code>?</p>
+<label><input type="radio" name="q6"> A sombra fica mais espalhada</label>
+<label><input type="radio" name="q6"> O último <code>2px</code> é ignorado e o resto funciona</label>
+<label><input type="radio" name="q6"> A página mostra um erro</label>
+<label><input type="radio" name="q6"> A declaração inteira é ignorada: o texto fica sem sombra</label>
+</div>
+
+<h3>Missão final: a capa do site</h3>
+
+<div class="tryhtml" data-goal="css:.capa h1{text-shadow}=rgba(0, 0, 0, 0.8) 0px 2px 6px,css:.selo{text-shadow}=rgb(255, 215, 0) 0px 0px 8px,css:.capa p{text-shadow}=none">
+<p class="try-task"><strong>Missão:</strong> (1) deixe o título branco legível sobre a foto com a sombra <code>0 2px 6px rgba(0, 0, 0, 0.8)</code>; (2) dê ao selo "Novo!" um brilho dourado: sem deslocamento, desfoque de <code>8px</code>, cor <code>gold</code>; (3) o parágrafo da capa, que já tem uma faixa escura atrás, fica <strong>sem</strong> sombra. Cuidado: a sombra herdada também conta.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="capa"&gt;
+  &lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+  &lt;p&gt;&lt;span class="selo"&gt;Novo!&lt;/span&gt; Bolo de cenoura com cobertura de chocolate&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.capa {
+  background-image: url("assets/midia/bolo-800.jpg");
+  background-size: cover;
+  background-position: center;
+  padding: 40px 16px;
+  color: white;
+  font-family: sans-serif;
+  text-shadow: 2 2 4 black;
+}
+
+.capa p {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 4px 8px;
+}
+
+.selo {
+  color: navy;
+  background-color: white;
+  padding: 2px 6px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.capa {
+  background-image: url("assets/midia/bolo-800.jpg");
+  background-size: cover;
+  background-position: center;
+  padding: 40px 16px;
+  color: white;
+  font-family: sans-serif;
+}
+
+.capa h1 {
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.capa p {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 4px 8px;
+}
+
+.selo {
+  color: navy;
+  background-color: white;
+  padding: 2px 6px;
+  text-shadow: 0 0 8px gold;
+}
+</pre>
+</div>
+
+<p>Na solução, a sombra saiu do <code>.capa</code> (onde todos os filhos a herdariam) e foi só para o <code>h1</code>.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>text-shadow: X Y desfoque cor;</code> desenha uma cópia das letras atrás delas: X para a direita, Y para baixo, borrada e colorida. Desfoque e cor são opcionais; sem cor, vale a cor do texto.</li>
+  <li><code>0 0 8px cor</code> faz um brilho; números negativos levam a sombra para a esquerda e para cima.</li>
+  <li>Várias sombras vão separadas por vírgula, e a primeira fica por cima. Quatro sombras de <code>1px</code> fazem um contorno.</li>
+  <li>O uso mais útil: <code>0 2px 6px rgba(0, 0, 0, 0.8)</code> em texto claro sobre foto.</li>
+  <li>O valor calculado põe a cor primeiro, em <code>rgb()</code>: <code>rgb(128, 128, 128) 2px 2px 4px</code>.</li>
+  <li>Qualquer erro apaga a sombra inteira: número sem unidade (<code>only “0” can be a “length”</code>), o quarto número do <code>box-shadow</code> ou a vírgula esquecida (<code>Too many values or values are not recognized</code>).</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
