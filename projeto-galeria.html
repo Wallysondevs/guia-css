@@ -31,7 +31,7 @@
 </ul>
 </div>
 
-<p>As descrições do resultado foram conferidas em fotos do Chromium, num quadro de 870 px (o de um computador, nesta coluna do guia) e num de 375 ou 320 px (celulares). As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>). As imagens são a mídia de exemplo do guia.</p>
+<p>As descrições do resultado foram conferidas em fotos do Chromium, num quadro de 870 px (uma janela bem larga) e num de 375 ou 320 px (celulares). Na barra de cada caixa, os botões <strong>375</strong>, <strong>768</strong> e <strong>cheia</strong> mudam a largura do quadro: use-os para ver a galeria se rearrumar. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>). As imagens são a mídia de exemplo do guia.</p>
 
 <hr>
 
@@ -293,7 +293,7 @@ body {
   <dd>Tiram as bolinhas e os recuos que o navegador põe na lista e no <code>&lt;figure&gt;</code>. Aula: <a href="listas.html">Estilizando Listas</a>.</dd>
 </dl>
 
-<p><strong>O que muda na tela:</strong> no quadro de 870 px, a lista tem 838 px, e cabem <strong>quatro colunas</strong> de 197,5 px (quatro de 160 px mais três vãos de 16 px dão 688 px; cinco dariam 864, e não cabem). No quadro de 375 px, são <strong>duas colunas</strong> de 163,5 px. Só que as fotos têm alturas diferentes: o bolo, o vídeo e o mapa são largos e baixos, o recorte quadrado e o avatar são altos, o logo é uma faixa fininha. As fileiras ficam desalinhadas, com as legendas em alturas diferentes.</p>
+<p><strong>O que muda na tela:</strong> no quadro de 870 px, a lista tem 838 px, e cabem <strong>quatro colunas</strong> de 197,5 px (quatro de 160 px mais três vãos de 16 px dão 688 px; cinco dariam 864, e não cabem). Numa janela de 1100 px, o quadro "cheio" tem uns 728 px e também cabem quatro colunas, mais estreitas. No quadro de 375 px (botão 375), são <strong>duas colunas</strong> de 163,5 px. Só que as fotos têm alturas diferentes: o bolo, o vídeo e o mapa são largos e baixos, o recorte quadrado e o avatar são altos, o logo é uma faixa fininha. As fileiras ficam desalinhadas, com as legendas em alturas diferentes.</p>
 
 <h3>Experimente: a versão 2</h3>
 <div class="tryhtml">
@@ -1271,7 +1271,7 @@ body {
 <p>Brinque: passe o mouse nas fotos; clique dentro do quadro e use <kbd>Tab</kbd>. Troque <code>scale(1.05)</code> por <code>scale(1.2) rotate(3deg)</code>. Tire o <code>overflow: hidden</code> do <code>.galeria figure</code> e veja a foto escapar do cartão no zoom. (Clicar numa foto abre a versão grande dentro do quadro; o ↻ volta à galeria.)</p>
 
 <h3>Missão 6</h3>
-<div class="tryhtml" data-goal="css:.galeria img{transition-duration}=0.3s,src::hover\s+img,src::focus-visible\s+img,src:scale\(\s*1\.05\s*\)">
+<div class="tryhtml" data-goal="css:.galeria img{transition-duration}=0.3s,hover:.galeria img{transform}=matrix(1.05\, 0\, 0\, 1.05\, 0\, 0),src::focus-visible\s+img,src:scale\(\s*1\.05\s*\)">
 <p class="try-task"><strong>Missão:</strong> faça a foto crescer para <code>scale(1.05)</code> quando o mouse passar no link <strong>e</strong> quando o link receber o foco do teclado (<code>:focus-visible</code>), com uma transição de <code>0.3s</code>.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;ul class="galeria"&gt;

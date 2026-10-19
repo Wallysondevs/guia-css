@@ -1043,10 +1043,12 @@ h2 {
   <dd>32 px entre as duas colunas.</dd>
 </dl>
 
-<p><strong>O que muda na tela:</strong> no quadro de 870 px (o de um computador, nesta coluna do guia), a página ocupa o quadro todo, a foto cresce junto (838 px de largura), os três cartões ficam numa linha, e "Ingredientes" fica numa coluna à esquerda com cerca de 269 px, ao lado de "Modo de preparo", com cerca de 537 px; cada título com a sua linha cor de pêssego. No quadro de 375 px, nada disso acontece: a página fica igual à da versão 5, empilhada.</p>
+<p><strong>O que muda na tela:</strong> num quadro de 768 px, a página ocupa o quadro todo, a foto cresce junto (736 px de largura), os três cartões ficam numa linha, e "Ingredientes" fica numa coluna à esquerda com cerca de 235 px, ao lado de "Modo de preparo", com cerca de 469 px; cada título com a sua linha cor de pêssego. Num quadro de 870 px, é igual, só que mais largo (cerca de 269 e 537 px). No quadro de 375 px, nada disso acontece: a página fica igual à da versão 5, empilhada.</p>
+
+<div class="tip"><strong>A largura do quadro:</strong> na barra de cada caixa há os botões <strong>375</strong> (celular), <strong>768</strong> (tablet) e <strong>cheia</strong> (a largura toda da caixa). O quadro da caixa abaixo já abre em 768 px. Numa janela de 1100 px, a largura "cheia" dá uns 728 px: menos que os 768 do <code>@media</code>, e a página fica empilhada. Não é erro, é o <code>@media</code> fazendo o trabalho dele.</div>
 
 <h3>Experimente: a versão 6 (a página completa)</h3>
-<div class="tryhtml">
+<div class="tryhtml" data-largura="768">
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;main class="receita"&gt;
   &lt;h1&gt;Bolo de cenoura com cobertura de chocolate&lt;/h1&gt;
@@ -1212,11 +1214,11 @@ h2 {
 </pre>
 </div>
 
-<p>Brinque: abra o resultado numa aba nova (↗) e estreite e alargue a janela devagar; no ponto dos 768 px, as colunas se juntam ou se separam. Troque <code>1fr 2fr</code> por <code>1fr 1fr</code>. Se você estiver num celular, o quadro é estreito e você verá só a versão empilhada: é o <code>@media</code> funcionando.</p>
+<p>Brinque: clique em 375 e em 768 na barra do quadro e veja as colunas se separarem e se juntarem. Abra o resultado numa aba nova (↗) e estreite a janela devagar: no ponto dos 768 px, as colunas se juntam. Troque <code>1fr 2fr</code> por <code>1fr 1fr</code>. Se você estiver num celular, o quadro é estreito e você verá só a versão empilhada: é o <code>@media</code> funcionando.</p>
 
 <h3>Missão 6</h3>
-<div class="tryhtml" data-goal="src:@media\s*\(\s*min-width:\s*48rem\s*\),src:grid-template-columns:\s*1fr\s+2fr,src:display:\s*grid">
-<p class="try-task"><strong>Missão:</strong> escreva a media query: a partir de <code>48rem</code>, o <code>.colunas</code> vira uma grade de duas colunas, <code>1fr 2fr</code>, com <code>2rem</code> de espaço. (Como o resultado depende da largura do quadro, a missão confere o seu código; para ver as colunas, use um quadro largo.)</p>
+<div class="tryhtml" data-largura="768" data-goal="src:@media\s*\(\s*min-width:\s*48rem\s*\),css:.colunas{display}=grid,css:.colunas{column-gap}=32px,src:grid-template-columns:\s*1fr\s+2fr">
+<p class="try-task"><strong>Missão:</strong> escreva a media query: a partir de <code>48rem</code>, o <code>.colunas</code> vira uma grade de duas colunas, <code>1fr 2fr</code>, com <code>2rem</code> de espaço. O quadro desta caixa está em 768 px, onde a regra vale; no botão 375, a página volta a ficar empilhada.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;div class="colunas"&gt;
   &lt;section class="ingredientes"&gt;
@@ -1326,7 +1328,7 @@ h2 {
 </pre>
 <pre class="term" data-cwd="~/receita">$ vnu --css style.css
 "file:/home/ana/receita/style.css":5.2-6.1: error: CSS: unrecognized media “min-width”.</pre>
-<p><strong>O que você vê, nos dois casos:</strong> mesmo no quadro de 870 px, os ingredientes ficam em cima do modo de preparo; o <code>.colunas</code> continua <code>display: block</code>. <strong>Por quê:</strong> uma condição de <code>@media</code> que o navegador não entende é tratada como falsa, e o bloco inteiro é pulado, em silêncio. No primeiro, o espaço separa o número da unidade ("só o 0 pode ficar sem unidade: ponha uma unidade depois do número"). No segundo, faltaram os parênteses em volta de <code>min-width: 48rem</code>.</p>
+<p><strong>O que você vê, nos dois casos:</strong> mesmo no quadro de 768 ou 870 px, os ingredientes ficam em cima do modo de preparo; o <code>.colunas</code> continua <code>display: block</code>. <strong>Por quê:</strong> uma condição de <code>@media</code> que o navegador não entende é tratada como falsa, e o bloco inteiro é pulado, em silêncio. No primeiro, o espaço separa o número da unidade ("só o 0 pode ficar sem unidade: ponha uma unidade depois do número"). No segundo, faltaram os parênteses em volta de <code>min-width: 48rem</code>.</p>
 <p>Um terceiro motivo, que o validador não pega: o <code>@media</code> está certo, mas a tela (ou o quadro) tem menos de 768 px. Antes de procurar erro, confira a largura: no celular, a página empilhada é o resultado <strong>certo</strong>.</p>
 </div>
 
