@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS e HTML — estrutura e aparência, cada um no seu lugar | Guia CSS</title>
+<meta name="description" content="HTML e CSS para quem nunca escreveu CSS: o HTML diz o que cada coisa é, o CSS diz como ela aparece. A mesma receita com duas folhas de estilo, o visual padrão do navegador, por que não escolher um h4 pelo tamanho e os elementos antigos de aparência (font, center, align, bgcolor) com as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">e HTML</span></h1>
+
+<p class="intro">HTML e CSS trabalham juntos, mas cada um tem o seu serviço. O HTML diz <strong>o que</strong> cada pedaço da página é: um título, uma lista, um link. O CSS diz <strong>como</strong> esse pedaço aparece: a cor, o tamanho, a posição. Nesta aula você vai ver a mesma receita da Ana com duas roupas diferentes, descobrir de onde vem o visual de uma página sem CSS e aprender a não usar o HTML para fazer o serviço do CSS.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A divisão de trabalho: <strong>estrutura</strong> (HTML) × <strong>aparência</strong> (CSS).</li>
+  <li>Como o mesmo HTML ganha caras bem diferentes só trocando o arquivo de CSS.</li>
+  <li>O visual padrão que o navegador dá a cada elemento, com os valores reais.</li>
+  <li>Por que escolher o elemento pelo <strong>significado</strong>, e não pelo tamanho ou pela cor.</li>
+  <li>Os elementos e atributos antigos de aparência (<code>&lt;font&gt;</code>, <code>&lt;center&gt;</code>, <code>align</code>, <code>bgcolor</code>) e o que o validador diz deles.</li>
+</ul>
+</div>
+
+<hr>
+
+<h2>A ideia: a receita e o jeito de apresentar</h2>
+<p>Pense na receita do bolo de cenoura da Ana. O <strong>conteúdo</strong> é sempre o mesmo: o nome, a lista de ingredientes, o modo de preparo. Mas ela pode aparecer escrita à mão num caderno, impressa num cartaz colorido na padaria ou numa página de livro. O caderno não muda a receita; muda só a apresentação.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Pergunta</th><th>Quem responde</th><th>Exemplo</th></tr>
+<tr><td>O que é isto?</td><td><strong>HTML</strong> (estrutura)</td><td>"Bolo de cenoura" é o <strong>título</strong> da página; os ingredientes são uma <strong>lista</strong>.</td></tr>
+<tr><td>Como isto aparece?</td><td><strong>CSS</strong> (aparência)</td><td>O título é marrom, com uma linha dupla embaixo; a lista não tem bolinhas.</td></tr>
+</table>
+</div>
+
+<p>Essa separação tem nome: separar a <strong>estrutura</strong> (ou o conteúdo) da <strong>apresentação</strong>. Ela é a razão de o CSS existir.</p>
+
+<hr>
+
+<h2>1. O HTML diz o que é</h2>
+<p>Quando você escreve <code>&lt;h1&gt;Bolo de cenoura&lt;/h1&gt;</code>, não está pedindo "letra grande". Está dizendo "este é o título principal da página". Quem usa essa informação:</p>
+<ul>
+  <li>o <strong>leitor de tela</strong> (o programa que lê a página em voz alta para quem não enxerga) anuncia "título nível 1" e deixa pular de título em título;</li>
+  <li>o <strong>Google</strong> e outros buscadores usam os títulos para entender do que a página trata;</li>
+  <li>o <strong>modo de leitura</strong> do navegador monta a versão "limpa" da página a partir dessa estrutura.</li>
+</ul>
+<p>Nenhum deles enxerga a cor ou o tamanho da letra. Para eles, só a estrutura importa. (A escolha dos elementos pelo significado é o assunto do Guia HTML: <a href="https://wallysondevs.github.io/guia-html/">wallysondevs.github.io/guia-html</a>.)</p>
+
+<hr>
+
+<h2>2. O CSS diz como aparece</h2>
+<p>Agora a mesma receita, com <strong>duas</strong> folhas de estilo à escolha. O <code>index.html</code> chama uma delas no <code>&lt;link&gt;</code>:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o resultado mostra a receita com o <code>caderno.css</code>. Na aba <code>index.html</code>, troque <code>href="caderno.css"</code> por <code>href="cartaz.css"</code> e veja a página inteira mudar. O HTML da receita continua o mesmo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="caderno.css"&gt;
+&lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;p&gt;Fofinho, com cobertura de chocolate.&lt;/p&gt;
+&lt;h2&gt;Ingredientes&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;3 cenouras&lt;/li&gt;
+  &lt;li&gt;4 ovos&lt;/li&gt;
+  &lt;li&gt;2 xícaras de açúcar&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="caderno.css">body {
+  font-family: serif;
+  background-color: ivory;
+}
+
+h1 {
+  color: saddlebrown;
+  border-bottom: 3px double saddlebrown;
+}
+
+h2 {
+  font-style: italic;
+}
+</pre>
+<pre class="script" data-file="cartaz.css">body {
+  font-family: sans-serif;
+  background-color: midnightblue;
+  color: white;
+  text-align: center;
+}
+
+h1 {
+  color: gold;
+  text-transform: uppercase;
+}
+
+ul {
+  list-style-type: none;
+}
+</pre>
+</div>
+
+<p>Com o <code>caderno.css</code>: fundo creme (<code>ivory</code>, "marfim"), letra com serifa, título marrom com uma linha dupla embaixo e o subtítulo "Ingredientes" em itálico. Com o <code>cartaz.css</code>: fundo azul-escuro, letra branca e sem serifa, tudo centralizado, o título amarelo-ouro em <strong>maiúsculas</strong> e a lista sem as bolinhas.</p>
+<p>Repare no título do cartaz: aparece "BOLO DE CENOURA", mas no HTML continua escrito "Bolo de cenoura". As maiúsculas são só aparência; o texto de verdade, que o leitor de tela e o Google recebem, não mudou. (Isso tem aula própria: <a href="text-transform.html">Maiúsculas e Minúsculas</a>.)</p>
+<p>As propriedades desses arquivos (<code>font-family</code>, <code>border-bottom</code>, <code>text-transform</code>…) vão aparecer, cada uma, na sua aula. Aqui o que importa é a ideia: <strong>o HTML ficou parado e a página mudou de roupa</strong>.</p>
+
+<hr>
+
+<h2>3. O visual padrão do navegador</h2>
+<p>Uma página sem nenhum CSS não sai "sem estilo". O navegador tem uma folha de estilo própria (em inglês, <em>user agent stylesheet</em>, "folha do agente do usuário", que é o nome técnico do navegador) com um visual padrão para cada elemento:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Um bolo &lt;em&gt;muito&lt;/em&gt; fofo, de &lt;strong&gt;cenoura&lt;/strong&gt;. &lt;a href="bolo.html"&gt;Ver a receita&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;3 cenouras&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+<p>Os valores que o navegador usa (conferidos no Chromium, com a letra padrão de 16 pixels):</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Elemento</th><th>Visual padrão</th><th>Em CSS</th></tr>
+<tr><td><code>&lt;h1&gt;</code></td><td>letra 2 vezes maior, negrito</td><td><code>font-size</code> 32px, <code>font-weight</code> 700</td></tr>
+<tr><td><code>&lt;h2&gt;</code></td><td>letra 1,5 vez maior, negrito</td><td><code>font-size</code> 24px</td></tr>
+<tr><td><code>&lt;p&gt;</code></td><td>espaço em cima e embaixo</td><td><code>margin-top</code> 16px</td></tr>
+<tr><td><code>&lt;em&gt;</code></td><td>itálico</td><td><code>font-style: italic</code></td></tr>
+<tr><td><code>&lt;strong&gt;</code></td><td>negrito</td><td><code>font-weight</code> 700</td></tr>
+<tr><td><code>&lt;a href&gt;</code></td><td>azul e sublinhado</td><td><code>color</code> rgb(0, 0, 238), <code>text-decoration</code> underline</td></tr>
+<tr><td><code>&lt;ul&gt;</code></td><td>bolinhas, recuo à esquerda</td><td><code>list-style-type: disc</code>, <code>padding-left</code> 40px</td></tr>
+<tr><td><code>&lt;body&gt;</code></td><td>uma margem fininha em volta da página</td><td><code>margin</code> 8px</td></tr>
+</table>
+</div>
+
+<p>Esses valores são <strong>sugestões</strong>, e cada navegador tem as suas (parecidas, mas não idênticas). O seu CSS pode mudar qualquer uma: um <code>&lt;h1&gt;</code> pode ficar pequeno, um <code>&lt;em&gt;</code> pode deixar de ser itálico. O elemento continua significando a mesma coisa. Como ver esses valores no seu navegador: aula <a href="devtools.html">Inspecionando com o F12</a>.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> este CSS deixa o <code>&lt;h1&gt;</code> com a letra do tamanho normal (16 pixels). Ele continua sendo o título da página para o leitor de tela e para o Google. Troque <code>16px</code> por <code>48px</code> e veja o tamanho mudar sem mexer no HTML.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  font-size: 16px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>4. Escolha pelo significado, ajuste pelo CSS</h2>
+<p>O erro mais comum de quem está começando: escolher o elemento pela <strong>aparência</strong> que ele tem por padrão. "O <code>&lt;h1&gt;</code> é grande demais, vou usar <code>&lt;h4&gt;</code>." Funciona na tela, mas a estrutura fica errada: para o leitor de tela, a página não tem título principal.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você quer…</th><th>Errado (HTML pela aparência)</th><th>Certo (HTML pelo significado + CSS)</th></tr>
+<tr><td>Um título principal menor</td><td><code>&lt;h4&gt;</code></td><td><code>&lt;h1&gt;</code> + <code>font-size</code> no CSS</td></tr>
+<tr><td>Espaço entre dois parágrafos</td><td><code>&lt;br&gt;&lt;br&gt;&lt;br&gt;</code> ou <code>&lt;p&gt;&amp;nbsp;&lt;/p&gt;</code></td><td><code>margin</code> no CSS (<a href="margin.html">Margem</a>)</td></tr>
+<tr><td>Texto em itálico só por enfeite</td><td><code>&lt;em&gt;</code> (que quer dizer ênfase)</td><td><code>font-style: italic</code> no CSS</td></tr>
+<tr><td>Uma citação com recuo</td><td><code>&lt;ul&gt;</code> sem itens, só pelo recuo</td><td><code>&lt;blockquote&gt;</code> + o recuo que quiser no CSS</td></tr>
+<tr><td>Um menu de links em linha</td><td>links soltos separados por <code>|</code></td><td><code>&lt;nav&gt;</code> com lista + <a href="flexbox.html">Flexbox</a></td></tr>
+</table>
+</div>
+
+<p>A regra de bolso: <strong>primeiro escreva o HTML como se o CSS não existisse</strong>, escolhendo cada elemento pelo que ele é. Depois dê a aparência com CSS.</p>
+
+<hr>
+
+<h2>5. O jeito antigo: HTML fazendo papel de CSS</h2>
+<p>Antes do CSS, a aparência era escrita no próprio HTML. Você ainda vai encontrar isso em sites velhos e em tutoriais antigos:</p>
+
+<pre class="file" data-file="antigo.html · jeito antigo">&lt;body bgcolor="linen"&gt;
+&lt;center&gt;Receitas da Ana&lt;/center&gt;
+&lt;p&gt;&lt;font color="red"&gt;Promoção!&lt;/font&gt;&lt;/p&gt;
+&lt;p align="center"&gt;Bolo de fubá&lt;/p&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>bgcolor="linen"</dt><dd>Cor de fundo da página. Hoje: <code>background-color</code> no CSS.</dd>
+  <dt>&lt;center&gt;</dt><dd>Centraliza o que está dentro. Hoje: <code>text-align: center</code>.</dd>
+  <dt>&lt;font color="red"&gt;</dt><dd>Muda a cor (e o tamanho e a fonte) de um trecho. Hoje: <code>color</code>.</dd>
+  <dt>align="center"</dt><dd>Alinha um parágrafo. Hoje: <code>text-align</code>.</dd>
+</dl>
+
+<p>Por que isso foi abandonado:</p>
+<ul>
+  <li><strong>Repetição:</strong> 30 promoções no site = 30 <code>&lt;font color="red"&gt;</code>. Mudar a cor da promoção é editar 30 lugares. Com CSS, é uma linha.</li>
+  <li><strong>Mistura:</strong> o HTML fica cheio de enfeites, difícil de ler e de manter.</li>
+  <li><strong>Obsoleto:</strong> o HTML de hoje tirou esses elementos e atributos da lista do que é válido. Os navegadores ainda desenham (para não quebrar sites velhos), mas o validador reclama.</li>
+</ul>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Aparência no HTML: <code>The “font” element is obsolete. Use CSS instead.</code></strong>
+<pre class="file" data-file="antigo.html">&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+&lt;meta charset="utf-8"&gt;
+&lt;title&gt;Receitas&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;p&gt;&lt;font color="red"&gt;Promoção!&lt;/font&gt;&lt;/p&gt;
+&lt;center&gt;Receitas da Ana&lt;/center&gt;
+&lt;p align="center"&gt;Bolo de fubá&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu antigo.html
+"file:/home/ana/site/antigo.html":8.4-8.21: error: The “font” element is obsolete. Use CSS instead.
+"file:/home/ana/site/antigo.html":9.1-9.8: error: The “center” element is obsolete. Use CSS instead.
+"file:/home/ana/site/antigo.html":10.1-10.18: info warning: The “align” attribute on the “p” element is obsolete. Use CSS instead.</pre>
+<p><strong>O que significa:</strong> "o elemento <code>font</code> é obsoleto. Use CSS no lugar", o mesmo para o <code>center</code>, e um aviso (<em>info warning</em>, mais leve que um erro) para o atributo <code>align</code> do <code>p</code>. O próprio validador manda usar CSS. Com o <code>bgcolor</code> do <code>&lt;body&gt;</code> é igual:</p>
+<pre class="term" data-cwd="~/site">$ vnu bg.html
+"file:/home/ana/site/bg.html":7.1-7.22: info warning: The “bgcolor” attribute on the “body” element is obsolete. Use CSS instead.</pre>
+<p><strong>O que o navegador faz:</strong> desenha tudo normalmente (vermelho, centralizado), por isso o erro passa despercebido. Só o validador avisa.</p>
+<p><strong>Como consertar:</strong> tire os enfeites do HTML e passe para o CSS. É a missão logo abaixo.</p>
+</div>
+
+<div class="tryhtml" data-goal="nsel:font=0,nsel:center=0,css:h1{text-align}=center,css:p{color}=rgb(178, 34, 34)">
+<p class="try-task"><strong>Missão:</strong> a página da Ana usa <code>&lt;center&gt;</code> e <code>&lt;font&gt;</code>. Tire os dois do <code>index.html</code> (deixe só o <code>&lt;h1&gt;</code> e o <code>&lt;p&gt;</code> com o texto) e faça o mesmo efeito com CSS: na aba <code>style.css</code>, o <code>h1</code> centralizado (<code>text-align: center;</code>) e o <code>p</code> com <code>color: firebrick;</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;center&gt;&lt;h1&gt;Receitas da Ana&lt;/h1&gt;&lt;/center&gt;
+&lt;p&gt;&lt;font color="firebrick"&gt;Promoção: bolo de cenoura pela metade do preço!&lt;/font&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+}
+
+p {
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Promoção: bolo de cenoura pela metade do preço!&lt;/p&gt;
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  text-align: center;
+}
+
+p {
+  color: firebrick;
+}
+</pre>
+</div>
+
+<div class="cenario">
+<strong>Um <code>&lt;h4&gt;</code> no lugar do <code>&lt;h1&gt;</code>, só pelo tamanho</strong>
+<pre class="file" data-file="titulo.html · trecho">&lt;h4&gt;Receitas da Ana&lt;/h4&gt;
+&lt;p&gt;Bolo de fubá&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> um título pequeno, do jeito que a Ana queria. Na tela, parece tudo certo.</p>
+<p><strong>O problema:</strong> a página ficou sem título principal. Quem navega pelos títulos com o leitor de tela encontra só um "título nível 4", como se faltassem três níveis acima dele. Num documento completo, o validador avisa (com um <em>info warning</em>, não um erro):</p>
+<pre class="term" data-cwd="~/site">$ vnu titulo.html
+"file:/home/ana/site/titulo.html":8.1-8.4: info warning: This document has heading elements but none of them has a computed heading level of 1.</pre>
+<p>"Este documento tem títulos, mas nenhum deles tem nível 1."</p>
+<p><strong>Como consertar:</strong> <code>&lt;h1&gt;</code> no HTML e o tamanho no CSS: <code>h1 { font-size: 16px; }</code>, como no "Experimente" da seção 3. Tamanhos de letra têm aula própria: <a href="font-size.html">Tamanho da Letra</a>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>&lt;br&gt;</code> para dar espaço: o validador não reclama</strong>
+<pre class="file" data-file="index.html" data-resultado>&lt;p&gt;Bolo de fubá&lt;/p&gt;
+&lt;br&gt;&lt;br&gt;&lt;br&gt;
+&lt;p&gt;Pão de queijo&lt;/p&gt;
+</pre>
+<p><strong>O que acontece:</strong> o espaço aparece, e o <code>vnu</code> não mostra erro nenhum: <code>&lt;br&gt;</code> é um elemento válido. Mas o <code>&lt;br&gt;</code> quer dizer "quebra de linha dentro do texto" (num endereço, num poema), não "espaço". O espaço fica preso no HTML, e para mudá-lo é preciso editar cada página.</p>
+<p><strong>Como consertar:</strong> tire os <code>&lt;br&gt;</code> e use a margem no CSS: <code>p { margin-bottom: 48px; }</code> (aula <a href="margin.html">Margem</a>).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Jeito antigo (no HTML)</th><th>Jeito certo (no CSS)</th><th>Aula</th></tr>
+<tr><td><code>&lt;font color="red"&gt;</code></td><td><code>color: red;</code></td><td><a href="cores.html">Cores por Nome</a></td></tr>
+<tr><td><code>&lt;font face="Arial"&gt;</code></td><td><code>font-family: Arial, sans-serif;</code></td><td><a href="font-family.html">Fontes</a></td></tr>
+<tr><td><code>&lt;font size="5"&gt;</code></td><td><code>font-size: 1.5rem;</code></td><td><a href="font-size.html">Tamanho da Letra</a></td></tr>
+<tr><td><code>&lt;center&gt;</code>, <code>align="center"</code></td><td><code>text-align: center;</code></td><td><a href="text-align.html">Alinhamento</a></td></tr>
+<tr><td><code>bgcolor="linen"</code></td><td><code>background-color: linen;</code></td><td><a href="background-color.html">Cor de Fundo</a></td></tr>
+<tr><td><code>&lt;br&gt;&lt;br&gt;</code> para espaço</td><td><code>margin</code></td><td><a href="margin.html">Margem</a></td></tr>
+<tr><td><code>&lt;h4&gt;</code> porque o <code>&lt;h1&gt;</code> é grande</td><td><code>&lt;h1&gt;</code> + <code>font-size</code></td><td><a href="font-size.html">Tamanho da Letra</a></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Quem faz o quê</h3>
+<p>Complete: a estrutura fica no HTML, e a aparência fica no…</p>
+<div class="ex-code"><input data-answer="CSS|css" aria-label="linguagem"></div>
+</div>
+
+<div class="exercise">
+<h3>2. Centralizar sem <code>&lt;center&gt;</code></h3>
+<p>Complete a regra que centraliza o título:</p>
+<div class="ex-code">h1 {
+  <input data-answer="text-align" aria-label="propriedade">: center;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>3. Cor sem <code>&lt;font&gt;</code></h3>
+<p>Complete a regra que pinta os parágrafos de <code>firebrick</code>:</p>
+<div class="ex-code">p {
+  <input data-answer="color" aria-label="propriedade">: firebrick;
+}</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. A Ana acha o <code>&lt;h1&gt;</code> grande demais para o título principal. O que ela deve fazer?</p>
+<label><input type="radio" name="q4"> Trocar por <code>&lt;h4&gt;</code></label>
+<label><input type="radio" name="q4"> Trocar por <code>&lt;p&gt;&lt;b&gt;</code></label>
+<label><input type="radio" name="q4"> Manter o <code>&lt;h1&gt;</code> e diminuir a letra com <code>font-size</code> no CSS</label>
+<label><input type="radio" name="q4"> Usar <code>&lt;font size="3"&gt;</code></label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Uma página sem CSS mostra os links azuis e sublinhados. De onde vem isso?</p>
+<label><input type="radio" name="q5"> Do atributo <code>href</code></label>
+<label><input type="radio" name="q5"> Da folha de estilo padrão do navegador</label>
+<label><input type="radio" name="q5"> De um CSS escondido no servidor</label>
+<label><input type="radio" name="q5"> Do validador</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. O CSS do cartaz deixou o título em maiúsculas (<code>BOLO DE CENOURA</code>). O que o leitor de tela e o Google recebem?</p>
+<label><input type="radio" name="q6"> <code>BOLO DE CENOURA</code>, porque é o que aparece</label>
+<label><input type="radio" name="q6"> Nada, porque o CSS esconde o texto</label>
+<label><input type="radio" name="q6"> Um erro</label>
+<label><input type="radio" name="q6"> O texto do HTML, <code>Bolo de cenoura</code>: o CSS só mudou a aparência</label>
+</div>
+
+<h3>Missão final: a ficha da receita</h3>
+
+<div class="tryhtml" data-goal="sel:h1,nsel:h4=0,nsel:br=0,css:h1{font-size}=20px,css:body{background-color}=rgb(255, 255, 240)">
+<p class="try-task"><strong>Missão:</strong> a Ana montou a ficha pela aparência. Conserte a estrutura e passe a aparência para o CSS: (1) troque o <code>&lt;h4&gt;</code> por <code>&lt;h1&gt;</code> e, no CSS, deixe o <code>h1</code> com <code>font-size: 20px;</code>; (2) apague os <code>&lt;br&gt;</code>; (3) tire o <code>bgcolor</code> do <code>&lt;body&gt;</code> e ponha a cor no CSS, com <code>background-color: ivory;</code> na regra do <code>body</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;body bgcolor="ivory"&gt;
+&lt;h4&gt;Bolo de fubá&lt;/h4&gt;
+&lt;br&gt;&lt;br&gt;
+&lt;p&gt;Fofinho, com erva-doce. Fica pronto em 50 minutos.&lt;/p&gt;
+&lt;/body&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+}
+
+h1 {
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Bolo de fubá&lt;/h1&gt;
+&lt;p&gt;Fofinho, com erva-doce. Fica pronto em 50 minutos.&lt;/p&gt;
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  background-color: ivory;
+}
+
+h1 {
+  font-size: 20px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>HTML = <strong>estrutura</strong> (o que cada coisa é). CSS = <strong>aparência</strong> (como ela aparece). Cada um no seu arquivo.</li>
+  <li>O mesmo HTML pode ganhar caras completamente diferentes trocando só o CSS.</li>
+  <li>Sem CSS, vale a folha padrão do navegador: <code>&lt;h1&gt;</code> com 32px e negrito, link azul e sublinhado, lista com bolinhas. São sugestões que o seu CSS muda.</li>
+  <li>Escolha o elemento pelo <strong>significado</strong>, nunca pela aparência padrão; ajuste o visual com CSS.</li>
+  <li><code>&lt;font&gt;</code>, <code>&lt;center&gt;</code>, <code>align</code> e <code>bgcolor</code> são obsoletos: o validador manda "Use CSS instead".</li>
+  <li><code>&lt;br&gt;</code> para dar espaço e <code>&lt;h4&gt;</code> no lugar do <code>&lt;h1&gt;</code> não dão erro no validador, mas deixam a estrutura errada.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
