@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS A Cascata — quem vence quando duas regras brigam | Guia CSS</title>
+<meta name="description" content="A cascata do CSS para quem nunca escreveu CSS: o que acontece quando duas regras dão valores diferentes à mesma propriedade. Os critérios na ordem: origem (navegador × você) e importância, camadas (@layer, prévia), especificidade e ordem no código; o atributo style; a briga é por propriedade, e não por regra; a ordem dos arquivos <link>; e o que fazer quando a sua regra não pega.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">A Cascata: Quem Vence</span></h1>
+
+<p class="intro">Numa página de verdade, é comum duas regras falarem do mesmo elemento e da mesma propriedade: uma diz que o parágrafo é azul, outra diz que é vermelho. O navegador não mistura as cores nem mostra erro: ele escolhe <strong>uma</strong>, sempre do mesmo jeito, seguindo uma lista de critérios. Essa lista é a <strong>cascata</strong>, o "C" de CSS (<em>Cascading Style Sheets</em>, "folhas de estilo em cascata"). Entendê-la é o que separa "o meu CSS não funciona!" de "ah, aquela outra regra está ganhando".</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que é um conflito e por que ele é normal.</li>
+  <li>Os critérios da cascata, na ordem: <strong>origem e importância</strong>, <strong>camadas</strong>, <strong>especificidade</strong> e <strong>ordem no código</strong>.</li>
+  <li>Por que o seu CSS vence o do navegador, e onde entra o atributo <code>style</code>.</li>
+  <li>Que a briga é por <strong>propriedade</strong>, e não pela regra inteira.</li>
+  <li>A ordem dos arquivos <code>&lt;link&gt;</code>, e o que fazer quando a sua regra não pega.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código.</p>
+
+<hr>
+
+<h2>A ideia: o campeonato</h2>
+<p>Pense num campeonato de pontos corridos. Para decidir quem fica na frente, olha-se primeiro o número de pontos. Só se der empate nos pontos, olha-se o número de vitórias. Só se empatar de novo, o saldo de gols. E assim por diante. Cada critério só entra em jogo quando o anterior <strong>empatou</strong>.</p>
+<p>A cascata é igual. Quando duas declarações disputam a mesma propriedade do mesmo elemento, o navegador compara:</p>
+
+<ol class="passo">
+  <li><strong>Origem e importância</strong>: quem escreveu a regra (o navegador, o usuário ou você, o autor da página) e se ela tem <code>!important</code>.</li>
+  <li><strong>Camadas</strong> (<code>@layer</code>): se você organizou o seu CSS em camadas, a camada que vem depois ganha. Sem camadas, todo mundo empata aqui.</li>
+  <li><strong>Especificidade</strong>: o seletor mais "específico" ganha (<code>#topo</code> ganha de <code>.titulo</code>, que ganha de <code>h1</code>).</li>
+  <li><strong>Ordem no código</strong>: se tudo empatou, ganha a declaração que aparece <strong>por último</strong>.</li>
+</ol>
+
+<p>No dia a dia, quase todo conflito é resolvido nos dois últimos critérios. Vamos de baixo para cima: primeiro a ordem, que é o desempate mais simples.</p>
+
+<hr>
+
+<h2 id="ordem">1. Empatou em tudo: vence quem vem por último</h2>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> as duas regras usam o mesmo seletor (<code>p</code>), então empatam em tudo, e a de baixo ganha: o parágrafo fica vermelho-escuro. Inverta a ordem das regras (recorte a de baixo e cole em cima) e veja a cor mudar.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Receita nova toda sexta-feira!&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">p {
+  color: navy;
+}
+
+p {
+  color: darkred;
+}
+</pre>
+</div>
+
+<p>A regra de cima não sumiu: ela continua no arquivo, só perdeu. Se você apagar a de baixo, a de cima volta a valer. O mesmo vale <strong>dentro</strong> de uma regra: em <code>p { color: navy; color: darkred; }</code>, a segunda declaração ganha.</p>
+
+<div class="tip">
+<strong>O truque da "rede de segurança"</strong>
+<p>Repetir a propriedade de propósito é um truque antigo para cores e recursos novos: <code>color: darkred;</code> e, logo abaixo, a mesma cor num formato novo, como <code>color: oklch(40% 0.15 25);</code>. O navegador moderno entende a segunda, que vem depois e ganha. Um navegador antigo, que não entende <code>oklch()</code>, ignora a linha inteira e fica com a primeira (aula <a href="cores-modernas.html">Cores Modernas</a>).</p>
+</div>
+
+<h3>A ordem vale entre arquivos também</h3>
+<p>"Por último" quer dizer na ordem em que o navegador lê <strong>todo</strong> o CSS da página: o primeiro <code>&lt;link&gt;</code>, depois o segundo, depois o <code>&lt;style&gt;</code>, na ordem em que aparecem no HTML. Trocar a ordem dos <code>&lt;link&gt;</code> muda quem ganha.</p>
+
+<div class="tryhtml" data-goal="css:h1{color}=rgb(139, 0, 0),css:p{color}=rgb(139, 0, 0),src:base\.css[\s\S]*tema\.css">
+<p class="try-task"><strong>Missão:</strong> a Ana tem dois arquivos: <code>base.css</code>, com o estilo geral, e <code>tema.css</code>, com as cores de Natal, que deviam ganhar. Mas no <code>index.html</code> o tema foi ligado <strong>antes</strong> da base, e a base está ganhando. Troque a ordem dos dois <code>&lt;link&gt;</code>, sem mexer nos arquivos <code>.css</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="tema.css"&gt;
+&lt;link rel="stylesheet" href="base.css"&gt;
+&lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;p&gt;Panetone artesanal até o dia 24.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="base.css">h1, p {
+  color: navy;
+}
+</pre>
+<pre class="script" data-file="tema.css">h1, p {
+  color: darkred;
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="base.css"&gt;
+&lt;link rel="stylesheet" href="tema.css"&gt;
+&lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;p&gt;Panetone artesanal até o dia 24.&lt;/p&gt;
+</pre>
+</div>
+
+<p>É por isso que, num site que usa um CSS pronto (um <em>framework</em>, como o Bootstrap), o <code>&lt;link&gt;</code> do framework vem <strong>primeiro</strong> e o seu, <strong>depois</strong>: assim, nos empates, você ganha.</p>
+
+<hr>
+
+<h2>2. Antes da ordem: a especificidade</h2>
+<p>A ordem só decide quando os seletores têm a <strong>mesma força</strong>. Se um seletor é mais específico, ele ganha, mesmo vindo antes:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .aviso {
+    color: darkred;
+  }
+  p {
+    color: navy;
+  }
+&lt;/style&gt;
+&lt;p class="aviso"&gt;Fechado no feriado.&lt;/p&gt;
+&lt;p&gt;Pão quentinho às 7 da manhã.&lt;/p&gt;
+</pre>
+
+<p>O aviso ficou vermelho-escuro, embora a regra <code>p</code> venha depois: um seletor de classe é mais forte que um seletor de elemento. O segundo parágrafo, que não tem a classe, só está na regra <code>p</code> e ficou azul-marinho. Como o navegador "mede" a força de um seletor é o assunto da próxima aula, <a href="especificidade.html">Especificidade</a>. A versão curta:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Mais forte</th><th></th><th>Mais fraco</th></tr>
+<tr><td><code>#id</code></td><td><code>.classe</code>, <code>[atributo]</code>, <code>:hover</code></td><td><code>elemento</code>, <code>::before</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>3. Antes de tudo: a origem</h2>
+<p>Você nunca escreveu "<code>h1</code> é grande e em negrito" nem "link é azul e sublinhado", e mesmo assim é assim que eles aparecem. Quem escreveu foi o <strong>navegador</strong>: todo navegador tem a sua própria folha de estilo, a <strong>folha padrão</strong> (em inglês, <em>user agent stylesheet</em>). O CSS pode vir de três origens:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Origem</th><th>Quem escreve</th><th>Exemplo</th></tr>
+<tr><td><strong>Navegador</strong> (<em>user agent</em>)</td><td>Quem fez o navegador</td><td>Links azuis, <code>&lt;h1&gt;</code> grande e em negrito, margens nos parágrafos</td></tr>
+<tr><td><strong>Usuário</strong></td><td>Quem está lendo a página</td><td>Tamanho mínimo de letra nas configurações, extensões de "modo escuro" ou de leitura</td></tr>
+<tr><td><strong>Autor</strong></td><td>Você, quem fez a página</td><td>O seu <code>style.css</code></td></tr>
+</table>
+</div>
+
+<p>Nas declarações normais, o <strong>autor</strong> ganha do usuário, que ganha do navegador. É por isso que a sua regra <code>h1 { font-weight: normal; }</code> tira o negrito do título, mesmo com um seletor simples: a origem é decidida <strong>antes</strong> da especificidade, e a sua origem é mais forte que a do navegador.</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  h1 {
+    font-weight: normal;
+  }
+  a {
+    color: darkgreen;
+  }
+&lt;/style&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Veja o &lt;a href="bolo.html"&gt;bolo de fubá&lt;/a&gt;.&lt;/p&gt;
+</pre>
+
+<p>O título continua grande, mas sem negrito, e o link ficou verde. O tamanho do título e o sublinhado do link continuam valendo: ninguém disputou essas propriedades com o navegador, e a regra dele segue de pé (mais sobre isso na <a href="#propriedade">seção 6</a>).</p>
+
+<h3>E a importância?</h3>
+<p>Uma declaração pode ganhar a marca <code>!important</code> ("importante"): <code>color: darkred !important;</code>. Ela pula para um andar acima de todas as declarações normais, e aí a ordem das origens se <strong>inverte</strong>: o <code>!important</code> do usuário ganha do <code>!important</code> do autor. É assim que uma configuração de acessibilidade do leitor consegue vencer o site. A aula <a href="important.html">!important (e Por que Evitar)</a> explica quando usar (quase nunca) e por quê.</p>
+
+<hr>
+
+<h2>4. O atributo <code>style</code></h2>
+<p>Uma declaração escrita direto no elemento, no atributo <code>style</code> (aula <a href="onde-colocar.html">Três Jeitos de Usar CSS</a>), não tem seletor: ela já está no elemento. Ela ganha de qualquer regra das folhas de estilo, até de um ID:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  #aviso {
+    color: navy;
+  }
+&lt;/style&gt;
+&lt;p id="aviso" style="color: darkred;"&gt;Fechado no feriado.&lt;/p&gt;
+</pre>
+
+<p>O parágrafo ficou vermelho-escuro. Esse poder todo é justamente o problema: para mudar essa cor, só editando o HTML (ou com <code>!important</code>). Por isso o guia evita o <code>style</code>, a não ser para testes rápidos.</p>
+
+<hr>
+
+<h2>5. As camadas: <code>@layer</code> (uma prévia)</h2>
+<p>Entre a origem e a especificidade existe mais um critério, para quem organiza o CSS em <strong>camadas</strong>. Veja um caso em que ele vira o jogo:</p>
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  @layer base, tema;
+
+  @layer tema {
+    h1 {
+      color: darkred;
+    }
+  }
+
+  @layer base {
+    #topo {
+      color: navy;
+    }
+  }
+&lt;/style&gt;
+&lt;h1 id="topo"&gt;Padaria da Ana&lt;/h1&gt;
+</pre>
+<p>O título ficou vermelho-escuro. Sem as camadas, <code>#topo</code> ganharia duas vezes: é mais específico e vem depois. Com camadas, quem decide primeiro é a <strong>ordem das camadas</strong>, dada na primeira linha (<code>base</code> antes, <code>tema</code> depois): a regra da camada <code>tema</code> ganha, por mais fraco que seja o seu seletor. É um recurso avançado, feito para organizar projetos grandes. Enquanto você não usa <code>@layer</code>, todo o seu CSS está "na mesma camada" e este critério sempre empata. A aula completa é <a href="layer.html">Camadas da Cascata (@layer)</a>, no nível avançado.</p>
+<div class="note">
+<strong>Suporte</strong>
+<p><code>@layer</code> funciona nos navegadores atuais (Chrome, Edge, Firefox e Safari) desde março de 2022: o MDN o marca como <em>Baseline</em>, "amplamente disponível".</p>
+</div>
+
+<hr>
+
+<h2 id="propriedade">6. A briga é por propriedade, não por regra</h2>
+<p>Um engano comum é pensar que uma regra "ganha" e a outra é jogada fora inteira. Não é assim: a cascata decide <strong>cada propriedade separadamente</strong>. O elemento acaba com uma mistura das regras.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o cartão em promoção recebe a borda da <code>.cartao</code> (só a <code>.cartao</code> fala de borda), o fundo da <code>.promocao</code> (só ela fala de fundo) e, na única propriedade que as duas disputam, <code>color</code>, ganha a <code>.promocao</code>, que vem depois. Mude <code>padding</code> na <code>.promocao</code> e veja só o espaço interno mudar.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;Bolo de fubá&lt;/div&gt;
+&lt;div class="cartao promocao"&gt;Bolo de cenoura&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  border: 2px solid gray;
+  padding: 8px;
+  margin-bottom: 8px;
+  color: navy;
+}
+
+.promocao {
+  background-color: lightyellow;
+  color: darkred;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade do cartão em promoção</th><th>Quem disputa</th><th>Valor final</th></tr>
+<tr><td><code>border</code></td><td>só <code>.cartao</code></td><td>2px, cinza</td></tr>
+<tr><td><code>padding</code></td><td>só <code>.cartao</code></td><td>8px</td></tr>
+<tr><td><code>background-color</code></td><td>só <code>.promocao</code></td><td>amarelo-claro</td></tr>
+<tr><td><code>color</code></td><td><code>.cartao</code> × <code>.promocao</code> (empate na força)</td><td>vermelho-escuro (a de baixo)</td></tr>
+</table>
+</div>
+
+<p>E se nenhuma regra fala de uma propriedade? Aí não há briga: ou o elemento <strong>herda</strong> o valor do pai (cor e fonte, por exemplo), ou fica com o valor inicial da propriedade. É a aula <a href="heranca.html">Herança</a>.</p>
+
+<hr>
+
+<h2>7. Vendo a cascata no F12</h2>
+<p>Você não precisa adivinhar quem ganhou. Na aula <a href="devtools.html">Inspecionando com o F12</a>, você aprende a clicar com o botão direito no elemento e escolher "Inspecionar". No painel de estilos (<em>Styles</em>), o navegador lista <strong>todas</strong> as regras que pegam aquele elemento, da mais forte para a mais fraca. As declarações que perderam aparecem <strong>riscadas</strong>. Lá embaixo aparecem até as regras da folha padrão do navegador, marcadas como <em>user agent stylesheet</em>.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Na cascata, nada "dá erro": sempre alguém ganha. O problema é quando ganha a regra que você não queria. O sintoma: você muda um valor e nada acontece.</p>
+
+<div class="cenario">
+<strong>Uma regra mais abaixo desfaz a sua</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .titulo {
+    color: darkred;
+  }
+
+  /* … 200 linhas depois … */
+
+  .titulo {
+    color: navy;
+  }
+&lt;/style&gt;
+&lt;h1 class="titulo"&gt;Padaria da Ana&lt;/h1&gt;
+</pre>
+<p><strong>O que você vê:</strong> a Ana mudou o <code>darkred</code> várias vezes, e o título continua azul-marinho.</p>
+<p><strong>Por quê:</strong> existe outra regra com o mesmo seletor mais abaixo no arquivo (ou num arquivo ligado depois). Empate na força, vence a de baixo.</p>
+<p><strong>Como consertar:</strong> inspecione o elemento no F12: a sua declaração aparece riscada, e a vencedora aparece acima dela, com o nome do arquivo e a linha. Junte as duas regras numa só, ou apague a que sobrou.</p>
+</div>
+
+<div class="cenario">
+<strong>Um seletor mais forte, em outro lugar</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .cardapio p {
+    color: navy;
+  }
+  .preco {
+    color: darkgreen;
+  }
+&lt;/style&gt;
+&lt;div class="cardapio"&gt;
+  &lt;p&gt;Pão francês&lt;/p&gt;
+  &lt;p class="preco"&gt;R$ 0,80&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> o preço continua azul-marinho, mesmo com a regra <code>.preco</code> vindo depois.</p>
+<p><strong>Por quê:</strong> <code>.cardapio p</code> (uma classe e um elemento) é mais específico que <code>.preco</code> (só uma classe). A especificidade é decidida antes da ordem.</p>
+<p><strong>Como consertar:</strong> use um seletor tão forte quanto o outro, como <code>.cardapio .preco</code>, e deixe-o depois. <strong>Não</strong> conserte com <code>!important</code>: ele resolve hoje e cria uma briga pior amanhã (aula <a href="important.html">!important</a>).</p>
+</div>
+
+<div class="cenario">
+<strong>O arquivo certo, ligado na ordem errada</strong>
+<p><strong>O que você vê:</strong> as mudanças no <code>style.css</code> não aparecem em alguns elementos, e aparecem em outros.</p>
+<p><strong>Por quê:</strong> o <code>&lt;link&gt;</code> do <code>style.css</code> está <strong>antes</strong> de outro arquivo (um framework, um tema) que tem regras com seletores iguais. Nos empates, o outro arquivo ganha.</p>
+<p><strong>Como consertar:</strong> o seu arquivo por último, como na missão da <a href="#ordem">seção 1</a>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Critério (nesta ordem)</th><th>Quem ganha</th></tr>
+<tr><td>1. Origem e importância</td><td>Normais: autor &gt; usuário &gt; navegador. Com <code>!important</code>, invertido: navegador &gt; usuário &gt; autor, e qualquer <code>!important</code> ganha das normais</td></tr>
+<tr><td>(junto da origem) atributo <code>style</code></td><td>Ganha de qualquer seletor do autor (menos de <code>!important</code>)</td></tr>
+<tr><td>2. Camadas (<code>@layer</code>)</td><td>A camada declarada por último; sem camadas, empate</td></tr>
+<tr><td>3. Especificidade</td><td>ID &gt; classe/atributo/pseudo-classe &gt; elemento</td></tr>
+<tr><td>4. Ordem no código</td><td>A última declaração lida (arquivos na ordem dos <code>&lt;link&gt;</code>/<code>&lt;style&gt;</code>)</td></tr>
+<tr><td>Ninguém disputou</td><td>Herança ou valor inicial (não é cascata)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Empate</h3>
+<p>Com <code>p { color: navy; }</code> e, logo abaixo, <code>p { color: darkred; }</code>, de que cor fica o parágrafo? (escreva o nome da cor, em inglês, como no código)</p>
+<div class="ex-code">color: <input data-answer="darkred" aria-label="cor"></div>
+</div>
+
+<div class="exercise">
+<h3>2. O nome</h3>
+<p>Qual palavra do nome <em>Cascading Style Sheets</em> dá nome à lista de critérios desta aula? (em português)</p>
+<div class="ex-code"><input data-answer="cascata|Cascata" aria-label="palavra"></div>
+</div>
+
+<div class="exercise">
+<h3>3. A folha do navegador</h3>
+<p>No F12, as regras que vêm do próprio navegador aparecem marcadas como <em>user agent</em>… o quê?</p>
+<div class="ex-code">user agent <input data-answer="stylesheet" aria-label="palavra"></div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. <code>.aviso { color: darkred; }</code> vem antes de <code>p { color: navy; }</code>. De que cor fica <code>&lt;p class="aviso"&gt;</code>?</p>
+<label><input type="radio" name="q4"> Azul-marinho, porque a regra <code>p</code> vem depois</label>
+<label><input type="radio" name="q4"> Vermelho-escuro, porque a classe é mais específica que o elemento</label>
+<label><input type="radio" name="q4"> Uma mistura das duas cores</label>
+<label><input type="radio" name="q4"> Preto, porque as regras se anulam</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Por que <code>h1 { font-weight: normal; }</code> tira o negrito que o navegador põe nos títulos?</p>
+<label><input type="radio" name="q5"> Porque o seletor <code>h1</code> é mais específico que o do navegador</label>
+<label><input type="radio" name="q5"> Porque a sua regra vem depois no mesmo arquivo</label>
+<label><input type="radio" name="q5"> Porque o CSS do autor ganha do CSS do navegador, e a origem é decidida antes da especificidade</label>
+<label><input type="radio" name="q5"> Porque o navegador não põe negrito nos títulos</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Uma regra dá <code>color</code> e <code>padding</code> ao elemento; outra, mais forte, dá só <code>color</code>. O que acontece com o <code>padding</code>?</p>
+<label><input type="radio" name="q6"> Continua valendo: a briga é só pela propriedade <code>color</code></label>
+<label><input type="radio" name="q6"> Some, porque a regra mais forte "apaga" a outra</label>
+<label><input type="radio" name="q6"> Vira zero</label>
+<label><input type="radio" name="q6"> Depende da ordem dos arquivos</label>
+</div>
+
+<h3>Missão final: o preço que não fica verde</h3>
+
+<div class="tryhtml" data-goal="css:.preco{color}=rgb(0, 100, 0),css:.cardapio p:first-child{color}=rgb(0, 0, 128),nsrc:!important,nsrc:style=">
+<p class="try-task"><strong>Missão:</strong> a Ana quer o preço em verde-escuro, mas a regra <code>.preco</code> está perdendo. Sem <code>!important</code>, sem atributo <code>style</code> e sem mexer no HTML, faça o preço ficar <code>darkgreen</code>. O nome do pão tem de continuar azul-marinho. Dica: com que força a regra do preço precisa competir?</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cardapio"&gt;
+  &lt;p&gt;Pão francês&lt;/p&gt;
+  &lt;p class="preco"&gt;R$ 0,80&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cardapio p {
+  color: navy;
+}
+
+.preco {
+  color: darkgreen;
+  font-weight: bold;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cardapio p {
+  color: navy;
+}
+
+.cardapio .preco {
+  color: darkgreen;
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Quando duas declarações disputam a mesma propriedade do mesmo elemento, a <strong>cascata</strong> escolhe uma, critério por critério; o próximo só entra se o anterior empatar.</li>
+  <li>Os critérios: <strong>origem e importância</strong> (o seu CSS ganha do navegador; <code>!important</code> inverte), <strong>camadas</strong> (<code>@layer</code>, prévia), <strong>especificidade</strong> (ID &gt; classe &gt; elemento) e <strong>ordem</strong> (a última ganha).</li>
+  <li>O atributo <code>style</code> ganha de qualquer seletor. Evite-o.</li>
+  <li>A ordem vale entre arquivos: o seu <code>&lt;link&gt;</code> vai por último.</li>
+  <li>A briga é por propriedade: o elemento acaba com uma mistura das regras.</li>
+  <li>Sua regra não pega? Inspecione no F12: a declaração riscada perdeu, e a vencedora está logo acima.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
