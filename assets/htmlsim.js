@@ -313,6 +313,8 @@
     [/“linear\([^”]*” is not a/, "a curva linear() de transição/animação"],
     [/“sibling-(index|count)\(\)”/, "sibling-index()/sibling-count()"],
     [/“allow-discrete” is not a/, "transition-behavior: allow-discrete"],
+    [/“(path|shape)\([^”]*” is not a “clip-path” value/, "clip-path com path()/shape()"],
+    [/“plus-lighter” is not a/, "mix-blend-mode: plus-lighter"],
   ];
   // "Unknown dimension" é falso quando o valor usa as unidades de contêiner (cqi, cqw…)
   // "Parse Error" sem pista na mensagem: olha o trecho (extract) do código
