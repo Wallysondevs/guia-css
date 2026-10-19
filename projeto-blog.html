@@ -1,0 +1,2484 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Projeto: Layout de Blog — tipografia de leitura, cartões de post e áreas do Grid | Guia CSS</title>
+<meta name="description" content="Projeto do Guia CSS: o blog Cozinha da Ana em seis versões, com tipografia de leitura, cabeçalho, cartões de post com aspect-ratio, etiquetas em pílula, layout com grid-template-areas, barra lateral que acompanha a rolagem e letra capitular com ::first-letter.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Projeto: Layout de Blog</span></h1>
+
+<p class="intro">A Ana começou a escrever um blog, a <strong>Cozinha da Ana</strong>: receitas, vídeos e as novidades da lojinha. A página inicial de um blog tem sempre as mesmas partes: o nome no alto, a lista de posts (cada um com foto, data, título, resumo e etiquetas), uma barra lateral com "Sobre mim" e as categorias, e o rodapé. Neste projeto você monta esse layout em <strong>seis versões</strong>, do texto confortável de ler até as duas colunas com <strong>áreas com nome</strong> do Grid.</p>
+
+<div class="note">
+<strong>Você vai aprender (juntando o que já viu)</strong>
+<ul>
+  <li>A deixar o texto confortável de ler: tamanho, altura de linha, uma fonte serifada para o texto e outra sem serifa para os títulos.</li>
+  <li>A desenhar o cabeçalho do blog e o rodapé.</li>
+  <li>A fazer cartões de post com a foto sempre na proporção 16:9, cortada sem deformar.</li>
+  <li>A transformar uma lista de etiquetas em "pílulas" com <code>#</code> na frente.</li>
+  <li>A desenhar o layout da página com <code>grid-template-areas</code>, como um mapa.</li>
+  <li>A deixar a barra lateral grudada enquanto os posts rolam, e a fazer uma letra capitular com <code>::first-letter</code>.</li>
+</ul>
+</div>
+
+<p>As descrições do resultado foram conferidas em fotos do Chromium, nos quadros de 768 px e 375 px (os botões <strong>768</strong> e <strong>375</strong> da barra de cada caixa). As fontes que você vê dependem do seu sistema: o texto usa Georgia quando ela existe, senão outra serifada. Nas mensagens do validador, a máquina é a fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>O que vamos construir</h2>
+<p>Pense numa revista: o nome grande no alto da capa, as matérias com foto e título, a coluna estreita do editor ao lado, e a primeira letra da matéria principal enorme, ocupando três linhas. A revista é feita para ser <strong>lida</strong>: as linhas não são longas demais, as letras não são miúdas, e os títulos se destacam do texto.</p>
+
+<p>No fim, num quadro de 768 px: "Cozinha da Ana" centralizado no alto, com o lema em itálico e uma linha dupla embaixo; à esquerda, três cartões brancos de post, cada um com a foto em faixa 16:9, a data em maiúsculas pequenas, o título em negrito, o resumo em letra serifada e as etiquetas em pílulas amarelas (<code>#receitas</code>, <code>#bolos</code>); o resumo do primeiro post começa com um "D" grande e alaranjado; à direita, a coluna "Sobre mim" e "Categorias", que fica grudada no alto enquanto você rola os posts. No celular, tudo numa coluna só, com a lateral depois dos posts.</p>
+
+<h3>O HTML (é o mesmo em todas as versões)</h3>
+<p>Uma <code>&lt;div class="blog"&gt;</code> embrulha tudo: é ela que vai virar a grade. Dentro, um <code>&lt;header&gt;</code>, o <code>&lt;main class="posts"&gt;</code> com três <code>&lt;article&gt;</code>, um <code>&lt;aside class="lateral"&gt;</code> e um <code>&lt;footer&gt;</code>. Cada data usa <code>&lt;time datetime="…"&gt;</code>, e as etiquetas são uma lista de links (<a href="https://wallysondevs.github.io/guia-html/">Guia HTML</a>). Os links levam a <code>#</code> (um blog de verdade teria uma página por post).</p>
+
+<pre class="file" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="blog"&gt;
+  &lt;header class="cabecalho"&gt;
+    &lt;h1 class="nome-blog"&gt;&lt;a href="#"&gt;Cozinha da Ana&lt;/a&gt;&lt;/h1&gt;
+    &lt;p class="lema"&gt;Receitas, histórias e a vida numa lojinha de bolos&lt;/p&gt;
+  &lt;/header&gt;
+  &lt;main class="posts"&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate num prato branco" width="800" height="600"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-10-12"&gt;12 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;O segredo do bolo de cenoura fofinho&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Depois de trinta anos de domingos, a receita da minha avó tem três regras: cenoura bem batida, forno preaquecido e nada de abrir a porta antes da hora.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;receitas&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#"&gt;bolos&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/video-bolo-poster.jpg" alt="O bolo pronto, visto de lado, numa cena do vídeo" width="640" height="360"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-10-05"&gt;5 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;Gravei a receita em vídeo&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Seis segundos, do liquidificador à cobertura. Ficou curtinho, mas dá para ver o ponto da massa.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;vídeos&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/mapa-800.png" alt="Mapa do bairro com a Lojinha da Ana na Rua das Flores" width="800" height="500"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-09-28"&gt;28 de setembro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;A lojinha mudou de rua&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Agora estamos na Rua das Flores, pertinho da Praça da Árvore. Tem até banco na calçada para comer o bolo ainda quente.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;novidades&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#"&gt;bairro&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  &lt;/main&gt;
+  &lt;aside class="lateral"&gt;
+    &lt;section class="sobre"&gt;
+      &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="" width="96" height="96"&gt;
+      &lt;h2&gt;Sobre mim&lt;/h2&gt;
+      &lt;p&gt;Sou a Ana, confeiteira e dona da Lojinha da Ana. Escrevo aqui toda segunda-feira.&lt;/p&gt;
+    &lt;/section&gt;
+    &lt;section&gt;
+      &lt;h2&gt;Categorias&lt;/h2&gt;
+      &lt;ul class="categorias"&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Receitas&lt;/a&gt; (12)&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Vídeos&lt;/a&gt; (4)&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Novidades&lt;/a&gt; (7)&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/section&gt;
+  &lt;/aside&gt;
+  &lt;footer class="rodape"&gt;
+    &lt;p&gt;© 2026 Cozinha da Ana&lt;/p&gt;
+  &lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Com o <code>style.css</code> vazio, tudo aparece em sequência, em serifada: a foto do bolo com 800 px (passa da tela do celular), as datas, os títulos azuis sublinhados, as etiquetas numa lista com bolinhas, a lateral depois dos posts e o rodapé.</p>
+
+<hr>
+
+<h2 id="versao1">Versão 1 · Texto bom de ler</h2>
+<p>Um blog vive de texto. Antes de qualquer layout, o texto precisa ficar confortável: um pouco maior que o padrão, com linhas bem espaçadas, e uma combinação de fontes, serifada no texto corrido e sem serifa nos títulos e nas informações.</p>
+
+<pre class="file" data-file="style.css (versão 1)">:root {
+  --destaque: #b45309;
+  --fundo: #fffbf5;
+  --linha: #e7e5e4;
+  --apagado: #78716c;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: #292524;
+  background-color: var(--fundo);
+}
+
+h1,
+h2,
+.data,
+.tags,
+.lateral {
+  font-family: system-ui, sans-serif;
+}
+
+a {
+  color: var(--destaque);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.blog {
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>As variáveis</dt>
+  <dd>A cor de destaque (um âmbar escuro), o fundo, a cor das linhas e um cinza "apagado" para informações secundárias. Aula: <a href="variaveis.html">Variáveis</a>.</dd>
+  <dt><code>font-size: 1.0625rem</code> + <code>line-height: 1.7</code></dt>
+  <dd>17 px em vez de 16, e cada linha com 1,7 vez a altura da letra: texto longo cansa menos. Aulas: <a href="font-size.html">font-size</a> e <a href="line-height.html">line-height</a>.</dd>
+  <dt><code>font-family: Georgia, "Times New Roman", serif</code></dt>
+  <dd>Uma fonte serifada para o texto corrido. Nomes com espaço vão entre aspas. Aula: <a href="font-family.html">Fontes</a>.</dd>
+  <dt><code>h1, h2, .data, .tags, .lateral { font-family: system-ui, sans-serif; }</code></dt>
+  <dd>Títulos, datas, etiquetas e a lateral em sem serifa: o contraste entre as duas fontes ajuda o olho a separar "título" de "texto". Aula: <a href="seletor-grupo.html">Agrupando Seletores</a>.</dd>
+  <dt><code>.blog</code></dt>
+  <dd>Até 70rem (1120 px), centralizado, com 1rem de cada lado.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 768 px, fundo creme bem claro, o texto em serifada de 17 px, os títulos e as datas em sem serifa, e os links em âmbar escuro sublinhado ("Cozinha da Ana" também, porque é um link). As fotos não passam mais da coluna: a do bolo fica com 736 px, e a do vídeo, menor, fica nos 640 px dela. O <code>&lt;h1&gt;</code> fica com 34 px (2em de 17).</p>
+
+<h3>Experimente: a versão 1</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="blog"&gt;
+  &lt;header class="cabecalho"&gt;
+    &lt;h1 class="nome-blog"&gt;&lt;a href="#"&gt;Cozinha da Ana&lt;/a&gt;&lt;/h1&gt;
+    &lt;p class="lema"&gt;Receitas, histórias e a vida numa lojinha de bolos&lt;/p&gt;
+  &lt;/header&gt;
+  &lt;main class="posts"&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate num prato branco" width="800" height="600"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-10-12"&gt;12 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;O segredo do bolo de cenoura fofinho&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Depois de trinta anos de domingos, a receita da minha avó tem três regras: cenoura bem batida, forno preaquecido e nada de abrir a porta antes da hora.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;receitas&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#"&gt;bolos&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/video-bolo-poster.jpg" alt="O bolo pronto, visto de lado, numa cena do vídeo" width="640" height="360"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-10-05"&gt;5 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;Gravei a receita em vídeo&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Seis segundos, do liquidificador à cobertura. Ficou curtinho, mas dá para ver o ponto da massa.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;vídeos&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/mapa-800.png" alt="Mapa do bairro com a Lojinha da Ana na Rua das Flores" width="800" height="500"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-09-28"&gt;28 de setembro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;A lojinha mudou de rua&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Agora estamos na Rua das Flores, pertinho da Praça da Árvore. Tem até banco na calçada para comer o bolo ainda quente.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;novidades&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#"&gt;bairro&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  &lt;/main&gt;
+  &lt;aside class="lateral"&gt;
+    &lt;section class="sobre"&gt;
+      &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="" width="96" height="96"&gt;
+      &lt;h2&gt;Sobre mim&lt;/h2&gt;
+      &lt;p&gt;Sou a Ana, confeiteira e dona da Lojinha da Ana. Escrevo aqui toda segunda-feira.&lt;/p&gt;
+    &lt;/section&gt;
+    &lt;section&gt;
+      &lt;h2&gt;Categorias&lt;/h2&gt;
+      &lt;ul class="categorias"&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Receitas&lt;/a&gt; (12)&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Vídeos&lt;/a&gt; (4)&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Novidades&lt;/a&gt; (7)&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/section&gt;
+  &lt;/aside&gt;
+  &lt;footer class="rodape"&gt;
+    &lt;p&gt;© 2026 Cozinha da Ana&lt;/p&gt;
+  &lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --destaque: #b45309;
+  --fundo: #fffbf5;
+  --linha: #e7e5e4;
+  --apagado: #78716c;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: #292524;
+  background-color: var(--fundo);
+}
+
+h1,
+h2,
+.data,
+.tags,
+.lateral {
+  font-family: system-ui, sans-serif;
+}
+
+a {
+  color: var(--destaque);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.blog {
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+</pre>
+</div>
+
+<h3>Missão 1</h3>
+<div class="tryhtml" data-goal="css:body{font-size}=17px,src:line-height:\s*1\.7,css:a{color}=rgb(180, 83, 9),src:color:\s*var\(\s*--destaque\s*\)">
+<p class="try-task"><strong>Missão:</strong> deixe o texto com <code>1.0625rem</code> e altura de linha <code>1.7</code>; ponha o título e a data em <code>system-ui, sans-serif</code>; e pinte os links com a variável <code>--destaque</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="post"&gt;
+  &lt;p class="data"&gt;&lt;time datetime="2026-10-12"&gt;12 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+  &lt;h2&gt;&lt;a href="#"&gt;O segredo do bolo de cenoura fofinho&lt;/a&gt;&lt;/h2&gt;
+  &lt;p class="resumo"&gt;Depois de trinta anos de domingos, a receita da minha avó tem três regras: cenoura bem batida, forno preaquecido e nada de abrir a porta antes da hora.&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --destaque: #b45309;
+}
+
+body {
+  margin: 1rem;
+  font-family: Georgia, "Times New Roman", serif;
+  color: #292524;
+}
+</pre>
+<pre class="solucao" data-file="style.css">:root {
+  --destaque: #b45309;
+}
+
+body {
+  margin: 1rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: #292524;
+}
+
+h2,
+.data {
+  font-family: system-ui, sans-serif;
+}
+
+a {
+  color: var(--destaque);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao2">Versão 2 · Cabeçalho e rodapé</h2>
+
+<pre class="file" data-file="style.css (versão 2: o que entra)">
+.cabecalho {
+  padding: 2rem 0 1.5rem;
+  border-bottom: 3px double var(--linha);
+  text-align: center;
+}
+
+.nome-blog {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: -0.02em;
+}
+
+.nome-blog a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lema {
+  margin: 0.25rem 0 0;
+  font-style: italic;
+  color: var(--apagado);
+}
+
+.rodape {
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--linha);
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--apagado);
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>border-bottom: 3px double var(--linha)</code></dt>
+  <dd>Uma borda <code>double</code> de 3 px desenha duas linhas finas com um vão entre elas: o clássico fio de jornal. Aula: <a href="border.html">Bordas</a>.</dd>
+  <dt><code>font-size: clamp(2rem, 5vw, 3rem)</code> e <code>letter-spacing: -0.02em</code></dt>
+  <dd>O nome do blog cresce com a tela, entre 32 e 48 px, com as letras um pouco mais juntas, como nos logotipos. Aulas: <a href="clamp.html">clamp()</a> e <a href="line-height.html">letter-spacing</a>.</dd>
+  <dt><code>.nome-blog a { color: inherit; text-decoration: none; }</code></dt>
+  <dd>O link do nome herda a cor do título e perde o sublinhado: continua sendo um link, mas com cara de logotipo. Aula: <a href="heranca.html">Herança</a>.</dd>
+  <dt><code>.lema</code> e <code>.rodape</code></dt>
+  <dd>Em itálico e cinza, o lema fica em segundo plano; o rodapé ganha uma linha em cima, letra menor e cinza.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 768 px, "Cozinha da Ana" fica centralizado, escuro e sem sublinhado, com 38,4 px (5% de 768); embaixo, o lema em itálico cinza e, separando o cabeçalho dos posts, o fio duplo. No fim da página, o "© 2026 Cozinha da Ana" pequeno e centralizado, com uma linha em cima.</p>
+
+<h3>Experimente: a versão 2</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="blog"&gt;
+  &lt;header class="cabecalho"&gt;
+    &lt;h1 class="nome-blog"&gt;&lt;a href="#"&gt;Cozinha da Ana&lt;/a&gt;&lt;/h1&gt;
+    &lt;p class="lema"&gt;Receitas, histórias e a vida numa lojinha de bolos&lt;/p&gt;
+  &lt;/header&gt;
+  &lt;main class="posts"&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate num prato branco" width="800" height="600"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-10-12"&gt;12 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;O segredo do bolo de cenoura fofinho&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Depois de trinta anos de domingos, a receita da minha avó tem três regras: cenoura bem batida, forno preaquecido e nada de abrir a porta antes da hora.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;receitas&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#"&gt;bolos&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/video-bolo-poster.jpg" alt="O bolo pronto, visto de lado, numa cena do vídeo" width="640" height="360"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-10-05"&gt;5 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;Gravei a receita em vídeo&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Seis segundos, do liquidificador à cobertura. Ficou curtinho, mas dá para ver o ponto da massa.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;vídeos&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/mapa-800.png" alt="Mapa do bairro com a Lojinha da Ana na Rua das Flores" width="800" height="500"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-09-28"&gt;28 de setembro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;A lojinha mudou de rua&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Agora estamos na Rua das Flores, pertinho da Praça da Árvore. Tem até banco na calçada para comer o bolo ainda quente.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;novidades&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#"&gt;bairro&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  &lt;/main&gt;
+  &lt;aside class="lateral"&gt;
+    &lt;section class="sobre"&gt;
+      &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="" width="96" height="96"&gt;
+      &lt;h2&gt;Sobre mim&lt;/h2&gt;
+      &lt;p&gt;Sou a Ana, confeiteira e dona da Lojinha da Ana. Escrevo aqui toda segunda-feira.&lt;/p&gt;
+    &lt;/section&gt;
+    &lt;section&gt;
+      &lt;h2&gt;Categorias&lt;/h2&gt;
+      &lt;ul class="categorias"&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Receitas&lt;/a&gt; (12)&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Vídeos&lt;/a&gt; (4)&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Novidades&lt;/a&gt; (7)&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/section&gt;
+  &lt;/aside&gt;
+  &lt;footer class="rodape"&gt;
+    &lt;p&gt;© 2026 Cozinha da Ana&lt;/p&gt;
+  &lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --destaque: #b45309;
+  --fundo: #fffbf5;
+  --linha: #e7e5e4;
+  --apagado: #78716c;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: #292524;
+  background-color: var(--fundo);
+}
+
+h1,
+h2,
+.data,
+.tags,
+.lateral {
+  font-family: system-ui, sans-serif;
+}
+
+a {
+  color: var(--destaque);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.blog {
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.cabecalho {
+  padding: 2rem 0 1.5rem;
+  border-bottom: 3px double var(--linha);
+  text-align: center;
+}
+
+.nome-blog {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: -0.02em;
+}
+
+.nome-blog a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lema {
+  margin: 0.25rem 0 0;
+  font-style: italic;
+  color: var(--apagado);
+}
+
+.rodape {
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--linha);
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--apagado);
+}
+</pre>
+</div>
+
+<h3>Missão 2</h3>
+<div class="tryhtml" data-goal="css:.cabecalho{text-align}=center,css:.cabecalho{border-bottom-style}=double,css:.cabecalho{border-bottom-width}=3px,css:.lema{font-style}=italic">
+<p class="try-task"><strong>Missão:</strong> centralize o cabeçalho, ponha embaixo dele uma borda dupla (<code>double</code>) de <code>3px</code> na cor <code>#e7e5e4</code> e deixe o lema em itálico.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="cabecalho"&gt;
+  &lt;h1 class="nome-blog"&gt;&lt;a href="#"&gt;Cozinha da Ana&lt;/a&gt;&lt;/h1&gt;
+  &lt;p class="lema"&gt;Receitas, histórias e a vida numa lojinha de bolos&lt;/p&gt;
+&lt;/header&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  margin: 1rem;
+  font-family: system-ui, sans-serif;
+}
+
+.cabecalho {
+  padding: 2rem 0 1.5rem;
+}
+
+.nome-blog {
+  margin: 0;
+}
+
+.nome-blog a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lema {
+  margin: 0.25rem 0 0;
+  color: #78716c;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  margin: 1rem;
+  font-family: system-ui, sans-serif;
+}
+
+.cabecalho {
+  padding: 2rem 0 1.5rem;
+  border-bottom: 3px double #e7e5e4;
+  text-align: center;
+}
+
+.nome-blog {
+  margin: 0;
+}
+
+.nome-blog a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lema {
+  margin: 0.25rem 0 0;
+  font-style: italic;
+  color: #78716c;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao3">Versão 3 · Os cartões de post</h2>
+<p>Cada post vira um cartão branco. As três fotos têm formatos diferentes (4:3, 16:9 e 8:5); no cartão, todas ficam numa faixa 16:9, cortada sem deformar.</p>
+
+<pre class="file" data-file="style.css (versão 3: o que entra)">
+.posts {
+  display: grid;
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+.post {
+  overflow: hidden;
+  background-color: #fff;
+  border: 1px solid var(--linha);
+  border-radius: 12px;
+}
+
+.post img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.post-texto {
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.data {
+  margin: 0;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--apagado);
+}
+
+.post h2 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+.post h2 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.post h2 a:hover {
+  color: var(--destaque);
+  text-decoration: underline;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>.posts { display: grid; gap: 2rem; }</code></dt>
+  <dd>Uma grade de uma coluna, só para ter 32 px entre os cartões. Aula: <a href="gap.html">gap</a>.</dd>
+  <dt><code>.post { overflow: hidden; border-radius: 12px; }</code></dt>
+  <dd>O cartão arredonda os cantos, e o <code>overflow: hidden</code> corta os cantos da foto junto. Aula: <a href="overflow.html">overflow</a>.</dd>
+  <dt><code>.post img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }</code></dt>
+  <dd>Todas as fotos na largura do cartão, na proporção 16:9, cobrindo a faixa e cortando as sobras. Aulas: <a href="aspect-ratio.html">aspect-ratio</a> e <a href="imagens-responsivas.html">Imagens que se Adaptam</a>.</dd>
+  <dt><code>.data</code></dt>
+  <dd>Letra pequena (13 px), em maiúsculas com <code>text-transform</code> e letras afastadas (<code>letter-spacing</code>), em cinza: informação de apoio. Aula: <a href="text-transform.html">Maiúsculas e Minúsculas</a>.</dd>
+  <dt><code>.post h2 a</code></dt>
+  <dd>O título é um link, mas com a cor do texto e sem sublinhado; no <code>:hover</code>, fica âmbar e sublinhado, avisando que dá para clicar.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 375 px, cada post vira um cartão branco com borda cinza-clara e cantos arredondados, com 32 px entre um e outro. As três fotos ficam com a mesma altura (192 px), em faixa: o bolo aparece cortado em cima e embaixo, o mapa também. Embaixo da foto, "12 DE OUTUBRO DE 2026" pequeno e cinza, o título grande em negrito, escuro, e o resumo em serifada. As etiquetas ainda são uma lista com bolinhas.</p>
+
+<h3>Experimente: a versão 3</h3>
+<div class="tryhtml" data-largura="375">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="blog"&gt;
+  &lt;header class="cabecalho"&gt;
+    &lt;h1 class="nome-blog"&gt;&lt;a href="#"&gt;Cozinha da Ana&lt;/a&gt;&lt;/h1&gt;
+    &lt;p class="lema"&gt;Receitas, histórias e a vida numa lojinha de bolos&lt;/p&gt;
+  &lt;/header&gt;
+  &lt;main class="posts"&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate num prato branco" width="800" height="600"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-10-12"&gt;12 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;O segredo do bolo de cenoura fofinho&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Depois de trinta anos de domingos, a receita da minha avó tem três regras: cenoura bem batida, forno preaquecido e nada de abrir a porta antes da hora.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;receitas&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#"&gt;bolos&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/video-bolo-poster.jpg" alt="O bolo pronto, visto de lado, numa cena do vídeo" width="640" height="360"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-10-05"&gt;5 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;Gravei a receita em vídeo&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Seis segundos, do liquidificador à cobertura. Ficou curtinho, mas dá para ver o ponto da massa.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;vídeos&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/mapa-800.png" alt="Mapa do bairro com a Lojinha da Ana na Rua das Flores" width="800" height="500"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-09-28"&gt;28 de setembro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;A lojinha mudou de rua&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Agora estamos na Rua das Flores, pertinho da Praça da Árvore. Tem até banco na calçada para comer o bolo ainda quente.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;novidades&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#"&gt;bairro&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  &lt;/main&gt;
+  &lt;aside class="lateral"&gt;
+    &lt;section class="sobre"&gt;
+      &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="" width="96" height="96"&gt;
+      &lt;h2&gt;Sobre mim&lt;/h2&gt;
+      &lt;p&gt;Sou a Ana, confeiteira e dona da Lojinha da Ana. Escrevo aqui toda segunda-feira.&lt;/p&gt;
+    &lt;/section&gt;
+    &lt;section&gt;
+      &lt;h2&gt;Categorias&lt;/h2&gt;
+      &lt;ul class="categorias"&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Receitas&lt;/a&gt; (12)&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Vídeos&lt;/a&gt; (4)&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Novidades&lt;/a&gt; (7)&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/section&gt;
+  &lt;/aside&gt;
+  &lt;footer class="rodape"&gt;
+    &lt;p&gt;© 2026 Cozinha da Ana&lt;/p&gt;
+  &lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --destaque: #b45309;
+  --fundo: #fffbf5;
+  --linha: #e7e5e4;
+  --apagado: #78716c;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: #292524;
+  background-color: var(--fundo);
+}
+
+h1,
+h2,
+.data,
+.tags,
+.lateral {
+  font-family: system-ui, sans-serif;
+}
+
+a {
+  color: var(--destaque);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.blog {
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.cabecalho {
+  padding: 2rem 0 1.5rem;
+  border-bottom: 3px double var(--linha);
+  text-align: center;
+}
+
+.nome-blog {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: -0.02em;
+}
+
+.nome-blog a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lema {
+  margin: 0.25rem 0 0;
+  font-style: italic;
+  color: var(--apagado);
+}
+
+.rodape {
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--linha);
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--apagado);
+}
+
+.posts {
+  display: grid;
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+.post {
+  overflow: hidden;
+  background-color: #fff;
+  border: 1px solid var(--linha);
+  border-radius: 12px;
+}
+
+.post img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.post-texto {
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.data {
+  margin: 0;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--apagado);
+}
+
+.post h2 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+.post h2 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.post h2 a:hover {
+  color: var(--destaque);
+  text-decoration: underline;
+}
+</pre>
+</div>
+
+<h3>Missão 3</h3>
+<div class="tryhtml" data-goal="css:.post img{aspect-ratio}=16 / 9,css:.post img{object-fit}=cover,css:.post{border-top-left-radius}=12px,css:.post{overflow-x}=hidden">
+<p class="try-task"><strong>Missão:</strong> deixe a foto do post numa faixa <code>16 / 9</code>, cortada sem deformar, e arredonde o cartão em <code>12px</code>, cortando os cantos da foto junto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="post"&gt;
+  &lt;img src="assets/midia/mapa-800.png" alt="Mapa do bairro com a Lojinha da Ana na Rua das Flores" width="800" height="500"&gt;
+  &lt;div class="post-texto"&gt;
+    &lt;h2&gt;&lt;a href="#"&gt;A lojinha mudou de rua&lt;/a&gt;&lt;/h2&gt;
+    &lt;p class="resumo"&gt;Agora estamos na Rua das Flores, pertinho da Praça da Árvore.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  margin: 1rem;
+  font-family: system-ui, sans-serif;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.post {
+  max-width: 24rem;
+  background-color: #fff;
+  border: 1px solid #e7e5e4;
+}
+
+.post-texto {
+  padding: 1rem 1.5rem 1.5rem;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  margin: 1rem;
+  font-family: system-ui, sans-serif;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.post {
+  max-width: 24rem;
+  overflow: hidden;
+  background-color: #fff;
+  border: 1px solid #e7e5e4;
+  border-radius: 12px;
+}
+
+.post img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.post-texto {
+  padding: 1rem 1.5rem 1.5rem;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao4">Versão 4 · As etiquetas em pílulas</h2>
+
+<pre class="file" data-file="style.css (versão 4: o que entra)">
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags a {
+  display: inline-block;
+  padding: 0.125rem 0.75rem;
+  border-radius: 999px;
+  background-color: #fef3c7;
+  color: #92400e;
+  font-size: 0.8125rem;
+  text-decoration: none;
+}
+
+.tags a::before {
+  content: "#";
+}
+
+.tags a:hover {
+  background-color: #fde68a;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>.tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }</code></dt>
+  <dd>As etiquetas lado a lado, com 8 px entre elas, descendo de linha se não couberem. Sem bolinhas e sem recuo. Aulas: <a href="flex-wrap.html">flex-wrap</a> e <a href="listas.html">Listas</a>.</dd>
+  <dt><code>.tags a</code></dt>
+  <dd>Cada link vira uma pílula amarelo-clara com texto marrom pequeno, sem sublinhado. Aula: <a href="border-radius.html">border-radius</a>.</dd>
+  <dt><code>.tags a::before { content: "#"; }</code></dt>
+  <dd>O <code>#</code> na frente de cada etiqueta vem do CSS: o HTML continua só com a palavra. Aula: <a href="before-after.html">::before e ::after</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 375 px, embaixo de cada resumo, as etiquetas aparecem lado a lado como pílulas amarelas: "#receitas" e "#bolos" no primeiro post, "#vídeos" no segundo, "#novidades" e "#bairro" no terceiro. Com o mouse em cima, a pílula escurece um pouco.</p>
+
+<h3>Experimente: a versão 4</h3>
+<div class="tryhtml" data-largura="375">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="blog"&gt;
+  &lt;header class="cabecalho"&gt;
+    &lt;h1 class="nome-blog"&gt;&lt;a href="#"&gt;Cozinha da Ana&lt;/a&gt;&lt;/h1&gt;
+    &lt;p class="lema"&gt;Receitas, histórias e a vida numa lojinha de bolos&lt;/p&gt;
+  &lt;/header&gt;
+  &lt;main class="posts"&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate num prato branco" width="800" height="600"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-10-12"&gt;12 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;O segredo do bolo de cenoura fofinho&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Depois de trinta anos de domingos, a receita da minha avó tem três regras: cenoura bem batida, forno preaquecido e nada de abrir a porta antes da hora.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;receitas&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#"&gt;bolos&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/video-bolo-poster.jpg" alt="O bolo pronto, visto de lado, numa cena do vídeo" width="640" height="360"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-10-05"&gt;5 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;Gravei a receita em vídeo&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Seis segundos, do liquidificador à cobertura. Ficou curtinho, mas dá para ver o ponto da massa.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;vídeos&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/mapa-800.png" alt="Mapa do bairro com a Lojinha da Ana na Rua das Flores" width="800" height="500"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-09-28"&gt;28 de setembro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;A lojinha mudou de rua&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Agora estamos na Rua das Flores, pertinho da Praça da Árvore. Tem até banco na calçada para comer o bolo ainda quente.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;novidades&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#"&gt;bairro&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  &lt;/main&gt;
+  &lt;aside class="lateral"&gt;
+    &lt;section class="sobre"&gt;
+      &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="" width="96" height="96"&gt;
+      &lt;h2&gt;Sobre mim&lt;/h2&gt;
+      &lt;p&gt;Sou a Ana, confeiteira e dona da Lojinha da Ana. Escrevo aqui toda segunda-feira.&lt;/p&gt;
+    &lt;/section&gt;
+    &lt;section&gt;
+      &lt;h2&gt;Categorias&lt;/h2&gt;
+      &lt;ul class="categorias"&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Receitas&lt;/a&gt; (12)&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Vídeos&lt;/a&gt; (4)&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Novidades&lt;/a&gt; (7)&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/section&gt;
+  &lt;/aside&gt;
+  &lt;footer class="rodape"&gt;
+    &lt;p&gt;© 2026 Cozinha da Ana&lt;/p&gt;
+  &lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --destaque: #b45309;
+  --fundo: #fffbf5;
+  --linha: #e7e5e4;
+  --apagado: #78716c;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: #292524;
+  background-color: var(--fundo);
+}
+
+h1,
+h2,
+.data,
+.tags,
+.lateral {
+  font-family: system-ui, sans-serif;
+}
+
+a {
+  color: var(--destaque);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.blog {
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.cabecalho {
+  padding: 2rem 0 1.5rem;
+  border-bottom: 3px double var(--linha);
+  text-align: center;
+}
+
+.nome-blog {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: -0.02em;
+}
+
+.nome-blog a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lema {
+  margin: 0.25rem 0 0;
+  font-style: italic;
+  color: var(--apagado);
+}
+
+.rodape {
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--linha);
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--apagado);
+}
+
+.posts {
+  display: grid;
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+.post {
+  overflow: hidden;
+  background-color: #fff;
+  border: 1px solid var(--linha);
+  border-radius: 12px;
+}
+
+.post img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.post-texto {
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.data {
+  margin: 0;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--apagado);
+}
+
+.post h2 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+.post h2 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.post h2 a:hover {
+  color: var(--destaque);
+  text-decoration: underline;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags a {
+  display: inline-block;
+  padding: 0.125rem 0.75rem;
+  border-radius: 999px;
+  background-color: #fef3c7;
+  color: #92400e;
+  font-size: 0.8125rem;
+  text-decoration: none;
+}
+
+.tags a::before {
+  content: "#";
+}
+
+.tags a:hover {
+  background-color: #fde68a;
+}
+</pre>
+</div>
+
+<h3>Missão 4</h3>
+<div class="tryhtml" data-goal="css:.tags{display}=flex,css:.tags{list-style-type}=none,css:.tags a{border-top-left-radius}=999px,css:.tags a::before{content}=&quot;#&quot;">
+<p class="try-task"><strong>Missão:</strong> ponha as etiquetas lado a lado (<code>flex</code>, com <code>flex-wrap</code> e <code>gap</code>), sem bolinhas; arredonde cada uma em pílula (<code>999px</code>) e ponha um <code>#</code> antes de cada uma, pelo CSS.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul class="tags"&gt;
+  &lt;li&gt;&lt;a href="#"&gt;receitas&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="#"&gt;bolos&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="#"&gt;vídeos&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+
+.tags a {
+  display: inline-block;
+  padding: 0.125rem 0.75rem;
+  background-color: #fef3c7;
+  color: #92400e;
+  text-decoration: none;
+}
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: system-ui, sans-serif;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.tags a {
+  display: inline-block;
+  padding: 0.125rem 0.75rem;
+  border-radius: 999px;
+  background-color: #fef3c7;
+  color: #92400e;
+  text-decoration: none;
+}
+
+.tags a::before {
+  content: "#";
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao5">Versão 5 · O layout com áreas do Grid</h2>
+<p>Agora a página inteira. Em vez de dizer "o item 3 vai na coluna 2, linha 2", a gente <strong>desenha o mapa</strong> da página com palavras, e depois diz a cada parte em que área ela mora.</p>
+
+<pre class="file" data-file="style.css (versão 5: o que entra)">
+.lateral {
+  padding: 2rem 0;
+}
+
+.lateral h2 {
+  font-size: 1.125rem;
+}
+
+.sobre .avatar {
+  border-radius: 50%;
+}
+
+.categorias {
+  padding: 0;
+  list-style: none;
+}
+
+.categorias li {
+  padding: 0.375rem 0;
+  border-bottom: 1px solid var(--linha);
+}
+
+@media (min-width: 48rem) {
+  .blog {
+    display: grid;
+    grid-template-columns: 1fr 16rem;
+    grid-template-areas:
+      "cabecalho cabecalho"
+      "posts     lateral"
+      "rodape    rodape";
+    column-gap: 2.5rem;
+  }
+
+  .cabecalho {
+    grid-area: cabecalho;
+  }
+
+  .posts {
+    grid-area: posts;
+  }
+
+  .lateral {
+    grid-area: lateral;
+  }
+
+  .rodape {
+    grid-area: rodape;
+  }
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>grid-template-columns: 1fr 16rem</code></dt>
+  <dd>Duas colunas: a dos posts com o que sobrar, a lateral com 16rem (256 px) fixos. Aula: <a href="grid-colunas.html">Colunas</a>.</dd>
+  <dt><code>grid-template-areas</code></dt>
+  <dd>O mapa: cada texto entre aspas é uma linha da grade, e cada palavra, uma célula. <code>"cabecalho cabecalho"</code> faz o cabeçalho ocupar as duas colunas; <code>"posts lateral"</code> põe um ao lado do outro; o rodapé ocupa a largura toda. Os espaços a mais só alinham o texto, para o mapa ficar legível. Aula: <a href="grid-areas.html">Áreas com Nome</a>.</dd>
+  <dt><code>grid-area: posts</code> (e as outras)</dt>
+  <dd>Cada parte da página diz em que área do mapa ela mora.</dd>
+  <dt><code>column-gap: 2.5rem</code></dt>
+  <dd>40 px entre os posts e a lateral; entre as linhas, nada (o cabeçalho e o rodapé já têm o próprio respiro).</dd>
+  <dt>A lateral, fora do <code>@media</code></dt>
+  <dd>Títulos menores, avatar redondo e categorias sem bolinhas, separadas por linhas: vale no celular e no computador.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 768 px, o cabeçalho continua no alto, de ponta a ponta; embaixo, os posts numa coluna de 440 px à esquerda e, à direita, a lateral de 256 px com o avatar, "Sobre mim" e as categorias separadas por linhas finas; o rodapé fecha a página, de ponta a ponta. No quadro de 375 px, nada de colunas: a lateral fica depois dos posts. O F12 do Chrome e do Firefox desenha o mapa por cima da página (o botão "grid" ao lado do elemento, no painel Elementos), com o nome de cada área.</p>
+
+<h3>Experimente: a versão 5</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="blog"&gt;
+  &lt;header class="cabecalho"&gt;
+    &lt;h1 class="nome-blog"&gt;&lt;a href="#"&gt;Cozinha da Ana&lt;/a&gt;&lt;/h1&gt;
+    &lt;p class="lema"&gt;Receitas, histórias e a vida numa lojinha de bolos&lt;/p&gt;
+  &lt;/header&gt;
+  &lt;main class="posts"&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate num prato branco" width="800" height="600"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-10-12"&gt;12 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;O segredo do bolo de cenoura fofinho&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Depois de trinta anos de domingos, a receita da minha avó tem três regras: cenoura bem batida, forno preaquecido e nada de abrir a porta antes da hora.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;receitas&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#"&gt;bolos&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/video-bolo-poster.jpg" alt="O bolo pronto, visto de lado, numa cena do vídeo" width="640" height="360"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-10-05"&gt;5 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;Gravei a receita em vídeo&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Seis segundos, do liquidificador à cobertura. Ficou curtinho, mas dá para ver o ponto da massa.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;vídeos&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/mapa-800.png" alt="Mapa do bairro com a Lojinha da Ana na Rua das Flores" width="800" height="500"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-09-28"&gt;28 de setembro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;A lojinha mudou de rua&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Agora estamos na Rua das Flores, pertinho da Praça da Árvore. Tem até banco na calçada para comer o bolo ainda quente.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;novidades&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#"&gt;bairro&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  &lt;/main&gt;
+  &lt;aside class="lateral"&gt;
+    &lt;section class="sobre"&gt;
+      &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="" width="96" height="96"&gt;
+      &lt;h2&gt;Sobre mim&lt;/h2&gt;
+      &lt;p&gt;Sou a Ana, confeiteira e dona da Lojinha da Ana. Escrevo aqui toda segunda-feira.&lt;/p&gt;
+    &lt;/section&gt;
+    &lt;section&gt;
+      &lt;h2&gt;Categorias&lt;/h2&gt;
+      &lt;ul class="categorias"&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Receitas&lt;/a&gt; (12)&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Vídeos&lt;/a&gt; (4)&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Novidades&lt;/a&gt; (7)&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/section&gt;
+  &lt;/aside&gt;
+  &lt;footer class="rodape"&gt;
+    &lt;p&gt;© 2026 Cozinha da Ana&lt;/p&gt;
+  &lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --destaque: #b45309;
+  --fundo: #fffbf5;
+  --linha: #e7e5e4;
+  --apagado: #78716c;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: #292524;
+  background-color: var(--fundo);
+}
+
+h1,
+h2,
+.data,
+.tags,
+.lateral {
+  font-family: system-ui, sans-serif;
+}
+
+a {
+  color: var(--destaque);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.blog {
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.cabecalho {
+  padding: 2rem 0 1.5rem;
+  border-bottom: 3px double var(--linha);
+  text-align: center;
+}
+
+.nome-blog {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: -0.02em;
+}
+
+.nome-blog a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lema {
+  margin: 0.25rem 0 0;
+  font-style: italic;
+  color: var(--apagado);
+}
+
+.rodape {
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--linha);
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--apagado);
+}
+
+.posts {
+  display: grid;
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+.post {
+  overflow: hidden;
+  background-color: #fff;
+  border: 1px solid var(--linha);
+  border-radius: 12px;
+}
+
+.post img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.post-texto {
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.data {
+  margin: 0;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--apagado);
+}
+
+.post h2 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+.post h2 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.post h2 a:hover {
+  color: var(--destaque);
+  text-decoration: underline;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags a {
+  display: inline-block;
+  padding: 0.125rem 0.75rem;
+  border-radius: 999px;
+  background-color: #fef3c7;
+  color: #92400e;
+  font-size: 0.8125rem;
+  text-decoration: none;
+}
+
+.tags a::before {
+  content: "#";
+}
+
+.tags a:hover {
+  background-color: #fde68a;
+}
+
+.lateral {
+  padding: 2rem 0;
+}
+
+.lateral h2 {
+  font-size: 1.125rem;
+}
+
+.sobre .avatar {
+  border-radius: 50%;
+}
+
+.categorias {
+  padding: 0;
+  list-style: none;
+}
+
+.categorias li {
+  padding: 0.375rem 0;
+  border-bottom: 1px solid var(--linha);
+}
+
+@media (min-width: 48rem) {
+  .blog {
+    display: grid;
+    grid-template-columns: 1fr 16rem;
+    grid-template-areas:
+      "cabecalho cabecalho"
+      "posts     lateral"
+      "rodape    rodape";
+    column-gap: 2.5rem;
+  }
+
+  .cabecalho {
+    grid-area: cabecalho;
+  }
+
+  .posts {
+    grid-area: posts;
+  }
+
+  .lateral {
+    grid-area: lateral;
+  }
+
+  .rodape {
+    grid-area: rodape;
+  }
+}
+</pre>
+</div>
+
+<p>Brinque: troque a ordem no mapa para <code>"lateral posts"</code> (e as colunas para <code>16rem 1fr</code>): a lateral passa para a esquerda sem mudar uma linha do HTML. Troque <code>"cabecalho cabecalho"</code> por <code>"cabecalho lateral"</code> e veja a lateral subir até o alto.</p>
+
+<h3>Missão 5</h3>
+<div class="tryhtml" data-largura="768" data-goal="css:.blog{display}=grid,css:.lateral{grid-row-start}=lateral,css:.posts{grid-column-start}=posts,src:grid-template-areas,src:@media\s*\(\s*min-width:\s*48rem\s*\)">
+<p class="try-task"><strong>Missão:</strong> a partir de <code>48rem</code>, transforme o <code>.blog</code> numa grade de colunas <code>1fr 16rem</code> com as áreas <code>cabecalho</code> (largura toda), <code>posts</code> e <code>lateral</code> (lado a lado) e <code>rodape</code> (largura toda), e ponha cada parte na sua área.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="blog"&gt;
+  &lt;header class="cabecalho"&gt;
+    &lt;h1 class="nome-blog"&gt;&lt;a href="#"&gt;Cozinha da Ana&lt;/a&gt;&lt;/h1&gt;
+    &lt;p class="lema"&gt;Receitas, histórias e a vida numa lojinha de bolos&lt;/p&gt;
+  &lt;/header&gt;
+  &lt;main class="posts"&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate num prato branco" width="800" height="600"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-10-12"&gt;12 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;O segredo do bolo de cenoura fofinho&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Depois de trinta anos de domingos, a receita da minha avó tem três regras: cenoura bem batida, forno preaquecido e nada de abrir a porta antes da hora.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;receitas&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#"&gt;bolos&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/video-bolo-poster.jpg" alt="O bolo pronto, visto de lado, numa cena do vídeo" width="640" height="360"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-10-05"&gt;5 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;Gravei a receita em vídeo&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Seis segundos, do liquidificador à cobertura. Ficou curtinho, mas dá para ver o ponto da massa.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;vídeos&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/mapa-800.png" alt="Mapa do bairro com a Lojinha da Ana na Rua das Flores" width="800" height="500"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-09-28"&gt;28 de setembro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;A lojinha mudou de rua&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Agora estamos na Rua das Flores, pertinho da Praça da Árvore. Tem até banco na calçada para comer o bolo ainda quente.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;novidades&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#"&gt;bairro&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  &lt;/main&gt;
+  &lt;aside class="lateral"&gt;
+    &lt;section class="sobre"&gt;
+      &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="" width="96" height="96"&gt;
+      &lt;h2&gt;Sobre mim&lt;/h2&gt;
+      &lt;p&gt;Sou a Ana, confeiteira e dona da Lojinha da Ana. Escrevo aqui toda segunda-feira.&lt;/p&gt;
+    &lt;/section&gt;
+    &lt;section&gt;
+      &lt;h2&gt;Categorias&lt;/h2&gt;
+      &lt;ul class="categorias"&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Receitas&lt;/a&gt; (12)&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Vídeos&lt;/a&gt; (4)&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Novidades&lt;/a&gt; (7)&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/section&gt;
+  &lt;/aside&gt;
+  &lt;footer class="rodape"&gt;
+    &lt;p&gt;© 2026 Cozinha da Ana&lt;/p&gt;
+  &lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --destaque: #b45309;
+  --fundo: #fffbf5;
+  --linha: #e7e5e4;
+  --apagado: #78716c;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: #292524;
+  background-color: var(--fundo);
+}
+
+h1,
+h2,
+.data,
+.tags,
+.lateral {
+  font-family: system-ui, sans-serif;
+}
+
+a {
+  color: var(--destaque);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.blog {
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.cabecalho {
+  padding: 2rem 0 1.5rem;
+  border-bottom: 3px double var(--linha);
+  text-align: center;
+}
+
+.nome-blog {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: -0.02em;
+}
+
+.nome-blog a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lema {
+  margin: 0.25rem 0 0;
+  font-style: italic;
+  color: var(--apagado);
+}
+
+.rodape {
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--linha);
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--apagado);
+}
+
+.posts {
+  display: grid;
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+.post {
+  overflow: hidden;
+  background-color: #fff;
+  border: 1px solid var(--linha);
+  border-radius: 12px;
+}
+
+.post img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.post-texto {
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.data {
+  margin: 0;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--apagado);
+}
+
+.post h2 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+.post h2 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.post h2 a:hover {
+  color: var(--destaque);
+  text-decoration: underline;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags a {
+  display: inline-block;
+  padding: 0.125rem 0.75rem;
+  border-radius: 999px;
+  background-color: #fef3c7;
+  color: #92400e;
+  font-size: 0.8125rem;
+  text-decoration: none;
+}
+
+.tags a::before {
+  content: "#";
+}
+
+.tags a:hover {
+  background-color: #fde68a;
+}
+
+.lateral {
+  padding: 2rem 0;
+}
+
+/* a partir de 48rem: as áreas aqui embaixo */
+</pre>
+<pre class="solucao" data-file="style.css">:root {
+  --destaque: #b45309;
+  --fundo: #fffbf5;
+  --linha: #e7e5e4;
+  --apagado: #78716c;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: #292524;
+  background-color: var(--fundo);
+}
+
+h1,
+h2,
+.data,
+.tags,
+.lateral {
+  font-family: system-ui, sans-serif;
+}
+
+a {
+  color: var(--destaque);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.blog {
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.cabecalho {
+  padding: 2rem 0 1.5rem;
+  border-bottom: 3px double var(--linha);
+  text-align: center;
+}
+
+.nome-blog {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: -0.02em;
+}
+
+.nome-blog a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lema {
+  margin: 0.25rem 0 0;
+  font-style: italic;
+  color: var(--apagado);
+}
+
+.rodape {
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--linha);
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--apagado);
+}
+
+.posts {
+  display: grid;
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+.post {
+  overflow: hidden;
+  background-color: #fff;
+  border: 1px solid var(--linha);
+  border-radius: 12px;
+}
+
+.post img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.post-texto {
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.data {
+  margin: 0;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--apagado);
+}
+
+.post h2 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+.post h2 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.post h2 a:hover {
+  color: var(--destaque);
+  text-decoration: underline;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags a {
+  display: inline-block;
+  padding: 0.125rem 0.75rem;
+  border-radius: 999px;
+  background-color: #fef3c7;
+  color: #92400e;
+  font-size: 0.8125rem;
+  text-decoration: none;
+}
+
+.tags a::before {
+  content: "#";
+}
+
+.tags a:hover {
+  background-color: #fde68a;
+}
+
+.lateral {
+  padding: 2rem 0;
+}
+
+/* a partir de 48rem: as áreas aqui embaixo */
+@media (min-width: 48rem) {
+  .blog {
+    display: grid;
+    grid-template-columns: 1fr 16rem;
+    grid-template-areas:
+      "cabecalho cabecalho"
+      "posts     lateral"
+      "rodape    rodape";
+    column-gap: 2.5rem;
+  }
+
+  .cabecalho {
+    grid-area: cabecalho;
+  }
+
+  .posts {
+    grid-area: posts;
+  }
+
+  .lateral {
+    grid-area: lateral;
+  }
+
+  .rodape {
+    grid-area: rodape;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="versao6">Versão 6 · Capitular e lateral que acompanha</h2>
+<p>Dois toques de revista: a primeira letra do post mais recente, grande, ocupando a altura de três linhas; e a lateral, que fica à vista enquanto a pessoa rola os posts.</p>
+
+<pre class="file" data-file="style.css (versão 6: o que entra)">
+.post:first-child .resumo::first-letter {
+  float: left;
+  margin: 0.1em 0.12em 0 0;
+  font-size: 3.4em;
+  font-weight: 700;
+  line-height: 0.8;
+  color: var(--destaque);
+}
+
+@media (min-width: 48rem) {
+  .lateral {
+    position: sticky;
+    top: 0;
+    align-self: start;
+  }
+}
+</pre>
+
+<dl class="anatomy">
+  <dt><code>.post:first-child .resumo::first-letter</code></dt>
+  <dd>"A primeira letra do resumo, só no primeiro post." <code>:first-child</code> escolhe o primeiro <code>&lt;article&gt;</code>; <code>::first-letter</code> pega a primeira letra do parágrafo. Aulas: <a href="nth-child.html">:first-child e :nth-child</a> e <a href="pseudo-elementos.html">Outros Pseudo-elementos</a>.</dd>
+  <dt><code>float: left</code> + <code>font-size: 3.4em</code> + <code>line-height: 0.8</code></dt>
+  <dd>A letra cresce para 3,4 vezes o tamanho do texto e "flutua" à esquerda: as linhas do resumo contornam a letra pela direita. É um dos poucos usos do <code>float</code> que continuam atuais. Aula: <a href="float.html">float</a>.</dd>
+  <dt><code>.lateral { position: sticky; top: 0; align-self: start; }</code></dt>
+  <dd>Na tela larga, a lateral gruda no alto enquanto os posts rolam. O <code>align-self: start</code> é essencial: sem ele, a lateral esticaria até a altura da coluna de posts, e um elemento que já ocupa a altura toda não tem para onde "grudar". Aulas: <a href="position-sticky.html">position: sticky</a> e <a href="align-self.html">align-self</a>.</dd>
+</dl>
+
+<p><strong>O que muda na tela:</strong> no quadro de 768 px, o resumo do primeiro post começa com um "D" grande, em negrito âmbar, ocupando a altura de cerca de duas linhas, com o texto contornando-o pela direita. Os outros dois posts não mudam. Rolando 900 px para baixo, a lateral continua no alto do quadro, ao lado do segundo e do terceiro post.</p>
+
+<h3>Experimente: a versão 6 (a página completa)</h3>
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="blog"&gt;
+  &lt;header class="cabecalho"&gt;
+    &lt;h1 class="nome-blog"&gt;&lt;a href="#"&gt;Cozinha da Ana&lt;/a&gt;&lt;/h1&gt;
+    &lt;p class="lema"&gt;Receitas, histórias e a vida numa lojinha de bolos&lt;/p&gt;
+  &lt;/header&gt;
+  &lt;main class="posts"&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate num prato branco" width="800" height="600"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-10-12"&gt;12 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;O segredo do bolo de cenoura fofinho&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Depois de trinta anos de domingos, a receita da minha avó tem três regras: cenoura bem batida, forno preaquecido e nada de abrir a porta antes da hora.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;receitas&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#"&gt;bolos&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/video-bolo-poster.jpg" alt="O bolo pronto, visto de lado, numa cena do vídeo" width="640" height="360"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-10-05"&gt;5 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;Gravei a receita em vídeo&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Seis segundos, do liquidificador à cobertura. Ficou curtinho, mas dá para ver o ponto da massa.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;vídeos&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;article class="post"&gt;
+      &lt;img src="assets/midia/mapa-800.png" alt="Mapa do bairro com a Lojinha da Ana na Rua das Flores" width="800" height="500"&gt;
+      &lt;div class="post-texto"&gt;
+        &lt;p class="data"&gt;&lt;time datetime="2026-09-28"&gt;28 de setembro de 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;h2&gt;&lt;a href="#"&gt;A lojinha mudou de rua&lt;/a&gt;&lt;/h2&gt;
+        &lt;p class="resumo"&gt;Agora estamos na Rua das Flores, pertinho da Praça da Árvore. Tem até banco na calçada para comer o bolo ainda quente.&lt;/p&gt;
+        &lt;ul class="tags"&gt;
+          &lt;li&gt;&lt;a href="#"&gt;novidades&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#"&gt;bairro&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  &lt;/main&gt;
+  &lt;aside class="lateral"&gt;
+    &lt;section class="sobre"&gt;
+      &lt;img class="avatar" src="assets/midia/avatar-ana-96.png" srcset="assets/midia/avatar-ana-192.png 2x" alt="" width="96" height="96"&gt;
+      &lt;h2&gt;Sobre mim&lt;/h2&gt;
+      &lt;p&gt;Sou a Ana, confeiteira e dona da Lojinha da Ana. Escrevo aqui toda segunda-feira.&lt;/p&gt;
+    &lt;/section&gt;
+    &lt;section&gt;
+      &lt;h2&gt;Categorias&lt;/h2&gt;
+      &lt;ul class="categorias"&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Receitas&lt;/a&gt; (12)&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Vídeos&lt;/a&gt; (4)&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Novidades&lt;/a&gt; (7)&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/section&gt;
+  &lt;/aside&gt;
+  &lt;footer class="rodape"&gt;
+    &lt;p&gt;© 2026 Cozinha da Ana&lt;/p&gt;
+  &lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --destaque: #b45309;
+  --fundo: #fffbf5;
+  --linha: #e7e5e4;
+  --apagado: #78716c;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: #292524;
+  background-color: var(--fundo);
+}
+
+h1,
+h2,
+.data,
+.tags,
+.lateral {
+  font-family: system-ui, sans-serif;
+}
+
+a {
+  color: var(--destaque);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.blog {
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.cabecalho {
+  padding: 2rem 0 1.5rem;
+  border-bottom: 3px double var(--linha);
+  text-align: center;
+}
+
+.nome-blog {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: -0.02em;
+}
+
+.nome-blog a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lema {
+  margin: 0.25rem 0 0;
+  font-style: italic;
+  color: var(--apagado);
+}
+
+.rodape {
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--linha);
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--apagado);
+}
+
+.posts {
+  display: grid;
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+.post {
+  overflow: hidden;
+  background-color: #fff;
+  border: 1px solid var(--linha);
+  border-radius: 12px;
+}
+
+.post img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.post-texto {
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.data {
+  margin: 0;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--apagado);
+}
+
+.post h2 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+.post h2 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.post h2 a:hover {
+  color: var(--destaque);
+  text-decoration: underline;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags a {
+  display: inline-block;
+  padding: 0.125rem 0.75rem;
+  border-radius: 999px;
+  background-color: #fef3c7;
+  color: #92400e;
+  font-size: 0.8125rem;
+  text-decoration: none;
+}
+
+.tags a::before {
+  content: "#";
+}
+
+.tags a:hover {
+  background-color: #fde68a;
+}
+
+.lateral {
+  padding: 2rem 0;
+}
+
+.lateral h2 {
+  font-size: 1.125rem;
+}
+
+.sobre .avatar {
+  border-radius: 50%;
+}
+
+.categorias {
+  padding: 0;
+  list-style: none;
+}
+
+.categorias li {
+  padding: 0.375rem 0;
+  border-bottom: 1px solid var(--linha);
+}
+
+@media (min-width: 48rem) {
+  .blog {
+    display: grid;
+    grid-template-columns: 1fr 16rem;
+    grid-template-areas:
+      "cabecalho cabecalho"
+      "posts     lateral"
+      "rodape    rodape";
+    column-gap: 2.5rem;
+  }
+
+  .cabecalho {
+    grid-area: cabecalho;
+  }
+
+  .posts {
+    grid-area: posts;
+  }
+
+  .lateral {
+    grid-area: lateral;
+  }
+
+  .rodape {
+    grid-area: rodape;
+  }
+}
+
+.post:first-child .resumo::first-letter {
+  float: left;
+  margin: 0.1em 0.12em 0 0;
+  font-size: 3.4em;
+  font-weight: 700;
+  line-height: 0.8;
+  color: var(--destaque);
+}
+
+@media (min-width: 48rem) {
+  .lateral {
+    position: sticky;
+    top: 0;
+    align-self: start;
+  }
+}
+</pre>
+</div>
+
+<p>Brinque: role dentro do quadro (ele tem uma altura máxima e rola por dentro) e veja a lateral acompanhar. Troque <code>:first-child</code> por <code>:nth-child(2)</code> para a capitular ir para o segundo post.</p>
+
+<h3>Missão 6</h3>
+<div class="tryhtml" data-goal="css:.resumo::first-letter{float}=left,css:.resumo::first-letter{font-size}=54.4px,css:.data::first-letter{float}=none">
+<p class="try-task"><strong>Missão:</strong> faça a capitular do primeiro post: a primeira letra do <code>.resumo</code> com <code>float: left</code> e <code>3.4em</code>. Só do resumo: a data não pode ganhar a letra grande.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="post"&gt;
+  &lt;p class="data"&gt;&lt;time datetime="2026-10-12"&gt;12 de outubro de 2026&lt;/time&gt;&lt;/p&gt;
+  &lt;h2&gt;&lt;a href="#"&gt;O segredo do bolo de cenoura fofinho&lt;/a&gt;&lt;/h2&gt;
+  &lt;p class="resumo"&gt;Depois de trinta anos de domingos, a receita da minha avó tem três regras: cenoura bem batida, forno preaquecido e nada de abrir a porta antes da hora.&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">:root {
+  --destaque: #b45309;
+}
+
+body {
+  margin: 1rem;
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.7;
+}
+</pre>
+<pre class="solucao" data-file="style.css">:root {
+  --destaque: #b45309;
+}
+
+body {
+  margin: 1rem;
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.7;
+}
+
+.post:first-child .resumo::first-letter {
+  float: left;
+  margin: 0.1em 0.12em 0 0;
+  font-size: 3.4em;
+  font-weight: 700;
+  line-height: 0.8;
+  color: var(--destaque);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Formas diferentes de fazer as mesmas coisas</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Para</th><th>Usamos</th><th>Também daria</th><th>Quando preferir a outra</th></tr></thead>
+<tbody>
+<tr><td>Posicionar as partes</td><td><code>grid-template-areas</code></td><td><code>grid-column</code> e <code>grid-row</code> com números (<code>grid-column: 1 / -1</code>)</td><td>Grades com muitas partes pequenas, em que dar nome a cada uma seria trabalho demais (<a href="grid-posicionar.html">Posicionando Itens</a>).</td></tr>
+<tr><td>Lateral com largura fixa</td><td><code>1fr 16rem</code></td><td><code>1fr minmax(14rem, 20rem)</code> ou <code>3fr 1fr</code></td><td>Quando a lateral deve crescer um pouco com a tela.</td></tr>
+<tr><td>Capitular</td><td><code>::first-letter</code> com <code>float</code></td><td><code>initial-letter: 3</code></td><td>Quando o suporte permitir: o <code>initial-letter</code> alinha a letra às linhas sozinho, mas ainda não funciona em todos os navegadores (veja o MDN).</td></tr>
+<tr><td>Etiquetas</td><td>Flexbox com <code>flex-wrap</code></td><td><code>display: inline-block</code> nos <code>&lt;li&gt;</code></td><td>Quase nunca: o <code>gap</code> do Flexbox dá o espaço certinho, sem sobra no fim.</td></tr>
+<tr><td>Fonte do texto</td><td>Fontes do sistema (<code>Georgia</code>, <code>system-ui</code>)</td><td>Uma fonte da internet com <code>@font-face</code></td><td>Quando a identidade visual pede uma fonte específica (<a href="fontes-web.html">Fontes da Internet</a>); custa um download.</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<h2>Quando dá errado</h2>
+
+<div class="cenario">
+<h3>O mapa com uma célula a menos: a página vira uma bagunça</h3>
+<pre class="file" data-file="style.css · erro de propósito">grid-template-areas:
+  "cabecalho cabecalho"
+  "posts     lateral"
+  "rodape";
+</pre>
+<p><strong>O que você vê:</strong> no quadro de 768 px, a metade esquerda fica vazia, e os posts, a lateral e o rodapé aparecem desenhados <strong>uns por cima dos outros</strong> na metade direita: o avatar e "Sobre mim" sobre a foto do primeiro post, o "© 2026" no meio da foto. <strong>Por quê:</strong> todas as linhas do mapa precisam ter o mesmo número de células; a última tem uma, e as outras, duas. O mapa inteiro fica inválido (o estilo calculado do <code>grid-template-areas</code> é <code>none</code>), as áreas com nome deixam de existir, e o <code>grid-area: posts</code> de cada parte manda todas para o mesmo lugar, fora das colunas. Para o rodapé ocupar as duas colunas, repita o nome: <code>"rodape rodape"</code>. O validador do laboratório <strong>não acusou nada</strong> nesse arquivo; quem mostra o problema é o F12, com o desenho da grade.</p>
+</div>
+
+<div class="cenario">
+<h3>Os posts somem numa coluna fininha</h3>
+<pre class="file" data-file="style.css · erro de propósito">.lateral {
+  grid-area: lateal;
+}
+</pre>
+<p><strong>O que você vê:</strong> no quadro de 768 px, o cabeçalho espremido à esquerda, com "Cozinha da Ana" quebrado em duas linhas; no lugar dos posts, só uma linha vertical fininha (as bordas dos cartões, numa coluna de 2 px); e a lateral lá embaixo, depois do rodapé, à direita. <strong>Por quê:</strong> a área <code>lateal</code> (faltou o "r") não está no mapa. O Grid cria linhas e colunas extras para ela, fora do desenho, e as colunas de verdade ficam espremidas (o estilo calculado do <code>grid-template-columns</code> vira <code>2px 256px 0px 358px</code>). O validador não acusa: <code>lateal</code> é um nome válido, só não existe no mapa.</p>
+</div>
+
+<div class="cenario">
+<h3>A capitular aparece na data</h3>
+<pre class="file" data-file="style.css · erro de propósito">.post:first-child p::first-letter {
+  float: left;
+  font-size: 3.4em;
+}
+</pre>
+<p><strong>O que você vê:</strong> além do "D" do resumo, o "1" de "12 de outubro" também fica enorme e laranja, empurrando a data e o título para a direita. <strong>Por quê:</strong> a data também é um <code>&lt;p&gt;</code>, e <code>p::first-letter</code> pega todos os parágrafos do post. O seletor precisa ser específico: <code>.resumo::first-letter</code>. O CSS é válido; o validador não tem como saber o que você queria.</p>
+</div>
+
+<div class="cenario">
+<h3>A lateral não gruda</h3>
+<p>Com <code>position: sticky; top: 0;</code>, mas sem o <code>align-self: start</code>:</p>
+<p><strong>O que você vê:</strong> rolando 900 px, a lateral sobe junto com a página e some pelo alto do quadro. <strong>Por quê:</strong> num item de Grid, o padrão é esticar até a altura da linha (<code>stretch</code>). A lateral fica tão alta quanto a coluna dos posts (1612 px), e um elemento que já ocupa a altura toda do seu espaço não tem para onde se mover. Com <code>align-self: start</code>, ela fica da altura do conteúdo e pode grudar.</p>
+</div>
+
+<hr>
+
+<h2>Referência: o que o projeto usou</h2>
+<div class="table-wrap">
+<table class="ref">
+<thead><tr><th>Versão</th><th>Propriedades e seletores</th><th>Aulas</th></tr></thead>
+<tbody>
+<tr><td>1 · Texto</td><td><code>font-size</code>, <code>line-height</code>, <code>font-family</code>, variáveis</td><td><a href="font-family.html">Fontes</a>, <a href="line-height.html">Espaçamento</a></td></tr>
+<tr><td>2 · Cabeçalho</td><td><code>border-bottom: double</code>, <code>clamp()</code>, <code>letter-spacing</code>, <code>color: inherit</code>, <code>font-style</code></td><td><a href="border.html">Bordas</a>, <a href="heranca.html">Herança</a></td></tr>
+<tr><td>3 · Cartões</td><td><code>overflow</code>, <code>aspect-ratio</code>, <code>object-fit</code>, <code>text-transform</code></td><td><a href="aspect-ratio.html">aspect-ratio</a></td></tr>
+<tr><td>4 · Etiquetas</td><td><code>display: flex</code>, <code>flex-wrap</code>, <code>gap</code>, <code>::before</code></td><td><a href="before-after.html">::before e ::after</a></td></tr>
+<tr><td>5 · Áreas</td><td><code>grid-template-areas</code>, <code>grid-area</code>, <code>column-gap</code>, <code>@media</code></td><td><a href="grid-areas.html">Áreas com Nome</a></td></tr>
+<tr><td>6 · Capitular e lateral</td><td><code>:first-child</code>, <code>::first-letter</code>, <code>float</code>, <code>position: sticky</code>, <code>align-self</code></td><td><a href="pseudo-elementos.html">Pseudo-elementos</a>, <a href="position-sticky.html">sticky</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Desafios extras</h2>
+<ul>
+  <li>Na tela bem larga (64rem para cima), ponha os posts em duas colunas com <code>repeat(auto-fill, minmax(16rem, 1fr))</code> e o primeiro post ocupando as duas (<code>grid-column: 1 / -1</code>).</li>
+  <li>Crie uma página de post (um artigo só) com a coluna de texto limitada a <code>65ch</code> (65 caracteres por linha, <a href="unidades.html">Unidades</a>).</li>
+  <li>Faça o tema escuro com as variáveis (<a href="tema-escuro.html">Tema Escuro</a>).</li>
+</ul>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A linha que falta no mapa</h3>
+<p>Complete a última linha para o rodapé ocupar as duas colunas:</p>
+<div class="ex-code">grid-template-areas: "cabecalho cabecalho" "posts lateral" "<input data-answer="rodape rodape" aria-label="última linha">";</div>
+</div>
+
+<div class="exercise">
+<h3>2. A primeira letra</h3>
+<p>Qual pseudo-elemento pega a primeira letra de um parágrafo?</p>
+<div class="ex-code">.resumo<input data-answer="::first-letter|:first-letter" aria-label="pseudo-elemento"> { font-size: 3.4em; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. A lateral com <code>position: sticky; top: 0</code> não gruda num layout de Grid. O que costuma faltar?</p>
+<label><input type="radio" name="q3"> <code>z-index</code></label>
+<label><input type="radio" name="q3"> <code>align-self: start</code>, para ela não esticar até a altura da linha</label>
+<label><input type="radio" name="q3"> <code>display: flex</code> na lateral</label>
+<label><input type="radio" name="q3"> <code>position: fixed</code> no lugar de <code>sticky</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">4. Para todas as fotos dos posts ficarem na mesma faixa 16:9, sem deformar, o que vai na <code>img</code>?</p>
+<label><input type="radio" name="q4"> <code>aspect-ratio: 16 / 9; object-fit: cover;</code></label>
+<label><input type="radio" name="q4"> <code>height: 16 / 9;</code></label>
+<label><input type="radio" name="q4"> <code>aspect-ratio: 16:9;</code></label>
+<label><input type="radio" name="q4"> <code>object-fit: fill;</code></label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. No celular (menos de 48rem), onde fica a lateral?</p>
+<label><input type="radio" name="q5"> À direita dos posts, mais estreita</label>
+<label><input type="radio" name="q5"> Escondida</label>
+<label><input type="radio" name="q5"> Depois dos posts, na ordem do HTML</label>
+<label><input type="radio" name="q5"> Antes do cabeçalho</label>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Texto de blog: um pouco maior que o padrão, <code>line-height</code> generoso, serifada no texto e sem serifa nos títulos.</li>
+  <li>Cartões de post com <code>overflow: hidden</code> + <code>border-radius</code>, e a foto em <code>aspect-ratio: 16 / 9</code> + <code>object-fit: cover</code>.</li>
+  <li>Etiquetas: lista em <code>flex</code> com <code>flex-wrap</code> e <code>gap</code>, pílulas com <code>border-radius: 999px</code>, <code>#</code> com <code>::before</code>.</li>
+  <li><code>grid-template-areas</code> desenha o layout como um mapa; todas as linhas com o mesmo número de células; cada parte entra com <code>grid-area</code>.</li>
+  <li>Capitular com <code>::first-letter</code> + <code>float</code>, num seletor específico; lateral grudada com <code>sticky</code> + <code>align-self: start</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
