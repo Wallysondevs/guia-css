@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS flex-grow, flex-shrink e flex-basis — crescer e encolher | Guia CSS</title>
+<meta name="description" content="Como os itens do Flexbox crescem e encolhem: flex-basis (o tamanho de partida), flex-grow (quem fica com o espaço que sobra), flex-shrink (quem cede quando falta), o atalho flex com flex: 1, auto e none, a palavra comprida que não deixa encolher e as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Crescer e Encolher</span></h1>
+
+<p class="intro">No cabeçalho da lojinha, a Ana quer o logo à esquerda, o botão "Entrar" à direita e, no meio, a caixa de busca ocupando <strong>todo o resto</strong>, seja a tela larga ou estreita. Não dá para escrever uma largura fixa para a busca: o "resto" muda com cada tela. Quem resolve isso são três propriedades dos <strong>itens</strong> flex: <code>flex-basis</code> (o tamanho de partida), <code>flex-grow</code> (crescer) e <code>flex-shrink</code> (encolher), e o atalho que junta as três, <code>flex</code>.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Como o navegador mede os itens: primeiro o tamanho de partida, depois divide o espaço que sobra (ou o que falta).</li>
+  <li><code>flex-grow</code>: quem fica com a sobra, e por que <code>2</code> não quer dizer "o dobro do tamanho".</li>
+  <li><code>flex-shrink</code>: quem cede quando falta espaço, e como proteger um item (o logo) para ele nunca encolher.</li>
+  <li><code>flex-basis</code>: o tamanho de partida, e a diferença para o <code>width</code>.</li>
+  <li>O atalho <code>flex</code>, com os valores que você mais vai ver: <code>flex: 1</code>, <code>flex: auto</code> e <code>flex: none</code>.</li>
+  <li>Por que "colunas iguais" às vezes não ficam iguais, e as mensagens reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="flexbox.html">Introdução ao Flexbox</a>, <a href="flex-wrap.html">Quebrando Linha</a> e <a href="gap.html">Espaço entre Itens (gap)</a>. Os exemplos com resultado são desenhados agora pelo <strong>seu</strong> navegador; os números em pixels do texto foram medidos no Chromium. As mensagens do validador saíram do validador W3C (<code>vnu</code>), na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: dividir o que sobra da mesa</h2>
+<p>A Ana arruma uma mesa de 4 metros para uma feira. Cada barraca chega com o seu tamanho (é o <strong>tamanho de partida</strong>): três barracas de 1 metro. Sobra 1 metro. O que fazer com ele?</p>
+<ul>
+  <li>Se ninguém pedir, a sobra fica vazia no fim da mesa. É o padrão do Flexbox: <code>flex-grow: 0</code>, "não crescer".</li>
+  <li>Se a barraca do meio pedir (<code>flex-grow: 1</code>), ela fica com o metro inteiro.</li>
+  <li>Se as três pedirem, a sobra é dividida em partes. Quem pede 2 partes ganha o dobro <strong>da sobra</strong>, e não o dobro do tamanho.</li>
+</ul>
+<p>E se a mesa for menor que as barracas? Aí falta espaço, e cada barraca <strong>cede</strong> um pedaço (<code>flex-shrink</code>). A que não pode ceder (<code>flex-shrink: 0</code>) fica com o tamanho inteiro, e as outras cedem mais.</p>
+
+<hr>
+
+<h2>1. <code>flex-grow</code>: quem fica com a sobra</h2>
+<p>Quatro vezes a mesma fila de 400 pixels, com três itens de 100 pixels de partida (<code>flex-basis: 100px</code>, seção 3). Sobram 100 pixels. Muda só o <code>flex-grow</code>:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;ninguém cresce (padrão)&lt;/p&gt;
+&lt;div class="fila"&gt;
+  &lt;div class="item"&gt;A&lt;/div&gt;&lt;div class="item"&gt;B&lt;/div&gt;&lt;div class="item"&gt;C&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;só o B: flex-grow: 1&lt;/p&gt;
+&lt;div class="fila"&gt;
+  &lt;div class="item"&gt;A&lt;/div&gt;&lt;div class="item cresce-1"&gt;B&lt;/div&gt;&lt;div class="item"&gt;C&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;todos: flex-grow: 1&lt;/p&gt;
+&lt;div class="fila"&gt;
+  &lt;div class="item cresce-1"&gt;A&lt;/div&gt;&lt;div class="item cresce-1"&gt;B&lt;/div&gt;&lt;div class="item cresce-1"&gt;C&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;1, 2 e 1&lt;/p&gt;
+&lt;div class="fila"&gt;
+  &lt;div class="item cresce-1"&gt;A&lt;/div&gt;&lt;div class="item cresce-2"&gt;B&lt;/div&gt;&lt;div class="item cresce-1"&gt;C&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">p {
+  margin: 8px 0 4px;
+  font-family: monospace;
+}
+
+.fila {
+  display: flex;
+  width: 400px;
+  border: 2px dashed gray;
+}
+
+.item {
+  box-sizing: border-box;
+  flex-basis: 100px;
+  padding: 8px;
+  border: 1px solid white;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+
+.cresce-1 {
+  flex-grow: 1;
+}
+
+.cresce-2 {
+  flex-grow: 2;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Fila</th><th>A conta da sobra (100 px)</th><th>Larguras finais (medidas)</th></tr>
+<tr><td>ninguém cresce</td><td>ninguém pede: a sobra fica vazia à direita</td><td>100 · 100 · 100</td></tr>
+<tr><td>só o B</td><td>B pede 1 parte de 1: fica com tudo</td><td>100 · 200 · 100</td></tr>
+<tr><td>todos 1</td><td>3 partes: 33,3 para cada</td><td>133,3 · 133,3 · 133,3</td></tr>
+<tr><td>1, 2 e 1</td><td>4 partes de 25: A ganha 25, B ganha 50, C ganha 25</td><td>125 · 150 · 125</td></tr>
+</table>
+</div>
+
+<p>Repare na última fila: o B tem <code>flex-grow: 2</code>, mas ficou com 150 pixels, e não com o dobro dos 125 do A. O número do <code>flex-grow</code> diz <strong>quantas partes da sobra</strong> o item recebe, e não o tamanho final. (A seção 4 mostra como fazer tamanhos finais proporcionais.)</p>
+
+<dl class="anatomy">
+  <dt>.cresce-1</dt><dd>O seletor: um <strong>item</strong> flex (filho de um elemento com <code>display: flex</code>). Ao contrário do <code>flex-wrap</code> e do <code>gap</code>, que vão no pai, as três propriedades desta aula vão nos <strong>filhos</strong>.</dd>
+  <dt>flex-grow</dt><dd>"Crescimento flexível": quanto o item cresce quando sobra espaço.</dd>
+  <dt>1</dt><dd>Um número <strong>sem unidade</strong>, zero ou maior. <code>0</code> (o padrão) = não cresce. Pode ter vírgula decimal, escrita com ponto: <code>0.5</code>.</dd>
+</dl>
+
+<h3>Experimente: a busca que ocupa o resto</h3>
+<div class="tryhtml" data-goal="css:.busca{flex-grow}=1">
+<p class="try-task"><strong>Missão:</strong> faça a caixa de busca ocupar todo o espaço que sobra entre o logo e o botão. Depois, arraste o canto da página (ou mude o <code>width</code> do cabeçalho) e veja a busca acompanhar.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;strong class="logo"&gt;Lojinha da Ana&lt;/strong&gt;
+  &lt;input class="busca" type="search" placeholder="Buscar doces…" aria-label="Buscar"&gt;
+  &lt;button&gt;Entrar&lt;/button&gt;
+&lt;/header&gt;
+</pre>
+<pre class="script" data-file="style.css">.topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  background-color: lavender;
+  font-family: sans-serif;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  background-color: lavender;
+  font-family: sans-serif;
+}
+
+.busca {
+  flex-grow: 1;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. <code>flex-shrink</code>: quem cede quando falta</h2>
+<p>Agora o contrário: uma fila de <strong>300</strong> pixels com três itens de 150 de partida. Faltam 150 pixels. O padrão é <code>flex-shrink: 1</code>: todos cedem por igual. Com <code>flex-shrink: 0</code>, o item <strong>não cede nada</strong>, e os outros cedem a parte dele:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;todos cedem (padrão)&lt;/p&gt;
+&lt;div class="fila"&gt;
+  &lt;div class="item"&gt;A&lt;/div&gt;&lt;div class="item"&gt;B&lt;/div&gt;&lt;div class="item"&gt;C&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;B com flex-shrink: 0&lt;/p&gt;
+&lt;div class="fila"&gt;
+  &lt;div class="item"&gt;A&lt;/div&gt;&lt;div class="item nao-encolhe"&gt;B&lt;/div&gt;&lt;div class="item"&gt;C&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">p {
+  margin: 8px 0 4px;
+  font-family: monospace;
+}
+
+.fila {
+  display: flex;
+  width: 300px;
+  border: 2px dashed gray;
+}
+
+.item {
+  box-sizing: border-box;
+  flex-basis: 150px;
+  padding: 8px;
+  border: 1px solid white;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+
+.nao-encolhe {
+  flex-shrink: 0;
+}
+</pre>
+</div>
+
+<p>Na primeira fila, cada item cedeu 50 e ficou com 100 pixels. Na segunda, o B manteve os seus 150, e o A e o C cederam 75 cada, ficando com 75. Isso é ótimo para um <strong>logo</strong> ou um ícone, que fica feio espremido: <code>flex-shrink: 0</code> nele, e o resto se vira.</p>
+
+<div class="tip">
+<strong>Encolher tem limite</strong>
+<p>Um item flex não encolhe menos que o seu conteúdo mais largo que não se quebra: a palavra mais comprida, uma imagem, um endereço da web. Você viu isso na aula <a href="flex-wrap.html">flex-wrap</a>, com o "Brigadeiro", e vai ver de novo em <a href="#errado">Quando dá errado</a>.</p>
+</div>
+
+<hr>
+
+<h2>3. <code>flex-basis</code>: o tamanho de partida</h2>
+<p>Antes de dividir a sobra (ou o que falta), o navegador precisa saber o tamanho de partida de cada item. É o <code>flex-basis</code> ("base flexível"):</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>Tamanho de partida</th></tr>
+<tr><td><code>auto</code> (padrão)</td><td>Olha o <code>width</code> do item (numa fila em linha). Sem <code>width</code>, usa o tamanho do conteúdo</td></tr>
+<tr><td><code>150px</code>, <code>10rem</code>, <code>30%</code></td><td>Esse tamanho, como se fosse um <code>width</code> (o <code>%</code> é da largura do pai)</td></tr>
+<tr><td><code>0</code></td><td>Zero: o item parte do nada e fica só com a parte da sobra que ganhar (seção 4)</td></tr>
+</table>
+</div>
+
+<h3><code>flex-basis</code> ou <code>width</code>?</h3>
+<p>Numa fila em linha, os dois dão o mesmo resultado na maioria das vezes, e o <code>flex-basis</code> <strong>vence</strong> se os dois estiverem no mesmo item. A diferença aparece com <code>flex-direction: column</code>: aí o <code>flex-basis</code> passa a ser a <strong>altura</strong> de partida, porque ele sempre segue a direção da fila. Use <code>flex-basis</code> (ou o atalho <code>flex</code>) quando o tamanho é "de partida, mas pode crescer ou encolher"; use <code>width</code> quando o tamanho é a largura e pronto, fora do Flexbox também.</p>
+
+<hr>
+
+<h2>4. O atalho <code>flex</code></h2>
+<p>As três propriedades quase sempre andam juntas, e na prática quase todo mundo escreve o atalho <code>flex</code>, na ordem <strong>crescer, encolher, partida</strong>:</p>
+
+<pre class="file" data-file="style.css">.lateral {
+  flex: 0 0 200px;
+}</pre>
+
+<dl class="anatomy">
+  <dt>flex</dt><dd>O atalho para <code>flex-grow</code> + <code>flex-shrink</code> + <code>flex-basis</code>.</dd>
+  <dt>0</dt><dd>Primeiro número: o <code>flex-grow</code>. Não cresce.</dd>
+  <dt>0</dt><dd>Segundo número: o <code>flex-shrink</code>. Não encolhe.</dd>
+  <dt>200px</dt><dd>O tamanho (com unidade): o <code>flex-basis</code>. Resultado: uma coluna lateral de 200 pixels, firme.</dd>
+</dl>
+
+<p>Os valores curtos mais comuns, com o que cada um vira de verdade (conferido no <code>getComputedStyle</code> do Chromium, que mostra as três propriedades longas):</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>grow · shrink · basis</th><th>Na prática</th></tr>
+<tr><td>(nada)</td><td><code>0</code> · <code>1</code> · <code>auto</code></td><td>O padrão: não cresce, encolhe se faltar espaço, parte do <code>width</code> ou do conteúdo</td></tr>
+<tr><td><code>flex: 1</code></td><td><code>1</code> · <code>1</code> · <code>0%</code></td><td>Parte do zero e divide <strong>todo</strong> o espaço: com todos em <code>flex: 1</code>, colunas iguais</td></tr>
+<tr><td><code>flex: 2</code></td><td><code>2</code> · <code>1</code> · <code>0%</code></td><td>Partindo do zero, recebe 2 partes: o <strong>dobro do tamanho</strong> de um vizinho com <code>flex: 1</code></td></tr>
+<tr><td><code>flex: auto</code></td><td><code>1</code> · <code>1</code> · <code>auto</code></td><td>Parte do tamanho do conteúdo e divide só a sobra: quem tem mais texto fica maior</td></tr>
+<tr><td><code>flex: none</code></td><td><code>0</code> · <code>0</code> · <code>auto</code></td><td>Rígido: nem cresce, nem encolhe</td></tr>
+<tr><td><code>flex: 200px</code></td><td><code>1</code> · <code>1</code> · <code>200px</code></td><td>Parte de 200 e pode crescer e encolher</td></tr>
+</table>
+</div>
+
+<p>Repare na pegadinha: escrever só um número (<code>flex: 1</code>) muda <strong>também</strong> o <code>flex-basis</code> para <code>0%</code>. É por isso que <code>flex: 2</code> dá o dobro do tamanho, e <code>flex-grow: 2</code> sozinho, não: com a partida zero, toda a largura é "sobra", e a divisão por partes vale para o tamanho inteiro. Compare <code>flex: 1</code> e <code>flex: auto</code> nos mesmos três itens:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;flex: 1&lt;/p&gt;
+&lt;div class="fila iguais"&gt;
+  &lt;div class="item"&gt;Bolo&lt;/div&gt;
+  &lt;div class="item"&gt;Torta de limão com merengue&lt;/div&gt;
+  &lt;div class="item"&gt;Pão&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;flex: auto&lt;/p&gt;
+&lt;div class="fila pelo-conteudo"&gt;
+  &lt;div class="item"&gt;Bolo&lt;/div&gt;
+  &lt;div class="item"&gt;Torta de limão com merengue&lt;/div&gt;
+  &lt;div class="item"&gt;Pão&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">p {
+  margin: 8px 0 4px;
+  font-family: monospace;
+}
+
+.fila {
+  display: flex;
+  width: 400px;
+  border: 2px dashed gray;
+}
+
+.item {
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid white;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+
+.iguais .item {
+  flex: 1;
+}
+
+.pelo-conteudo .item {
+  flex: auto;
+}
+</pre>
+</div>
+
+<p>Com <code>flex: 1</code>, as três colunas ficaram iguais (133 pixels cada), e o título comprido quebrou em duas linhas. Com <code>flex: auto</code>, cada uma partiu do tamanho do seu texto e só a sobra foi dividida: a torta ficou bem mais larga, numa linha só, e o pão, estreito. <code>flex: 1</code> é o que você quer para "colunas iguais"; <code>flex: auto</code>, para "cada um com o que precisa, e o resto dividido".</p>
+
+<hr>
+
+<h2>5. Formas de fazer a mesma coisa</h2>
+<p>"A busca ocupa o resto do cabeçalho" pode ser escrito de vários jeitos. Todos estes funcionam:</p>
+
+<pre class="file" data-file="style.css">/* 1. só o crescimento */
+.busca {
+  flex-grow: 1;
+}
+
+/* 2. o atalho: cresce, encolhe, parte do zero */
+.busca {
+  flex: 1;
+}
+
+/* 3. parte de um tamanho mínimo razoável e cresce */
+.busca {
+  flex: 1 1 10rem;
+}</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Quando usar</th></tr>
+<tr><td><code>flex-grow: 1</code></td><td>Para deixar claro "este item fica com a sobra", sem mexer no resto</td></tr>
+<tr><td><code>flex: 1</code></td><td>O mais comum: colunas iguais, ou o item que ocupa o resto</td></tr>
+<tr><td><code>flex: 1 1 10rem</code></td><td>Quando o item precisa de um tamanho de partida; com <code>flex-wrap: wrap</code>, ele quebra para a linha de baixo quando ficaria menor que isso</td></tr>
+<tr><td><code>flex: 0 0 200px</code> ou <code>flex: none</code> + <code>width</code></td><td>Colunas e itens de tamanho fixo: a lateral, o logo, o avatar</td></tr>
+<tr><td><code>width: 70%</code> sem Flexbox</td><td>O jeito antigo: contas de porcentagem que não sabem o tamanho dos vizinhos. Prefira o Flexbox (ou o Grid, com <code>fr</code>: aula <a href="grid-colunas.html">Colunas</a>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>CSS quase nunca mostra mensagem: o navegador ignora em silêncio o que não entende.</p>
+
+<div class="cenario">
+<strong>"<code>flex: 1</code> e as colunas não ficaram iguais"</strong>
+<p><strong>O que aconteceu:</strong> três colunas com <code>flex: 1</code>, mas a do meio tem um endereço da web comprido, sem espaços:</p>
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="fila"&gt;
+  &lt;div class="item"&gt;Bolo&lt;/div&gt;
+  &lt;div class="item"&gt;https://receitasdaana.exemplo.com/bolodecenouracomchocolate&lt;/div&gt;
+  &lt;div class="item"&gt;Pão&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.fila {
+  display: flex;
+  width: 400px;
+  border: 2px dashed gray;
+}
+
+.item {
+  flex: 1;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid white;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+<p><strong>O que você vê:</strong> a coluna do meio ficou muito mais larga que as outras, e o endereço passa da borda tracejada. Não é erro de escrita (o validador não reclama): um item flex tem, por padrão, <code>min-width: auto</code>, que quer dizer "nunca fique menor que o seu conteúdo que não se quebra". O endereço não tem onde quebrar, então a coluna não encolhe.</p>
+<p><strong>Como consertar:</strong> no item, <code>min-width: 0</code> (pode encolher abaixo do conteúdo) e <code>overflow-wrap: anywhere</code> (o texto pode quebrar em qualquer ponto, aula <a href="texto-longo.html">Texto que Não Cabe</a>). Acrescente as duas linhas no <code>.item</code> acima e veja as colunas ficarem iguais.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>flex-grow</code> não faz nada</strong>
+<p><strong>O que aconteceu:</strong> um destes três:</p>
+<ul>
+  <li>foi escrito no <strong>pai</strong> (<code>.topo { flex-grow: 1; }</code>): ele vale para o próprio <code>.topo</code> em relação ao pai <em>dele</em>, e não para os filhos;</li>
+  <li>o pai não tem <code>display: flex</code>: então os filhos não são itens flex, e <code>flex-grow</code>, <code>flex-shrink</code> e <code>flex-basis</code> são ignorados;</li>
+  <li><strong>não sobra espaço</strong>: os itens já ocupam a linha toda (ou o pai tem a largura exata do conteúdo, como um <code>inline-flex</code>), então não há o que dividir.</li>
+</ul>
+<p><strong>O que você vê:</strong> nada muda, e nenhuma mensagem aparece. No F12, o painel Styles (Estilos) mostra a declaração normalmente.</p>
+<p><strong>Como consertar:</strong> <code>display: flex</code> no pai, <code>flex-grow</code> no filho, e confira se o pai é mais largo que a soma dos itens (no F12, passe o mouse sobre o pai e veja o tamanho dele).</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “flex”: “200” is not a “flex” value.</code></strong>
+<p><strong>O que aconteceu:</strong> o tamanho de partida sem unidade: <code>flex: 0 0 200;</code> (ou <code>flex-basis: 200;</code>).</p>
+<pre class="term" data-cwd="~/crescer">$ vnu --css semunidade.css
+"file:/home/ana/crescer/semunidade.css":2.13-2.15: error: CSS: “flex”: “200” is not a “flex” value.
+$ vnu --css basis.css
+"file:/home/ana/crescer/basis.css":2.15-2.17: error: CSS: “flex-basis”: “200” is not a “flex-basis” value.</pre>
+<p>"<code>200</code> não é um valor de <code>flex</code>." O crescer e o encolher são números puros, mas o tamanho de partida é um <strong>tamanho</strong> e precisa de unidade. O navegador ignora a declaração inteira, e a lateral volta a encolher como qualquer item.</p>
+<p><strong>Como consertar:</strong> <code>flex: 0 0 200px;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “flex-grow”: “1px” is not a “flex-grow” value.</code></strong>
+<p><strong>O que aconteceu:</strong> o erro contrário: unidade onde não pode. Também acontece com valores inventados, como <code>true</code> ou <code>none</code>:</p>
+<pre class="term" data-cwd="~/crescer">$ vnu --css px.css
+"file:/home/ana/crescer/px.css":2.14-2.16: error: CSS: “flex-grow”: “1px” is not a “flex-grow” value.
+$ vnu --css true.css
+"file:/home/ana/crescer/true.css":2.14-2.17: error: CSS: “flex-grow”: “true” is not a “flex-grow” value.
+$ vnu --css none.css
+"file:/home/ana/crescer/none.css":2.16-2.19: error: CSS: “flex-shrink”: “none” is not a “flex-shrink” value.</pre>
+<p><code>flex-grow</code> e <code>flex-shrink</code> são "quantas partes": números sem unidade. O <code>none</code> existe, mas só no atalho <code>flex: none</code>.</p>
+<p><strong>Como consertar:</strong> <code>flex-grow: 1;</code>, <code>flex-shrink: 0;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “flex-grow”: “-1” negative values are not allowed.</code></strong>
+<p><strong>O que aconteceu:</strong> a Ana quis "encolher" com um crescimento negativo: <code>flex-grow: -1;</code>.</p>
+<pre class="term" data-cwd="~/crescer">$ vnu --css neg.css
+"file:/home/ana/crescer/neg.css":2.15-2.15: error: CSS: “flex-grow”: “-1” negative values are not allowed.</pre>
+<p>"Valores negativos não são permitidos." O menor valor é <code>0</code>; a declaração é ignorada.</p>
+<p><strong>Como consertar:</strong> para não crescer, <code>flex-grow: 0</code>. Para encolher, quem manda é o <code>flex-shrink</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “flex”: Too many values or values are not recognized.</code></strong>
+<p><strong>O que aconteceu:</strong> quatro valores no atalho: <code>flex: 1 1 200px 3;</code>.</p>
+<pre class="term" data-cwd="~/crescer">$ vnu --css quatro.css
+"file:/home/ana/crescer/quatro.css":2.19-2.19: error: CSS: “flex”: Too many values or values are not recognized.</pre>
+<p>"Valores demais, ou não reconhecidos." O <code>flex</code> aceita no máximo três: crescer, encolher, partida.</p>
+<p><strong>Como consertar:</strong> <code>flex: 1 1 200px;</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>flex-grow: 1;</code></td><td>Recebe 1 parte da sobra (padrão: <code>0</code>, não cresce)</td></tr>
+<tr><td><code>flex-shrink: 0;</code></td><td>Não encolhe quando falta espaço (padrão: <code>1</code>)</td></tr>
+<tr><td><code>flex-basis: 200px;</code></td><td>Tamanho de partida (padrão: <code>auto</code>, o <code>width</code> ou o conteúdo)</td></tr>
+<tr><td><code>flex: 0 0 200px;</code></td><td>Atalho: crescer, encolher, partida</td></tr>
+<tr><td><code>flex: 1;</code></td><td><code>1 1 0%</code>: colunas iguais / ocupa o resto</td></tr>
+<tr><td><code>flex: auto;</code></td><td><code>1 1 auto</code>: parte do conteúdo e divide a sobra</td></tr>
+<tr><td><code>flex: none;</code></td><td><code>0 0 auto</code>: rígido</td></tr>
+<tr><td><code>min-width: 0;</code></td><td>Deixa o item encolher abaixo do seu conteúdo</td></tr>
+<tr><td>Onde vai</td><td>Nos <strong>itens</strong> (filhos do pai flex)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Ocupar o resto</h3>
+<p>Complete para o item ficar com todo o espaço que sobra:</p>
+<div class="ex-code">.busca { <input data-answer="flex-grow" aria-label="propriedade">: 1; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. O logo que não encolhe</h3>
+<p>Complete para o logo nunca ceder espaço:</p>
+<div class="ex-code">.logo { flex-shrink: <input data-answer="0" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. Numa fila de 400 px, três itens de 100 px de partida têm <code>flex-grow</code> 1, 2 e 1. Qual a largura do item do meio?</p>
+<label><input type="radio" name="q3"> 200 px</label>
+<label><input type="radio" name="q3"> 133 px</label>
+<label><input type="radio" name="q3"> 150 px</label>
+<label><input type="radio" name="q3"> 100 px</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. O que <code>flex: 1</code> vira nas propriedades longas?</p>
+<label><input type="radio" name="q4"> <code>flex-grow: 1</code> e mais nada</label>
+<label><input type="radio" name="q4"> <code>flex-grow: 1</code>, <code>flex-shrink: 1</code>, <code>flex-basis: 0%</code></label>
+<label><input type="radio" name="q4"> <code>flex-grow: 1</code>, <code>flex-shrink: 0</code>, <code>flex-basis: auto</code></label>
+<label><input type="radio" name="q4"> <code>width: 100%</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. Três colunas com <code>flex: 1</code>, mas a do meio, com um endereço comprido sem espaços, ficou mais larga. Por quê?</p>
+<label><input type="radio" name="q5"> Porque <code>flex: 1</code> não funciona com texto</label>
+<label><input type="radio" name="q5"> Porque faltou <code>flex-wrap: wrap</code></label>
+<label><input type="radio" name="q5"> Porque a coluna do meio tem <code>flex-grow</code> maior</label>
+<label><input type="radio" name="q5"> Porque o item não encolhe abaixo do conteúdo que não quebra (<code>min-width: auto</code>)</label>
+</div>
+
+<h3>Missão final: lateral e conteúdo</h3>
+
+<div class="tryhtml" data-goal="css:.lateral{flex-basis}=180px,css:.lateral{flex-shrink}=0,css:.lateral{flex-grow}=0,css:.conteudo{flex-grow}=1">
+<p class="try-task"><strong>Missão:</strong> monte o blog da Ana em duas colunas. (1) A <code>.lateral</code> tem 180 pixels firmes: não cresce e não encolhe (use o atalho <code>flex</code> com três valores). (2) O <code>.conteudo</code> ocupa todo o resto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;nav class="lateral"&gt;
+    &lt;p&gt;Bolos&lt;/p&gt;
+    &lt;p&gt;Tortas&lt;/p&gt;
+    &lt;p&gt;Pães&lt;/p&gt;
+  &lt;/nav&gt;
+  &lt;main class="conteudo"&gt;
+    &lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+    &lt;p&gt;A receita que a Ana faz todo domingo, com cobertura de chocolate.&lt;/p&gt;
+  &lt;/main&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+  display: flex;
+  gap: 16px;
+  font-family: sans-serif;
+}
+
+.lateral {
+  padding: 8px;
+  background-color: lavender;
+}
+
+.conteudo {
+  padding: 8px;
+  background-color: lightyellow;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.pagina {
+  display: flex;
+  gap: 16px;
+  font-family: sans-serif;
+}
+
+.lateral {
+  flex: 0 0 180px;
+  padding: 8px;
+  background-color: lavender;
+}
+
+.conteudo {
+  flex: 1;
+  padding: 8px;
+  background-color: lightyellow;
+}
+</pre>
+</div>
+
+<p>Diminua a largura da página (ou escreva <code>width: 400px</code> no <code>.pagina</code>): a lateral fica com os seus 180 pixels, e só o conteúdo estreita.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O navegador parte do <code>flex-basis</code> de cada item e depois divide a <strong>sobra</strong> (com <code>flex-grow</code>) ou o que <strong>falta</strong> (com <code>flex-shrink</code>).</li>
+  <li><code>flex-grow</code>: partes da sobra. Padrão <code>0</code>. <code>2</code> é o dobro da sobra, não do tamanho.</li>
+  <li><code>flex-shrink</code>: quanto cede. Padrão <code>1</code>. <code>0</code> protege o item (logo, lateral).</li>
+  <li><code>flex-basis</code>: o tamanho de partida (com unidade); <code>auto</code> usa o <code>width</code> ou o conteúdo.</li>
+  <li>Atalho <code>flex</code>: crescer, encolher, partida. <code>flex: 1</code> = <code>1 1 0%</code> (colunas iguais), <code>flex: auto</code> = <code>1 1 auto</code>, <code>flex: none</code> = <code>0 0 auto</code>.</li>
+  <li>Tudo isso vai nos <strong>itens</strong>. Um item não encolhe abaixo do conteúdo que não quebra: <code>min-width: 0</code> libera.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
