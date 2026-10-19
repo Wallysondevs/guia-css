@@ -243,7 +243,7 @@
 <hr>
 
 <h2>4. Pintar só o marcador: <code>::marker</code></h2>
-<p>E se a Ana quiser os números do modo de preparo em laranja, mas o texto em preto? Um <code>color</code> no <code>&lt;li&gt;</code> pinta os dois. Para mexer <strong>só no marcador</strong>, existe o pseudo-elemento <code>::marker</code>:</p>
+<p>E se a Ana quiser os números do modo de preparo em vermelho, mas o texto em preto? Um <code>color</code> no <code>&lt;li&gt;</code> pinta os dois. Para mexer <strong>só no marcador</strong>, existe o pseudo-elemento <code>::marker</code>:</p>
 
 <div class="tryhtml">
 <p class="try-task"><strong>Experimente:</strong> mude o <code>font-size</code> para <code>2em</code> e a cor para <code>navy</code>.</p>
@@ -256,7 +256,7 @@
 &lt;/ol&gt;
 </pre>
 <pre class="script" data-file="style.css">.preparo li::marker {
-  color: tomato;
+  color: firebrick;
   font-size: 1.5em;
   font-weight: bold;
 }
@@ -277,7 +277,7 @@
 </div>
 
 <div class="tryhtml" data-goal="css:.preparo li{list-style-type}=lower-alpha,src:::marker\s*\{[^}]*color\s*:">
-<p class="try-task"><strong>Missão:</strong> deixe os passos com letras minúsculas (a, b, c) e pinte só as letras de <code>tomato</code>, com <code>::marker</code>.</p>
+<p class="try-task"><strong>Missão:</strong> deixe os passos com letras minúsculas (a, b, c) e pinte só as letras de <code>firebrick</code> (vermelho-escuro), com <code>::marker</code>.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;h2&gt;Modo de preparo&lt;/h2&gt;
 &lt;ol class="preparo"&gt;
@@ -295,7 +295,7 @@
 }
 
 .preparo li::marker {
-  color: tomato;
+  color: firebrick;
 }
 </pre>
 </div>
@@ -412,7 +412,7 @@
 <tr><td><code>list-style-position: inside;</code></td><td>Marcador dentro do texto (o padrão é <code>outside</code>)</td></tr>
 <tr><td><code>list-style-image: url(…);</code></td><td>Imagem como marcador (pouco usado)</td></tr>
 <tr><td><code>list-style: none;</code></td><td>Atalho: sem marcador</td></tr>
-<tr><td><code>li::marker { color: tomato; }</code></td><td>Estiliza só o marcador (cor, fonte)</td></tr>
+<tr><td><code>li::marker { color: firebrick; }</code></td><td>Estiliza só o marcador (cor, fonte)</td></tr>
 <tr><td><code>padding: 0; margin: 0;</code></td><td>Tira o recuo (40px) e as margens (16px) padrão da lista</td></tr>
 </table>
 </div>
@@ -436,7 +436,7 @@
 <div class="exercise">
 <h3>3. Só o marcador</h3>
 <p>Complete o pseudo-elemento que pinta só os números:</p>
-<div class="ex-code">li<input data-answer="::marker" aria-label="pseudo-elemento"> { color: tomato; }</div>
+<div class="ex-code">li<input data-answer="::marker" aria-label="pseudo-elemento"> { color: firebrick; }</div>
 </div>
 
 <div class="mc" data-answer="2">
