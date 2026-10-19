@@ -835,7 +835,7 @@
     ".hs-w3c .hs-e{color:var(--bad);font-weight:700}.hs-w3c .hs-a{color:#a36a00;font-weight:700}",
     ".hs-w3c code{white-space:pre-wrap;word-break:break-word}",
     ".hs-nota{margin:8px 0 0;font-size:13.5px;color:var(--muted);line-height:1.5}",
-    ".hs-falta{display:block;font-weight:400;font-size:14px;margin-top:2px}",
+    ".hs-falta{display:block;font-weight:400;font-size:14px;margin-top:2px;overflow-wrap:anywhere}",
     ".hs-res{margin:-6px 0 18px}",
     ".hs-res .hs-barra{border-radius:8px 8px 0 0}",
     ".hs-res .hs-console{margin-top:6px}",
