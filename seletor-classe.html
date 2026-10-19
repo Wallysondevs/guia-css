@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Seletor de Classe — o ponto (.) e o atributo class | Guia CSS</title>
+<meta name="description" content="O seletor de classe do CSS para quem nunca escreveu CSS: o atributo class no HTML e o ponto no CSS, a mesma classe em vários elementos, várias classes no mesmo elemento, p.destaque, .cartao.promocao, como dar bons nomes e o que acontece quando dá errado (sem o ponto, ponto no HTML, maiúscula, número no começo, vírgula no class), com as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Seletor de Classe (.)</span></h1>
+
+<p class="intro">O seletor de elemento (<code>p</code>, <code>h1</code>) pinta <strong>todos</strong> os parágrafos, <strong>todos</strong> os títulos. Mas quase sempre você quer escolher: só <strong>este</strong> parágrafo em destaque, só <strong>estes</strong> dois cartões em promoção. Para isso existe a <strong>classe</strong>: um nome que você cola nos elementos, no HTML, e depois chama no CSS com um <strong>ponto</strong> na frente. É o seletor que você mais vai usar na vida.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O atributo <code>class</code> no HTML e o seletor <code>.nome</code> no CSS: como um encontra o outro.</li>
+  <li>A mesma classe em vários elementos, e várias classes no mesmo elemento.</li>
+  <li>A diferença entre <code>.destaque</code>, <code>p.destaque</code>, <code>.cartao.promocao</code> e <code>.cartao .promocao</code>.</li>
+  <li>Como dar bons nomes às classes.</li>
+  <li>Os erros mais comuns: esquecer o ponto, pôr o ponto no HTML, maiúscula trocada, número no começo, vírgula no <code>class</code>.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: etiquetas coloridas</h2>
+<p>Pense numa estante de potes de tempero. A Ana quer marcar os potes que estão acabando. Ela não escreve "o terceiro pote da segunda prateleira": ela cola uma <strong>etiqueta vermelha</strong> em cada pote que está no fim. Depois, para fazer a lista de compras, basta procurar as etiquetas vermelhas.</p>
+<p>A classe é essa etiqueta:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Na estante</th><th>Na página</th></tr>
+<tr><td>Colar a etiqueta "acabando" no pote</td><td>Escrever <code>class="acabando"</code> no elemento, no <strong>HTML</strong></td></tr>
+<tr><td>Uma etiqueta igual em vários potes</td><td>A mesma classe em vários elementos</td></tr>
+<tr><td>Um pote com duas etiquetas ("acabando" e "picante")</td><td>Um elemento com duas classes: <code>class="acabando picante"</code></td></tr>
+<tr><td>"Procure todos os potes com a etiqueta vermelha"</td><td>O seletor <code>.acabando</code>, no <strong>CSS</strong></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. A primeira classe</h2>
+<p>São dois passos, um em cada arquivo. No HTML, você dá a classe ao elemento; no CSS, você escreve o nome da classe com um ponto na frente.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> só o parágrafo com <code>class="destaque"</code> ganhou o fundo amarelo e as letras vermelho-escuras. Os outros dois continuam normais. Troque o <code>class="destaque"</code> de lugar, para o primeiro parágrafo, e veja o destaque mudar junto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura com cobertura de chocolate.&lt;/p&gt;
+&lt;p class="destaque"&gt;Receita nova toda sexta-feira!&lt;/p&gt;
+&lt;p&gt;Pão de queijo mineiro.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.destaque {
+  background-color: lightyellow;
+  color: darkred;
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>class="destaque"</dt><dd>No <strong>HTML</strong>: o atributo <code>class</code> ("classe") cola a etiqueta <code>destaque</code> no parágrafo. Aqui o nome vai <strong>sem</strong> ponto. O atributo <code>class</code> não muda nada na aparência sozinho: ele só dá um nome.</dd>
+  <dt>.</dt><dd>No <strong>CSS</strong>: o ponto quer dizer "classe". Sem ele, o navegador procuraria um elemento <code>&lt;destaque&gt;</code>, que não existe.</dd>
+  <dt>destaque</dt><dd>O nome da classe, escrito igualzinho ao do HTML, letra por letra.</dd>
+  <dt>{ … }</dt><dd>As declarações, como em qualquer regra (aula <a href="sintaxe.html">Regras, Seletores e Declarações</a>). Valem para <strong>todo</strong> elemento que tiver essa classe.</dd>
+</dl>
+
+<p>O nome é você quem inventa. O navegador não conhece nenhuma classe de antemão: <code>destaque</code>, <code>aviso</code>, <code>cartao-receita</code>, tanto faz. O que importa é que o nome no HTML e o nome no CSS sejam <strong>iguais</strong>.</p>
+
+<hr>
+
+<h2>2. A mesma classe em vários elementos</h2>
+<p>A grande vantagem da classe: você escreve o estilo <strong>uma vez</strong> e usa em quantos elementos quiser, até de tipos diferentes. Aqui, um título, um parágrafo e um item de lista usam a mesma classe:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .destaque {
+    background-color: lightyellow;
+    color: darkred;
+  }
+&lt;/style&gt;
+&lt;h2 class="destaque"&gt;Novidades da semana&lt;/h2&gt;
+&lt;p&gt;Esta semana tem &lt;span class="destaque"&gt;bolo de fubá&lt;/span&gt; e pão de mel.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Brigadeiro&lt;/li&gt;
+  &lt;li class="destaque"&gt;Cocada (nova!)&lt;/li&gt;
+  &lt;li&gt;Quindim&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+<p>Os três elementos com <code>class="destaque"</code> ficaram com fundo amarelo e letras vermelho-escuras. Repare que o fundo segue a forma de cada um: no <code>&lt;h2&gt;</code> e no <code>&lt;li&gt;</code>, que são blocos, o fundo ocupa a largura toda; no <code>&lt;span&gt;</code>, que fica em linha, só atrás das palavras "bolo de fubá" (aula <a href="display.html">display</a>). O <code>&lt;span&gt;</code> é o elemento "sem significado" do HTML, feito justamente para receber uma classe no meio de uma frase.</p>
+
+<p>Quer mudar o destaque do site inteiro? Troque <code>lightyellow</code> por outra cor <strong>uma vez</strong>, no CSS, e todos os elementos mudam juntos. Esse é o motivo de existir CSS separado.</p>
+
+<hr>
+
+<h2>3. Várias classes no mesmo elemento</h2>
+<p>Um elemento pode ter <strong>várias</strong> classes, separadas por <strong>espaço</strong> dentro do mesmo <code>class</code>. Cada classe traz o seu pedaço do estilo, e o elemento recebe tudo junto:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> os três cartões têm a classe <code>cartao</code> (borda e espaço interno). O do meio tem também <code>promocao</code> (fundo amarelo e borda vermelha). Acrescente <code>promocao</code> no terceiro cartão: <code>class="cartao promocao"</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;Bolo de fubá&lt;/div&gt;
+&lt;div class="cartao promocao"&gt;Bolo de cenoura&lt;/div&gt;
+&lt;div class="cartao"&gt;Pão de mel&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  border: 2px solid gray;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.promocao {
+  background-color: lightyellow;
+  border-color: crimson;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>class="cartao promocao"</dt><dd>Duas classes, separadas por um espaço. O elemento entra na regra <code>.cartao</code> <strong>e</strong> na regra <code>.promocao</code>.</dd>
+  <dt>a ordem no HTML</dt><dd>Não importa: <code>class="promocao cartao"</code> dá o mesmo resultado.</dd>
+  <dt>border-color: crimson</dt><dd>As duas regras falam da borda: <code>.cartao</code> diz cinza e <code>.promocao</code> diz vermelho. Ganha a que vem <strong>depois no CSS</strong>, e não a que vem depois no <code>class</code>. Esse "quem ganha" tem aula própria: <a href="cascata.html">A Cascata</a>.</dd>
+</dl>
+
+<p>Esse é o jeito de montar variações sem repetir código: uma classe com a base (<code>cartao</code>) e outras pequenas com o que muda (<code>promocao</code>, <code>esgotado</code>, <code>grande</code>).</p>
+
+<div class="tryhtml" data-goal="texto:.esgotado=Pão de queijo,nsel:.esgotado=1,css:li:nth-child(2){color}=rgb(105, 105, 105)">
+<p class="try-task"><strong>Missão:</strong> o CSS já tem a classe <code>esgotado</code> (letra cinza e riscada). O pão de queijo acabou: dê a classe <code>esgotado</code> ao item "Pão de queijo", e só a ele.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Cardápio de hoje&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;Bolo de fubá&lt;/li&gt;
+  &lt;li&gt;Pão de queijo&lt;/li&gt;
+  &lt;li&gt;Brigadeiro&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.esgotado {
+  color: dimgray;
+  text-decoration: line-through;
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Cardápio de hoje&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;Bolo de fubá&lt;/li&gt;
+  &lt;li class="esgotado"&gt;Pão de queijo&lt;/li&gt;
+  &lt;li&gt;Brigadeiro&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+</div>
+
+<hr>
+
+<h2>4. Elemento + classe: <code>p.destaque</code></h2>
+<p>Você pode juntar um nome de elemento e uma classe, <strong>sem espaço</strong>: <code>p.destaque</code> quer dizer "um <code>&lt;p&gt;</code> que tenha a classe <code>destaque</code>". Um <code>&lt;h2 class="destaque"&gt;</code> não entra.</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .destaque {
+    color: darkred;
+  }
+  p.destaque {
+    background-color: lightyellow;
+  }
+&lt;/style&gt;
+&lt;h2 class="destaque"&gt;Novidades&lt;/h2&gt;
+&lt;p class="destaque"&gt;Receita nova toda sexta-feira!&lt;/p&gt;
+</pre>
+
+<p>Os dois ficaram com letra vermelho-escura (regra <code>.destaque</code>), mas só o parágrafo ganhou o fundo amarelo (regra <code>p.destaque</code>). Na prática, use <code>p.destaque</code> pouco: se a classe só serve para parágrafos, <code>.destaque</code> já basta, e um seletor mais comprido fica mais difícil de vencer depois (aula <a href="especificidade.html">Especificidade</a>).</p>
+
+<hr>
+
+<h2>5. <code>.cartao.promocao</code> × <code>.cartao .promocao</code></h2>
+<p>Um espaço muda tudo:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Quer dizer</th></tr>
+<tr><td><code>.cartao.promocao</code> (sem espaço)</td><td>Um elemento que tem as <strong>duas</strong> classes ao mesmo tempo</td></tr>
+<tr><td><code>.cartao .promocao</code> (com espaço)</td><td>Um elemento com a classe <code>promocao</code> que está <strong>dentro</strong> de outro, com a classe <code>cartao</code></td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o primeiro cartão tem as duas classes e ganhou o fundo amarelo (<code>.cartao.promocao</code>). No segundo, só a palavra "Promoção", que está <strong>dentro</strong> do cartão, ficou vermelha (<code>.cartao .promocao</code>). Tire o espaço do segundo seletor e veja a palavra perder a cor.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao promocao"&gt;Cartão com as duas classes&lt;/div&gt;
+&lt;div class="cartao"&gt;&lt;span class="promocao"&gt;Promoção&lt;/span&gt; dentro de um cartão&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  border: 2px solid gray;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.cartao.promocao {
+  background-color: lightyellow;
+}
+
+.cartao .promocao {
+  color: crimson;
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<p>O seletor com espaço é um <strong>combinador</strong>, assunto da aula <a href="combinadores.html">Descendente, Filho e Irmãos</a>. Por enquanto, guarde: <strong>sem espaço = o mesmo elemento</strong>.</p>
+
+<hr>
+
+<h2>6. Como dar nome a uma classe</h2>
+<p>O CSS aceita quase qualquer nome, mas alguns ajudam e outros atrapalham:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Regra</th><th>Bom</th><th>Evite</th></tr>
+<tr><td>Diga <strong>o que é</strong>, e não a aparência</td><td><code>aviso</code>, <code>preco</code>, <code>esgotado</code></td><td><code>vermelho</code>, <code>letra-grande</code> (e quando o aviso virar laranja?)</td></tr>
+<tr><td>Letras minúsculas, palavras com hífen</td><td><code>cartao-receita</code></td><td><code>CartaoReceita</code>, <code>cartao_receita</code> (funcionam, mas o guia usa o hífen)</td></tr>
+<tr><td>Sem acento e sem espaço</td><td><code>preco</code>, <code>promocao</code></td><td><code>preço</code> (funciona, mas é fácil digitar diferente); com espaço, vira <strong>duas</strong> classes</td></tr>
+<tr><td>Comece com letra</td><td><code>coluna-1</code></td><td><code>1coluna</code>: o CSS não aceita (veja <a href="#errado">Quando dá errado</a>)</td></tr>
+</table>
+</div>
+<p>E lembre: <strong>maiúscula e minúscula são diferentes</strong>. <code>Destaque</code> e <code>destaque</code> são duas classes.</p>
+
+<hr>
+
+<h2>7. Classe, elemento ou ID: qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Pega</th><th>Use para</th></tr>
+<tr><td><code>p</code> (<a href="seletor-elemento.html">elemento</a>)</td><td>Todos os parágrafos da página</td><td>O estilo geral: a fonte do texto, a cor dos links</td></tr>
+<tr><td><code>.destaque</code> (classe)</td><td>Os elementos que você marcou</td><td><strong>Quase tudo</strong>: componentes, variações, estados</td></tr>
+<tr><td><code>#topo</code> (<a href="seletor-id.html">ID</a>)</td><td>Um único elemento</td><td>Âncoras e JavaScript; para estilo, prefira a classe (próxima aula)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>No CSS, um seletor que não acha ninguém não dá erro: a regra simplesmente não pega em nada. O sintoma é sempre o mesmo, <strong>nada muda</strong>. Na aula <a href="devtools.html">Inspecionando com o F12</a> você aprende a clicar no elemento e ver quais regras chegaram nele: se a sua regra não aparece na lista, o seletor não casou.</p>
+
+<div class="cenario">
+<strong>Esqueceu o ponto no CSS</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  destaque {
+    background-color: lightyellow;
+  }
+&lt;/style&gt;
+&lt;p class="destaque"&gt;Receita nova toda sexta-feira!&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> o parágrafo continua sem fundo.</p>
+<p><strong>Por quê:</strong> sem o ponto, <code>destaque</code> é um seletor de <strong>elemento</strong>: "todos os <code>&lt;destaque&gt;</code> da página". Não há nenhum.</p>
+<p><strong>O que o validador diz:</strong> nada. <code>vnu --css</code> aceita o arquivo sem nenhuma mensagem, porque o seletor é válido: ele só não acha ninguém.</p>
+<p><strong>Como consertar:</strong> <code>.destaque</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Pôs o ponto no HTML</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .destaque {
+    background-color: lightyellow;
+  }
+&lt;/style&gt;
+&lt;p class=".destaque"&gt;Receita nova toda sexta-feira!&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> nada muda.</p>
+<p><strong>Por quê:</strong> o ponto é só do CSS. Com <code>class=".destaque"</code>, o nome da classe passou a ser <code>.destaque</code>, com ponto e tudo, e o seletor <code>.destaque</code> procura a classe <code>destaque</code>, sem ponto. O validador de HTML também não reclama: qualquer texto vale como nome de classe.</p>
+<p><strong>Como consertar:</strong> no HTML, o nome puro: <code>class="destaque"</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Maiúscula trocada</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .destaque {
+    background-color: lightyellow;
+  }
+&lt;/style&gt;
+&lt;p class="Destaque"&gt;Receita nova toda sexta-feira!&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> nada muda.</p>
+<p><strong>Por quê:</strong> nomes de classe diferenciam maiúsculas de minúsculas. <code>Destaque</code> e <code>destaque</code> são etiquetas diferentes. Por isso a regra do guia: tudo minúsculo.</p>
+</div>
+
+<div class="cenario">
+<strong>Classe começando com número</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .1coluna {
+    background-color: lightyellow;
+  }
+&lt;/style&gt;
+&lt;p class="1coluna"&gt;Receita nova toda sexta-feira!&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> nada muda, mesmo com o nome igual nos dois lados.</p>
+<p><strong>Por quê:</strong> no HTML, <code>class="1coluna"</code> é permitido. Mas no CSS um nome depois do ponto não pode começar com algarismo: o navegador lê <code>.1coluna</code> como um número com uma unidade estranha, o seletor fica inválido e a regra <strong>inteira</strong> é jogada fora. O validador avisa:</p>
+<pre class="term" data-cwd="~/site">$ vnu --css numero.css
+"file:/home/ana/site/numero.css":1.1-1.8: error: CSS: In CSS1, a class name could start with a digit (".55ft"), unless it was a dimension (".55in"). In CSS2, such classes are parsed as unknown dimensions (to allow for future additions of new units) To make “1coluna” a valid class, CSS2 requires the first digit to be escaped: “.\31 coluna”.</pre>
+<p><strong>O que significa:</strong> "no CSS1, um nome de classe podia começar com algarismo; no CSS2, essas classes são lidas como <em>dimensões</em> desconhecidas (um número com unidade, como <code>1em</code>). Para tornar <code>1coluna</code> uma classe válida, o CSS2 exige que o primeiro algarismo seja escapado: <code>.\31 coluna</code>". O escape funciona, mas ninguém quer escrever isso.</p>
+<p><strong>Como consertar:</strong> comece o nome com letra: <code>coluna-1</code>, nos dois arquivos.</p>
+</div>
+
+<div class="cenario">
+<strong>Espaço depois do ponto: <code>Parse Error</code></strong>
+<pre class="term" data-cwd="~/site">$ cat espaco.css
+. destaque {
+  color: red;
+}
+$ vnu --css espaco.css
+"file:/home/ana/site/espaco.css":1.3-1.10: error: CSS: Parse Error.</pre>
+<p><strong>O que significa:</strong> "erro de leitura" na linha 1, colunas 3 a 10 (a palavra <code>destaque</code>). O ponto e o nome têm de vir <strong>colados</strong>. Com o espaço, o seletor fica inválido e o navegador ignora a regra inteira, em silêncio.</p>
+<p><strong>Como consertar:</strong> <code>.destaque</code>, sem espaço.</p>
+</div>
+
+<div class="cenario">
+<strong>Vírgula entre as classes no HTML</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .cartao {
+    border: 2px solid gray;
+    padding: 8px;
+  }
+  .promocao {
+    background-color: lightyellow;
+  }
+&lt;/style&gt;
+&lt;div class="cartao, promocao"&gt;Bolo de cenoura&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> o fundo amarelo apareceu, mas a borda cinza, não.</p>
+<p><strong>Por quê:</strong> no <code>class</code>, quem separa as classes é o <strong>espaço</strong>. Com a vírgula, as classes do elemento viraram <code>cartao,</code> (com a vírgula grudada) e <code>promocao</code>. A regra <code>.cartao</code> procura <code>cartao</code>, sem vírgula, e não acha. O validador de HTML não reclama.</p>
+<p><strong>Como consertar:</strong> <code>class="cartao promocao"</code>, só com espaço. A vírgula é usada no <strong>CSS</strong>, para juntar seletores (aula <a href="seletor-grupo.html">Agrupando Seletores</a>).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Onde</th><th>O que faz</th></tr>
+<tr><td><code>class="destaque"</code></td><td>HTML</td><td>Dá a classe <code>destaque</code> ao elemento (sem ponto)</td></tr>
+<tr><td><code>class="cartao promocao"</code></td><td>HTML</td><td>Duas classes, separadas por espaço</td></tr>
+<tr><td><code>.destaque { … }</code></td><td>CSS</td><td>Todo elemento com a classe <code>destaque</code></td></tr>
+<tr><td><code>p.destaque { … }</code></td><td>CSS</td><td>Só os <code>&lt;p&gt;</code> com a classe <code>destaque</code></td></tr>
+<tr><td><code>.cartao.promocao { … }</code></td><td>CSS</td><td>Elementos com as duas classes ao mesmo tempo</td></tr>
+<tr><td><code>.cartao .promocao { … }</code></td><td>CSS</td><td>Um <code>.promocao</code> dentro de um <code>.cartao</code> (<a href="combinadores.html">combinador</a>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O símbolo da classe</h3>
+<p>Complete o seletor para pegar os elementos com <code>class="aviso"</code>:</p>
+<div class="ex-code"><input data-answer="." aria-label="símbolo">aviso {
+  color: darkred;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. O atributo</h3>
+<p>Complete o HTML para o parágrafo ter a classe <code>aviso</code>:</p>
+<div class="ex-code">&lt;p <input data-answer="class" aria-label="atributo">="aviso"&gt;Loja fechada no feriado.&lt;/p&gt;</div>
+</div>
+
+<div class="exercise">
+<h3>3. Duas classes</h3>
+<p>Escreva o seletor que pega <strong>só</strong> os elementos que têm as classes <code>cartao</code> e <code>promocao</code> ao mesmo tempo:</p>
+<div class="ex-code"><input data-answer=".cartao.promocao|.promocao.cartao" aria-label="seletor"> {
+  background-color: lightyellow;
+}</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. A Ana escreveu <code>.Destaque { color: darkred; }</code> no CSS e <code>&lt;p class="destaque"&gt;</code> no HTML. O que acontece?</p>
+<label><input type="radio" name="q4"> O parágrafo fica vermelho-escuro</label>
+<label><input type="radio" name="q4"> Nada: <code>Destaque</code> e <code>destaque</code> são classes diferentes</label>
+<label><input type="radio" name="q4"> O validador mostra um erro</label>
+<label><input type="radio" name="q4"> A página inteira fica vermelho-escura</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Qual é o melhor nome para a classe de um aviso de "loja fechada"?</p>
+<label><input type="radio" name="q5"> <code>.vermelho</code></label>
+<label><input type="radio" name="q5"> <code>.1aviso</code></label>
+<label><input type="radio" name="q5"> <code>.aviso</code></label>
+<label><input type="radio" name="q5"> <code>.Aviso_Loja</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Como dar duas classes, <code>cartao</code> e <code>grande</code>, ao mesmo elemento?</p>
+<label><input type="radio" name="q6"> <code>class="cartao grande"</code></label>
+<label><input type="radio" name="q6"> <code>class="cartao, grande"</code></label>
+<label><input type="radio" name="q6"> <code>class="cartao" class="grande"</code></label>
+<label><input type="radio" name="q6"> <code>class=".cartao.grande"</code></label>
+</div>
+
+<h3>Missão final: os preços da padaria</h3>
+
+<div class="tryhtml" data-goal="css:span.preco{color}=rgb(0, 100, 0),nsel:span.preco=2,nsel:.cartao.promocao=1,css:.cartao:nth-child(3){background-color}=rgb(255, 255, 224)">
+<p class="try-task"><strong>Missão:</strong> (1) No <code>style.css</code>, crie a classe <code>preco</code> com <code>color: darkgreen;</code>. (2) No <code>index.html</code>, dê a classe <code>preco</code> aos dois <code>&lt;span&gt;</code> dos preços. (3) O pão de mel entrou em promoção: acrescente a classe <code>promocao</code> ao segundo cartão, sem tirar a <code>cartao</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Padaria da Ana&lt;/h2&gt;
+&lt;div class="cartao"&gt;Bolo de fubá: &lt;span&gt;R$ 25,00&lt;/span&gt;&lt;/div&gt;
+&lt;div class="cartao"&gt;Pão de mel: &lt;span&gt;R$ 6,00&lt;/span&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  border: 2px solid gray;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.promocao {
+  background-color: lightyellow;
+  border-color: crimson;
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Padaria da Ana&lt;/h2&gt;
+&lt;div class="cartao"&gt;Bolo de fubá: &lt;span class="preco"&gt;R$ 25,00&lt;/span&gt;&lt;/div&gt;
+&lt;div class="cartao promocao"&gt;Pão de mel: &lt;span class="preco"&gt;R$ 6,00&lt;/span&gt;&lt;/div&gt;
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  border: 2px solid gray;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.promocao {
+  background-color: lightyellow;
+  border-color: crimson;
+}
+
+.preco {
+  color: darkgreen;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>A classe é uma etiqueta: no HTML, <code>class="destaque"</code> (sem ponto); no CSS, <code>.destaque</code> (com ponto). Os nomes têm de ser idênticos, maiúsculas incluídas.</li>
+  <li>A mesma classe serve para quantos elementos você quiser, de qualquer tipo. Um elemento pode ter várias classes, separadas por espaço.</li>
+  <li><code>p.destaque</code>: só parágrafos com a classe. <code>.cartao.promocao</code>: as duas classes no mesmo elemento. <code>.cartao .promocao</code>: uma dentro da outra.</li>
+  <li>Nomes que dizem o que a coisa é (<code>aviso</code>, <code>preco</code>), em minúsculas, com hífen, começando com letra.</li>
+  <li>Quando dá errado, nada muda: falta de ponto no CSS, ponto no HTML, maiúscula trocada e vírgula no <code>class</code> passam em silêncio; número no começo e espaço depois do ponto o validador acusa.</li>
+  <li>Para estilo, a classe é a escolha padrão. O ID fica para a próxima aula.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
