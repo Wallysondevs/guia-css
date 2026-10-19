@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Seletores de Atributo — [type="email"], [href^="https"], [href$=".pdf"] | Guia CSS</title>
+<meta name="description" content="Seletores de atributo do CSS para quem está começando: escolher elementos pelo atributo que eles têm ([alt]), pelo valor exato ([type=&quot;email&quot;]), pelo começo (^=), pelo fim ($=), por um pedaço (*=) e por uma palavra (~=), a letra i para ignorar maiúsculas, a especificidade, quando usar classe e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Seletores de Atributo</span></h1>
+
+<p class="intro">Num formulário, todos os campos são <code>&lt;input&gt;</code>: o de nome, o de e-mail, a caixinha de marcar. Como pintar só o de e-mail, sem pôr uma classe em cada um? Olhando o <strong>atributo</strong>: o campo de e-mail é o que tem <code>type="email"</code>. Os <strong>seletores de atributo</strong> escolhem elementos pelo que está escrito nos atributos do HTML: o tipo do campo, o endereço do link, o idioma, o texto alternativo da imagem.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Escolher quem <strong>tem</strong> um atributo: <code>img[alt]</code>.</li>
+  <li>Escolher pelo <strong>valor exato</strong>: <code>input[type="email"]</code>.</li>
+  <li>Escolher pelo <strong>começo</strong> (<code>^=</code>), pelo <strong>fim</strong> (<code>$=</code>), por um <strong>pedaço</strong> (<code>*=</code>) e por uma <strong>palavra</strong> (<code>~=</code>) do valor.</li>
+  <li>A letra <code>i</code>, que ignora maiúsculas e minúsculas.</li>
+  <li>A força (especificidade) desses seletores, e quando é melhor usar uma classe.</li>
+  <li>Os erros reais: a aspa que falta, o colchete que falta e o espaço no lugar errado.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a etiqueta da mala</h2>
+<p>No aeroporto, as malas passam todas pela mesma esteira. O funcionário não abre cada uma: ele lê a <strong>etiqueta</strong>. "Destino: Recife" vai para um carrinho, "Destino: Manaus" vai para outro. Ele pode até separar por um pedaço da etiqueta: "todas as que começam com <em>GRU</em>".</p>
+<p>No HTML, os atributos são as etiquetas: <code>type="email"</code>, <code>href="https://…"</code>, <code>lang="pt-BR"</code>. O seletor de atributo lê a etiqueta e escolhe os elementos, sem você precisar pôr uma classe em cada um.</p>
+
+<hr>
+
+<h2>1. Quem tem o atributo: <code>[atributo]</code></h2>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> só o link com <code>title</code> ficou com o sublinhado pontilhado. Ponha um <code>title</code> no segundo link e veja.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;&lt;a href="bolo.html" title="Rende 12 fatias"&gt;Bolo de cenoura&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="pao.html"&gt;Pão de queijo&lt;/a&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">a[title] {
+  text-decoration-style: dotted;
+  cursor: help;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>a</dt><dd>O elemento: links.</dd>
+  <dt>[title]</dt><dd>Os colchetes guardam o <strong>nome do atributo</strong>. Sem valor, o seletor quer dizer "que tem o atributo <code>title</code>", com qualquer valor (até vazio).</dd>
+  <dt>a[title]</dt><dd>Colado, sem espaço: "um <code>a</code> que tem <code>title</code>". É o mesmo jeito de juntar de <code>p.destaque</code> (aula <a href="seletor-classe.html">Seletor de Classe</a>).</dd>
+</dl>
+
+<p>Sem nada na frente, <code>[title]</code> escolhe <strong>qualquer</strong> elemento com <code>title</code>: links, imagens, abreviações.</p>
+
+<hr>
+
+<h2>2. O valor exato: <code>[atributo="valor"]</code></h2>
+<p>O uso mais comum: campos de formulário pelo <code>type</code>.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> os três campos são <code>input</code>, mas cada regra pega um só. Troque o <code>type</code> do primeiro campo para <code>email</code> e veja ele ganhar a borda azul.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;&lt;label&gt;Nome &lt;input type="text" name="nome"&gt;&lt;/label&gt;&lt;/p&gt;
+&lt;p&gt;&lt;label&gt;E-mail &lt;input type="email" name="email"&gt;&lt;/label&gt;&lt;/p&gt;
+&lt;p&gt;&lt;label&gt;&lt;input type="checkbox" name="novidades"&gt; Quero novidades&lt;/label&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">input[type="email"] {
+  border: 2px solid navy;
+}
+
+input[type="checkbox"] {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>[type="email"]</dt><dd>"Cujo atributo <code>type</code> é <strong>exatamente</strong> <code>email</code>". Nem mais, nem menos: <code>type="emails"</code> não casa.</dd>
+  <dt>"email"</dt><dd>As aspas são opcionais quando o valor é uma palavra simples (<code>[type=email]</code> funciona). Com espaço, ponto, barra ou dois-pontos, elas são obrigatórias. Use <strong>sempre</strong> aspas e nunca precisa pensar nisso.</dd>
+</dl>
+
+<p>Repare no resultado: só o campo de e-mail tem a borda azul-marinho de 2 pixels; a caixinha de marcar ficou maior; o campo de nome ficou como o navegador desenha.</p>
+
+<div class="tryhtml" data-goal="css:input[type='email']{border-top-color}=rgb(0, 128, 0),css:input[type='tel']{border-top-color}=rgb(0, 128, 0),src:input\[type=[&quot;']?email,src:input\[type=[&quot;']?tel,nsrc:class=">
+<p class="try-task"><strong>Missão:</strong> no formulário de encomendas, os campos de e-mail e de telefone ficam com a borda verde (<code>border: 2px solid green;</code>). Use seletores de atributo, <strong>sem</strong> pôr classes no HTML. Dica: dá para juntar os dois seletores com vírgula (aula <a href="seletor-grupo.html">Agrupando Seletores</a>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;&lt;label&gt;Nome &lt;input type="text" name="nome"&gt;&lt;/label&gt;&lt;/p&gt;
+&lt;p&gt;&lt;label&gt;E-mail &lt;input type="email" name="email"&gt;&lt;/label&gt;&lt;/p&gt;
+&lt;p&gt;&lt;label&gt;Telefone &lt;input type="tel" name="telefone"&gt;&lt;/label&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">input {
+  padding: 0.3rem;
+}
+</pre>
+<pre class="solucao" data-file="style.css">input {
+  padding: 0.3rem;
+}
+
+input[type="email"],
+input[type="tel"] {
+  border: 2px solid green;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Um pedaço do valor: <code>^=</code>, <code>$=</code> e <code>*=</code></h2>
+<p>Às vezes você não sabe o valor inteiro, só um pedaço. Três sinais resolvem, e cada um lembra um símbolo que você talvez já conheça:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Casa quando o valor…</th><th>Para lembrar</th><th>Exemplo de uso</th></tr>
+<tr><td><code>[href^="https"]</code></td><td><strong>começa</strong> com <code>https</code></td><td><code>^</code> é "começo" nas expressões regulares</td><td>Links para outros sites</td></tr>
+<tr><td><code>[href$=".pdf"]</code></td><td><strong>termina</strong> com <code>.pdf</code></td><td><code>$</code> é "fim" nas expressões regulares</td><td>Links para arquivos PDF</td></tr>
+<tr><td><code>[href*="receita"]</code></td><td><strong>contém</strong> <code>receita</code> em qualquer lugar</td><td><code>*</code> é "qualquer coisa"</td><td>Links que falam de receitas</td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> cada link casa com uma regra diferente. Mude o endereço do terceiro link para <code>cardapio.pdf</code> e veja qual regra ele passa a seguir.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href="https://example.com"&gt;Receitas do mundo&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="assets/midia/receita-bolo.pdf"&gt;Receita do bolo (PDF)&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="sobre.html"&gt;Quem é a Ana&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">a[href^="https"] {
+  color: darkgreen;
+}
+
+a[href^="https"]::after {
+  content: " ↗";
+}
+
+a[href$=".pdf"] {
+  font-weight: bold;
+  color: firebrick;
+}
+</pre>
+</div>
+
+<p>Repare: o primeiro link (que começa com <code>https</code>) fica verde-escuro e ganha a setinha <code>↗</code> no fim, criada pelo <a href="before-after.html"><code>::after</code></a>; o segundo (que termina em <code>.pdf</code>) fica em negrito, vermelho-tijolo; o terceiro, um endereço do próprio site, continua azul e sublinhado, como todo link. O leitor sabe, antes de clicar, que um vai sair do site e o outro vai baixar um arquivo.</p>
+
+<div class="tip">
+<strong><code>^="https"</code> ou <code>^="http"</code>?</strong>
+<p><code>[href^="http"]</code> pega os dois tipos, <code>http://</code> e <code>https://</code>, porque <code>https</code> também começa com <code>http</code>. É o jeito mais seguro de marcar "link para fora".</p>
+</div>
+
+<hr>
+
+<h2>4. Uma palavra do valor: <code>~=</code> e <code>|=</code></h2>
+<p>Alguns atributos guardam uma <strong>lista de palavras</strong> separadas por espaço, como <code>class="cartao novo"</code> ou <code>rel="noopener noreferrer"</code>. O <code>~=</code> procura uma palavra inteira da lista:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Casa com</th><th>Não casa com</th></tr>
+<tr><td><code>[rel~="noopener"]</code></td><td><code>rel="noopener noreferrer"</code></td><td><code>rel="noopeners"</code></td></tr>
+<tr><td><code>[rel*="noopener"]</code></td><td><code>rel="noopener noreferrer"</code> e também <code>rel="noopeners"</code></td><td>—</td></tr>
+<tr><td><code>[lang|="pt"]</code></td><td><code>lang="pt"</code> e <code>lang="pt-BR"</code> (a palavra, ou ela seguida de hífen)</td><td><code>lang="pten"</code></td></tr>
+</table>
+</div>
+
+<p>O <code>|=</code> foi feito para idiomas: <code>[lang|="pt"]</code> pega português do Brasil e de Portugal. No dia a dia, os dois aparecem bem menos que os da seção 3. Para classes, não use <code>[class~="novo"]</code>: o seletor de classe <code>.novo</code> faz exatamente a mesma coisa e é mais fácil de ler.</p>
+
+<hr>
+
+<h2>5. Maiúsculas e minúsculas: a letra <code>i</code></h2>
+<p>O valor diferencia maiúsculas de minúsculas: <code>[href$=".pdf"]</code> não pega <code>CARDAPIO.PDF</code>. Um <code>i</code> (de <em>insensitive</em>, "sem diferenciar") antes do <code>]</code> resolve:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> apague o <code>i</code> da regra e veja o segundo link perder o negrito.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;&lt;a href="cardapio.pdf"&gt;Cardápio de segunda&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="CARDAPIO-SABADO.PDF"&gt;Cardápio de sábado&lt;/a&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">a[href$=".pdf" i] {
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>6. A força do seletor de atributo</h2>
+<p>Na conta da <a href="especificidade.html">especificidade</a>, um seletor de atributo vale <strong>o mesmo que uma classe</strong>: <code>[type="email"]</code> e <code>.email</code> empatam. <code>input[type="email"]</code> soma um elemento e fica igual a <code>input.email</code>.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Especificidade (ID, classe, elemento)</th></tr>
+<tr><td><code>input</code></td><td>0, 0, 1</td></tr>
+<tr><td><code>[type="email"]</code></td><td>0, 1, 0</td></tr>
+<tr><td><code>input[type="email"]</code></td><td>0, 1, 1</td></tr>
+<tr><td><code>.formulario input[type="email"]</code></td><td>0, 2, 1</td></tr>
+</table>
+</div>
+
+<h3>Atributo ou classe?</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Use</th><th>Por quê</th></tr>
+<tr><td>O HTML já diz o que o elemento é (<code>type</code>, <code>href</code>, <code>lang</code>, <code>disabled</code>)</td><td>Atributo</td><td>Não precisa repetir a informação numa classe. Um campo novo de e-mail já sai estilizado.</td></tr>
+<tr><td>Marcar links para fora do site ou para arquivos</td><td>Atributo (<code>^=</code>, <code>$=</code>)</td><td>O endereço já diz; ninguém precisa lembrar de pôr a classe.</td></tr>
+<tr><td>Um estilo de aparência (cartão, destaque, botão principal)</td><td>Classe</td><td>Não depende de atributo nenhum; é decisão de visual.</td></tr>
+<tr><td>Estado ligado ou desligado (<code>aria-expanded="true"</code>, <code>aria-current="page"</code>)</td><td>Atributo</td><td>O mesmo atributo que avisa o leitor de tela pinta a tela: os dois nunca ficam em desacordo.</td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o menu marca a página atual com <code>aria-current="page"</code> (no Guia HTML, ele avisa o leitor de tela "página atual"). O CSS usa o mesmo atributo para destacar o link. Passe o <code>aria-current="page"</code> para "Receitas".</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav&gt;
+  &lt;a href="index.html" aria-current="page"&gt;Início&lt;/a&gt;
+  &lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;
+  &lt;a href="sobre.html"&gt;Sobre&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+<pre class="script" data-file="style.css">nav a {
+  margin-right: 1rem;
+}
+
+nav a[aria-current="page"] {
+  font-weight: bold;
+  text-decoration: none;
+  border-bottom: 3px solid tomato;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Valor com <code>:</code> e <code>/</code> sem aspas: <code>Parse Error</code></strong>
+<div class="tryhtml">
+<p class="try-task"><strong>Erro de propósito:</strong> o link deveria ficar verde. Ponha aspas em volta do endereço, dentro dos colchetes.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;&lt;a href="https://example.com"&gt;Receitas do mundo&lt;/a&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">a[href=https://example.com] {
+  color: green;
+}
+</pre>
+</div>
+<p><strong>O que você vê:</strong> o link continua azul. Nenhuma mensagem na página.</p>
+<p><strong>Por quê:</strong> sem aspas, o valor só pode ser uma palavra simples (letras, números, hífen e <code>_</code>). Os <code>:</code> e as <code>/</code> de <code>https://</code> quebram o seletor, e o navegador joga fora a regra inteira. O validador:</p>
+<pre class="term" data-cwd="~/site">$ vnu --css sem-aspas.css
+"file:/home/ana/site/sem-aspas.css":1.27-1.27: error: CSS: Parse Error.</pre>
+<p><strong>O que significa:</strong> "erro de análise", na linha 1, coluna 27 (o <code>]</code>, onde ele desistiu de entender o seletor). A mensagem é curta e não diz o motivo: quando ela aponta para dentro de colchetes, desconfie das aspas.</p>
+<p><strong>Como consertar:</strong> <code>a[href="https://example.com"]</code>. Aspas sempre.</p>
+</div>
+
+<div class="cenario">
+<strong>Esqueceu o <code>]</code>: o resto do arquivo some</strong>
+<div class="tryhtml">
+<p class="try-task"><strong>Erro de propósito:</strong> o parágrafo deveria ficar verde, e a regra dele está certa. Feche o colchete da primeira regra (<code>"email"]</code>) e veja as duas funcionarem.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Assine as novidades da lojinha:&lt;/p&gt;
+&lt;input type="email" name="email"&gt;
+</pre>
+<pre class="script" data-file="style.css">input[type="email" {
+  color: navy;
+}
+
+p {
+  color: green;
+}
+</pre>
+</div>
+<p><strong>O que você vê:</strong> o parágrafo continua preto, apesar de a regra do <code>p</code> estar perfeita.</p>
+<p><strong>Por quê:</strong> o navegador abriu o colchete e ficou esperando o <code>]</code> para fechar. Enquanto não acha, tudo vira parte do seletor: as chaves, o <code>color: navy;</code>, o <code>p</code>, a regra seguinte inteira. No fim do arquivo, ele tem um "seletor" gigante e sem sentido, e joga tudo fora. Um colchete (ou uma chave, ou uma aspa) aberto pode apagar o resto do CSS. O validador:</p>
+<pre class="term" data-cwd="~/site">$ vnu --css colchete.css
+"file:/home/ana/site/colchete.css":1.12-1.18: error: CSS: Parse Error.</pre>
+<p><strong>Como consertar:</strong> feche o colchete. Quando várias regras param de funcionar ao mesmo tempo, procure um <code>]</code>, <code>}</code> ou aspa que falta <strong>antes</strong> da primeira regra quebrada.</p>
+</div>
+
+<div class="cenario">
+<strong>Espaço antes do <code>[</code>: o seletor procura outro elemento</strong>
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  a [href^="https"] {
+    color: green;
+  }
+&lt;/style&gt;
+&lt;p&gt;&lt;a href="https://example.com"&gt;Receitas do mundo&lt;/a&gt;&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> o link continua azul.</p>
+<p><strong>Por quê:</strong> o espaço é o combinador descendente (aula <a href="combinadores.html">Combinadores</a>). <code>a [href^="https"]</code> quer dizer "um elemento com <code>href</code> que começa com <code>https</code>, <strong>dentro</strong> de um <code>a</code>". Dentro do link só há texto. O seletor é válido, então o validador não diz nada.</p>
+<p><strong>Como consertar:</strong> <code>a[href^="https"]</code>, colado.</p>
+</div>
+
+<div class="cenario">
+<strong>Valor exato quando era um pedaço</strong>
+<p><strong>O que acontece:</strong> <code>a[href="https"]</code> só casa com um link cujo endereço é exatamente a palavra <code>https</code>, e esse link não existe. Nada fica verde, e o validador não reclama.</p>
+<p><strong>Como consertar:</strong> para "começa com", é <code>^=</code>: <code>a[href^="https"]</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Escolhe o elemento cujo atributo…</th></tr>
+<tr><td><code>[attr]</code></td><td>existe (com qualquer valor)</td></tr>
+<tr><td><code>[attr="v"]</code></td><td>é exatamente <code>v</code></td></tr>
+<tr><td><code>[attr^="v"]</code></td><td>começa com <code>v</code></td></tr>
+<tr><td><code>[attr$="v"]</code></td><td>termina com <code>v</code></td></tr>
+<tr><td><code>[attr*="v"]</code></td><td>contém <code>v</code> em qualquer lugar</td></tr>
+<tr><td><code>[attr~="v"]</code></td><td>tem a palavra <code>v</code> numa lista separada por espaços</td></tr>
+<tr><td><code>[attr|="v"]</code></td><td>é <code>v</code> ou começa com <code>v-</code> (idiomas)</td></tr>
+<tr><td><code>[attr="v" i]</code></td><td>qualquer um acima, sem diferenciar maiúsculas</td></tr>
+<tr><td>Especificidade</td><td>igual à de uma classe (0, 1, 0)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O campo de e-mail</h3>
+<p>Complete o seletor do campo de e-mail:</p>
+<div class="ex-code">input[<input data-answer="type" aria-label="atributo">="email"] { border-color: navy; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Termina com</h3>
+<p>Complete o sinal para escolher os links que <strong>terminam</strong> com <code>.pdf</code>:</p>
+<div class="ex-code">a[href<input data-answer="$=" aria-label="sinal">".pdf"] { font-weight: bold; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Começa com</h3>
+<p>Complete o sinal para escolher os links que <strong>começam</strong> com <code>http</code>:</p>
+<div class="ex-code">a[href<input data-answer="^=" aria-label="sinal">"http"] { color: darkgreen; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Qual destes casa com <code>&lt;img src="bolo.jpg" alt=""&gt;</code>?</p>
+<label><input type="radio" name="q4"> <code>img[alt="bolo"]</code></label>
+<label><input type="radio" name="q4"> <code>img[alt]</code></label>
+<label><input type="radio" name="q4"> <code>img[title]</code></label>
+<label><input type="radio" name="q4"> <code>img [alt]</code></label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. A Ana escreveu <code>input[type="email" { … }</code> no começo do arquivo, e várias regras de baixo pararam de funcionar. Por quê?</p>
+<label><input type="radio" name="q5"> Porque <code>email</code> precisa estar sem aspas</label>
+<label><input type="radio" name="q5"> Porque o navegador só lê a primeira regra</label>
+<label><input type="radio" name="q5"> Porque o colchete ficou aberto e o navegador engoliu o resto do arquivo como parte do seletor</label>
+<label><input type="radio" name="q5"> Porque seletores de atributo não funcionam em <code>input</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Quem vence: <code>input[type="email"] { color: navy; }</code> ou <code>input.campo { color: green; }</code>, num <code>&lt;input class="campo" type="email"&gt;</code>, com a regra do <code>.campo</code> escrita depois?</p>
+<label><input type="radio" name="q6"> <code>.campo</code>: as duas têm a mesma força (0, 1, 1), e vale a que vem depois</label>
+<label><input type="radio" name="q6"> <code>[type="email"]</code>: atributo é mais forte que classe</label>
+<label><input type="radio" name="q6"> Nenhuma: as duas se anulam</label>
+<label><input type="radio" name="q6"> <code>[type="email"]</code>: porque vem antes</label>
+</div>
+
+<h3>Missão final: a lista de links da Ana</h3>
+
+<div class="tryhtml" data-goal="css:a[href^='https']{color}=rgb(0, 100, 0),css:a[href$='.pdf']{font-weight}=700,css:a[href='sobre.html']{color}=rgb(0, 0, 238),src:\[href\^=,src:\[href\$=,nsrc:class=">
+<p class="try-task"><strong>Missão:</strong> sem pôr classes no HTML, (1) os links que começam com <code>https</code> ficam <code>darkgreen</code>; (2) os links que terminam com <code>.pdf</code> ficam em negrito (<code>font-weight: bold</code>); (3) o link para <code>sobre.html</code> continua com a cor normal de link.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Links da Ana&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href="https://example.com"&gt;Receitas do mundo&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="https://example.org"&gt;Blog de confeitaria&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="assets/midia/receita-bolo.pdf"&gt;Receita do bolo (PDF)&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="sobre.html"&gt;Quem é a Ana&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">li {
+  margin-bottom: 0.5rem;
+}
+</pre>
+<pre class="solucao" data-file="style.css">li {
+  margin-bottom: 0.5rem;
+}
+
+a[href^="https"] {
+  color: darkgreen;
+}
+
+a[href$=".pdf"] {
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Os colchetes escolhem pelo atributo do HTML: <code>[alt]</code> (tem), <code>[type="email"]</code> (valor exato).</li>
+  <li>Pedaços do valor: <code>^=</code> começa com, <code>$=</code> termina com, <code>*=</code> contém. Palavras: <code>~=</code> (uma palavra da lista) e <code>|=</code> (idiomas, <code>pt</code> e <code>pt-BR</code>).</li>
+  <li>Um <code>i</code> antes do <code>]</code> ignora maiúsculas: <code>[href$=".pdf" i]</code>.</li>
+  <li>A força é igual à de uma classe. Use atributo quando o HTML já diz o que o elemento é (tipo, endereço, idioma, <code>aria-current</code>); use classe para decisões de aparência.</li>
+  <li>Aspas sempre. Valor com <code>:</code> ou <code>/</code> sem aspas, ou um <code>]</code> esquecido, dá <code>Parse Error</code> no validador; o colchete aberto apaga também as regras seguintes. Espaço antes do <code>[</code> muda o sentido, e o validador não avisa.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
