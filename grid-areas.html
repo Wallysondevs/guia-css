@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS grid-template-areas — áreas com nome no Grid | Guia CSS</title>
+<meta name="description" content="grid-template-areas para quem está começando: desenhar o layout da página com palavras, dar nome a cada parte com grid-area, células vazias com ponto, trocar o layout mudando só o mapa, e os erros que o validador W3C não pega (área em L, fileiras de tamanhos diferentes, nome que não está no mapa).">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">grid-template-areas</span></h1>
+
+<p class="intro">Na aula anterior você posicionou itens pelos números dos riscos da grade: <code>grid-column: 1 / 3</code>. Funciona, mas quem lê o código precisa contar riscos de cabeça. Nesta aula você vai <strong>desenhar</strong> o layout da página do blog da Ana com palavras, como um mapa: "aqui fica o topo, aqui o menu, aqui o conteúdo". O CSS lê o desenho e monta a grade.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li><code>grid-template-areas</code>: o mapa da grade, escrito no pai.</li>
+  <li><code>grid-area</code>: o nome de cada parte, escrito no filho.</li>
+  <li>Como uma área ocupa várias células (repetindo o nome) e como deixar uma célula vazia (<code>.</code>).</li>
+  <li>Como mudar o layout inteiro mexendo só no mapa.</li>
+  <li>Os erros que o validador W3C <strong>não</strong> pega: área em forma de L, fileiras com números diferentes de células, nome que não está no mapa.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, dentro de cada caixa. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a planta da casa</h2>
+<p>Antes de construir uma casa, alguém desenha a planta: um retângulo escrito "sala", outro "cozinha", outro "quarto". Ninguém diz "a cozinha vai do metro 3 ao metro 7"; a planta <strong>mostra</strong> onde cada cômodo fica.</p>
+<p>O <code>grid-template-areas</code> (em inglês, "modelo de áreas da grade") é a planta da sua página. Cada palavra é uma célula. Para um cômodo ocupar duas células, você escreve o nome duas vezes. Depois, cada elemento da página diz em que cômodo mora, com <code>grid-area</code> ("área da grade").</p>
+
+<hr>
+
+<h2>1. O primeiro mapa</h2>
+<p>O blog da Ana tem quatro partes: o topo (<code>&lt;header&gt;</code>), o menu (<code>&lt;nav&gt;</code>), o conteúdo (<code>&lt;main&gt;</code>) e o rodapé (<code>&lt;footer&gt;</code>), os elementos da aula <a href="https://wallysondevs.github.io/guia-html/semantica.html">HTML Semântico</a> do Guia HTML. Ela quer o topo e o rodapé de ponta a ponta, e o menu ao lado do conteúdo:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> leia o mapa no <code>style.css</code> e compare com o resultado. Depois troque <code>"menu conteudo"</code> por <code>"conteudo menu"</code> e troque o <code>grid-template-columns</code> para <code>1fr 150px</code>: o menu passa para a direita, sem mexer no HTML.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;header class="topo"&gt;Blog da Ana&lt;/header&gt;
+  &lt;nav class="menu"&gt;Receitas · Sobre&lt;/nav&gt;
+  &lt;main class="conteudo"&gt;Hoje: bolo de cenoura.&lt;/main&gt;
+  &lt;footer class="rodape"&gt;Feito pela Ana&lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  grid-template-areas:
+    "topo   topo"
+    "menu   conteudo"
+    "rodape rodape";
+  gap: 8px;
+}
+
+.topo {
+  grid-area: topo;
+}
+
+.menu {
+  grid-area: menu;
+}
+
+.conteudo {
+  grid-area: conteudo;
+}
+
+.rodape {
+  grid-area: rodape;
+}
+
+.pagina header,
+.pagina nav,
+.pagina main,
+.pagina footer {
+  background: #dbeafe;
+  border: 2px solid #1d4ed8;
+  padding: 12px;
+}
+</pre>
+</div>
+
+<p>No resultado, "Blog da Ana" ocupa a primeira fileira inteira; embaixo, o menu fica numa coluna estreita à esquerda e o conteúdo na coluna larga; o rodapé fecha a página de ponta a ponta.</p>
+
+<dl class="anatomy">
+  <dt>grid-template-areas:</dt><dd>Vai no <strong>pai</strong> (o elemento com <code>display: grid</code>). É o mapa.</dd>
+  <dt>"topo   topo"</dt><dd>Uma <strong>fileira</strong> da grade, entre aspas. Cada palavra é uma célula: aqui, duas células, as duas do <code>topo</code>. Repetir o nome faz a área ocupar as duas.</dd>
+  <dt>"menu   conteudo"</dt><dd>A segunda fileira: a célula da esquerda é do <code>menu</code>, a da direita do <code>conteudo</code>.</dd>
+  <dt>"rodape rodape";</dt><dd>A terceira fileira. Só a última fileira leva o <code>;</code>: as três strings juntas são <strong>um</strong> valor.</dd>
+  <dt>grid-area: topo;</dt><dd>Vai no <strong>filho</strong>. Diz "este elemento mora na área <code>topo</code>". O nome vai <strong>sem aspas</strong>.</dd>
+</dl>
+
+<p>Os espaços extras dentro das aspas (<code>"menu   conteudo"</code>) não mudam nada: servem para alinhar as palavras e deixar o mapa parecido com o resultado. É um costume que ajuda muito a ler.</p>
+
+<div class="tip">
+<strong>O mapa e o tamanho das colunas são coisas separadas</strong>
+<p>O mapa diz <strong>quem fica onde</strong>. A <strong>largura</strong> das colunas continua vindo do <code>grid-template-columns</code> (aula <a href="grid-colunas.html">Colunas</a>), e a altura das fileiras, do <code>grid-template-rows</code> (aula <a href="grid-linhas.html">Linhas</a>). O número de palavras de cada fileira tem de bater com o número de colunas.</p>
+</div>
+
+<h3>Os nomes</h3>
+<p>Os nomes são inventados por você: <code>topo</code>, <code>cabecalho</code>, <code>a</code>, <code>lateral</code>. Não precisam ser iguais à classe nem ao elemento. A regra do guia é a mesma das classes: minúsculas, sem acento, com hífen quando tiver mais de uma palavra (<code>menu-lateral</code>). Um nome com acento até funciona, mas é fácil escrever <code>rodape</code> num lugar e <code>rodapé</code> no outro (veja <a href="#errado">Quando dá errado</a>).</p>
+
+<hr>
+
+<h2>2. Células vazias: o ponto</h2>
+<p>Para deixar uma célula <strong>sem ninguém</strong>, escreva um ponto (<code>.</code>) no lugar do nome:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .pagina {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    grid-template-areas:
+      "topo topo"
+      "menu conteudo"
+      ".    rodape";
+    gap: 8px;
+  }
+  .topo { grid-area: topo; }
+  .menu { grid-area: menu; }
+  .conteudo { grid-area: conteudo; }
+  .rodape { grid-area: rodape; }
+  .pagina &gt; * {
+    background: #dbeafe;
+    border: 2px solid #1d4ed8;
+    padding: 12px;
+  }
+&lt;/style&gt;
+&lt;div class="pagina"&gt;
+  &lt;header class="topo"&gt;Blog da Ana&lt;/header&gt;
+  &lt;nav class="menu"&gt;Receitas · Sobre&lt;/nav&gt;
+  &lt;main class="conteudo"&gt;Hoje: bolo de cenoura.&lt;/main&gt;
+  &lt;footer class="rodape"&gt;Feito pela Ana&lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Agora o rodapé fica só embaixo do conteúdo, e o canto de baixo, à esquerda, fica vazio. (Nos exemplos curtos, <code>.pagina &gt; *</code> pinta todos os filhos de uma vez: o <code>*</code> é o <a href="seletor-universal.html">seletor universal</a> e o <code>&gt;</code> o <a href="combinadores.html">combinador filho</a>.)</p>
+
+<div class="tryhtml" data-goal="css:.pagina{grid-template-areas}=&quot;topo topo&quot; &quot;menu conteudo&quot; &quot;rodape rodape&quot;">
+<p class="try-task"><strong>Missão:</strong> o rodapé ficou só à direita. Mude a última fileira do mapa para o rodapé ocupar as <strong>duas</strong> colunas.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;header class="topo"&gt;Blog da Ana&lt;/header&gt;
+  &lt;nav class="menu"&gt;Receitas · Sobre&lt;/nav&gt;
+  &lt;main class="conteudo"&gt;Hoje: bolo de cenoura.&lt;/main&gt;
+  &lt;footer class="rodape"&gt;Feito pela Ana&lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  grid-template-areas:
+    "topo topo"
+    "menu conteudo"
+    ".    rodape";
+  gap: 8px;
+}
+
+.topo {
+  grid-area: topo;
+}
+
+.menu {
+  grid-area: menu;
+}
+
+.conteudo {
+  grid-area: conteudo;
+}
+
+.rodape {
+  grid-area: rodape;
+}
+
+.pagina &gt; * {
+  background: #dbeafe;
+  border: 2px solid #1d4ed8;
+  padding: 12px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.pagina {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  grid-template-areas:
+    "topo   topo"
+    "menu   conteudo"
+    "rodape rodape";
+  gap: 8px;
+}
+
+.topo {
+  grid-area: topo;
+}
+
+.menu {
+  grid-area: menu;
+}
+
+.conteudo {
+  grid-area: conteudo;
+}
+
+.rodape {
+  grid-area: rodape;
+}
+
+.pagina &gt; * {
+  background: #dbeafe;
+  border: 2px solid #1d4ed8;
+  padding: 12px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Outro layout, o mesmo HTML</h2>
+<p>A grande vantagem das áreas: para mudar o layout, você mexe <strong>só no mapa</strong>. No celular, por exemplo, a Ana quer tudo empilhado, numa coluna só:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .pagina {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "topo"
+      "menu"
+      "conteudo"
+      "rodape";
+    gap: 8px;
+  }
+  .topo { grid-area: topo; }
+  .menu { grid-area: menu; }
+  .conteudo { grid-area: conteudo; }
+  .rodape { grid-area: rodape; }
+  .pagina &gt; * {
+    background: #dbeafe;
+    border: 2px solid #1d4ed8;
+    padding: 12px;
+  }
+&lt;/style&gt;
+&lt;div class="pagina"&gt;
+  &lt;header class="topo"&gt;Blog da Ana&lt;/header&gt;
+  &lt;nav class="menu"&gt;Receitas · Sobre&lt;/nav&gt;
+  &lt;main class="conteudo"&gt;Hoje: bolo de cenoura.&lt;/main&gt;
+  &lt;footer class="rodape"&gt;Feito pela Ana&lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+
+<p>As quatro partes ficam uma embaixo da outra, cada uma com a largura toda. Os <code>grid-area</code> dos filhos são os mesmos: só o mapa mudou. Para usar um mapa no celular e outro na tela grande, junte isto com <code>@media</code> (aula <a href="media-queries.html">Media Queries</a>): dentro do <code>@media</code>, você troca só o <code>grid-template-columns</code> e o <code>grid-template-areas</code>.</p>
+
+<hr>
+
+<h2>4. As outras formas de usar <code>grid-area</code></h2>
+<p>O <code>grid-area</code> também aceita <strong>números</strong>, como atalho de quatro propriedades. A ordem é: fileira de começo / coluna de começo / fileira de fim / coluna de fim.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>É o mesmo que</th><th>Quando usar</th></tr>
+<tr><td><code>grid-area: topo;</code></td><td>Mora na área <code>topo</code> do mapa</td><td>Layout da página (topo, menu, conteúdo): o mapa se lê como o resultado</td></tr>
+<tr><td><code>grid-column: 1 / 3;</code> + <code>grid-row: 1;</code></td><td>Riscos numerados (aula <a href="grid-posicionar.html">Posicionando Itens</a>)</td><td>Um item especial numa grade de itens iguais (o destaque de um cardápio)</td></tr>
+<tr><td><code>grid-area: 1 / 1 / 2 / 3;</code></td><td><code>grid-row-start: 1</code>, <code>grid-column-start: 1</code>, <code>grid-row-end: 2</code>, <code>grid-column-end: 3</code></td><td>Raramente: é curto, mas difícil de ler (qual número é qual?)</td></tr>
+</table>
+</div>
+
+<p>Por baixo dos panos, o nome vira riscos: no F12, aba Computed, o <code>.topo</code> do primeiro exemplo mostra <code>grid-row-start: topo</code> e <code>grid-column-end: topo</code>. O navegador cria riscos chamados <code>topo-start</code> e <code>topo-end</code> em volta da área e usa esses.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Nesta aula, os piores erros são os que o validador <strong>não</strong> vê. Em todos eles, o mapa inválido é ignorado inteiro (no F12, o <code>grid-template-areas</code> calculado fica <code>none</code>), e os filhos procuram áreas que não existem.</p>
+
+<div class="cenario">
+<strong>Área em forma de L: o mapa todo é ignorado</strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  .pagina {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    grid-template-areas:
+      "topo topo"
+      "menu conteudo"
+      "menu rodape"
+      "conteudo conteudo";
+    gap: 8px;
+  }
+  .topo { grid-area: topo; }
+  .menu { grid-area: menu; }
+  .conteudo { grid-area: conteudo; }
+  .rodape { grid-area: rodape; }
+  .pagina &gt; * {
+    background: #dbeafe;
+    border: 2px solid #1d4ed8;
+    padding: 12px;
+  }
+&lt;/style&gt;
+&lt;div class="pagina"&gt;
+  &lt;header class="topo"&gt;Blog da Ana&lt;/header&gt;
+  &lt;nav class="menu"&gt;Receitas · Sobre&lt;/nav&gt;
+  &lt;main class="conteudo"&gt;Hoje: bolo de cenoura.&lt;/main&gt;
+  &lt;footer class="rodape"&gt;Feito pela Ana&lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> só o "Feito pela Ana", num cartão pequeno à direita. O topo, o menu e o conteúdo sumiram.</p>
+<p><strong>Por quê:</strong> a área <code>conteudo</code> aparece em dois pedaços separados (na segunda fileira e na quarta). Cada área precisa ser um <strong>retângulo</strong>: nada de L, de T ou de pedaços soltos. Com uma área inválida, o navegador ignora o <code>grid-template-areas</code> <strong>inteiro</strong>. Aí os quatro filhos pedem áreas que não existem, e o Grid manda todos para a <strong>mesma</strong> célula extra, fora da grade: eles ficam empilhados um em cima do outro, e só o último, o rodapé, aparece.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+$</pre>
+<p><strong>O validador não diz nada:</strong> para ele, as aspas e os nomes estão bem escritos. Só olhando o resultado (ou o <code>none</code> no F12) você descobre.</p>
+<p><strong>Como consertar:</strong> desenhe cada área como um retângulo. Se o conteúdo precisa de mais espaço, aumente o retângulo dele, sem pedaços separados.</p>
+</div>
+
+<div class="cenario">
+<strong>Uma fileira com mais células que as outras</strong>
+<pre class="file" data-file="style.css · erro de propósito">.pagina {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  grid-template-areas:
+    "topo topo"
+    "menu conteudo conteudo"
+    "rodape rodape";
+}
+</pre>
+<p><strong>O que você vê:</strong> o mesmo desastre do L: só o rodapé aparece.</p>
+<p><strong>Por quê:</strong> todas as fileiras do mapa precisam ter o <strong>mesmo número de palavras</strong>. Aqui a do meio tem 3 e as outras 2, e o mapa inteiro é ignorado. O validador também fica quieto.</p>
+<p><strong>Como consertar:</strong> conte as palavras de cada fileira. Alinhar o mapa com espaços, como uma tabela, ajuda a ver o erro.</p>
+</div>
+
+<div class="cenario">
+<strong>Esqueceu as aspas no mapa: <code>is not a “grid-template-areas” value</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.pagina {
+  display: grid;
+  grid-template-areas: topo topo;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.29-3.32: error: CSS: “grid-template-areas”: “topo” is not a “grid-template-areas” value.</pre>
+<p><strong>O que significa:</strong> "<code>topo</code> não é um valor de <code>grid-template-areas</code>". No mapa, cada fileira é um <strong>texto entre aspas</strong>: <code>"topo topo"</code>. Sem as aspas, a declaração é ignorada e o mapa fica <code>none</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Aspas no lugar errado: <code>is not a “grid-area” value</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.topo {
+  grid-area: "topo";
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":2.14-2.19: error: CSS: “grid-area”: “"topo"” is not a “grid-area” value.</pre>
+<p><strong>O que você vê:</strong> o topo deixa de atravessar a página: ele cai na primeira célula livre, a da esquerda na primeira fileira, e a da direita fica vazia.</p>
+<p><strong>Por quê:</strong> é o contrário do erro anterior. No <strong>mapa</strong> vão aspas; no <strong><code>grid-area</code></strong> do filho, o nome vai <strong>sem</strong> aspas. Com aspas, a declaração é ignorada (no F12, riscada) e o item volta a ser posicionado automaticamente.</p>
+</div>
+
+<div class="cenario">
+<strong>Nome diferente do mapa: <code>rodape</code> × <code>rodapé</code></strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  .pagina {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    grid-template-areas:
+      "topo   topo"
+      "menu   conteudo"
+      "rodape rodape";
+    gap: 8px;
+  }
+  .topo { grid-area: topo; }
+  .menu { grid-area: menu; }
+  .conteudo { grid-area: conteudo; }
+  .rodape { grid-area: rodapé; }
+  .pagina &gt; * {
+    background: #dbeafe;
+    border: 2px solid #1d4ed8;
+    padding: 12px;
+  }
+&lt;/style&gt;
+&lt;div class="pagina"&gt;
+  &lt;header class="topo"&gt;Blog da Ana&lt;/header&gt;
+  &lt;nav class="menu"&gt;Receitas · Sobre&lt;/nav&gt;
+  &lt;main class="conteudo"&gt;Hoje: bolo de cenoura.&lt;/main&gt;
+  &lt;footer class="rodape"&gt;Feito pela Ana&lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> o topo, o menu e o conteúdo estão no lugar, só um pouco mais estreitos; a última fileira do mapa ficou vazia, e o rodapé apareceu sozinho lá embaixo, num cartão estreito à direita, fora da grade.</p>
+<p><strong>Por quê:</strong> <code>rodapé</code>, com acento, é um nome válido, mas não é <code>rodape</code>. Como não existe área <code>rodapé</code> no mapa, o Grid cria uma coluna e uma fileira extras e põe o item lá. O validador não reclama: para ele, os dois nomes estão bem escritos.</p>
+<p><strong>Como consertar:</strong> o mesmo nome, letra por letra, no mapa e no <code>grid-area</code>. Nomes sem acento evitam o problema.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Onde</th><th>O que faz</th></tr>
+<tr><td><code>grid-template-areas: "a a" "b c";</code></td><td>Pai</td><td>O mapa: uma string por fileira, uma palavra por célula</td></tr>
+<tr><td>Nome repetido (<code>"topo topo"</code>)</td><td>Pai</td><td>A área ocupa várias células (sempre um retângulo)</td></tr>
+<tr><td><code>.</code></td><td>Pai</td><td>Célula vazia</td></tr>
+<tr><td><code>grid-area: topo;</code></td><td>Filho</td><td>Põe o elemento na área <code>topo</code> (nome sem aspas)</td></tr>
+<tr><td><code>grid-area: 1 / 1 / 2 / 3;</code></td><td>Filho</td><td>Fileira início / coluna início / fileira fim / coluna fim</td></tr>
+<tr><td>Mapa inválido (L, fileiras desiguais, sem aspas)</td><td>Pai</td><td>Ignorado inteiro: <code>grid-template-areas</code> calculado = <code>none</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A propriedade do mapa</h3>
+<p>Complete a propriedade que vai no pai:</p>
+<div class="ex-code">grid-template-<input data-answer="areas" aria-label="final do nome">: "topo topo" "menu conteudo";</div>
+</div>
+
+<div class="exercise">
+<h3>2. A célula vazia</h3>
+<p>Complete o mapa para o canto de baixo, à esquerda, ficar vazio:</p>
+<div class="ex-code">"<input data-answer="." aria-label="célula vazia"> rodape"</div>
+</div>
+
+<div class="exercise">
+<h3>3. No filho</h3>
+<p>Complete a propriedade que põe o <code>&lt;nav&gt;</code> na área <code>menu</code>:</p>
+<div class="ex-code">nav { <input data-answer="grid-area" aria-label="propriedade">: menu; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Qual destes mapas é inválido?</p>
+<label><input type="radio" name="q4"> <code>"a a" "b c"</code></label>
+<label><input type="radio" name="q4"> <code>"a b" "b b" "a a"</code></label>
+<label><input type="radio" name="q4"> <code>"a" "b" "c"</code></label>
+<label><input type="radio" name="q4"> <code>"a a" ". b"</code></label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. A Ana escreveu um mapa com uma área em L. O que o validador W3C diz?</p>
+<label><input type="radio" name="q5"> <code>Parse Error</code></label>
+<label><input type="radio" name="q5"> Que a área precisa ser um retângulo</label>
+<label><input type="radio" name="q5"> Nada: o erro só aparece no resultado e no F12 (<code>none</code>)</label>
+<label><input type="radio" name="q5"> Que falta um <code>;</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Onde vão as aspas?</p>
+<label><input type="radio" name="q6"> No <code>grid-template-areas</code> (o mapa); o <code>grid-area</code> do filho vai sem aspas</label>
+<label><input type="radio" name="q6"> No <code>grid-area</code>; o mapa vai sem aspas</label>
+<label><input type="radio" name="q6"> Nos dois</label>
+<label><input type="radio" name="q6"> Em nenhum</label>
+</div>
+
+<h3>Missão final: o layout do blog</h3>
+
+<div class="tryhtml" data-goal="css:.pagina{grid-template-areas}=&quot;topo topo&quot; &quot;conteudo menu&quot; &quot;rodape rodape&quot;,css:header{grid-row-start}=topo,css:nav{grid-row-start}=menu,css:main{grid-row-start}=conteudo,css:footer{grid-row-start}=rodape">
+<p class="try-task"><strong>Missão:</strong> a grade já tem duas colunas (a larga à esquerda). Escreva o mapa com o topo em cima, o <strong>conteúdo à esquerda e o menu à direita</strong>, e o rodapé embaixo, de ponta a ponta. Depois ponha cada elemento na sua área com <code>grid-area</code> (use os nomes <code>topo</code>, <code>menu</code>, <code>conteudo</code> e <code>rodape</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;header&gt;Blog da Ana&lt;/header&gt;
+  &lt;nav&gt;Receitas · Sobre&lt;/nav&gt;
+  &lt;main&gt;Hoje: bolo de cenoura.&lt;/main&gt;
+  &lt;footer&gt;Feito pela Ana&lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+  display: grid;
+  grid-template-columns: 1fr 150px;
+  gap: 8px;
+}
+
+.pagina &gt; * {
+  background: #dbeafe;
+  border: 2px solid #1d4ed8;
+  padding: 12px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.pagina {
+  display: grid;
+  grid-template-columns: 1fr 150px;
+  grid-template-areas:
+    "topo     topo"
+    "conteudo menu"
+    "rodape   rodape";
+  gap: 8px;
+}
+
+header {
+  grid-area: topo;
+}
+
+nav {
+  grid-area: menu;
+}
+
+main {
+  grid-area: conteudo;
+}
+
+footer {
+  grid-area: rodape;
+}
+
+.pagina &gt; * {
+  background: #dbeafe;
+  border: 2px solid #1d4ed8;
+  padding: 12px;
+}
+</pre>
+</div>
+
+<p>Antes da missão, os quatro elementos entram na grade em ordem, dois por fileira. Com a solução, o topo atravessa a página, o conteúdo fica na coluna larga com o menu à direita, e o rodapé fecha embaixo. Repare que, no HTML, o <code>&lt;nav&gt;</code> continua antes do <code>&lt;main&gt;</code>: só a tela mudou.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>grid-template-areas</code>, no pai, é o <strong>mapa</strong>: uma string entre aspas por fileira, uma palavra por célula. Repetir o nome estica a área; <code>.</code> é uma célula vazia.</li>
+  <li><code>grid-area: nome</code>, no filho, sem aspas, põe o elemento na área.</li>
+  <li>A largura das colunas continua no <code>grid-template-columns</code>; o número de palavras de cada fileira tem de bater com ele.</li>
+  <li>Para mudar o layout (por exemplo, no celular), troque só o mapa.</li>
+  <li>Cada área é um retângulo e todas as fileiras têm o mesmo número de células. Um mapa inválido é ignorado inteiro (<code>none</code>), e o validador não avisa. Aspas faltando no mapa ou sobrando no <code>grid-area</code>: o validador avisa.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
