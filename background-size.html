@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS background-size — cover, contain e o tamanho do fundo | Guia CSS</title>
+<meta name="description" content="O tamanho da imagem de fundo em CSS para quem está começando: background-size com auto, cover, contain, pixels e porcentagens, lado a lado; cover com center, contain com no-repeat, o atalho background com a barra e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">background-size</span></h1>
+
+<p class="intro">Até agora, a imagem de fundo aparecia sempre no tamanho original dela. A foto do bolo tem 800×600 pixels: numa caixa de 300×150, aparecia só um cantinho da parede. A propriedade <code>background-size</code> ("tamanho do fundo") muda o tamanho da imagem. Os dois valores mais usados têm nome: <code>cover</code> ("cobrir") e <code>contain</code> ("conter"). No fim, você junta tudo o que viu nas aulas de fundo numa linha só, com o atalho <code>background</code>.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Os valores do <code>background-size</code>, lado a lado: <code>auto</code>, <code>cover</code>, <code>contain</code>, pixels e porcentagens.</li>
+  <li>A diferença entre <code>cover</code> (cobre tudo e corta) e <code>contain</code> (mostra tudo e sobra espaço).</li>
+  <li>Por que <code>cover</code> anda com <code>background-position: center</code>, e <code>contain</code> com <code>no-repeat</code>.</li>
+  <li>Quando a imagem fica deformada, e como evitar.</li>
+  <li>O atalho <code>background</code>, com a barra entre a posição e o tamanho.</li>
+  <li>O que acontece quando dá errado, e as mensagens reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Antes, veja <a href="background-image.html">Imagem de Fundo</a> e <a href="background-posicao.html">Repetição e Posição do Fundo</a>. A foto dos exemplos é a do bolo de cenoura do guia (<code>assets/midia/bolo-800.jpg</code>, 800×600 pixels): o bolo com cobertura de chocolate no meio, a parede clara e uma janela atrás, a bancada de madeira embaixo. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana.</p>
+
+<hr>
+
+<h2>A ideia: a foto no porta-retrato</h2>
+<p>A Ana tem uma foto 10×15 e um porta-retrato de outro formato. Ela pode fazer duas coisas:</p>
+<ul>
+  <li><strong>Ampliar a foto até cobrir todo o vidro</strong> e cortar o que sobra nas beiradas. Não fica nenhum buraco, mas um pedaço da foto se perde. Isso é o <code>cover</code>.</li>
+  <li><strong>Diminuir a foto até ela caber inteira</strong>. A foto aparece toda, mas sobra uma faixa vazia do lado ou embaixo. Isso é o <code>contain</code>.</li>
+</ul>
+<p>Nos dois casos, a foto <strong>não é esticada</strong>: ela cresce ou diminui por igual, sem deformar o bolo. Quem deforma são os valores com dois números, que você vai ver na seção 3.</p>
+
+<hr>
+
+<h2>1. Os valores lado a lado</h2>
+<p>As caixas têm 300×150 pixels, e a foto, 800×600. Todas estão com <code>no-repeat</code>, para você ver uma cópia só. O valor do <code>background-size</code> está escrito em cada uma:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa auto"&gt;&lt;code&gt;auto&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa cover"&gt;&lt;code&gt;cover&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa contain"&gt;&lt;code&gt;contain&lt;/code&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  background-color: lightyellow;
+  background-image: url("assets/midia/bolo-800.jpg");
+  background-repeat: no-repeat;
+  width: 300px;
+  height: 150px;
+  border: 1px solid gray;
+  margin-bottom: 8px;
+}
+
+.caixa code {
+  background-color: white;
+}
+
+.auto {
+  background-size: auto;
+}
+
+.cover {
+  background-size: cover;
+}
+
+.contain {
+  background-size: contain;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que você vê</th><th>A conta do navegador</th></tr>
+<tr><td><code>auto</code></td><td>Só um pedaço claro da parede: o bolo nem aparece. É o valor inicial: a foto no tamanho original, cortada pela caixa.</td><td>800×600, sem mudar</td></tr>
+<tr><td><code>cover</code></td><td>A foto preenche a caixa toda: a parede, a janela e a parte de cima do bolo. A parte de baixo (o resto do bolo, o prato) foi cortada.</td><td>A menor escala que <strong>cobre</strong> as duas medidas: 300 de largura → a foto fica 300×225, e 75 pixels de altura sobram para fora</td></tr>
+<tr><td><code>contain</code></td><td>A foto inteira, com o bolo e o prato, na esquerda; à direita, uma faixa amarela vazia.</td><td>A maior escala que <strong>cabe</strong> nas duas medidas: 150 de altura → a foto fica 200×150, e sobram 100 pixels de largura</td></tr>
+</table>
+</div>
+
+<p>Mude a caixa para um formato <strong>em pé</strong> (<code>width: 150px;</code> e <code>height: 220px;</code>) e repare: agora o <code>cover</code> corta a <strong>direita</strong> da foto (o bolo aparece pela metade), e o <code>contain</code> deixa a sobra <strong>embaixo</strong>. A regra é a mesma; o lado que sobra depende do formato da caixa.</p>
+
+<hr>
+
+<h2>2. Os parceiros: <code>cover</code> + <code>center</code>, <code>contain</code> + <code>no-repeat</code></h2>
+
+<h3><code>cover</code> corta de um lado só</h3>
+<p>Na caixa <code>cover</code> acima, o corte foi todo <strong>embaixo</strong>, e o bolo perdeu a metade de baixo. É que a posição inicial é <code>top left</code> (aula <a href="background-posicao.html">Repetição e Posição</a>): a foto fica presa no canto de cima, à esquerda, e tudo o que sobra vai para baixo e para a direita. Com <code>background-position: center</code>, a sobra é dividida entre os dois lados, e o centro da foto, que costuma ser o mais importante, fica no centro da caixa:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa"&gt;&lt;code&gt;cover&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa centro"&gt;&lt;code&gt;cover + center&lt;/code&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  background-image: url("assets/midia/bolo-800.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 300px;
+  height: 150px;
+  border: 1px solid gray;
+  margin-bottom: 8px;
+}
+
+.caixa code {
+  background-color: white;
+}
+
+.centro {
+  background-position: center;
+}
+</pre>
+</div>
+
+<p>Na segunda caixa, o bolo aparece inteiro, com a cobertura de chocolate e a borda do prato, e o corte foi dividido: um pouco da parede em cima, um pouco da bancada embaixo. Se o importante da foto não está no meio, use outra posição: <code>center top</code> guarda a parte de cima; <code>center bottom</code>, a de baixo.</p>
+
+<h3><code>contain</code> deixa espaço, e o espaço repete</h3>
+<p>Se você tirar o <code>no-repeat</code>, o <code>contain</code> mostra a sua pegadinha: a sobra é preenchida com <strong>outra cópia</strong> da foto (a repetição continua valendo, agora com a foto pequena). Na caixa de 300×150, aparecem um bolo inteiro e, ao lado, um segundo bolo cortado.</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa"&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  background-color: lightyellow;
+  background-image: url("assets/midia/bolo-800.jpg");
+  background-size: contain;
+  width: 300px;
+  height: 150px;
+  border: 1px solid gray;
+}
+</pre>
+</div>
+
+<p>Acrescente <code>background-repeat: no-repeat;</code> e <code>background-position: center;</code>: um bolo só, centralizado, com faixas amarelas iguais dos dois lados. Esse é o trio do <code>contain</code>.</p>
+
+<div class="tryhtml" data-goal="css:.capa{background-size}=cover,css:.capa{background-position}=50% 50%">
+<p class="try-task"><strong>Missão:</strong> a capa mostra só um pedaço da parede. Faça a foto <strong>cobrir</strong> a capa inteira e fique <strong>centralizada</strong>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="capa"&gt;
+  &lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.capa {
+  background-color: saddlebrown;
+  background-image: url("assets/midia/bolo-800.jpg");
+  background-repeat: no-repeat;
+  height: 250px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.capa {
+  background-color: saddlebrown;
+  background-image: url("assets/midia/bolo-800.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  height: 250px;
+}
+</pre>
+</div>
+
+<p>Mude a largura da janela do navegador: a capa muda de largura, e o <code>cover</code> refaz a conta a cada mudança, sempre sem buracos e sem deformar. É por isso que ele é o valor das fotos de capa de sites.</p>
+
+<hr>
+
+<h2>3. Pixels e porcentagens</h2>
+<p>Você também pode dar o tamanho em números. Com <strong>um</strong> valor, ele é a largura, e a altura acompanha na proporção certa (fica <code>auto</code>). Com <strong>dois</strong>, o primeiro é a largura e o segundo, a altura, e aí a foto pode deformar:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa a"&gt;&lt;code&gt;200px&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa b"&gt;&lt;code&gt;200px 100px&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa c"&gt;&lt;code&gt;100%&lt;/code&gt;&lt;/div&gt;
+&lt;div class="caixa d"&gt;&lt;code&gt;100% 100%&lt;/code&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  background-color: lightyellow;
+  background-image: url("assets/midia/bolo-800.jpg");
+  background-repeat: no-repeat;
+  width: 300px;
+  height: 150px;
+  border: 1px solid gray;
+  margin-bottom: 8px;
+}
+
+.caixa code {
+  background-color: white;
+}
+
+.a {
+  background-size: 200px;
+}
+
+.b {
+  background-size: 200px 100px;
+}
+
+.c {
+  background-size: 100%;
+}
+
+.d {
+  background-size: 100% 100%;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>Tamanho da foto</th><th>O que você vê</th></tr>
+<tr><td><code>200px</code></td><td>200×150 (a altura acompanhou)</td><td>A foto inteira, sem deformar; sobra uma faixa à direita</td></tr>
+<tr><td><code>200px 100px</code></td><td>200×100</td><td>O bolo fica <strong>achatado</strong>, mais largo do que alto, e sobra espaço à direita e embaixo</td></tr>
+<tr><td><code>100%</code></td><td>100% da largura da caixa (300), altura na proporção (225)</td><td>Igual ao <code>cover</code> nesta caixa: preenche a largura e corta embaixo</td></tr>
+<tr><td><code>100% 100%</code></td><td>300×150, exatamente a caixa</td><td>Preenche tudo, sem corte, mas o bolo fica <strong>esticado</strong> para os lados</td></tr>
+</table>
+</div>
+
+<p>As porcentagens do <code>background-size</code> são da <strong>caixa</strong>, e não da foto: <code>50%</code> é metade da largura da caixa. O navegador guarda o valor com as duas medidas: <code>200px</code> vira <code>200px auto</code>; <code>100%</code> vira <code>100% auto</code>.</p>
+
+<div class="warning">
+<strong>Foto deformada</strong>
+<p>Dois números que não respeitam a proporção da foto (aqui, 4 por 3) esticam ou achatam a imagem. Numa foto de gente ou de comida, isso fica estranho na hora. Para encher a caixa, use <code>cover</code>; para mostrar a foto toda, <code>contain</code>. Dois números só fazem sentido em padrões e texturas que aguentam ser esticados.</p>
+</div>
+
+<hr>
+
+<h2>4. O atalho <code>background</code></h2>
+<p>Na aula <a href="background-color.html">Cor de Fundo</a> você viu que o <code>background</code> é um atalho. Agora que conhece todas as partes, dá para escrever o fundo da capa numa linha só:</p>
+
+<pre class="file" data-file="style.css">.capa {
+  background: saddlebrown url("assets/midia/bolo-800.jpg") center / cover no-repeat;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>saddlebrown</dt><dd>A cor (<code>background-color</code>). Fica embaixo da imagem.</dd>
+  <dt>url("assets/midia/bolo-800.jpg")</dt><dd>A imagem (<code>background-image</code>).</dd>
+  <dt>center</dt><dd>A posição (<code>background-position</code>).</dd>
+  <dt>/ cover</dt><dd>O tamanho (<code>background-size</code>). Ele vem <strong>logo depois da posição</strong>, separado por uma barra. A barra é obrigatória: sem ela, o navegador não sabe se <code>cover</code> é um tamanho; e sem a posição antes, a barra não tem a quem se juntar.</dd>
+  <dt>no-repeat</dt><dd>A repetição (<code>background-repeat</code>).</dd>
+</dl>
+
+<p>Fora a dupla <code>posição / tamanho</code>, a ordem é livre: <code>background: no-repeat center / cover url("…") saddlebrown;</code> dá o mesmo resultado. O guia segue a ordem cor, imagem, posição / tamanho, repetição, que é fácil de lembrar. No F12, aba <em>Computed</em>, o atalho não aparece: cada parte está na sua propriedade longa (lido no Chromium: <code>background-color: rgb(139, 69, 19)</code>, <code>background-position: 50% 50%</code>, <code>background-size: cover</code>, <code>background-repeat: no-repeat</code>).</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Quando usar</th></tr>
+<tr><td>Propriedades longas, uma por linha</td><td>Enquanto você está aprendendo, e quando quer mudar <strong>uma</strong> parte (por exemplo, só a imagem numa versão para celular). Cada linha diz o que faz.</td></tr>
+<tr><td>O atalho <code>background</code></td><td>Para definir o fundo inteiro de uma vez. Lembre: ele <strong>zera</strong> o que não foi escrito (sem cor no atalho, a cor volta a <code>transparent</code>).</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>5. Parecido no <code>&lt;img&gt;</code>: <code>object-fit</code></h2>
+<p>O <code>cover</code> e o <code>contain</code> são só para imagens de <strong>fundo</strong>. Para uma foto de conteúdo (um <code>&lt;img&gt;</code>), existe a mesma ideia com outro nome: <code>object-fit: cover</code> e <code>object-fit: contain</code>, na aula <a href="imagens-responsivas.html">Imagens que se Adaptam</a>. Escrever <code>background-size</code> num <code>&lt;img&gt;</code> não muda a foto dele, porque a foto não é o fundo.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Erro de propósito:</strong> cada regra quer a foto cobrindo a caixa. Nenhuma conseguiu: as quatro caixas, emendadas uma na outra, mostram só o canto claro da parede, com a foto no tamanho original. Leia os cenários e conserte.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa um"&gt;um&lt;/div&gt;
+&lt;div class="caixa dois"&gt;dois&lt;/div&gt;
+&lt;div class="caixa tres"&gt;três&lt;/div&gt;
+&lt;div class="caixa quatro"&gt;quatro&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  background-color: wheat;
+  background-image: url("assets/midia/bolo-800.jpg");
+  height: 150px;
+}
+
+.um {
+  background-size: contains;
+}
+
+.dois {
+  background: url("assets/midia/bolo-800.jpg") cover;
+}
+
+.tres {
+  background: url("assets/midia/bolo-800.jpg") / cover;
+}
+
+.quatro {
+  background-size: cover center;
+}
+</pre>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-size”: “contains” is not a “background-size” value.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>contains</code>, com <code>s</code> (como no inglês "it contains"). O valor é <code>contain</code>. A declaração é ignorada, e a foto fica no tamanho original.</p>
+<pre class="term" data-cwd="~/tamanho">$ vnu --css style.css
+"file:/home/ana/tamanho/style.css":8.20-8.27: error: CSS: “background-size”: “contains” is not a “background-size” value.</pre>
+<p><strong>Como consertar:</strong> <code>contain</code> (e <code>cover</code>, sem <code>s</code> também).</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background”: “cover” is not a “background-color” value.</code></strong>
+<p><strong>O que aconteceu:</strong> o <code>cover</code> foi para o atalho sem a barra e sem a posição. Sem a barra, o validador tenta encaixar <code>cover</code> em alguma parte do fundo, chega à cor e desiste. O atalho inteiro é ignorado: a caixa fica como estava antes dele (aqui, a foto no tamanho original, das regras do <code>.caixa</code>).</p>
+<pre class="term" data-cwd="~/tamanho">$ vnu --css style.css
+"file:/home/ana/tamanho/style.css":12.48-12.52: error: CSS: “background”: “cover” is not a “background-color” value.</pre>
+<p>"<code>cover</code> não é um valor de <code>background-color</code>." A mensagem fala da cor, mas o problema é a barra.</p>
+<p><strong>Como consertar:</strong> <code>background: url("…") center / cover;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background”: “/” is an incorrect operator.</code></strong>
+<p><strong>O que aconteceu:</strong> a barra está lá, mas sem a posição antes dela: <code>url("…") / cover</code>. A barra só existe <strong>entre</strong> uma posição e um tamanho.</p>
+<pre class="term" data-cwd="~/tamanho">$ vnu --css style.css
+"file:/home/ana/tamanho/style.css":16.50-16.54: error: CSS: “background”: “/” is an incorrect operator.</pre>
+<p>"<code>/</code> é um operador incorreto."</p>
+<p><strong>Como consertar:</strong> ponha uma posição antes da barra. Se você não quer mudar a posição, escreva a inicial: <code>0 0 / cover</code> ou <code>left top / cover</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “background-size”: “ ” is an incorrect operator.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>background-size: cover center;</code>. A posição foi parar dentro do tamanho. O <code>cover</code> e o <code>contain</code> vêm <strong>sozinhos</strong>: não aceitam um segundo valor.</p>
+<pre class="term" data-cwd="~/tamanho">$ vnu --css style.css
+"file:/home/ana/tamanho/style.css":20.26-20.31: error: CSS: “background-size”: “ ” is an incorrect operator.</pre>
+<p>"O espaço é um operador incorreto": o validador não esperava nada depois do <code>cover</code>.</p>
+<p><strong>Como consertar:</strong> duas declarações: <code>background-size: cover;</code> e <code>background-position: center;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Sem mensagem: o bolo cortado ao meio</strong>
+<p><strong>O que aconteceu:</strong> <code>background-size: cover</code> sem posição. O corte vai todo para baixo e para a direita (seção 2), e justamente a parte importante da foto some.</p>
+<p><strong>Como consertar:</strong> <code>background-position: center;</code>, ou a posição da parte que importa.</p>
+</div>
+
+<div class="cenario">
+<strong>Sem mensagem: o <code>contain</code> com bolos repetidos</strong>
+<p><strong>O que aconteceu:</strong> <code>background-size: contain</code> sem <code>no-repeat</code>. A sobra é preenchida com mais cópias, cortadas na beirada.</p>
+<p><strong>Como consertar:</strong> <code>background-repeat: no-repeat;</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>background-size: auto;</code></td><td>Tamanho original (inicial)</td></tr>
+<tr><td><code>background-size: cover;</code></td><td>Cobre a caixa toda, sem deformar; corta o que sobra</td></tr>
+<tr><td><code>background-size: contain;</code></td><td>Mostra a imagem inteira, sem deformar; sobra espaço (que repete, se não houver <code>no-repeat</code>)</td></tr>
+<tr><td><code>background-size: 200px;</code></td><td>Largura de 200px; altura na proporção (<code>200px auto</code>)</td></tr>
+<tr><td><code>background-size: 200px 100px;</code></td><td>Largura e altura: pode deformar</td></tr>
+<tr><td><code>background-size: 50%;</code></td><td>Metade da largura <strong>da caixa</strong>; altura na proporção</td></tr>
+<tr><td><code>background: cor url() posição / tamanho repetição;</code></td><td>O atalho; o tamanho vem logo depois da posição, com <code>/</code></td></tr>
+<tr><td>Com várias imagens</td><td>Uma lista com vírgula, como na repetição e na posição</td></tr>
+<tr><td>No <code>&lt;img&gt;</code></td><td><code>object-fit</code> (aula <a href="imagens-responsivas.html">Imagens que se Adaptam</a>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Cobrir</h3>
+<p>Complete para a foto cobrir a caixa toda, sem deformar:</p>
+<div class="ex-code">.capa {
+  background-size: <input data-answer="cover" aria-label="valor">;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. A barra do atalho</h3>
+<p>Complete com o caractere que separa a posição do tamanho:</p>
+<div class="ex-code">.capa {
+  background: url("bolo.jpg") center <input data-answer="/" aria-label="caractere"> cover no-repeat;
+}</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. O logo da lojinha não pode ser cortado de jeito nenhum e tem de caber inteiro na caixa. Qual valor?</p>
+<label><input type="radio" name="q3"> <code>cover</code></label>
+<label><input type="radio" name="q3"> <code>contain</code></label>
+<label><input type="radio" name="q3"> <code>auto</code></label>
+<label><input type="radio" name="q3"> <code>100% 100%</code></label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Com <code>background-size: cover</code>, a parte de baixo da foto sempre some. O que falta?</p>
+<label><input type="radio" name="q4"> <code>background-repeat: repeat;</code></label>
+<label><input type="radio" name="q4"> <code>background-size: cover center;</code></label>
+<label><input type="radio" name="q4"> <code>background-position: center;</code></label>
+<label><input type="radio" name="q4"> Trocar para <code>contain</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. Qual destes valores pode deixar a foto deformada (esticada ou achatada)?</p>
+<label><input type="radio" name="q5"> <code>cover</code></label>
+<label><input type="radio" name="q5"> <code>contain</code></label>
+<label><input type="radio" name="q5"> <code>300px</code></label>
+<label><input type="radio" name="q5"> <code>100% 100%</code></label>
+</div>
+
+<h3>Missão final: a capa e o selo</h3>
+
+<div class="tryhtml" data-goal="css:.capa{background-size}=cover,css:.capa{background-position}=50% 50%,css:.capa{background-color}=rgb(139, 69, 19),css:.selo{background-size}=contain,css:.selo{background-repeat}=no-repeat">
+<p class="try-task"><strong>Missão:</strong> (1) A <code>.capa</code> deve ter a foto do bolo <strong>cobrindo</strong> tudo, <strong>centralizada</strong>, com o <code>saddlebrown</code> por baixo. O atalho dela tem dois erros. (2) O <code>.selo</code> deve mostrar o logo da lojinha <strong>inteiro</strong>, uma vez só, dentro da caixa de 150×60.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="capa"&gt;
+  &lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;/div&gt;
+&lt;div class="selo"&gt;&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.capa {
+  background: saddlebrown url("assets/midia/bolo-800.jpg") / cover center;
+  height: 250px;
+}
+
+.selo {
+  background-image: url("assets/midia/logo-lojinha.svg");
+  width: 150px;
+  height: 60px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.capa {
+  background: saddlebrown url("assets/midia/bolo-800.jpg") center / cover no-repeat;
+  height: 250px;
+}
+
+.selo {
+  background-image: url("assets/midia/logo-lojinha.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 150px;
+  height: 60px;
+}
+</pre>
+</div>
+
+<p>No atalho, a posição tem de vir <strong>antes</strong> da barra, e o tamanho, depois: <code>center / cover</code>. O logo tem 400×160; com <code>contain</code>, ele encolhe para 150×60 e cabe exatamente na caixa, que tem a mesma proporção.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>background-size</code> muda o tamanho da imagem de fundo. O inicial é <code>auto</code>: o tamanho original.</li>
+  <li><code>cover</code> cobre a caixa toda e corta o que sobra; <code>contain</code> mostra a imagem toda e deixa sobra. Nenhum dos dois deforma.</li>
+  <li><code>cover</code> + <code>background-position: center</code> divide o corte; <code>contain</code> + <code>no-repeat</code> evita cópias na sobra.</li>
+  <li>Um número é a largura (altura na proporção); dois números podem deformar. Porcentagens são da caixa.</li>
+  <li>No atalho: <code>background: cor url() posição / tamanho repetição;</code>. A barra só existe entre posição e tamanho.</li>
+  <li>Para <code>&lt;img&gt;</code>, a mesma ideia se chama <code>object-fit</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
