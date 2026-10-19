@@ -108,8 +108,8 @@
 </pre>
 
 <dl class="anatomy">
-  <dt>@layer reset, base, …;</dt><dd>A <strong>declaração da ordem</strong> (<code>@layer reset, base, componentes;</code>): os nomes, separados por vírgula, de baixo para cima na pilha. Termina com <code>;</code>, sem chaves. Daqui em diante, <code>componentes</code> vence <code>base</code>, que vence <code>reset</code>.</dd>
-  <dt>@layer componentes { … }</dt><dd>Depois da linha da ordem, os blocos podem vir em qualquer sequência no arquivo, e uma camada pode ganhar regras em vários blocos: tudo é somado na camada, e a ordem da pilha não muda.</dd>
+  <dt>@layer reset, base, componentes;</dt><dd>A <strong>declaração da ordem</strong>: os nomes, separados por vírgula, de baixo para cima na pilha. Termina com <code>;</code>, sem chaves. Daqui em diante, <code>componentes</code> vence <code>base</code>, que vence <code>reset</code>.</dd>
+  <dt>@layer componentes { … } (antes dos outros)</dt><dd>Depois da linha da ordem, os blocos podem vir em qualquer sequência no arquivo, e uma camada pode ganhar regras em vários blocos: tudo é somado na camada, e a ordem da pilha não muda.</dd>
 </dl>
 
 <div class="tryhtml" data-goal="css:.botao{background-color}=rgb(178, 34, 34)">
