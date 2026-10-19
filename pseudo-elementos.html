@@ -89,8 +89,8 @@
   <li>Aceita as propriedades de fonte, cor, fundo, margem, preenchimento (<code>padding</code>), borda, <code>float</code> e <code>line-height</code>. Uma propriedade fora da lista, como <code>width</code>, é ignorada.</li>
 </ul>
 
-<div class="tryhtml" data-goal="src:\.receita\s*p::first-letter\s*\{[^}]*font-size,src:\.receita\s*p::first-letter\s*\{[^}]*color">
-<p class="try-task"><strong>Missão:</strong> na página de receitas da Ana, faça uma capitular em <strong>cada</strong> parágrafo de dentro de <code>.receita</code>: escreva a regra <code>.receita p::first-letter</code> com um <code>font-size</code> maior e uma <code>color</code> (por exemplo, <code>darkgreen</code>).</p>
+<div class="tryhtml" data-goal="css:.receita p::first-letter{color}=rgb(0, 100, 0),css:.receita p::first-letter{font-size}=32px,src:\.receita\s*p::first-letter\s*\{">
+<p class="try-task"><strong>Missão:</strong> na página de receitas da Ana, faça uma capitular em <strong>cada</strong> parágrafo de dentro de <code>.receita</code>: escreva a regra <code>.receita p::first-letter</code> com <code>font-size: 2rem;</code> e <code>color: darkgreen;</code>.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;div class="receita"&gt;
   &lt;h2&gt;Pão de queijo&lt;/h2&gt;
@@ -412,7 +412,7 @@
 
 <h3>Missão final: o formulário de encomendas</h3>
 
-<div class="tryhtml" data-goal="src:\.passos\s+li::marker\s*\{[^}]*color,src:input::placeholder\s*\{[^}]*color,src:(^|[\s}])::selection\s*\{[^}]*background-color,nsrc:[^:]:placeholder">
+<div class="tryhtml" data-goal="css:.passos li::marker{color}=rgb(255, 99, 71),css:input::placeholder{color}=rgb(107, 107, 107),css:p::selection{background-color}=rgb(255, 215, 0),src:\.passos\s+li::marker\s*\{[^}]*color,src:input::placeholder\s*\{[^}]*color,src:(^|[\s}])::selection\s*\{[^}]*background-color,nsrc:[^:]:placeholder">
 <p class="try-task"><strong>Missão:</strong> deixe a página de encomendas da lojinha com a cara da Ana. (1) Os números da lista <code>.passos</code> ficam da cor <code>tomato</code> (<code>.passos li::marker</code>). (2) O texto de exemplo dos campos fica <code>#6b6b6b</code> (conserte o seletor quebrado). (3) A seleção de texto da página <strong>toda</strong> ganha fundo <code>gold</code> e letra <code>black</code>.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;h1&gt;Encomende um bolo&lt;/h1&gt;
