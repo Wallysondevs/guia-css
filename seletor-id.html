@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Seletor de ID — a cerquilha (#) e o atributo id | Guia CSS</title>
+<meta name="description" content="O seletor de ID do CSS para quem nunca escreveu CSS: o atributo id no HTML e a cerquilha # no CSS, por que o ID é único, para que ele serve (âncoras, formulários, JavaScript), por que preferir a classe para o estilo e o que acontece quando dá errado (sem #, ID repetido, espaço no ID, número no começo), com as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Seletor de ID (#)</span></h1>
+
+<p class="intro">A classe é uma etiqueta que você cola em quantos elementos quiser. O <strong>ID</strong> é outra coisa: é o <strong>nome próprio</strong> de um único elemento da página, como o CPF de uma pessoa. No CSS, ele é chamado com uma <strong>cerquilha</strong> (<code>#</code>) na frente. Nesta aula você vai ver como usar o seletor de ID, para que o ID serve de verdade e por que, para dar estilo, quase sempre a classe é a melhor escolha.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O atributo <code>id</code> no HTML e o seletor <code>#nome</code> no CSS.</li>
+  <li>A regra de ouro: um ID aparece <strong>uma vez só</strong> em cada página.</li>
+  <li>Para que o ID serve: âncoras (<code>href="#bolo"</code>), formulários e JavaScript.</li>
+  <li>Por que preferir a classe para o estilo: o ID é "forte demais".</li>
+  <li>Os erros comuns: esquecer o <code>#</code>, ID repetido, espaço no ID, número no começo.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: o nome próprio e o uniforme</h2>
+<p>Numa escola, vários alunos usam o mesmo <strong>uniforme</strong> do time de vôlei: isso é uma <strong>classe</strong>. Mas cada aluno tem um <strong>número de matrícula</strong> só dele: isso é um <strong>ID</strong>. Se a diretora chama "matrícula 1234", só uma pessoa se levanta.</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th>Classe</th><th>ID</th></tr>
+<tr><td>No HTML</td><td><code>class="destaque"</code></td><td><code>id="topo"</code></td></tr>
+<tr><td>No CSS</td><td><code>.destaque</code> (ponto)</td><td><code>#topo</code> (cerquilha)</td></tr>
+<tr><td>Quantos elementos</td><td>Quantos quiser</td><td><strong>Um só</strong> por página</td></tr>
+<tr><td>Quantos por elemento</td><td>Vários: <code>class="a b"</code></td><td>Um só</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. O primeiro seletor de ID</h2>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o cabeçalho com <code>id="topo"</code> ficou com fundo azul-marinho e letras brancas. Mude o <code>navy</code> para <code>darkgreen</code> no CSS.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header id="topo"&gt;
+  &lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;/header&gt;
+&lt;p&gt;Pão quentinho às 7 da manhã.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">#topo {
+  background-color: navy;
+  color: white;
+  padding: 8px;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>id="topo"</dt><dd>No <strong>HTML</strong>: o atributo <code>id</code> (de <em>identifier</em>, "identificador") dá ao elemento o nome <code>topo</code>, sem <code>#</code>.</dd>
+  <dt>#</dt><dd>No <strong>CSS</strong>: a cerquilha quer dizer "o elemento com este ID". É o mesmo <code>#</code> das âncoras do HTML (<code>href="#topo"</code>), e não é coincidência: os dois apontam para o elemento com aquele <code>id</code>.</dd>
+  <dt>topo</dt><dd>O nome, igual ao do HTML, maiúsculas incluídas.</dd>
+  <dt>{ … }</dt><dd>As declarações, que valem só para esse elemento.</dd>
+</dl>
+
+<p>Repare que o <code>&lt;h1&gt;</code> também ficou branco, embora a regra fale do <code>&lt;header&gt;</code>: a cor das letras passa de pai para filho. Isso é a <a href="heranca.html">herança</a>, assunto de outra aula.</p>
+
+<div class="tryhtml" data-goal="attr:footer[id]=rodape,css:footer{background-color}=rgb(47, 79, 79)">
+<p class="try-task"><strong>Missão:</strong> o CSS já tem uma regra para <code>#rodape</code>. Dê ao <code>&lt;footer&gt;</code> o ID <code>rodape</code> para ele ganhar o fundo escuro.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;p&gt;Pão quentinho às 7 da manhã.&lt;/p&gt;
+&lt;footer&gt;
+  &lt;p&gt;Rua das Flores, 120&lt;/p&gt;
+&lt;/footer&gt;
+</pre>
+<pre class="script" data-file="style.css">#rodape {
+  background-color: darkslategray;
+  color: white;
+  padding: 8px;
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;p&gt;Pão quentinho às 7 da manhã.&lt;/p&gt;
+&lt;footer id="rodape"&gt;
+  &lt;p&gt;Rua das Flores, 120&lt;/p&gt;
+&lt;/footer&gt;
+</pre>
+</div>
+
+<hr>
+
+<h2>2. Um ID, um elemento</h2>
+<p>A regra do HTML é clara: o valor de um <code>id</code> não pode se repetir na mesma página. E se repetir? O <strong>CSS</strong> não liga: pinta os dois. Mas o resto do navegador se confunde:</p>
+
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  #aviso {
+    background-color: lightyellow;
+    color: darkred;
+  }
+&lt;/style&gt;
+&lt;p id="aviso"&gt;Loja fechada no feriado.&lt;/p&gt;
+&lt;p id="aviso"&gt;Encomendas até sexta.&lt;/p&gt;
+&lt;p&gt;&lt;a href="#aviso"&gt;Ir para o aviso&lt;/a&gt;&lt;/p&gt;
+</pre>
+
+<p>Os dois parágrafos ficaram amarelos: o seletor <code>#aviso</code> pegou os dois. Parece que funcionou, mas:</p>
+<ul>
+  <li>o link <code>href="#aviso"</code> só leva ao <strong>primeiro</strong>;</li>
+  <li>no JavaScript, <code>document.getElementById("aviso")</code> devolve só o <strong>primeiro</strong>;</li>
+  <li>num formulário, <code>&lt;label for="aviso"&gt;</code> só se liga ao <strong>primeiro</strong>;</li>
+  <li>o validador acusa erro.</li>
+</ul>
+<pre class="term" data-cwd="~/site">$ vnu repetido.html
+"file:/home/ana/site/repetido.html":10.1-10.14: error: Duplicate ID “aviso”.
+"file:/home/ana/site/repetido.html":9.1-9.14: info warning: The first occurrence of ID “aviso” was here.</pre>
+<p>"ID <code>aviso</code> duplicado" na linha 10, e a nota "a primeira ocorrência do ID <code>aviso</code> foi aqui", na linha 9. Se o estilo é para <strong>vários</strong> elementos, ele pede uma <strong>classe</strong>.</p>
+
+<hr>
+
+<h2>3. Para que o ID serve, então</h2>
+<p>O ID é ótimo para o que <strong>precisa</strong> apontar para um elemento só:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Uso</th><th>Exemplo</th></tr>
+<tr><td>Âncora: um link para um ponto da página</td><td><code>&lt;a href="#ingredientes"&gt;</code> leva ao <code>&lt;h2 id="ingredientes"&gt;</code> (<a href="https://wallysondevs.github.io/guia-html/ancoras.html">Guia HTML: Âncoras</a>)</td></tr>
+<tr><td>Formulário: ligar o rótulo ao campo</td><td><code>&lt;label for="email"&gt;</code> e <code>&lt;input id="email"&gt;</code></td></tr>
+<tr><td>JavaScript: achar um elemento</td><td><code>document.getElementById("carrinho")</code></td></tr>
+<tr><td>Acessibilidade: ligar um texto a outro</td><td><code>aria-describedby="dica-senha"</code></td></tr>
+</table>
+</div>
+<p>Nenhum desses usos é estilo. Para o estilo, a recomendação do guia é: <strong>use classe</strong>. Um elemento pode ter as duas coisas, cada uma no seu papel:</p>
+<pre class="file" data-file="index.html">&lt;h2 id="ingredientes" class="titulo-secao"&gt;Ingredientes&lt;/h2&gt;
+</pre>
+<p>O <code>id</code> serve para o link <code>#ingredientes</code>; a <code>class</code> serve para o CSS.</p>
+
+<hr>
+
+<h2>4. Por que preferir a classe: o ID é forte demais</h2>
+<p>Quando duas regras falam da mesma propriedade, o navegador tem de escolher uma. Um dos critérios é a <strong>força do seletor</strong>, a <a href="especificidade.html">especificidade</a>. E o ID é muito forte: um único ID vence <strong>qualquer quantidade</strong> de classes.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> a Ana deu cor ao prato do dia pelo ID (<code>#prato</code>, azul-marinho). Depois criou a classe <code>destaque</code>, em vermelho, e pôs no mesmo parágrafo. A cor não mudou: o <code>#prato</code> ganha, mesmo vindo antes. Troque o ID por classe: no HTML, <code>class="prato destaque"</code> (e apague o <code>id</code>); no CSS, <code>.prato</code> no lugar de <code>#prato</code>. E agora?</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Pão francês&lt;/p&gt;
+&lt;p id="prato" class="destaque"&gt;Prato do dia: sopa de legumes&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">#prato {
+  color: navy;
+}
+
+.destaque {
+  color: crimson;
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<p>Com o ID, o prato do dia fica azul-marinho e em negrito: o <code>font-weight</code> da <code>.destaque</code> pegou (ninguém disputava com ele), mas a cor perdeu para <code>#prato</code>. Depois da troca, as duas regras têm a mesma força (uma classe contra uma classe), e quem vem <strong>depois</strong> no CSS vence: o prato fica vermelho, como a Ana queria. Com IDs no estilo, a página vira uma briga em que só outro ID (ou o <a href="important.html"><code>!important</code></a>) consegue ganhar.</p>
+
+<hr>
+
+<h2>5. Combinando com elemento e classe</h2>
+<p>Como na classe, você pode colar o ID a um nome de elemento ou a uma classe, sem espaço:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Quer dizer</th><th>Vale a pena?</th></tr>
+<tr><td><code>#topo</code></td><td>O elemento com <code>id="topo"</code></td><td>Sim, quando for usar ID</td></tr>
+<tr><td><code>header#topo</code></td><td>O <code>&lt;header&gt;</code> com <code>id="topo"</code></td><td>Raramente: o ID já é único</td></tr>
+<tr><td><code>#topo.fixo</code></td><td>O <code>#topo</code>, quando ele também tiver a classe <code>fixo</code></td><td>Às vezes (o JavaScript liga e desliga a classe)</td></tr>
+<tr><td><code>#topo a</code></td><td>Os links <strong>dentro</strong> do <code>#topo</code> (com espaço: <a href="combinadores.html">combinador</a>)</td><td>Melhor com classe: <code>.topo a</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Esqueceu a cerquilha</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  topo {
+    background-color: navy;
+    color: white;
+  }
+&lt;/style&gt;
+&lt;header id="topo"&gt;
+  &lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;/header&gt;
+</pre>
+<p><strong>O que você vê:</strong> o cabeçalho continua sem fundo, com o título preto.</p>
+<p><strong>Por quê:</strong> sem o <code>#</code>, <code>topo</code> é um seletor de elemento: "os <code>&lt;topo&gt;</code> da página". Não há nenhum. O validador de CSS não reclama, porque o seletor é válido.</p>
+<p><strong>Como consertar:</strong> <code>#topo</code>. Do mesmo jeito, <code>id="#topo"</code> no HTML não funciona: a cerquilha é só do CSS (e do <code>href</code>).</p>
+</div>
+
+<div class="cenario">
+<strong>Espaço no ID: <code>An ID must not contain whitespace</code></strong>
+<pre class="term" data-cwd="~/site">$ vnu espaco.html
+"file:/home/ana/site/espaco.html":9.1-9.22: error: Bad value “bolo de fuba” for attribute “id” on element “h2”: An ID must not contain whitespace.</pre>
+<p><strong>O que significa:</strong> "valor inválido <code>bolo de fuba</code> para o atributo <code>id</code>: um ID não pode ter espaço". Diferente do <code>class</code>, em que o espaço separa várias classes, o <code>id</code> é um nome só. E não há como escrever esse nome no CSS sem escapes: <code>#bolo de fuba</code> quer dizer outra coisa (um elemento <code>&lt;fuba&gt;</code> dentro de um <code>&lt;de&gt;</code> dentro do <code>#bolo</code>).</p>
+<p><strong>Como consertar:</strong> hífen no lugar do espaço: <code>id="bolo-de-fuba"</code> e <code>#bolo-de-fuba</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>ID começando com número: <code>Invalid ID selector</code></strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  #1ano {
+    background-color: lightyellow;
+  }
+&lt;/style&gt;
+&lt;p id="1ano"&gt;A padaria faz 1 ano!&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> nada muda. No HTML, <code>id="1ano"</code> é permitido; no CSS, o nome depois do <code>#</code> não pode começar com algarismo, e a regra inteira é ignorada.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css numero.css
+"file:/home/ana/site/numero.css":1.1-1.5: error: CSS: Invalid ID selector.</pre>
+<p><strong>O que significa:</strong> "seletor de ID inválido".</p>
+<p><strong>Como consertar:</strong> comece com letra: <code>id="aniversario-1ano"</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Espaço depois da cerquilha: <code>Parse Error</code></strong>
+<pre class="term" data-cwd="~/site">$ cat espaco.css
+# topo {
+  color: red;
+}
+$ vnu --css espaco.css
+"file:/home/ana/site/espaco.css":0.0-0.0: error: CSS: Parse Error.</pre>
+<p><strong>O que significa:</strong> "erro de leitura". Desta vez o validador nem consegue dizer a linha (<code>0.0</code>). O <code>#</code> e o nome têm de vir colados; com o espaço, a regra é ignorada.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Onde</th><th>O que faz</th></tr>
+<tr><td><code>id="topo"</code></td><td>HTML</td><td>Dá o nome único <code>topo</code> ao elemento (sem <code>#</code>, sem espaço)</td></tr>
+<tr><td><code>#topo { … }</code></td><td>CSS</td><td>O elemento com <code>id="topo"</code></td></tr>
+<tr><td><code>href="#topo"</code></td><td>HTML</td><td>Link que leva até esse elemento</td></tr>
+<tr><td><code>#topo.fixo { … }</code></td><td>CSS</td><td>O <code>#topo</code> quando tiver também a classe <code>fixo</code></td></tr>
+<tr><td>Classe × ID</td><td></td><td>Estilo: classe. Âncora, <code>label for</code>, JavaScript: ID</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O símbolo do ID</h3>
+<p>Complete o seletor para pegar o elemento com <code>id="carrinho"</code>:</p>
+<div class="ex-code"><input data-answer="#" aria-label="símbolo">carrinho {
+  border: 2px solid navy;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. O atributo</h3>
+<p>Complete o HTML para o título ter o ID <code>ingredientes</code>:</p>
+<div class="ex-code">&lt;h2 <input data-answer="id" aria-label="atributo">="ingredientes"&gt;Ingredientes&lt;/h2&gt;</div>
+</div>
+
+<div class="exercise">
+<h3>3. Corrija o ID</h3>
+<p>O ID <code>modo de preparo</code> é inválido. Escreva-o do jeito certo, com hífens:</p>
+<div class="ex-code">&lt;h2 id="<input data-answer="modo-de-preparo" aria-label="ID">"&gt;Modo de preparo&lt;/h2&gt;</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Quantos elementos de uma página podem ter <code>id="topo"</code>?</p>
+<label><input type="radio" name="q4"> Quantos você quiser</label>
+<label><input type="radio" name="q4"> Dois: um no começo e um no fim</label>
+<label><input type="radio" name="q4"> Um só</label>
+<label><input type="radio" name="q4"> Nenhum: <code>topo</code> é uma palavra reservada</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. A Ana quer o mesmo fundo amarelo em cinco avisos da página. O que ela deve usar?</p>
+<label><input type="radio" name="q5"> <code>id="aviso"</code> nos cinco e <code>#aviso</code> no CSS</label>
+<label><input type="radio" name="q5"> <code>class="aviso"</code> nos cinco e <code>.aviso</code> no CSS</label>
+<label><input type="radio" name="q5"> <code>id="aviso1"</code>, <code>id="aviso2"</code>… e cinco regras no CSS</label>
+<label><input type="radio" name="q5"> Um <code>style</code> em cada aviso</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. Um parágrafo dentro de <code>&lt;div id="menu"&gt;</code> tem <code>class="ativo"</code>. As regras são <code>#menu p { color: navy; }</code> e, depois, <code>.ativo { color: crimson; }</code>. De que cor ele fica?</p>
+<label><input type="radio" name="q6"> Vermelho, porque <code>.ativo</code> vem depois</label>
+<label><input type="radio" name="q6"> Preto, porque as regras se anulam</label>
+<label><input type="radio" name="q6"> Metade de cada cor</label>
+<label><input type="radio" name="q6"> Azul-marinho, porque o seletor com ID é mais forte</label>
+</div>
+
+<h3>Missão final: de ID para classe</h3>
+
+<div class="tryhtml" data-goal="nsel:#aviso=0,nsel:p.aviso=2,css:p.aviso:last-of-type{background-color}=rgb(255, 255, 224),nsrc:#aviso">
+<p class="try-task"><strong>Missão:</strong> a Ana usou o mesmo ID em dois avisos, e o validador reclamou de <code>Duplicate ID</code>. Troque o ID por uma classe <code>aviso</code>: no HTML (<code>class="aviso"</code> nos dois parágrafos) e no CSS (<code>.aviso</code>). O resultado tem de continuar igual, com os dois avisos amarelos.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;p id="aviso"&gt;Loja fechada no feriado.&lt;/p&gt;
+&lt;p id="aviso"&gt;Encomendas até sexta.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">#aviso {
+  background-color: lightyellow;
+  color: darkred;
+  padding: 8px;
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;p class="aviso"&gt;Loja fechada no feriado.&lt;/p&gt;
+&lt;p class="aviso"&gt;Encomendas até sexta.&lt;/p&gt;
+</pre>
+<pre class="solucao" data-file="style.css">.aviso {
+  background-color: lightyellow;
+  color: darkred;
+  padding: 8px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O ID é o nome único de um elemento: <code>id="topo"</code> no HTML, <code>#topo</code> no CSS.</li>
+  <li>Um ID, um elemento. Repetido, o CSS ainda pinta todos, mas links, <code>label</code> e JavaScript só acham o primeiro, e o validador acusa <code>Duplicate ID</code>.</li>
+  <li>O ID serve para âncoras, formulários, JavaScript e acessibilidade. Para estilo, use classe.</li>
+  <li>Um seletor com ID vence qualquer quantidade de classes: no estilo, isso vira briga (aula <a href="especificidade.html">Especificidade</a>).</li>
+  <li>Sem <code>#</code>, o seletor procura um elemento que não existe. ID com espaço é inválido no HTML; começando com número, o CSS não aceita.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
