@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS line-height e letter-spacing — espaço entre linhas e entre letras | Guia CSS</title>
+<meta name="description" content="Espaçamento do texto para quem nunca escreveu CSS: line-height (normal, número, px, em, %) com o valor calculado de cada um, por que o número sem unidade é o melhor, letter-spacing e word-spacing lado a lado, a recomendação de acessibilidade e os erros comuns (vírgula no lugar do ponto, letter-spacing sem unidade, linhas encavaladas com em).">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">line-height</span> e <span class="hl">letter-spacing</span></h1>
+
+<p class="intro">Um texto pode ter a fonte certa e o tamanho certo e mesmo assim cansar os olhos: as linhas grudadas umas nas outras, as letras de um título apertadas demais. Nesta aula você vai controlar o <strong>ar</strong> do texto: o espaço entre as linhas (<code>line-height</code>, "altura da linha"), entre as letras (<code>letter-spacing</code>) e entre as palavras (<code>word-spacing</code>). E vai descobrir por que <code>1.5</code> e <code>1.5em</code>, que parecem a mesma coisa, às vezes encavalam um título inteiro.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que é a altura da linha e como o <code>line-height</code> a muda.</li>
+  <li>Os jeitos de escrever o valor: <code>normal</code>, número, <code>px</code>, <code>em</code> e <code>%</code>, com a conta de cada um.</li>
+  <li>Por que o <strong>número sem unidade</strong> é o jeito recomendado.</li>
+  <li><code>letter-spacing</code> e <code>word-spacing</code>, lado a lado.</li>
+  <li>Quanto espaço a acessibilidade recomenda.</li>
+  <li>Os erros comuns: <code>1,5</code> com vírgula, <code>letter-spacing: 2</code> sem unidade (com as mensagens do validador W3C) e as linhas encavaladas.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. Os valores calculados foram conferidos no Chromium; as mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: o caderno pautado</h2>
+<p>Pense num caderno. As letras são do tamanho da sua letra; a <strong>pauta</strong>, as linhas impressas, é que decide quanto espaço cada linha escrita ocupa. Um caderno de pauta estreita aperta tudo; um de pauta larga deixa a página arejada. A letra é a mesma nos dois.</p>
+<p>No CSS, o <code>font-size</code> é o tamanho da letra (aula <a href="font-size.html">Tamanho da Letra</a>) e o <code>line-height</code> é a altura da pauta. O espaço que sobra é dividido igualmente entre cima e baixo de cada linha, e o texto fica no meio da sua "faixa".</p>
+
+<hr>
+
+<h2>1. A primeira regra</h2>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  p {
+    line-height: 1.5;
+  }
+&lt;/style&gt;
+&lt;p&gt;Bata no liquidificador as cenouras, os ovos e o óleo. Despeje numa tigela, junte o açúcar e a farinha e misture bem. Asse por 40 minutos em forno médio, até o palito sair limpo.&lt;/p&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>line-height</dt><dd>A propriedade: "altura da linha", a altura da faixa que cada linha de texto ocupa.</dd>
+  <dt>1.5</dt><dd>Um número <strong>sem unidade</strong>: "uma vez e meia o tamanho da letra". Com letra de 16px, cada linha ocupa 16 × 1,5 = <strong>24px</strong>. No CSS, a casa decimal usa <strong>ponto</strong>, nunca vírgula.</dd>
+  <dt>;</dt><dd>Fecha a declaração.</dd>
+</dl>
+
+<h2>2. Os valores, lado a lado</h2>
+<p>O mesmo texto, numa caixa estreita com borda, com quatro alturas de linha:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  p {
+    width: 260px;
+    border: 1px solid gray;
+  }
+  .normal { line-height: normal; }
+  .um { line-height: 1; }
+  .um-e-meio { line-height: 1.5; }
+  .dois { line-height: 2; }
+&lt;/style&gt;
+&lt;p class="normal"&gt;normal: Bata no liquidificador as cenouras, os ovos e o óleo.&lt;/p&gt;
+&lt;p class="um"&gt;1: Bata no liquidificador as cenouras, os ovos e o óleo.&lt;/p&gt;
+&lt;p class="um-e-meio"&gt;1.5: Bata no liquidificador as cenouras, os ovos e o óleo.&lt;/p&gt;
+&lt;p class="dois"&gt;2: Bata no liquidificador as cenouras, os ovos e o óleo.&lt;/p&gt;
+</pre>
+
+<p>Com <code>1</code>, as linhas quase se tocam; com <code>2</code>, parece texto de redação escolar com espaço duplo. O <code>normal</code>, valor inicial, fica perto de <code>1.2</code>, mas o número exato depende da <strong>fonte</strong>: cada fonte traz o seu.</p>
+
+<h3>As cinco formas de escrever, e a conta de cada uma</h3>
+<p>Com uma letra de <code>16px</code>, todas estas dão a mesma altura de linha. O "valor calculado" é o que aparece na aba <strong>Computed</strong> (Calculado) do F12, conferido no Chromium:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>A conta</th><th>Valor calculado</th></tr>
+<tr><td><code>line-height: 1.5;</code></td><td>16 × 1,5</td><td><code>24px</code></td></tr>
+<tr><td><code>line-height: 24px;</code></td><td>nenhuma: o valor é fixo</td><td><code>24px</code></td></tr>
+<tr><td><code>line-height: 1.5em;</code></td><td>16 × 1,5 (o <code>em</code> é o tamanho da letra do elemento)</td><td><code>24px</code></td></tr>
+<tr><td><code>line-height: 150%;</code></td><td>16 × 150 ÷ 100</td><td><code>24px</code></td></tr>
+<tr><td><code>line-height: normal;</code></td><td>a fonte decide</td><td><code>normal</code></td></tr>
+</table>
+</div>
+
+<p>Se dão o mesmo resultado, por que o guia insiste no número? Porque a diferença aparece nos <strong>filhos</strong>, na próxima seção.</p>
+
+<hr>
+
+<h2>3. Por que o número sem unidade é o melhor</h2>
+<p>O <code>line-height</code> é <strong>herdado</strong> (aula <a href="heranca.html">Herança</a>). A pergunta é: o que o filho herda?</p>
+<ul>
+  <li>Com <code>1.2em</code>, <code>120%</code> ou <code>px</code>, o pai faz a conta <strong>com a letra dele</strong> e o filho herda o <strong>resultado pronto</strong>, em pixels.</li>
+  <li>Com <code>1.2</code>, o filho herda o <strong>número</strong> e faz a conta de novo, com a letra <strong>dele</strong>.</li>
+</ul>
+<p>Veja com um título grande (<code>40px</code>) dentro de uma caixa com letra de <code>16px</code>:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .caixa-em {
+    width: 300px;
+    line-height: 1.2em;
+  }
+  .caixa-numero {
+    width: 300px;
+    line-height: 1.2;
+  }
+  h1 {
+    font-size: 40px;
+  }
+&lt;/style&gt;
+&lt;div class="caixa-em"&gt;
+  &lt;h1&gt;Bolo de cenoura com cobertura de chocolate&lt;/h1&gt;
+&lt;/div&gt;
+&lt;div class="caixa-numero"&gt;
+  &lt;h1&gt;Bolo de cenoura com cobertura de chocolate&lt;/h1&gt;
+&lt;/div&gt;
+</pre>
+
+<p>O primeiro título ficou com as linhas <strong>umas por cima das outras</strong>. O segundo ficou normal. As contas:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Caixa</th><th>A conta no pai (letra 16px)</th><th>O <code>h1</code> herda</th><th>Altura da linha do <code>h1</code> (letra 40px)</th></tr>
+<tr><td><code>line-height: 1.2em</code></td><td>16 × 1,2 = 19,2px</td><td>o resultado: <code>19.2px</code></td><td><strong><code>19.2px</code></strong>: menor que a letra, as linhas encavalam</td></tr>
+<tr><td><code>line-height: 1.2</code></td><td>16 × 1,2 = 19,2px</td><td>o número: <code>1.2</code></td><td>40 × 1,2 = <strong><code>48px</code></strong></td></tr>
+</table>
+</div>
+
+<p>Os valores <code>19.2px</code> e <code>48px</code> são os que o Chromium calcula para os dois <code>h1</code>. Por isso a regra do guia: <strong>use número sem unidade no <code>line-height</code></strong>. Ele se ajusta sozinho a cada tamanho de letra.</p>
+
+<div class="tryhtml" data-goal="css:.receita p{line-height}=27px,css:.receita h2{line-height}=36px">
+<p class="try-task"><strong>Missão:</strong> o título da receita está com as linhas encavaladas. Troque o <code>line-height</code> da <code>.receita</code> por um <strong>número sem unidade</strong> que deixe o parágrafo (letra de 18px) com linhas de 27px. Confira a conta: e o título, de 24px, fica com quanto?</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="receita"&gt;
+  &lt;h2&gt;Bolo de cenoura com cobertura de chocolate da vó&lt;/h2&gt;
+  &lt;p&gt;Bata no liquidificador as cenouras, os ovos e o óleo. Despeje numa tigela, junte o açúcar e a farinha e misture bem.&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">.receita {
+  width: 280px;
+  font-size: 18px;
+  line-height: 1em;
+}
+
+.receita h2 {
+  font-size: 24px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.receita {
+  width: 280px;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.receita h2 {
+  font-size: 24px;
+}
+</pre>
+</div>
+
+<p>A conta do título: 24 × 1,5 = 36px. Com o <code>1em</code> do começo, o título herdava os 18px prontos do pai, menos que os 24px da letra.</p>
+
+<hr>
+
+<h2>4. Quanto espaço? A recomendação de acessibilidade</h2>
+<p>Para texto corrido, a recomendação mais citada vem das regras de acessibilidade (WCAG): altura da linha de <strong>pelo menos 1,5</strong> vez o tamanho da letra nos parágrafos. Linhas apertadas cansam quem tem baixa visão ou dislexia; linhas soltas demais fazem o olho se perder na volta para o começo da próxima.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Onde</th><th>Valor comum</th><th>Por quê</th></tr>
+<tr><td>Parágrafos de texto</td><td><code>1.5</code> a <code>1.7</code></td><td>Respira, e o olho acha a próxima linha</td></tr>
+<tr><td>Títulos grandes</td><td><code>1.1</code> a <code>1.3</code></td><td>A letra já é grande; espaço demais separa o título em pedaços</td></tr>
+<tr><td>Botões e menus de uma linha só</td><td><code>1</code> a <code>1.2</code></td><td>A altura vem mais do <code>padding</code> do que da linha</td></tr>
+</table>
+</div>
+
+<p>Um jeito prático: <code>body { line-height: 1.5; }</code> no começo do CSS, que todo mundo herda, e um valor menor só nos títulos.</p>
+
+<hr>
+
+<h2>5. <code>letter-spacing</code>: o espaço entre as letras</h2>
+<p>O <code>letter-spacing</code> ("espaçamento entre letras") <strong>soma</strong> um espaço depois de cada letra. Ele aceita valores negativos, que apertam:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .l0 { letter-spacing: normal; }
+  .l1 { letter-spacing: 2px; }
+  .l2 { letter-spacing: 0.2em; }
+  .l3 { letter-spacing: -1px; }
+&lt;/style&gt;
+&lt;p class="l0"&gt;RECEITAS: normal&lt;/p&gt;
+&lt;p class="l1"&gt;RECEITAS: 2px&lt;/p&gt;
+&lt;p class="l2"&gt;RECEITAS: 0.2em&lt;/p&gt;
+&lt;p class="l3"&gt;RECEITAS: -1px&lt;/p&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>A conta (letra de 16px)</th><th>Valor calculado</th></tr>
+<tr><td><code>letter-spacing: normal;</code></td><td>o valor inicial: o espaço da própria fonte</td><td><code>normal</code></td></tr>
+<tr><td><code>letter-spacing: 2px;</code></td><td>nenhuma</td><td><code>2px</code></td></tr>
+<tr><td><code>letter-spacing: 0.2em;</code></td><td>16 × 0,2</td><td><code>3.2px</code></td></tr>
+<tr><td><code>letter-spacing: -1px;</code></td><td>nenhuma; aperta</td><td><code>-1px</code></td></tr>
+</table>
+</div>
+
+<p>Aqui, ao contrário do <code>line-height</code>, <strong>não existe número sem unidade</strong>: use <code>em</code>, que acompanha o tamanho da letra. O uso clássico é abrir um pouco as letras de palavras em MAIÚSCULAS (um subtítulo, um botão), que ficam apertadas sem isso. Em texto corrido, deixe <code>normal</code>. E com cuidado no negativo: letras grudadas são difíceis de ler.</p>
+
+<h3><code>word-spacing</code>: o espaço entre as palavras</h3>
+<p>O primo do <code>letter-spacing</code> soma espaço só nos <strong>espaços</strong> entre as palavras. É bem menos usado:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  p {
+    word-spacing: 10px;
+  }
+&lt;/style&gt;
+&lt;p&gt;Bolo de fubá com erva-doce&lt;/p&gt;
+</pre>
+
+<p>Repare que "erva-doce" não se separou: o hífen não é espaço.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> mude o <code>letter-spacing</code> do subtítulo (tente <code>0</code>, <code>0.3em</code>, <code>-0.05em</code>) e o <code>line-height</code> do parágrafo (tente <code>1</code> e <code>2</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="chamada"&gt;RECEITAS DA SEMANA&lt;/p&gt;
+&lt;h2&gt;Pão de queijo de liquidificador&lt;/h2&gt;
+&lt;p&gt;Fica pronto em meia hora, não precisa sovar e rende vinte pãezinhos. O segredo é o polvilho azedo misturado com o doce.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  line-height: 1.5;
+}
+
+.chamada {
+  font-size: 14px;
+  letter-spacing: 0.15em;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Vírgula no lugar do ponto, e número sem unidade no <code>letter-spacing</code></strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  p {
+    width: 260px;
+    line-height: 1,5;
+    letter-spacing: 2;
+  }
+&lt;/style&gt;
+&lt;p&gt;Bata no liquidificador as cenouras, os ovos e o óleo.&lt;/p&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> o parágrafo fica exatamente como um parágrafo sem regra nenhuma: linhas no espaço <code>normal</code> e letras no espaço normal. No Chromium, os dois valores calculados continuam <code>normal</code>.</p>
+<p><strong>Por quê:</strong> no CSS, a casa decimal é o <strong>ponto</strong> (<code>1.5</code>), como no inglês. A vírgula separa valores, então <code>1,5</code> vira "dois valores, <code>1</code> e <code>5</code>", e o <code>line-height</code> só aceita um. E o <code>letter-spacing</code> não tem número sem unidade: <code>2</code> sozinho não quer dizer nada para ele. O navegador ignora as duas declarações; no F12, no painel <strong>Styles</strong> (Estilos), elas aparecem riscadas, com um ícone de aviso.</p>
+<p><strong>O que o validador diz:</strong></p>
+<pre class="term" data-cwd="~/site">$ cat style.css
+p {
+  line-height: 1,5;
+  letter-spacing: 2;
+}
+$ vnu --css style.css
+"file:/home/ana/site/style.css":2.18-2.18: error: CSS: “line-height”: Too many values or values are not recognized.
+"file:/home/ana/site/style.css":3.19-3.19: error: CSS: “letter-spacing”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<p>"<code>line-height</code>: valores demais, ou valores não reconhecidos" e "<code>letter-spacing</code>: só o <code>0</code> pode ficar sem unidade. Você precisa pôr uma unidade depois do número."</p>
+<p><strong>Como consertar:</strong> <code>line-height: 1.5;</code> e <code>letter-spacing: 2px;</code> (ou <code>0.1em</code>).</p>
+</div>
+
+<div class="cenario">
+<strong>Linhas encavaladas no título</strong>
+<p>Você já viu na seção 3: um <code>line-height</code> com <code>em</code>, <code>%</code> ou <code>px</code> num pai passa um valor <strong>pronto</strong> para os filhos. Um título com letra maior que esse valor fica com as linhas umas sobre as outras, e o validador não reclama, porque tudo é válido. Na aba Computed do título, o <code>line-height</code> aparece menor que o <code>font-size</code>: é a pista.</p>
+<p><strong>Como consertar:</strong> número sem unidade no pai (<code>line-height: 1.2;</code>), ou um <code>line-height</code> próprio no título.</p>
+</div>
+
+<div class="cenario">
+<strong>Texto cortado num botão de altura fixa</strong>
+<p>Um botão com <code>width: 160px</code>, <code>height: 40px</code> e <code>line-height: 2</code> numa letra de 24px: cada linha precisa de 48px, mais que a caixa inteira. "Ver receita completa" não cabe numa linha, quebra em duas, e a palavra "completa" aparece <strong>embaixo</strong> do botão, fora da caixa cinza, por cima do que vem depois. Prefira deixar a altura livre e controlar o tamanho com <code>padding</code> (aula <a href="padding.html">Espaço Interno</a>).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>line-height: normal;</code></td><td>Valor inicial: perto de 1.2, depende da fonte</td></tr>
+<tr><td><code>line-height: 1.5;</code></td><td>Linha de 1,5 vez a letra; os filhos refazem a conta (recomendado)</td></tr>
+<tr><td><code>line-height: 24px;</code> / <code>1.5em</code> / <code>150%</code></td><td>Altura calculada uma vez, no elemento; os filhos herdam o resultado pronto</td></tr>
+<tr><td><code>letter-spacing: 0.1em;</code></td><td>Soma espaço entre as letras (aceita negativo; exige unidade)</td></tr>
+<tr><td><code>word-spacing: 4px;</code></td><td>Soma espaço entre as palavras</td></tr>
+<tr><td>Herança</td><td>As três são herdadas</td></tr>
+<tr><td>Casa decimal</td><td>Sempre ponto: <code>1.5</code>, nunca <code>1,5</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A conta</h3>
+<p>Com letra de 20px e <code>line-height: 1.5</code>, quantos pixels tem cada linha? (só o número)</p>
+<div class="ex-code">20 × 1,5 = <input data-answer="30|30px" aria-label="resultado">px</div>
+</div>
+
+<div class="exercise">
+<h3>2. O ponto</h3>
+<p>Escreva "uma vez e meia" do jeito que o CSS entende:</p>
+<div class="ex-code">p { line-height: <input data-answer="1.5" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Letras abertas</h3>
+<p>Complete a propriedade que afasta as letras:</p>
+<div class="ex-code">.chamada { <input data-answer="letter-spacing" aria-label="propriedade">: 0.1em; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. O <code>div</code> tem letra de 10px e <code>line-height: 2em</code>. Um <code>h1</code> dentro dele tem letra de 30px. Qual a altura da linha do <code>h1</code>?</p>
+<label><input type="radio" name="q4"> 60px</label>
+<label><input type="radio" name="q4"> 20px, e as linhas encavalam</label>
+<label><input type="radio" name="q4"> 30px</label>
+<label><input type="radio" name="q4"> <code>normal</code></label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. E se o <code>div</code> da pergunta anterior tivesse <code>line-height: 2</code>?</p>
+<label><input type="radio" name="q5"> 20px</label>
+<label><input type="radio" name="q5"> 60px: o <code>h1</code> herda o número e faz 30 × 2</label>
+<label><input type="radio" name="q5"> 2px</label>
+<label><input type="radio" name="q5"> 32px</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. O que o navegador faz com <code>letter-spacing: 3;</code>?</p>
+<label><input type="radio" name="q6"> Usa 3px</label>
+<label><input type="radio" name="q6"> Usa 3em</label>
+<label><input type="radio" name="q6"> Usa 3 vezes o espaço normal</label>
+<label><input type="radio" name="q6"> Ignora a declaração: falta a unidade</label>
+</div>
+
+<h3>Missão final: o post do blog</h3>
+
+<div class="tryhtml" data-goal="css:.post h1 + p{line-height}=30px,css:.post h1{line-height}=48px,css:.chamada{letter-spacing}=1.4px,nsrc:line-height:\s*[\d.]+(em|px|%)">
+<p class="try-task"><strong>Missão:</strong> arrume o espaçamento do post. (1) Ponha um <code>line-height</code> de <strong>número sem unidade</strong> no <code>.post</code>, de modo que os parágrafos (letra de 20px) tenham linhas de 30px. (2) Dê ao <code>h1</code> (letra de 40px) o próprio <code>line-height</code>, também sem unidade, para as linhas dele terem 48px. (3) Abra as letras da <code>.chamada</code> (letra de 14px) com <code>0.1em</code>. Nada de <code>em</code>, <code>px</code> ou <code>%</code> no <code>line-height</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="post"&gt;
+  &lt;p class="chamada"&gt;DIÁRIO DA COZINHA&lt;/p&gt;
+  &lt;h1&gt;O dia em que o bolo de fubá afundou no meio&lt;/h1&gt;
+  &lt;p&gt;Abri o forno antes da hora, e o bolo murchou como um balão. A lição: nos primeiros 25 minutos, o forno fica fechado.&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">.post {
+  width: 400px;
+  font-size: 20px;
+  line-height: 1em;
+}
+
+.post h1 {
+  font-size: 40px;
+}
+
+.chamada {
+  font-size: 14px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.post {
+  width: 400px;
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+.post h1 {
+  font-size: 40px;
+  line-height: 1.2;
+}
+
+.chamada {
+  font-size: 14px;
+  letter-spacing: 0.1em;
+}
+</pre>
+</div>
+
+<p>As contas: 20 × 1,5 = 30px nos parágrafos; 40 × 1,2 = 48px no título; 14 × 0,1 = 1,4px entre as letras da chamada.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>line-height</code> é a altura da faixa de cada linha. O valor inicial, <code>normal</code>, depende da fonte (perto de 1.2).</li>
+  <li><code>1.5</code>, <code>1.5em</code>, <code>150%</code> e <code>24px</code> dão 24px numa letra de 16px; a diferença está na herança.</li>
+  <li>Use <strong>número sem unidade</strong>: os filhos herdam o número e refazem a conta com a letra deles. Com <code>em</code>, <code>%</code> ou <code>px</code>, herdam o resultado pronto, e títulos grandes encavalam.</li>
+  <li>Parágrafos: <code>1.5</code> ou mais (recomendação de acessibilidade). Títulos: perto de <code>1.2</code>.</li>
+  <li><code>letter-spacing</code> soma espaço entre letras (exige unidade; <code>em</code> é o melhor); <code>word-spacing</code>, entre palavras.</li>
+  <li>Casa decimal com ponto: <code>1,5</code> dá <code>Too many values or values are not recognized</code>; <code>letter-spacing: 2</code> dá <code>only “0” can be a “unit”</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
