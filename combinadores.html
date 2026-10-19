@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Combinadores — descendente, filho (&gt;) e irmãos (+ e ~) | Guia CSS</title>
+<meta name="description" content="Os combinadores do CSS para quem nunca escreveu CSS: o espaço (descendente), o > (filho direto), o + (irmão logo depois) e o ~ (irmãos depois), com a árvore da página como uma família, exemplos lado a lado, quando usar cada um e o que acontece quando dá errado (um elemento no meio, irmão antes, procurar o pai com <), com as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Descendente, Filho e Irmãos</span></h1>
+
+<p class="intro">Às vezes o que identifica um elemento não é o nome nem a classe, e sim <strong>onde ele está</strong>: os links que ficam dentro do menu, os itens de primeiro nível de uma lista, o parágrafo que vem logo depois de um título. Os <strong>combinadores</strong> juntam dois seletores e dizem qual é a relação entre eles na página. São quatro: o espaço, o <code>&gt;</code>, o <code>+</code> e o <code>~</code>.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A página como uma árvore de família: pai, filho, neto, irmão.</li>
+  <li>O <strong>descendente</strong> (espaço): <code>nav a</code>.</li>
+  <li>O <strong>filho</strong> (<code>&gt;</code>): <code>.menu &gt; li</code>.</li>
+  <li>O <strong>irmão logo depois</strong> (<code>+</code>): <code>h2 + p</code>.</li>
+  <li>Os <strong>irmãos depois</strong> (<code>~</code>): <code>h2 ~ p</code>.</li>
+  <li>Quando usar cada um, e os erros: um elemento no meio do caminho, o irmão que vem antes, procurar o pai.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a árvore da família</h2>
+<p>O navegador guarda a página como uma <strong>árvore</strong>, igual a uma árvore genealógica. Quem está dentro de um elemento é <strong>descendente</strong> dele. Veja esta lista:</p>
+
+<pre class="file" data-file="index.html">&lt;ul class="menu"&gt;
+  &lt;li&gt;Bolos
+    &lt;ul&gt;
+      &lt;li&gt;Fubá&lt;/li&gt;
+      &lt;li&gt;Cenoura&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Pães&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Parentesco</th><th>Na lista acima</th></tr>
+<tr><td><strong>Filho</strong>: está diretamente dentro</td><td>"Bolos" e "Pães" são filhos do <code>ul.menu</code></td></tr>
+<tr><td><strong>Neto</strong> (e bisneto…): está dentro de um filho</td><td>"Fubá" e "Cenoura" são netos do <code>ul.menu</code> (filhos do <code>ul</code> de dentro)</td></tr>
+<tr><td><strong>Descendente</strong>: filho, neto, bisneto, qualquer nível</td><td>Os quatro <code>&lt;li&gt;</code> são descendentes do <code>ul.menu</code></td></tr>
+<tr><td><strong>Irmãos</strong>: têm o mesmo pai</td><td>"Bolos" e "Pães" são irmãos; "Fubá" e "Cenoura" também</td></tr>
+</table>
+</div>
+
+<p>Cada combinador fala de um desses parentescos:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Combinador</th><th>Exemplo</th><th>Lê-se</th></tr>
+<tr><td>espaço</td><td><code>.menu li</code></td><td>todo <code>li</code> <strong>dentro</strong> do <code>.menu</code>, em qualquer nível</td></tr>
+<tr><td><code>&gt;</code></td><td><code>.menu &gt; li</code></td><td>todo <code>li</code> que é <strong>filho direto</strong> do <code>.menu</code></td></tr>
+<tr><td><code>+</code></td><td><code>h2 + p</code></td><td>o <code>p</code> que vem <strong>logo depois</strong> de um <code>h2</code>, com o mesmo pai</td></tr>
+<tr><td><code>~</code></td><td><code>h2 ~ p</code></td><td>todo <code>p</code> que vem <strong>depois</strong> de um <code>h2</code>, com o mesmo pai</td></tr>
+</table>
+</div>
+<p>Em todos eles, quem recebe o estilo é o elemento da <strong>direita</strong>, o último do seletor. O da esquerda só diz onde procurar.</p>
+
+<hr>
+
+<h2>1. Descendente: o espaço</h2>
+<p>O espaço entre dois seletores quer dizer "dentro de". O caso clássico: os links do menu com uma cor, os links do texto com outra.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> <code>nav a</code> pegou só os dois links dentro do <code>&lt;nav&gt;</code>; o link do parágrafo continua com a cor normal. Troque o seletor por só <code>a</code> e veja os três mudarem.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav&gt;
+  &lt;a href="index.html"&gt;Início&lt;/a&gt;
+  &lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;
+&lt;/nav&gt;
+&lt;p&gt;Veja o &lt;a href="bolo.html"&gt;bolo de fubá&lt;/a&gt;.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">nav a {
+  color: darkgreen;
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>nav</dt><dd>O "ancestral": onde procurar.</dd>
+  <dt>(espaço)</dt><dd>O combinador descendente: "em qualquer lugar dentro de". Um espaço basta; vários espaços ou uma quebra de linha valem o mesmo.</dd>
+  <dt>a</dt><dd>Quem recebe o estilo: os <code>&lt;a&gt;</code> que estão dentro de um <code>&lt;nav&gt;</code>, seja como filhos, netos ou mais fundo.</dd>
+</dl>
+
+<p>Os dois lados podem ser qualquer seletor: <code>.receita li</code>, <code>#topo a</code>, <code>footer .aviso</code>. E dá para encadear: <code>.receita ul li</code> é "um <code>li</code> dentro de um <code>ul</code> dentro de um <code>.receita</code>". Mas evite correntes longas: quanto mais comprido o seletor, mais ele depende da estrutura do HTML, e mais difícil fica de vencer depois (aula <a href="especificidade.html">Especificidade</a>).</p>
+
+<hr>
+
+<h2>2. Filho: o <code>&gt;</code></h2>
+<p>O descendente pega <strong>todos os níveis</strong>. Numa lista dentro de lista, isso nem sempre é o que você quer:</p>
+
+<div class="tryhtml" data-goal="css:.menu &gt; li{border-left-style}=solid,css:.menu li li{border-left-style}=none,src:\.menu\s*&gt;\s*li">
+<p class="try-task"><strong>Missão:</strong> a Ana queria a barra vermelha só nas categorias ("Bolos" e "Pães"), mas <code>.menu li</code> pôs a barra nos subitens também. Troque o espaço por <code>&gt;</code> para pegar só os filhos diretos do <code>.menu</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul class="menu"&gt;
+  &lt;li&gt;Bolos
+    &lt;ul&gt;
+      &lt;li&gt;Fubá&lt;/li&gt;
+      &lt;li&gt;Cenoura&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Pães&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu li {
+  border-left: 4px solid crimson;
+  padding-left: 8px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.menu &gt; li {
+  border-left: 4px solid crimson;
+  padding-left: 8px;
+}
+</pre>
+</div>
+
+<p>No começo, há duas barras: uma comprida, à esquerda de tudo, e uma mais curta, mais para dentro, ao lado de "Fubá" e "Cenoura". Com <code>.menu &gt; li</code>, a barra de dentro some e fica só a de fora. Ela desce ao lado da sublista inteira porque a sublista está <strong>dentro</strong> do item "Bolos", e emenda com a barra de "Pães", logo abaixo. Os espaços em volta do <code>&gt;</code> são opcionais (<code>.menu&gt;li</code> também funciona), mas com eles fica mais fácil de ler.</p>
+
+<div class="warning">
+<strong>Cuidado com o que passa de pai para filho</strong>
+<p>Na caixa acima, troque a borda por <code>font-weight: bold;</code>, ainda com <code>.menu &gt; li</code>. "Fubá" e "Cenoura" também ficam em negrito! Não porque o seletor os pegou, mas porque o negrito (assim como a cor e a fonte) passa de pai para filho por <a href="heranca.html">herança</a>, e eles estão dentro de "Bolos". A borda não passa: por isso a missão usa a borda. Para tirar o negrito dos subitens, seria preciso uma regra para eles: <code>.menu li li { font-weight: normal; }</code>.</p>
+</div>
+
+<hr>
+
+<h2>3. Irmão logo depois: o <code>+</code></h2>
+<p>O <code>+</code> pega o elemento que vem <strong>imediatamente depois</strong> de outro, com o mesmo pai. Um uso comum: deixar diferente o primeiro parágrafo depois de cada título, a "linha fina" das revistas.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> em cada seção, só o primeiro parágrafo depois do <code>&lt;h2&gt;</code> ficou maior e em itálico. Troque o <code>+</code> por <code>~</code> (próxima seção) e compare.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Ingredientes&lt;/h2&gt;
+&lt;p&gt;Para uma forma média.&lt;/p&gt;
+&lt;p&gt;Use fubá fino.&lt;/p&gt;
+&lt;h2&gt;Modo de preparo&lt;/h2&gt;
+&lt;p&gt;Leva 50 minutos.&lt;/p&gt;
+&lt;p&gt;Bata tudo no liquidificador.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h2 + p {
+  font-size: 1.2rem;
+  font-style: italic;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>h2</dt><dd>O ponto de referência.</dd>
+  <dt>+</dt><dd>"O próximo irmão": o elemento seguinte, com o mesmo pai. Só ele, e só se for o <strong>logo depois</strong>.</dd>
+  <dt>p</dt><dd>Quem recebe o estilo, se o próximo irmão do <code>h2</code> for um <code>&lt;p&gt;</code>. Se for outra coisa (uma imagem, uma lista), ninguém recebe.</dd>
+</dl>
+
+<p>Outro uso famoso: <code>li + li { border-top: 1px solid gray; }</code>, uma linha entre os itens de uma lista. Todo item que tem um item antes dele ganha a linha em cima; o primeiro, que não tem ninguém antes, fica sem. Linha só <strong>entre</strong> os itens, sem sobrar nas pontas.</p>
+
+<hr>
+
+<h2>4. Irmãos depois: o <code>~</code></h2>
+<p>O <code>~</code> (til) é o primo largo do <code>+</code>: pega <strong>todos</strong> os irmãos que vêm depois, não só o primeiro.</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  h2 ~ p {
+    color: darkslateblue;
+  }
+&lt;/style&gt;
+&lt;p&gt;Receita da vó Lurdes.&lt;/p&gt;
+&lt;h2&gt;Ingredientes&lt;/h2&gt;
+&lt;p&gt;Para uma forma média.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;2 xícaras de fubá&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Use fubá fino.&lt;/p&gt;
+</pre>
+
+<p>Os dois parágrafos <strong>depois</strong> do <code>&lt;h2&gt;</code> ficaram azul-ardósia, mesmo com a lista no meio do caminho. O primeiro parágrafo, que vem <strong>antes</strong> do título, não mudou: o <code>~</code> e o <code>+</code> só olham para a frente.</p>
+
+<hr>
+
+<h2>5. Qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você quer</th><th>Use</th><th>Exemplo</th></tr>
+<tr><td>Tudo de um tipo dentro de uma área</td><td>espaço</td><td><code>nav a</code>, <code>.receita img</code></td></tr>
+<tr><td>Só o primeiro nível (listas dentro de listas, menus)</td><td><code>&gt;</code></td><td><code>.menu &gt; li</code></td></tr>
+<tr><td>O elemento logo depois de outro</td><td><code>+</code></td><td><code>h2 + p</code>, <code>li + li</code></td></tr>
+<tr><td>Todos os que vêm depois de outro, no mesmo nível</td><td><code>~</code></td><td><code>h2 ~ p</code></td></tr>
+<tr><td>Algo que tenha um filho de certo tipo (o "pai")</td><td>Nenhum combinador: <code>:has()</code></td><td><code>.cartao:has(img)</code> (aula <a href="has.html">:has()</a>)</td></tr>
+</table>
+</div>
+<p>Na dúvida, prefira uma <strong>classe</strong> no próprio elemento: <code>.linha-fina</code> não quebra se alguém puser uma imagem entre o título e o parágrafo. Combinadores são ótimos para estruturas que não mudam (o menu, a lista) e para não precisar pôr classe em tudo.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>O <code>&gt;</code> não acha: tem um elemento no meio</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .cartao &gt; p {
+    color: crimson;
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;
+  &lt;div class="corpo"&gt;
+    &lt;p&gt;Bolo de fubá&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> o parágrafo continua preto.</p>
+<p><strong>Por quê:</strong> o <code>&lt;p&gt;</code> é <strong>neto</strong> do <code>.cartao</code>, e não filho: entre os dois existe o <code>div.corpo</code>. O <code>&gt;</code> só desce um nível. O validador não reclama: o seletor é válido, só não acha ninguém.</p>
+<p><strong>Como consertar:</strong> <code>.cartao p</code> (qualquer nível) ou <code>.corpo &gt; p</code>. Na aula <a href="devtools.html">Inspecionando com o F12</a>, a aba de elementos mostra a árvore da página, com cada nível mais para a direita: é o jeito de descobrir quem é pai de quem.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>+</code> não acha: o vizinho mudou</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  h2 + p {
+    font-style: italic;
+  }
+&lt;/style&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="200" height="150"&gt;
+&lt;p&gt;Com cobertura de chocolate.&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> o parágrafo não ficou em itálico.</p>
+<p><strong>Por quê:</strong> o irmão logo depois do <code>&lt;h2&gt;</code> é a imagem, e não o parágrafo. O <code>+</code> não pula ninguém.</p>
+<p><strong>Como consertar:</strong> <code>h2 ~ p</code> (qualquer irmão depois), ou uma classe no parágrafo, que não depende da ordem.</p>
+</div>
+
+<div class="cenario">
+<strong>Procurando o pai: <code>ul &lt; li</code> não existe</strong>
+<pre class="term" data-cwd="~/site">$ cat menor.css
+ul &lt; li {
+  color: crimson;
+}
+$ vnu --css menor.css
+"file:/home/ana/site/menor.css":3.2-4.1: error: CSS: Parse Error.</pre>
+<p><strong>O que significa:</strong> "erro de leitura". Não há combinador <code>&lt;</code> no CSS, nem um "irmão de antes" (<code>-</code>): os combinadores só descem na árvore e só andam para a frente. O validador aponta o fim da regra (linha 3, coluna 2, depois do <code>}</code>), e não o <code>&lt;</code>: ele só percebe que a regra inteira não fazia sentido quando chega ao fim dela. O navegador ignora a regra toda.</p>
+<p><strong>Como consertar:</strong> para "o pai que tem tal filho", o CSS moderno tem o <code>:has()</code>: <code>ul:has(li.destaque)</code> (aula <a href="has.html">:has(): o Seletor do Pai</a>).</p>
+</div>
+
+<div class="cenario">
+<strong>Combinador sem nada depois: <code>Parse Error</code></strong>
+<pre class="term" data-cwd="~/site">$ cat mais.css
+h2 + {
+  color: crimson;
+}
+$ vnu --css mais.css
+"file:/home/ana/site/mais.css":3.2-4.1: error: CSS: Parse Error.</pre>
+<p><strong>O que significa:</strong> o <code>+</code> precisa de um seletor dos dois lados. Com o lado direito vazio, a regra inteira é ignorada. O mesmo vale para <code>&gt;</code> e <code>~</code>, e para dois combinadores seguidos (<code>ul &gt; &gt; li</code>).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>Nome</th><th>Pega</th></tr>
+<tr><td><code>A B</code></td><td>Descendente</td><td>Todo <code>B</code> dentro de <code>A</code>, em qualquer nível</td></tr>
+<tr><td><code>A &gt; B</code></td><td>Filho</td><td>Todo <code>B</code> que é filho direto de <code>A</code></td></tr>
+<tr><td><code>A + B</code></td><td>Irmão adjacente</td><td>O <code>B</code> logo depois de <code>A</code>, com o mesmo pai</td></tr>
+<tr><td><code>A ~ B</code></td><td>Irmãos gerais</td><td>Todo <code>B</code> depois de <code>A</code>, com o mesmo pai</td></tr>
+<tr><td colspan="3">Quem recebe o estilo é sempre o da direita. Não há combinador para o pai nem para o irmão de antes (para o pai, <code>:has()</code>).</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Só os filhos</h3>
+<p>Complete o seletor para pegar só os <code>li</code> filhos diretos do <code>.menu</code>:</p>
+<div class="ex-code">.menu <input data-answer="&gt;" aria-label="combinador"> li {
+  font-weight: bold;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. Logo depois</h3>
+<p>Complete o seletor para pegar o parágrafo que vem imediatamente depois de um <code>h2</code>:</p>
+<div class="ex-code">h2 <input data-answer="+" aria-label="combinador"> p {
+  font-style: italic;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>3. Os links do rodapé</h3>
+<p>Escreva o seletor para todos os links (<code>a</code>) dentro de um <code>footer</code>, em qualquer nível:</p>
+<div class="ex-code"><input data-answer="footer a" aria-label="seletor"> {
+  color: darkgreen;
+}</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Em <code>&lt;div class="cartao"&gt;&lt;section&gt;&lt;p&gt;Oi&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;</code>, qual seletor pega o parágrafo?</p>
+<label><input type="radio" name="q4"> <code>.cartao &gt; p</code></label>
+<label><input type="radio" name="q4"> <code>.cartao p</code></label>
+<label><input type="radio" name="q4"> <code>.cartao + p</code></label>
+<label><input type="radio" name="q4"> <code>.cartao ~ p</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. Em <code>&lt;p&gt;A&lt;/p&gt;&lt;h2&gt;T&lt;/h2&gt;&lt;p&gt;B&lt;/p&gt;&lt;p&gt;C&lt;/p&gt;</code>, quais parágrafos <code>h2 ~ p</code> pega?</p>
+<label><input type="radio" name="q5"> A, B e C</label>
+<label><input type="radio" name="q5"> Só A</label>
+<label><input type="radio" name="q5"> Só B</label>
+<label><input type="radio" name="q5"> B e C</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">6. Em <code>nav a</code>, quem recebe o estilo?</p>
+<label><input type="radio" name="q6"> O <code>&lt;nav&gt;</code></label>
+<label><input type="radio" name="q6"> O <code>&lt;nav&gt;</code> e os links</label>
+<label><input type="radio" name="q6"> Os links que estão dentro de um <code>&lt;nav&gt;</code></label>
+<label><input type="radio" name="q6"> Os links que vêm depois de um <code>&lt;nav&gt;</code></label>
+</div>
+
+<h3>Missão final: a página da receita</h3>
+
+<div class="tryhtml" data-goal="css:nav a{color}=rgb(0, 100, 0),css:h2 + p{font-style}=italic,css:p:nth-of-type(2){font-style}=normal,css:p:nth-of-type(3){font-style}=italic,src:nav\s+a\s*\{,src:h2\s*\+\s*p">
+<p class="try-task"><strong>Missão:</strong> sem mexer no HTML e sem criar classes: (1) deixe os links do menu (dentro do <code>&lt;nav&gt;</code>) com <code>color: darkgreen;</code>, sem mudar o link do rodapé; (2) deixe em itálico (<code>font-style: italic;</code>) só o primeiro parágrafo depois de cada <code>&lt;h2&gt;</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav&gt;
+  &lt;a href="index.html"&gt;Início&lt;/a&gt;
+  &lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;
+&lt;/nav&gt;
+&lt;h1&gt;Bolo de fubá&lt;/h1&gt;
+&lt;h2&gt;Ingredientes&lt;/h2&gt;
+&lt;p&gt;Para uma forma média.&lt;/p&gt;
+&lt;p&gt;Use fubá fino.&lt;/p&gt;
+&lt;h2&gt;Modo de preparo&lt;/h2&gt;
+&lt;p&gt;Leva 50 minutos.&lt;/p&gt;
+&lt;p&gt;Bata tudo no liquidificador.&lt;/p&gt;
+&lt;footer&gt;
+  &lt;p&gt;&lt;a href="index.html"&gt;Voltar ao início&lt;/a&gt;&lt;/p&gt;
+&lt;/footer&gt;
+</pre>
+<pre class="script" data-file="style.css">/* escreva as regras aqui */
+</pre>
+<pre class="solucao" data-file="style.css">nav a {
+  color: darkgreen;
+}
+
+h2 + p {
+  font-style: italic;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Combinadores dizem a relação entre dois seletores na árvore da página. Quem recebe o estilo é sempre o da direita.</li>
+  <li>Espaço: descendente, qualquer nível (<code>nav a</code>). <code>&gt;</code>: filho direto (<code>.menu &gt; li</code>).</li>
+  <li><code>+</code>: o irmão logo depois (<code>h2 + p</code>, <code>li + li</code>). <code>~</code>: todos os irmãos depois (<code>h2 ~ p</code>).</li>
+  <li>Os combinadores só descem e só andam para a frente. Para o pai, <code>:has()</code>.</li>
+  <li>Quando não pega: um elemento no meio (para o <code>&gt;</code>), um vizinho diferente (para o <code>+</code>), ou o irmão que vem antes. Combinador sem seletor do lado é <code>Parse Error</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
