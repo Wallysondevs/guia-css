@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Estilo de Código — escrever CSS fácil de ler e de manter | Guia CSS</title>
+<meta name="description" content="Estilo de código em CSS para quem está começando: indentação de 2 espaços, uma declaração por linha, ponto e vírgula sempre, nomes de classe em minúsculas com hífen, ordem das declarações, comentários /* */, cores e zeros, e os erros reais que um código bagunçado esconde (falta de ;, comentário com //, classe com maiúscula), com as mensagens do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Estilo de Código</span></h1>
+
+<p class="intro">O navegador lê CSS todo amontoado numa linha só sem reclamar. Quem não consegue ler é <strong>você</strong>, daqui a três meses, ou a pessoa que vai mexer no site da Ana. Estilo de código são as combinações de escrita (espaços, linhas, nomes, ordem) que deixam o CSS fácil de ler, de achar e de consertar. Nesta aula você vai conhecer as regras que este guia usa desde a primeira aula e o porquê de cada uma, e ver os erros que só aparecem quando o código está arrumado.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O formato de uma regra: indentação de 2 espaços, uma declaração por linha, <code>;</code> sempre.</li>
+  <li>Nomes de classe: minúsculas, com hífen, dizendo <strong>o que</strong> a coisa é.</li>
+  <li>Uma ordem para as declarações e para as regras no arquivo.</li>
+  <li>Comentários que ajudam, e o comentário que quebra o CSS (<code>//</code>).</li>
+  <li>Pequenos hábitos: cores, zeros, aspas, atalhos.</li>
+  <li>As ferramentas que arrumam e conferem o código sozinhas.</li>
+</ul>
+</div>
+
+<hr>
+
+<h2>A ideia: a cozinha arrumada</h2>
+<p>Numa cozinha bagunçada dá para cozinhar: os ingredientes estão lá, em algum lugar. Mas você perde tempo procurando o sal, pega o açúcar no lugar dele e só descobre quando prova. Numa cozinha arrumada, cada coisa tem o seu lugar, e quem chega de fora acha tudo. CSS arrumado é a mesma coisa: o navegador não liga, mas as <strong>pessoas</strong> ligam, e os erros ficam à vista.</p>
+
+<p>Veja: estas duas regras desenham <strong>exatamente</strong> a mesma coisa.</p>
+
+<pre class="file" data-file="bagunçado" data-resultado>&lt;style&gt;
+.aviso{background-color:#fff3cd;border:2px solid #e0a800;padding:12px;border-radius:8px;font-family:sans-serif;color:#5c4400}
+&lt;/style&gt;
+&lt;p class="aviso"&gt;A lojinha fecha às 18h no sábado.&lt;/p&gt;
+</pre>
+
+<pre class="file" data-file="arrumado" data-resultado>&lt;style&gt;
+.aviso {
+  padding: 12px;
+  border: 2px solid #e0a800;
+  border-radius: 8px;
+  background-color: #fff3cd;
+  color: #5c4400;
+  font-family: sans-serif;
+}
+&lt;/style&gt;
+&lt;p class="aviso"&gt;A lojinha fecha às 18h no sábado.&lt;/p&gt;
+</pre>
+
+<p>Os dois resultados são o mesmo aviso: fundo amarelo-claro, borda dourada e cantos arredondados. A diferença é para quem lê: no segundo, em um segundo você acha a cor da borda; no primeiro, precisa caçar na linha.</p>
+
+<hr>
+
+<h2>1. O formato de uma regra</h2>
+
+<pre class="file" data-file="style.css">.cartao-produto {
+  padding: 16px;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+}
+
+.cartao-produto h2 {
+  margin-top: 0;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>.cartao-produto {</dt><dd>O seletor, <strong>um espaço</strong>, e a chave que abre, na mesma linha.</dd>
+  <dt>␣␣padding: 16px;</dt><dd>Cada declaração na <strong>sua</strong> linha, com <strong>2 espaços</strong> de indentação (o recuo da esquerda). Depois dos dois-pontos, um espaço; antes, nenhum.</dd>
+  <dt>;</dt><dd>Ponto e vírgula no fim de <strong>toda</strong> declaração, até da última. O CSS permite omitir o último, mas quem acrescentar uma linha depois dele vai quebrar a regra sem ver (seção <a href="#errado">Quando dá errado</a>).</dd>
+  <dt>}</dt><dd>A chave que fecha, sozinha na linha, alinhada com o começo do seletor.</dd>
+  <dt>(linha em branco)</dt><dd>Uma linha vazia entre uma regra e outra, como parágrafos num texto.</dd>
+</dl>
+
+<h3>Por que cada uma?</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Regra</th><th>O porquê</th></tr>
+<tr><td>Uma declaração por linha</td><td>Você acha a propriedade passando o olho na coluna da esquerda. No Git e nas ferramentas de comparação, mudar uma cor mostra <strong>uma</strong> linha alterada, e não a regra inteira.</td></tr>
+<tr><td>Indentação de 2 espaços</td><td>Mostra o que está dentro de quê. Dentro de um <code>@media</code>, as regras ganham mais 2 espaços, e as declarações delas, mais 2. Use espaços, não tabulação, para o código ficar igual em qualquer editor.</td></tr>
+<tr><td><code>;</code> sempre</td><td>Acrescentar uma linha nunca quebra a de cima.</td></tr>
+<tr><td>Espaço depois de <code>:</code> e antes de <code>{</code></td><td>Separa o nome do valor, como numa frase.</td></tr>
+</table>
+</div>
+
+<pre class="file" data-file="style.css">@media (min-width: 600px) {
+  .cartao-produto {
+    display: flex;
+    gap: 16px;
+  }
+}
+</pre>
+
+<h3>Uma exceção aceitável: a regra de uma linha</h3>
+<p>Muitos projetos aceitam regras curtíssimas, com <strong>uma</strong> declaração, numa linha só:</p>
+<pre class="file" data-file="style.css">.oculto { display: none; }
+.centro { text-align: center; }
+</pre>
+<p>Com duas declarações ou mais, volte para uma por linha. Este guia usa sempre o formato longo, para você se acostumar.</p>
+
+<div class="tryhtml" data-goal="css:.preco{color}=rgb(229, 83, 61),css:.preco{font-weight}=700,src:^ {2}color:\s#e5533d;\s*$,nsrc:;[ \t]*[a-z-]+\s*:,nsrc:\{[ \t]*[a-z-]+\s*:">
+<p class="try-task"><strong>Missão:</strong> arrume a regra do preço no estilo desta aula: uma declaração por linha, 2 espaços de indentação, espaço depois dos dois-pontos e <code>;</code> em todas, inclusive na última. O resultado no quadro não pode mudar.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Bolo de cenoura: &lt;span class="preco"&gt;R$ 35,00&lt;/span&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.preco{color:#e5533d;font-weight:bold;font-size:1.25rem}
+</pre>
+<pre class="solucao" data-file="style.css">.preco {
+  color: #e5533d;
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. Nomes de classe</h2>
+<p>O nome de uma classe é a etiqueta de um pote na cozinha. A combinação deste guia:</p>
+<ul>
+  <li><strong>minúsculas</strong>, sem acento;</li>
+  <li>palavras separadas por <strong>hífen</strong>: <code>cartao-produto</code>, <code>botao-comprar</code> (o estilo chamado <em>kebab-case</em>, "espetinho", por causa dos pedaços enfiados no palito);</li>
+  <li>o nome diz <strong>o que é</strong>, não como parece: <code>.aviso</code>, e não <code>.caixa-amarela</code>. Se um dia o aviso ficar azul, o nome continua certo.</li>
+</ul>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Evite</th><th>Prefira</th><th>Por quê</th></tr>
+<tr><td><code>.CartaoProduto</code>, <code>.cartao_produto</code></td><td><code>.cartao-produto</code></td><td>O hífen é o padrão do próprio CSS (<code>font-size</code>, <code>background-color</code>). Maiúsculas importam: <code>.Cartao</code> não pega <code>class="cartao"</code></td></tr>
+<tr><td><code>.vermelho</code>, <code>.margem-20</code></td><td><code>.erro</code>, <code>.secao</code></td><td>O nome sobrevive às mudanças de aparência</td></tr>
+<tr><td><code>.c1</code>, <code>.box2</code></td><td><code>.receita-destaque</code></td><td>Daqui a três meses, ninguém lembra o que é <code>c1</code></td></tr>
+<tr><td><code>#titulo { … }</code> para estilo</td><td><code>.titulo { … }</code></td><td>O ID tem especificidade alta e só pode aparecer uma vez (aula <a href="seletor-id.html">Seletor de ID</a>)</td></tr>
+</table>
+</div>
+
+<p>Para projetos maiores, existe um método de nomes inteiro, com <code>__</code> e <code>--</code>: aula <a href="bem.html">Organizando Classes (BEM)</a>.</p>
+
+<hr>
+
+<h2>3. Uma ordem para as declarações</h2>
+<p>Dentro de uma regra, a ordem das declarações não muda o resultado (a não ser quando a mesma propriedade aparece duas vezes). Mas uma ordem <strong>combinada</strong> ajuda a achar as coisas. Há duas escolas:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Exemplo</th><th>Quando usar</th></tr>
+<tr><td><strong>Por grupo</strong>: posição → caixa → texto → aparência</td><td><code>position</code>, <code>display</code>, <code>width</code>, <code>padding</code>, <code>border</code>, <code>font-size</code>, <code>color</code>, <code>background-color</code>, <code>transition</code></td><td>A mais comum: as propriedades que mudam o layout ficam no alto, e você lê a regra "de fora para dentro"</td></tr>
+<tr><td><strong>Alfabética</strong></td><td><code>background-color</code>, <code>border</code>, <code>color</code>, <code>padding</code></td><td>Equipes grandes: não há o que discutir, e uma ferramenta pode ordenar sozinha</td></tr>
+</table>
+</div>
+
+<p>Qualquer uma serve, desde que o projeto inteiro use a mesma. Este guia usa a ordem por grupo, como no aviso amarelo do começo.</p>
+
+<h3>E a ordem das regras no arquivo?</h3>
+<p>Do geral para o específico, que é também a ordem que a cascata favorece (aula <a href="cascata.html">A Cascata</a>):</p>
+<ol class="passo">
+  <li>variáveis (<code>:root</code>) e o reset;</li>
+  <li>os elementos (<code>body</code>, <code>h1</code>, <code>a</code>);</li>
+  <li>o layout (cabeçalho, menu, rodapé);</li>
+  <li>os componentes (<code>.cartao-produto</code>, <code>.botao</code>);</li>
+  <li>as media queries de cada parte, junto dela ou no fim.</li>
+</ol>
+<p>Quando o arquivo fica grande, ele vira vários arquivos: aula <a href="organizar-arquivos.html">Organizando os Arquivos de CSS</a>.</p>
+
+<hr>
+
+<h2>4. Comentários</h2>
+<p>Comentário em CSS é só <code>/* … */</code> (aula <a href="comentarios.html">Comentários</a>). Use para:</p>
+<pre class="file" data-file="style.css">/* ===== Cabeçalho ===== */
+
+.cabecalho {
+  display: flex;
+  /* O menu precisa ficar por cima do banner */
+  z-index: 10;
+}
+</pre>
+<ul>
+  <li><strong>títulos de seção</strong>, para achar as partes de um arquivo comprido;</li>
+  <li>explicar o <strong>porquê</strong> de algo estranho (o <code>z-index: 10</code>, um número escolhido para corrigir um bug);</li>
+  <li>não para repetir o óbvio: <code>color: red; /* cor vermelha */</code> só ocupa espaço.</li>
+</ul>
+
+<hr>
+
+<h2>5. Pequenos hábitos</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Hábito</th><th>Exemplo</th><th>Por quê</th></tr>
+<tr><td>Hexadecimal em minúsculas, sempre do mesmo jeito</td><td><code>#e5533d</code>, e não <code>#E5533D</code> numa linha e <code>#e5533d</code> na outra</td><td>A busca (<kbd>Ctrl</kbd>+<kbd>F</kbd>) acha todas as ocorrências</td></tr>
+<tr><td>Zero sem unidade</td><td><code>margin: 0;</code></td><td>Zero pixels é zero centímetros: a unidade não acrescenta nada</td></tr>
+<tr><td>Aspas duplas</td><td><code>font-family: "Lato", sans-serif;</code> · <code>url("bolo.jpg")</code></td><td>Uma escolha só no projeto inteiro (o HTML também usa aspas duplas)</td></tr>
+<tr><td>Atalho só quando você quer todos os lados</td><td><code>margin: 0;</code> · mas <code>margin-top: 8px;</code> para mudar um lado só</td><td>O atalho (<code>margin</code>, <code>background</code>) também <strong>apaga</strong> o que não foi escrito</td></tr>
+<tr><td>Cores e medidas repetidas viram variáveis</td><td><code>color: var(--cor-destaque);</code></td><td>Muda num lugar, muda no site todo (aula <a href="variaveis.html">Variáveis</a>)</td></tr>
+<tr><td>Nada de <code>!important</code> para consertar</td><td>Ajuste o seletor ou a ordem</td><td>Cada <code>!important</code> pede outro para ser vencido (aula <a href="important.html">!important</a>)</td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> esta regra funciona, mas tem cinco hábitos para arrumar: as cores em maiúsculas, o zero com unidade, as aspas simples, o atalho <code>background</code> usado só para a cor e a falta do último <code>;</code>. Arrume um por um e confira que o resultado não muda.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1 class="titulo"&gt;Receitas da Ana&lt;/h1&gt;
+</pre>
+<pre class="script" data-file="style.css">.titulo {
+  margin: 0px;
+  padding: 12px;
+  background: #FFF3CD;
+  color: #5C4400;
+  font-family: 'Georgia', serif
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>6. Ferramentas que arrumam sozinhas</h2>
+<p>Ninguém precisa contar espaços à mão. Dois tipos de ferramenta fazem isso pelos programadores:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Tipo</th><th>Exemplo</th><th>O que faz</th></tr>
+<tr><td><strong>Formatador</strong></td><td>Prettier; o "Formatar documento" do VS Code</td><td>Reescreve o arquivo no formato combinado: indentação, uma declaração por linha, espaços. Não muda o que o CSS faz.</td></tr>
+<tr><td><strong>Linter</strong> ("verificador")</td><td>Stylelint</td><td>Lê o CSS e <strong>aponta</strong> problemas: propriedade desconhecida, cor repetida, seletor duplicado, <code>!important</code>. Cada projeto escolhe as regras.</td></tr>
+<tr><td><strong>Validador</strong></td><td><code>vnu --css</code>, <a href="https://jigsaw.w3.org/css-validator/">o validador de CSS do W3C</a></td><td>Confere se o CSS segue a especificação. Não olha o estilo, só a correção.</td></tr>
+</table>
+</div>
+<p>Num projeto com várias pessoas, o formatador roda ao salvar o arquivo, e ninguém discute espaços. Mesmo sem ferramenta, a regra mais importante é a <strong>consistência</strong>: um estilo meio esquisito usado em todo o arquivo é melhor que três estilos bonitos misturados.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Os erros abaixo não são "feios": eles <strong>quebram</strong> o CSS. E todos ficam muito mais fáceis de ver num código arrumado.</p>
+
+<div class="cenario">
+<strong>Faltou o <code>;</code>: duas declarações se perdem</strong>
+<pre class="file" data-file="style.css · erro de propósito">h1 {
+  padding: 8px
+  background-color: gold;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> o título fica sem o preenchimento <strong>e</strong> sem o fundo dourado. Conferido no Chromium: <code>padding-top</code> calculado <code>0px</code> e <code>background-color</code> <code>rgba(0, 0, 0, 0)</code> (transparente).</p>
+<p><strong>Por quê:</strong> sem o <code>;</code>, o navegador lê uma declaração só: <code>padding: 8px background-color: gold</code>. Esse valor não existe, e a declaração inteira é ignorada. Era a "última" linha que alguém achou que não precisava de <code>;</code>, até outra pessoa acrescentar uma linha embaixo.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.3-3.18: error: CSS: “padding”: Missing a semicolon before the property name “background-color”.</pre>
+<p>"Em <code>padding</code>: falta um ponto e vírgula antes do nome de propriedade <code>background-color</code>". O validador aponta a linha 3, onde começa a propriedade que ficou "grudada". <strong>Como consertar:</strong> <code>;</code> no fim de toda declaração.</p>
+</div>
+
+<div class="cenario">
+<strong>Comentário com <code>//</code>: a regra de baixo some</strong>
+<pre class="file" data-file="style.css · erro de propósito">// Título da página
+h1 {
+  color: navy;
+}
+p {
+  color: gray;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> o título fica preto, não <code>navy</code>; o parágrafo fica cinza normalmente. Conferido no Chromium: <code>h1</code> com cor calculada <code>rgb(0, 0, 0)</code>, <code>p</code> com <code>rgb(128, 128, 128)</code>.</p>
+<p><strong>Por quê:</strong> <code>//</code> é comentário em JavaScript e em outras linguagens, não em CSS. O navegador lê <code>// Título da página h1</code> como um <strong>seletor</strong> (inválido) e joga fora a regra inteira, até o <code>}</code>. A regra seguinte escapa.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":4.2-4.2: error: CSS: Parse Error.</pre>
+<p>Um "erro de leitura" apontando para o fim da regra quebrada (linha 4). <strong>Como consertar:</strong> <code>/* Título da página */</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Maiúscula no nome da classe: a regra não pega</strong>
+<pre class="file" data-file="erro de propósito" data-resultado>&lt;style&gt;
+.Cartao {
+  border: 2px solid tomato;
+  padding: 8px;
+}
+&lt;/style&gt;
+&lt;div class="cartao"&gt;Bolo de cenoura&lt;/div&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> o texto aparece sem borda e sem preenchimento. <strong>Por quê:</strong> nomes de classe diferenciam maiúsculas de minúsculas: <code>.Cartao</code> e <code>cartao</code> são etiquetas diferentes. O validador não acusa nada, porque os dois nomes são válidos. (Numa página sem <code>&lt;!DOCTYPE html&gt;</code>, o "modo quirks" ignora essa diferença, e o erro aparece só quando alguém acerta o DOCTYPE. Mais um motivo para usar sempre minúsculas.) <strong>Como consertar:</strong> tudo em minúsculas, no HTML e no CSS.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Combinação</th><th>Assim</th></tr>
+<tr><td>Indentação</td><td>2 espaços (mais 2 dentro de <code>@media</code>)</td></tr>
+<tr><td>Declarações</td><td>Uma por linha, <code>propriedade: valor;</code></td></tr>
+<tr><td><code>;</code></td><td>Em todas, inclusive na última</td></tr>
+<tr><td>Chaves</td><td><code>seletor {</code> na mesma linha; <code>}</code> sozinha</td></tr>
+<tr><td>Entre regras</td><td>Uma linha em branco</td></tr>
+<tr><td>Nomes de classe</td><td>Minúsculas, com hífen, dizendo o que é: <code>.cartao-produto</code></td></tr>
+<tr><td>Comentários</td><td>Só <code>/* … */</code>, para seções e para o porquê</td></tr>
+<tr><td>Cores</td><td>Hexadecimal minúsculo; repetidas viram variáveis</td></tr>
+<tr><td>Zero</td><td><code>0</code>, sem unidade</td></tr>
+<tr><td>Ferramentas</td><td>Formatador (Prettier), linter (Stylelint), validador (<code>vnu --css</code>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O comentário certo</h3>
+<p>Complete o começo do comentário em CSS:</p>
+<div class="ex-code"><input data-answer="/*" aria-label="começo do comentário"> Cabeçalho */</div>
+</div>
+
+<div class="exercise">
+<h3>2. O nome da classe</h3>
+<p>Reescreva <code>CartaoProduto</code> no estilo desta aula (minúsculas, com hífen):</p>
+<div class="ex-code">.<input data-answer="cartao-produto" aria-label="nome da classe"> { … }</div>
+</div>
+
+<div class="exercise">
+<h3>3. O que falta no fim</h3>
+<p>Qual caractere vai no fim de toda declaração, inclusive da última?</p>
+<div class="ex-code">color: navy<input data-answer=";" aria-label="caractere"></div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Qual nome de classe segue o estilo desta aula?</p>
+<label><input type="radio" name="q4"> <code>.BotaoComprar</code></label>
+<label><input type="radio" name="q4"> <code>.botao_azul</code></label>
+<label><input type="radio" name="q4"> <code>.botao-comprar</code></label>
+<label><input type="radio" name="q4"> <code>.b1</code></label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Na regra <code>h1 { padding: 8px background-color: gold; }</code> (faltou um <code>;</code>), o que o navegador faz?</p>
+<label><input type="radio" name="q5"> Aplica o <code>padding</code> e ignora o fundo</label>
+<label><input type="radio" name="q5"> Ignora as duas: lê uma declaração só, com um valor que não existe</label>
+<label><input type="radio" name="q5"> Mostra uma mensagem de erro na página</label>
+<label><input type="radio" name="q5"> Aplica as duas normalmente</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Por que uma declaração por linha?</p>
+<label><input type="radio" name="q6"> Para achar as propriedades de olho e ver mudanças linha a linha; o navegador não se importa</label>
+<label><input type="radio" name="q6"> Porque o navegador exige</label>
+<label><input type="radio" name="q6"> Porque deixa o site mais rápido</label>
+<label><input type="radio" name="q6"> Porque o validador recusa regras numa linha só</label>
+</div>
+
+<h3>Missão final: arrume o CSS da lojinha</h3>
+
+<div class="tryhtml" data-goal="sel:.cartao-produto,nsrc:CartaoProduto,css:.cartao-produto{border-top-width}=1px,css:.preco{color}=rgb(229, 83, 61),nsrc:!important,nsrc://,nsrc:;[ \t]*[a-z-]+\s*:">
+<p class="try-task"><strong>Missão:</strong> o CSS do cartão está bagunçado e com dois defeitos escondidos. (1) Troque o nome <code>CartaoProduto</code> por <code>cartao-produto</code>, no HTML e no CSS. (2) Ponha uma declaração por linha, com 2 espaços e <code>;</code> em todas. (3) O preço deveria ser vermelho-tomate, mas está preto: descubra o porquê (dica: o comentário) e conserte. (4) Tire o <code>!important</code>: ele não é necessário.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="CartaoProduto"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p class="preco"&gt;R$ 35,00&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.CartaoProduto{padding:16px;border:1px solid #cccccc;border-radius:8px;font-family:sans-serif}
+// preço em destaque
+.preco {
+  color: #e5533d !important;
+  font-weight: bold
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao-produto"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p class="preco"&gt;R$ 35,00&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="solucao" data-file="style.css">.cartao-produto {
+  padding: 16px;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  font-family: sans-serif;
+}
+
+/* preço em destaque */
+.preco {
+  color: #e5533d;
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O navegador não liga para espaços e linhas; as pessoas ligam. Código arrumado deixa os erros à vista.</li>
+  <li>Formato: seletor e <code>{</code> na mesma linha, uma declaração por linha com 2 espaços, <code>;</code> em todas, <code>}</code> sozinha, linha em branco entre regras.</li>
+  <li>Classes em minúsculas, com hífen, dizendo o que a coisa é (<code>.cartao-produto</code>, <code>.aviso</code>). Maiúscula conta: <code>.Cartao</code> não pega <code>class="cartao"</code>.</li>
+  <li>Declarações numa ordem combinada (por grupo ou alfabética); regras do geral para o específico.</li>
+  <li>Comentários só com <code>/* */</code>: o <code>//</code> faz o navegador jogar fora a regra seguinte (<code>Parse Error</code>).</li>
+  <li>Sem o <code>;</code>, duas declarações se perdem (<code>Missing a semicolon before the property name</code>).</li>
+  <li>Formatador (Prettier) e linter (Stylelint) fazem e conferem isso sozinhos. O mais importante é a consistência.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
