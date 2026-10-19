@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS accent-color e appearance — a cor dos campos e o visual do zero | Guia CSS</title>
+<meta name="description" content="accent-color e appearance em CSS para quem está começando: pintar caixas de marcar, botões de opção, controles deslizantes e barras de progresso com uma linha, o contraste automático do navegador, appearance: none para desenhar um campo do zero sem perder o foco, appearance: base-select, e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">accent-color e appearance</span></h1>
+
+<p class="intro">O site da Ana é laranja, mas as caixas de marcar do formulário de encomendas vêm <strong>azuis</strong>: é a cor que o navegador escolheu. Por muito tempo, trocar essa cor exigia esconder o campo e desenhar outro no lugar. Hoje existem dois caminhos. <code>accent-color</code> ("cor de destaque") troca a cor dos campos com <strong>uma linha</strong>, e o navegador cuida do resto. <code>appearance: none</code> ("aparência: nenhuma") tira o visual do navegador, para você desenhar o campo do zero. Esta aula mostra os dois, e quando usar cada um.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li><code>accent-color</code>: a cor de caixas de marcar, botões de opção, controles deslizantes e barras de progresso.</li>
+  <li>Quais campos mudam e quais não mudam.</li>
+  <li>O contraste automático: o navegador escolhe a cor do "visto".</li>
+  <li><code>appearance: none</code>: desenhar uma caixa de marcar do zero, sem perder o foco do teclado.</li>
+  <li><code>appearance: base-select</code>, a novidade para o <code>&lt;select&gt;</code>.</li>
+  <li>Qual dos dois usar, e os erros reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Os campos de formulário vêm do Guia HTML (<a href="https://wallysondevs.github.io/guia-html/">wallysondevs.github.io/guia-html</a>). Os resultados são desenhados pelo <strong>seu</strong> navegador, e cada navegador desenha os campos do seu jeito: o que está descrito aqui foi conferido no Chromium. As mensagens de erro são do validador W3C (<code>vnu</code>) rodado na máquina fictícia da Ana (<code>ana@notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: o uniforme e a roupa sob medida</h2>
+<p>Um time pode comprar o <strong>uniforme pronto</strong> e só escolher a cor: a fábrica cuida do corte, das costuras e de deixar o número legível sobre a cor escolhida. Isso é o <code>accent-color</code>.</p>
+<p>Ou pode mandar fazer uma <strong>roupa sob medida</strong>: fica do jeito exato que o time quer, mas cada detalhe (o tecido, o corte, o número) é responsabilidade dele. Isso é o <code>appearance: none</code>.</p>
+
+<hr>
+
+<h2>1. <code>accent-color</code>: uma linha, quatro campos</h2>
+
+<pre class="file" data-file="style.css">form {
+  accent-color: tomato;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>form</dt><dd>O seletor. O <code>accent-color</code> é <strong>herdado</strong> (aula <a href="heranca.html">Herança</a>): posto no formulário, vale para todos os campos dentro dele. No Chromium, os <code>input</code> do formulário ficaram com <code>accent-color: rgb(255, 99, 71)</code> no estilo calculado, sem nenhuma regra própria.</dd>
+  <dt>accent-color</dt><dd>"Cor de destaque": a cor que o navegador usa nas partes <strong>coloridas</strong> dos campos (o quadradinho marcado, a bolinha escolhida, a parte cheia da barra).</dd>
+  <dt>tomato</dt><dd>Qualquer cor do CSS (nome, <code>#hex</code>, <code>rgb()</code>, <code>hsl()</code>…). O padrão é <code>auto</code>: a cor que o navegador ou o sistema escolher.</dd>
+</dl>
+
+<p>Lado a lado, o mesmo formulário com a cor padrão e com <code>accent-color: tomato</code>:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .laranja {
+    accent-color: tomato;
+  }
+  form {
+    margin-bottom: 12px;
+  }
+&lt;/style&gt;
+&lt;form&gt;
+  &lt;p&gt;&lt;strong&gt;Padrão do navegador&lt;/strong&gt;&lt;/p&gt;
+  &lt;label&gt;&lt;input type="checkbox" checked&gt; Com cobertura&lt;/label&gt;
+  &lt;label&gt;&lt;input type="radio" name="t1" checked&gt; Pequeno&lt;/label&gt;
+  &lt;input type="range" value="70" aria-label="Doçura"&gt;
+  &lt;progress value="60" max="100"&gt;60%&lt;/progress&gt;
+  &lt;input type="text" value="Texto não muda" aria-label="Nome"&gt;
+&lt;/form&gt;
+&lt;form class="laranja"&gt;
+  &lt;p&gt;&lt;strong&gt;accent-color: tomato&lt;/strong&gt;&lt;/p&gt;
+  &lt;label&gt;&lt;input type="checkbox" checked&gt; Com cobertura&lt;/label&gt;
+  &lt;label&gt;&lt;input type="radio" name="t2" checked&gt; Pequeno&lt;/label&gt;
+  &lt;input type="range" value="70" aria-label="Doçura"&gt;
+  &lt;progress value="60" max="100"&gt;60%&lt;/progress&gt;
+  &lt;input type="text" value="Texto não muda" aria-label="Nome"&gt;
+&lt;/form&gt;
+</pre>
+
+<p>No Chromium, a primeira linha sai azul e a segunda, cor de tomate: a caixa marcada, a bolinha do botão de opção, a parte da esquerda do controle deslizante e a parte cheia da barra de progresso. A parte vazia do trilho e da barra também mudou, de cinza-claro para cinza-escuro: é o navegador ajustando o contraste com a cor nova. O campo de texto não muda nada. Os campos que o <code>accent-color</code> pinta (lista do MDN):</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Campo</th><th>O que muda de cor</th></tr>
+<tr><td><code>&lt;input type="checkbox"&gt;</code> (caixa de marcar)</td><td>O fundo da caixa marcada</td></tr>
+<tr><td><code>&lt;input type="radio"&gt;</code> (botão de opção)</td><td>O círculo escolhido</td></tr>
+<tr><td><code>&lt;input type="range"&gt;</code> (controle deslizante)</td><td>A bolinha e a parte "cheia" do trilho</td></tr>
+<tr><td><code>&lt;progress&gt;</code> (barra de progresso)</td><td>A parte cheia</td></tr>
+</table>
+</div>
+
+<p>Campos de texto, botões, <code>&lt;select&gt;</code> e datas <strong>não</strong> mudam: o estilo deles é feito com as propriedades de sempre (<code>border</code>, <code>background-color</code>, <code>color</code>…), na aula <a href="formularios.html">Estilizando Formulários</a>.</p>
+
+<h3>O contraste automático</h3>
+<p>Repare no "visto" (✓) dentro da caixa marcada. Com a cor padrão, azul-escura, o visto é <strong>branco</strong>. Com uma cor clara, o navegador troca o visto para <strong>escuro</strong>, para ele continuar visível:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  p { font-family: sans-serif; }
+  .navy { accent-color: navy; }
+  .tomato { accent-color: tomato; }
+  .gold { accent-color: gold; }
+&lt;/style&gt;
+&lt;p class="navy"&gt;&lt;input type="checkbox" checked aria-label="navy"&gt; &lt;input type="radio" checked aria-label="navy"&gt; navy&lt;/p&gt;
+&lt;p class="tomato"&gt;&lt;input type="checkbox" checked aria-label="tomato"&gt; &lt;input type="radio" checked aria-label="tomato"&gt; tomato&lt;/p&gt;
+&lt;p class="gold"&gt;&lt;input type="checkbox" checked aria-label="gold"&gt; &lt;input type="radio" checked aria-label="gold"&gt; gold&lt;/p&gt;
+</pre>
+
+<p>No Chromium (foto ampliada): com <code>navy</code>, o visto e o anel interno do botão de opção são brancos; com <code>tomato</code> e <code>gold</code>, ficam cinza-escuros. Você escolhe só uma cor, e o navegador cuida da legibilidade. É a "fábrica do uniforme" da comparação.</p>
+
+<div class="note">
+<strong>Suporte</strong>
+<p>O <code>accent-color</code> funciona desde 2021–2022 no Chrome (93), Edge, Firefox (92) e Safari (15.4). Pela tabela do MDN, o Safari só passou a garantir o contraste automático do visto na versão 26.2, e o Chrome para Android ainda não garante: nesses, o visto pode ficar pouco visível sobre uma cor clara. Por isso, prefira cores de destaque com contraste bom contra o branco, como <code>tomato</code> escuro, <code>navy</code>, <code>seagreen</code>. Num navegador sem suporte, os campos só ficam com a cor padrão.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:input{accent-color}=rgb(46, 139, 87),css:progress{accent-color}=rgb(46, 139, 87)">
+<p class="try-task"><strong>Missão:</strong> o formulário de encomendas da Ana é verde. Com <strong>uma</strong> regra no <code>form</code>, deixe as caixas, os botões de opção e a barra de progresso na cor <code>seagreen</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;form&gt;
+  &lt;h2&gt;Encomenda&lt;/h2&gt;
+  &lt;p&gt;&lt;label&gt;&lt;input type="checkbox" checked&gt; Com cobertura de chocolate&lt;/label&gt;&lt;/p&gt;
+  &lt;p&gt;
+    &lt;label&gt;&lt;input type="radio" name="tamanho" checked&gt; Pequeno&lt;/label&gt;
+    &lt;label&gt;&lt;input type="radio" name="tamanho"&gt; Grande&lt;/label&gt;
+  &lt;/p&gt;
+  &lt;p&gt;Pedido: &lt;progress value="2" max="3"&gt;2 de 3&lt;/progress&gt;&lt;/p&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">form {
+  font-family: sans-serif;
+}
+</pre>
+<pre class="solucao" data-file="style.css">form {
+  font-family: sans-serif;
+  accent-color: seagreen;
+}
+</pre>
+</div>
+
+<div class="tip">
+<strong>Para o site inteiro</strong>
+<p>Como o <code>accent-color</code> é herdado, uma regra no <code>:root</code> (o <code>html</code>) pinta todos os campos do site: <code>:root { accent-color: tomato; }</code>. Junto com uma variável (<code>--cor-principal</code>, aula <a href="variaveis.html">Variáveis</a>), a cor do site e a dos campos ficam num lugar só.</p>
+</div>
+
+<hr>
+
+<h2>2. <code>appearance: none</code>: desenhar do zero</h2>
+<p>Às vezes a Ana quer mais que uma cor: uma caixa de marcar quadrada com borda grossa, ou um <code>&lt;select&gt;</code> sem a setinha do sistema. Aí entra o <code>appearance</code>:</p>
+
+<pre class="file" data-file="style.css">.lembrar {
+  appearance: none;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>appearance</dt><dd>"Aparência": se o campo usa o visual do sistema (<code>auto</code>, o padrão) ou não.</dd>
+  <dt>none</dt><dd>"Nenhuma": o navegador <strong>para de desenhar</strong> o visual do campo. O campo continua funcionando (marca, desmarca, recebe foco, é enviado no formulário), mas a aparência fica toda com você.</dd>
+</dl>
+
+<p>Cuidado: "toda com você" quer dizer <strong>toda</strong>. No Chromium, uma caixa de marcar com <code>appearance: none</code> e nada mais ficou com <strong>0 × 0 px</strong> no estilo calculado: ela some da tela. Por isso, logo depois do <code>none</code>, vem o desenho novo:</p>
+
+<pre class="file" data-file="style.css">.lembrar {
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid navy;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+.lembrar:checked {
+  background-color: navy;
+  box-shadow: inset 0 0 0 3px white;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>width / height</dt><dd>O tamanho da caixa nova: 1.25rem = 20 px com a fonte padrão.</dd>
+  <dt>border, border-radius</dt><dd>A borda azul-marinho com cantos levemente arredondados (aulas <a href="border.html">Bordas</a> e <a href="border-radius.html">Cantos Arredondados</a>).</dd>
+  <dt>vertical-align: middle</dt><dd>Alinha a caixa com o meio do texto ao lado.</dd>
+  <dt>.lembrar:checked</dt><dd>A pseudo-classe <code>:checked</code> ("marcado") vale quando a caixa está marcada. É assim que a caixa desenhada por você mostra os dois estados.</dd>
+  <dt>box-shadow: inset 0 0 0 3px white</dt><dd>Uma "sombra" interna branca de 3 px, sem desfoque (aula <a href="box-shadow.html">Sombra</a>): cria um anel branco entre a borda e o miolo azul.</dd>
+</dl>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> clique nas duas caixas para marcar e desmarcar. Depois, clique numa delas e aperte <kbd>Tab</kbd>: o contorno do foco continua aparecendo. Apague as regras de <code>width</code> e <code>height</code> e veja a caixa sumir.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;&lt;label&gt;&lt;input class="lembrar" type="checkbox" checked&gt; Lembrar meu endereço&lt;/label&gt;&lt;/p&gt;
+&lt;p&gt;&lt;label&gt;&lt;input class="lembrar" type="checkbox"&gt; Receber novidades&lt;/label&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.lembrar {
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid navy;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+.lembrar:checked {
+  background-color: navy;
+  box-shadow: inset 0 0 0 3px white;
+}
+</pre>
+</div>
+
+<p>No Chromium, a caixa marcada é um quadrado com borda azul-marinho e miolo azul-marinho, separados por um anel branco; a desmarcada é só o quadrado com a borda. Com o foco (forçado na foto, como o <kbd>Tab</kbd> faria), aparece o contorno do navegador em volta da caixa: o <code>appearance: none</code> <strong>não</strong> apaga o foco. Mantenha assim: quem usa o teclado precisa ver onde está (aula <a href="acessibilidade.html">CSS e Acessibilidade</a>).</p>
+
+<h3>O <code>&lt;select&gt;</code>: <code>appearance: none</code> e <code>base-select</code></h3>
+<p>No <code>&lt;select&gt;</code>, <code>appearance: none</code> tira a setinha do sistema; no Chromium, a caixa ficou só com o texto e uma borda fina, sem a seta. A seta, se você quiser, vem de uma imagem de fundo (aula <a href="background-image.html">Imagem de Fundo</a>).</p>
+<p>Há um valor mais novo, <code>appearance: base-select</code>, que deixa o <code>&lt;select&gt;</code> <strong>e a lista que se abre</strong> totalmente estilizáveis com CSS:</p>
+
+<pre class="file" data-file="style.css">select,
+::picker(select) {
+  appearance: base-select;
+}
+</pre>
+
+<p>No Chromium, o <code>&lt;select&gt;</code> com <code>base-select</code> ganhou um visual simples, com borda arredondada e uma seta preta, pronto para receber o seu CSS.</p>
+
+<div class="note">
+<strong>Recurso novo</strong>
+<p><code>appearance: base-select</code> chegou no Chrome 135 (2025); pela tabela do MDN, o Firefox 149 e o Safari 27 também o têm. É recente: quem ainda não atualizou o navegador vê o <code>&lt;select&gt;</code> comum, que continua funcionando. O validador W3C (vnu 26.10.12) ainda não conhece o valor nem o <code>::picker(select)</code>, e reclama (veja <a href="#errado">Quando dá errado</a>).</p>
+</div>
+
+<hr>
+
+<h2>3. Qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você quer</th><th>Use</th><th>Por quê</th></tr>
+<tr><td>Só trocar a cor das caixas, opções, deslizantes e barras</td><td><code>accent-color</code></td><td>Uma linha; o navegador cuida do tamanho, do contraste, do tema escuro e do toque no celular.</td></tr>
+<tr><td>Outro formato (borda grossa, cantos, ícone próprio)</td><td><code>appearance: none</code> + o seu CSS</td><td>Controle total, mas você desenha os dois estados (<code>:checked</code>), o tamanho e mantém o foco visível.</td></tr>
+<tr><td>Um <code>&lt;select&gt;</code> sob medida, com a lista aberta estilizada</td><td><code>appearance: base-select</code></td><td>Recente; quem não tem fica com o <code>&lt;select&gt;</code> normal.</td></tr>
+<tr><td>Campos de texto e botões</td><td>Nenhum dos dois: <code>border</code>, <code>background-color</code>, <code>padding</code>…</td><td>O <code>accent-color</code> não os afeta; eles já aceitam CSS comum.</td></tr>
+</table>
+</div>
+
+<p>Em CSS antigo você vai ver <code>-webkit-appearance: none</code>: é o mesmo <code>appearance</code>, da época dos prefixos (aula <a href="supports.html">@supports e Compatibilidade</a>). O <code>appearance</code> sem prefixo funciona em todos os navegadores principais desde março de 2022 (MDN).</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong><code>accent-color</code> num campo de texto: nada muda</strong>
+<pre class="file" data-file="style.css · erro de propósito">input[type="text"] {
+  accent-color: tomato;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> o campo continua igual. O primeiro exemplo da aula mostra isso: o campo "Texto não muda" está dentro do formulário com <code>accent-color: tomato</code>.</p>
+<p><strong>Por quê:</strong> a declaração é válida e o campo até recebe o valor (o estilo calculado mostra a cor), mas um campo de texto não tem nenhuma parte "de destaque" para pintar. Para a borda de um campo de texto, use <code>border-color</code>; para a cor da barrinha que pisca, <code>caret-color</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>appearance: none</code> sozinho: a caixa de marcar sumiu</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .sumiu { appearance: none; }
+&lt;/style&gt;
+&lt;p&gt;&lt;label&gt;&lt;input class="sumiu" type="checkbox"&gt; Aceito os termos&lt;/label&gt;&lt;/p&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> só o texto "Aceito os termos", sem caixa. No Chromium, o estilo calculado da caixa ficou com <code>width: 0px</code> e <code>height: 0px</code>.</p>
+<p><strong>Por quê:</strong> o <code>none</code> tirou o desenho do navegador, e nada foi posto no lugar. O campo continua lá: clicar no texto do <code>&lt;label&gt;</code> ainda marca e desmarca, mas ninguém vê. O validador não reclama.</p>
+<p><strong>Como consertar:</strong> depois do <code>appearance: none</code>, dê tamanho, borda e um estado <code>:checked</code>, como na seção 2. Ou, se você só queria mudar a cor, troque tudo por <code>accent-color</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Valor inventado: <code>is not a “accent-color” value</code></strong>
+<pre class="file" data-file="estilo.css · erro de propósito">form {
+  accent-color: tomate;
+}
+.caixa {
+  appearance: nenhum;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css estilo.css
+"file:/home/ana/site/estilo.css":2.17-2.22: error: CSS: “accent-color”: “tomate” is not a “accent-color” value.
+"file:/home/ana/site/estilo.css":5.15-5.20: error: CSS: “appearance”: “nenhum” is not a “appearance” value.</pre>
+<p><strong>O que significa:</strong> "<code>tomate</code> não é um valor de <code>accent-color</code>" (a cor é <code>tomato</code>, em inglês) e "<code>nenhum</code> não é um valor de <code>appearance</code>" (é <code>none</code>). O navegador ignora as duas declarações: os campos ficam com a cor e a aparência padrão, e no F12 as duas linhas aparecem riscadas.</p>
+</div>
+
+<div class="cenario">
+<strong>O validador ainda não conhece <code>base-select</code></strong>
+<p>Com o CSS da seção 2 (<code>select, ::picker(select) { appearance: base-select; }</code>):</p>
+<pre class="term" data-cwd="~/site">$ vnu --css estilo.css
+"file:/home/ana/site/estilo.css":2.16-2.16: error: CSS: Parse Error.
+"file:/home/ana/site/estilo.css":3.15-3.25: error: CSS: “appearance”: “base-select” is not a “appearance” value.</pre>
+<p><strong>O que significa:</strong> o validador não entende o seletor <code>::picker(select)</code> ("erro de leitura" na linha 2) e acha que "<code>base-select</code> não é um valor de <code>appearance</code>" (linha 3). Mas os dois existem e funcionam nos navegadores que já o têm (no Chromium, o estilo calculado ficou <code>appearance: base-select</code>). Validadores demoram um pouco para aprender recursos novos: aqui, a mensagem pode ser ignorada.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>accent-color: tomato</code></td><td>Cor de destaque de checkbox, radio, range e progress (herdada)</td></tr>
+<tr><td><code>accent-color: auto</code></td><td>A cor padrão do navegador (o valor inicial)</td></tr>
+<tr><td><code>appearance: none</code></td><td>Tira o visual do sistema; você desenha (tamanho, borda, <code>:checked</code>)</td></tr>
+<tr><td><code>appearance: auto</code></td><td>O visual do sistema (o padrão)</td></tr>
+<tr><td><code>appearance: base-select</code></td><td>Em <code>select</code> e <code>::picker(select)</code>: visual simples, todo estilizável (recente)</td></tr>
+<tr><td><code>-webkit-appearance</code></td><td>Forma antiga, com prefixo: reconheça, use a sem prefixo</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A cor dos campos</h3>
+<p>Complete a propriedade:</p>
+<div class="ex-code">form {
+  <input data-answer="accent-color" aria-label="propriedade">: navy;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. Sem o visual do sistema</h3>
+<p>Complete o valor:</p>
+<div class="ex-code">.lembrar {
+  appearance: <input data-answer="none" aria-label="valor">;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>3. O estado marcado</h3>
+<p>Complete a pseudo-classe da caixa marcada:</p>
+<div class="ex-code">.lembrar:<input data-answer="checked" aria-label="pseudo-classe"> {
+  background-color: navy;
+}</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Qual destes campos o <code>accent-color</code> <strong>não</strong> muda?</p>
+<label><input type="radio" name="q4"> <code>&lt;input type="checkbox"&gt;</code></label>
+<label><input type="radio" name="q4"> <code>&lt;progress&gt;</code></label>
+<label><input type="radio" name="q4"> <code>&lt;input type="text"&gt;</code></label>
+<label><input type="radio" name="q4"> <code>&lt;input type="range"&gt;</code></label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. A Ana escreveu só <code>appearance: none</code> numa caixa de marcar. O que acontece?</p>
+<label><input type="radio" name="q5"> A caixa fica com a cor de destaque</label>
+<label><input type="radio" name="q5"> A caixa some: sem o visual do sistema, ela não tem tamanho nem borda</label>
+<label><input type="radio" name="q5"> A caixa para de funcionar no formulário</label>
+<label><input type="radio" name="q5"> O validador mostra um erro</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Com <code>accent-color: gold</code>, o visto da caixa marcada fica escuro no Chromium. Por quê?</p>
+<label><input type="radio" name="q6"> O navegador escolhe a cor do visto para ter contraste com a cor de destaque</label>
+<label><input type="radio" name="q6"> É um erro: deveria ficar branco</label>
+<label><input type="radio" name="q6"> Porque faltou <code>color: black</code></label>
+<label><input type="radio" name="q6"> Porque <code>gold</code> não é uma cor válida</label>
+</div>
+
+<h3>Missão final: a caixa sob medida</h3>
+
+<div class="tryhtml" data-goal="css:.termos{appearance}=none,css:.termos{border-top-style}=solid,css:.termos{background-color}=rgb(255, 99, 71)">
+<p class="try-task"><strong>Missão:</strong> desenhe a caixa "Aceito os termos" do zero. Na <code>.termos</code>: tire o visual do sistema (<code>appearance: none</code>), dê tamanho (<code>width</code> e <code>height</code> de <code>1.25rem</code>) e uma borda <code>2px solid tomato</code>. Em <code>.termos:checked</code>, pinte o fundo de <code>tomato</code>. A caixa já começa marcada.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;&lt;label&gt;&lt;input class="termos" type="checkbox" checked&gt; Aceito os termos&lt;/label&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.termos {
+  vertical-align: middle;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.termos {
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid tomato;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+.termos:checked {
+  background-color: tomato;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>accent-color</code> pinta, com uma linha, as caixas de marcar, os botões de opção, os controles deslizantes e as barras de progresso. É herdado: ponha no <code>form</code> ou no <code>:root</code>.</li>
+  <li>O navegador escolhe a cor do visto para ter contraste (no Safari, só a partir da 26.2). Campos de texto e botões não mudam.</li>
+  <li><code>appearance: none</code> tira o visual do sistema. O campo continua funcionando, mas some se você não desenhar tamanho, borda e o estado <code>:checked</code>. O foco continua visível: não o apague.</li>
+  <li><code>appearance: base-select</code> deixa o <code>&lt;select&gt;</code> todo estilizável; é recente e o validador ainda não conhece.</li>
+  <li>Só a cor? <code>accent-color</code>. Outro formato? <code>appearance: none</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
