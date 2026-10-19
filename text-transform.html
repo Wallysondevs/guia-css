@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS text-transform — maiúsculas e minúsculas sem reescrever o texto | Guia CSS</title>
+<meta name="description" content="A propriedade text-transform para quem nunca escreveu CSS: uppercase, lowercase, capitalize e none lado a lado, por que escrever o texto normal no HTML e deixar as maiúsculas para o CSS, os acentos, a armadilha do capitalize em português (De, Da, Com) e os erros comuns (upper, caps lock no HTML).">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">text-transform</span></h1>
+
+<p class="intro">Menus em MAIÚSCULAS, nomes com a Primeira Letra Grande, um aviso todo em minúsculas: dá para conseguir tudo isso sem reescrever uma palavra do HTML. A propriedade <code>text-transform</code>, "transformação do texto", troca só o <strong>jeito de mostrar</strong> as letras. Nesta aula você vai ver os valores lado a lado, entender por que o texto deve ficar normal no HTML e conhecer a armadilha do <code>capitalize</code> em português.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Os valores <code>uppercase</code>, <code>lowercase</code>, <code>capitalize</code> e <code>none</code>.</li>
+  <li>Que o texto do HTML não muda: só a aparência.</li>
+  <li>Por que escrever "Receitas" no HTML e deixar o CSS mostrar "RECEITAS".</li>
+  <li>Como ficam os acentos, e por que o <code>capitalize</code> estranha o português.</li>
+  <li>Como um filho volta ao normal com <code>none</code>.</li>
+  <li>Os erros comuns: valor inventado (com a mensagem do validador W3C) e o texto já digitado em maiúsculas.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: o letreiro da padaria</h2>
+<p>A Ana encomendou um letreiro para a padaria. Ela entregou ao pintor um papel escrito "Padaria da Ana", à mão, normal. O pintor pintou "PADARIA DA ANA", em letras grandes. O nome da padaria não mudou: mudou só o jeito de pintar.</p>
+<p>No CSS, o papel é o texto do HTML e o pintor é o <code>text-transform</code>. Ele mostra o texto em maiúsculas ou minúsculas, mas o que está escrito no código continua igual.</p>
+
+<hr>
+
+<h2>1. Os valores, lado a lado</h2>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .nenhum { text-transform: none; }
+  .maiusculas { text-transform: uppercase; }
+  .minusculas { text-transform: lowercase; }
+  .iniciais { text-transform: capitalize; }
+&lt;/style&gt;
+&lt;p class="nenhum"&gt;none: Bolo de fubá com erva-doce da vó Ana&lt;/p&gt;
+&lt;p class="maiusculas"&gt;uppercase: Bolo de fubá com erva-doce da vó Ana&lt;/p&gt;
+&lt;p class="minusculas"&gt;lowercase: Bolo de fubá com erva-doce da vó Ana&lt;/p&gt;
+&lt;p class="iniciais"&gt;capitalize: bolo de fubá com erva-doce da vó ana&lt;/p&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>.maiusculas</dt><dd>O seletor: os elementos com <code>class="maiusculas"</code>.</dd>
+  <dt>text-transform</dt><dd>A propriedade: "transformação do texto". Muda como as letras aparecem, maiúsculas ou minúsculas.</dd>
+  <dt>uppercase</dt><dd>O valor: "caixa alta", todas as letras maiúsculas. O nome vem das gráficas antigas, que guardavam as letras maiúsculas na caixa de cima (<em>upper case</em>) e as minúsculas na de baixo (<em>lower case</em>).</dd>
+  <dt>;</dt><dd>Fecha a declaração.</dd>
+</dl>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que faz</th><th>Uso comum</th></tr>
+<tr><td><code>none</code></td><td>Mostra como está escrito (o valor inicial)</td><td>Desfazer uma transformação herdada</td></tr>
+<tr><td><code>uppercase</code></td><td>Tudo em MAIÚSCULAS</td><td>Menus, botões, etiquetas curtas ("NOVO", "PROMOÇÃO")</td></tr>
+<tr><td><code>lowercase</code></td><td>tudo em minúsculas</td><td>Raro: um estilo de marca, um endereço de e-mail</td></tr>
+<tr><td><code>capitalize</code></td><td>A Primeira Letra De Cada Palavra Em Maiúscula</td><td>Nomes de pessoas digitados de qualquer jeito ("ana souza")</td></tr>
+</table>
+</div>
+
+<p>Repare nos acentos: "fubá" virou "FUBÁ" e "vó" virou "VÓ". O navegador conhece as maiúsculas de cada letra, inclusive acentuadas e com cedilha ("maçã" vira "MAÇÃ"), sobretudo quando a página diz a língua com <code>&lt;html lang="pt-BR"&gt;</code>.</p>
+
+<div class="tryhtml" data-goal="css:.chamada{text-transform}=uppercase,texto:.chamada=Receitas da semana">
+<p class="try-task"><strong>Missão:</strong> mostre a chamada "Receitas da semana" toda em maiúsculas, <strong>sem</strong> mudar o texto do HTML.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="chamada"&gt;Receitas da semana&lt;/p&gt;
+&lt;h2&gt;Pão de queijo de liquidificador&lt;/h2&gt;
+</pre>
+<pre class="script" data-file="style.css">.chamada {
+  color: tomato;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.chamada {
+  color: tomato;
+  text-transform: uppercase;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. O texto do HTML não muda</h2>
+<p>O <code>text-transform</code> só muda o desenho. Quem lê o código (o <code>texto:</code> das missões deste guia, o JavaScript com <code>textContent</code>, os buscadores) continua vendo "Receitas da semana". No F12, na aba <strong>Elements</strong> (Elementos), o texto aparece como foi escrito; a transformação só aparece na tela e na aba <strong>Computed</strong> (Calculado), como <code>text-transform: uppercase</code>.</p>
+
+<h3>Por que não digitar logo em maiúsculas?</h3>
+<p>Se o letreiro vai ser em maiúsculas, por que não escrever "RECEITAS" direto no HTML? Três motivos:</p>
+<ul>
+  <li><strong>Mudar de ideia sai barato.</strong> Se a Ana enjoar das maiúsculas, ela apaga uma linha do CSS. Com o texto digitado em maiúsculas, teria de reescrever cada menu, botão e título, página por página.</li>
+  <li><strong>O <code>lowercase</code> não conserta tudo.</strong> Para ter "Receitas da Ana" de volta a partir de "RECEITAS DA ANA", nenhum valor serve: o <code>capitalize</code> daria "Receitas Da Ana". A informação de quais letras eram maiúsculas se perdeu.</li>
+  <li><strong>Leitores de tela.</strong> Uma palavra digitada em maiúsculas pode ser lida como sigla, letra por letra. Escrita normal no HTML, ela é lida como palavra.</li>
+</ul>
+
+<hr>
+
+<h2>3. A herança, e como desligar com <code>none</code></h2>
+<p>O <code>text-transform</code> é <strong>herdado</strong> (aula <a href="heranca.html">Herança</a>): um título em maiúsculas transforma também o que está dentro dele. Para uma parte voltar ao normal, dê a ela <code>text-transform: none</code>:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  h2 {
+    text-transform: uppercase;
+  }
+  h2 span {
+    text-transform: none;
+  }
+&lt;/style&gt;
+&lt;h2&gt;Receitas &lt;span&gt;da Ana&lt;/span&gt;&lt;/h2&gt;
+</pre>
+
+<p>"Receitas" ficou em maiúsculas, e "da Ana" ficou como foi escrito. Aqui, ao contrário do sublinhado (aula <a href="text-decoration.html">text-decoration</a>), o <code>none</code> do filho funciona: o <code>text-transform</code> é passado por herança, e a regra do filho vence o valor herdado.</p>
+
+<hr>
+
+<h2>4. A armadilha do <code>capitalize</code> em português</h2>
+<p>O <code>capitalize</code> põe maiúscula na primeira letra de <strong>toda</strong> palavra. Ele não sabe que, em português, "de", "da", "com" e "e" ficam minúsculas num título:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  p {
+    text-transform: capitalize;
+  }
+&lt;/style&gt;
+&lt;p&gt;bolo de fubá com erva-doce da vó ana&lt;/p&gt;
+&lt;p&gt;bOLO DE FUBÁ&lt;/p&gt;
+</pre>
+
+<p>Dois detalhes no resultado:</p>
+<ul>
+  <li>"De", "Com" e "Da" ganharam maiúscula. No Chromium, até o "doce" de "erva-doce" virou "Doce".</li>
+  <li>No segundo parágrafo, nada ficou minúsculo: o <code>capitalize</code> só <strong>sobe</strong> a primeira letra, nunca abaixa as outras. "bOLO DE FUBÁ" virou "BOLO DE FUBÁ".</li>
+</ul>
+<p>Por isso, em português, o <code>capitalize</code> serve bem para nomes curtos ("ana souza" → "Ana Souza"). Para títulos, escreva o texto certo no HTML.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quero mostrar</th><th>Melhor caminho</th></tr>
+<tr><td>Menu, botão ou etiqueta em MAIÚSCULAS</td><td>Texto normal no HTML + <code>text-transform: uppercase</code></td></tr>
+<tr><td>Título com as maiúsculas certas ("Bolo de Fubá da Ana")</td><td>Escrever assim no HTML</td></tr>
+<tr><td>Nome de pessoa digitado em minúsculas</td><td><code>text-transform: capitalize</code></td></tr>
+<tr><td>Letras pequenas em formato de maiúscula (versalete)</td><td>Outra propriedade: <code>font-variant: small-caps</code></td></tr>
+</table>
+</div>
+
+<div class="tip">
+<strong>Maiúsculas e o espaço entre as letras</strong>
+<p>Palavras em maiúsculas ficam com as letras apertadas. Um pouco de <code>letter-spacing</code> (como <code>0.05em</code>) deixa o menu mais legível (aula <a href="line-height.html">Espaçamento</a>). E use maiúsculas só em textos curtos: um parágrafo inteiro em caixa alta é difícil de ler.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Um valor que não existe: <code>upper</code></strong>
+<pre class="term" data-cwd="~/site">$ cat style.css
+.chamada {
+  text-transform: upper;
+}
+$ vnu --css style.css
+"file:/home/ana/site/style.css":2.19-2.23: error: CSS: “text-transform”: “upper” is not a “text-transform” value.</pre>
+<p><strong>O que o leitor vê:</strong> a chamada continua com as letras como foram escritas.</p>
+<p><strong>Por quê:</strong> o valor é <code>uppercase</code>, inteiro; <code>upper</code>, <code>caps</code> e <code>capitalized</code> não existem. O navegador ignora a declaração (no F12, no painel <strong>Styles</strong>, ela aparece riscada, com um ícone de aviso) e o valor calculado continua <code>none</code>.</p>
+<p><strong>O que o validador diz:</strong> "<code>upper</code> não é um valor de <code>text-transform</code>", na linha 2, coluna 19.</p>
+<p><strong>Como consertar:</strong> <code>text-transform: uppercase;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O texto foi digitado em maiúsculas, e o <code>capitalize</code> não resolve</strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  h2 {
+    text-transform: capitalize;
+  }
+&lt;/style&gt;
+&lt;h2&gt;BOLO DE FUBÁ&lt;/h2&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> "BOLO DE FUBÁ", igualzinho: o <code>capitalize</code> não abaixa letra nenhuma.</p>
+<p><strong>Por quê:</strong> o CSS não sabe quais letras deveriam ser minúsculas. O <code>lowercase</code> deixaria tudo minúsculo ("bolo de fubá"), e o <code>capitalize</code> por cima não existe (uma propriedade só tem um valor). O validador não reclama: tudo é válido.</p>
+<p><strong>Como consertar:</strong> reescreva o texto normal no HTML ("Bolo de fubá") e use o CSS só para a aparência.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>uppercase</code> do pai chegou onde não devia</strong>
+<p>A Ana pôs <code>nav { text-transform: uppercase; }</code> e o e-mail de contato, dentro do <code>nav</code>, virou "ANA@EXEMPLO.COM". Não é erro do navegador: é a herança. O validador não tem o que dizer.</p>
+<p><strong>Como consertar:</strong> ponha a regra só nos links do menu (<code>nav a</code>), ou devolva o normal no e-mail com <code>text-transform: none</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>text-transform: none;</code></td><td>Como foi escrito (valor inicial); desfaz a herança</td></tr>
+<tr><td><code>text-transform: uppercase;</code></td><td>TUDO EM MAIÚSCULAS</td></tr>
+<tr><td><code>text-transform: lowercase;</code></td><td>tudo em minúsculas</td></tr>
+<tr><td><code>text-transform: capitalize;</code></td><td>Primeira Letra De Cada Palavra (só sobe, nunca abaixa)</td></tr>
+<tr><td>Herança</td><td>Sim; o <code>none</code> no filho funciona</td></tr>
+<tr><td>O texto do HTML</td><td>Não muda: só a aparência</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Caixa alta</h3>
+<p>Complete para mostrar o menu em maiúsculas:</p>
+<div class="ex-code">nav a { text-transform: <input data-answer="uppercase" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Desligar</h3>
+<p>O título está em maiúsculas por herança. Complete para o <code>span</code> voltar ao normal:</p>
+<div class="ex-code">h2 span { text-transform: <input data-answer="none" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Iniciais</h3>
+<p>Complete para "ana souza" aparecer como "Ana Souza":</p>
+<div class="ex-code">.autora { text-transform: <input data-answer="capitalize" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. O HTML tem <code>&lt;p class="x"&gt;Receitas&lt;/p&gt;</code> e o CSS, <code>.x { text-transform: uppercase; }</code>. O que o JavaScript lê em <code>textContent</code>?</p>
+<label><input type="radio" name="q4"> RECEITAS</label>
+<label><input type="radio" name="q4"> receitas</label>
+<label><input type="radio" name="q4"> Receitas</label>
+<label><input type="radio" name="q4"> Nada: o texto foi apagado</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Como fica <code>bolo de fubá</code> com <code>text-transform: capitalize</code>?</p>
+<label><input type="radio" name="q5"> Bolo de fubá</label>
+<label><input type="radio" name="q5"> Bolo De Fubá</label>
+<label><input type="radio" name="q5"> BOLO DE FUBÁ</label>
+<label><input type="radio" name="q5"> Bolo de Fubá</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Por que é melhor escrever "Receitas" no HTML e mostrar "RECEITAS" com CSS?</p>
+<label><input type="radio" name="q6"> Para trocar o visual depois sem reescrever os textos, e para o leitor de tela ler como palavra</label>
+<label><input type="radio" name="q6"> Porque o HTML não aceita letras maiúsculas</label>
+<label><input type="radio" name="q6"> Porque o validador W3C exige</label>
+<label><input type="radio" name="q6"> Porque o <code>text-transform</code> deixa a página mais rápida</label>
+</div>
+
+<h3>Missão final: a página da padaria</h3>
+
+<div class="tryhtml" data-goal="css:nav a{text-transform}=uppercase,css:nav .email{text-transform}=none,texto:h2=Bolo de fubá,css:h2{text-transform}=uppercase,css:.autora{text-transform}=capitalize">
+<p class="try-task"><strong>Missão:</strong> (1) mostre os links do menu em maiúsculas, mas o e-mail do <code>nav</code> continua como foi escrito; (2) o título foi digitado em caixa alta: reescreva-o no HTML como "Bolo de fubá" e mostre-o em maiúsculas pelo CSS; (3) mostre o nome da autora, "ana souza", com as iniciais maiúsculas.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav&gt;
+  &lt;a href="#"&gt;Início&lt;/a&gt; · &lt;a href="#"&gt;Receitas&lt;/a&gt;
+  &lt;p class="email"&gt;ana@exemplo.com&lt;/p&gt;
+&lt;/nav&gt;
+&lt;h2&gt;BOLO DE FUBÁ&lt;/h2&gt;
+&lt;p&gt;Receita de &lt;span class="autora"&gt;ana souza&lt;/span&gt;.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">nav {
+  text-transform: uppercase;
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav&gt;
+  &lt;a href="#"&gt;Início&lt;/a&gt; · &lt;a href="#"&gt;Receitas&lt;/a&gt;
+  &lt;p class="email"&gt;ana@exemplo.com&lt;/p&gt;
+&lt;/nav&gt;
+&lt;h2&gt;Bolo de fubá&lt;/h2&gt;
+&lt;p&gt;Receita de &lt;span class="autora"&gt;ana souza&lt;/span&gt;.&lt;/p&gt;
+</pre>
+<pre class="solucao" data-file="style.css">nav a {
+  text-transform: uppercase;
+}
+
+h2 {
+  text-transform: uppercase;
+}
+
+.autora {
+  text-transform: capitalize;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>text-transform</code> muda só a aparência das letras: <code>uppercase</code>, <code>lowercase</code>, <code>capitalize</code> ou <code>none</code> (o valor inicial).</li>
+  <li>O texto do HTML não muda: o JavaScript, os buscadores e as missões leem o que foi escrito.</li>
+  <li>Escreva normal no HTML e deixe as maiúsculas para o CSS: fica fácil mudar, e o leitor de tela lê palavras, não siglas.</li>
+  <li>Acentos e cedilha funcionam: "maçã" vira "MAÇÃ".</li>
+  <li>O <code>capitalize</code> sobe a primeira letra de <strong>toda</strong> palavra ("De", "Da") e nunca abaixa as outras: bom para nomes, ruim para títulos em português.</li>
+  <li>É herdado; <code>text-transform: none</code> no filho desfaz.</li>
+  <li>Valor inventado é ignorado: <code>“upper” is not a “text-transform” value</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
