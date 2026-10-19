@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS grid-column e grid-row — posicionando itens no Grid | Guia CSS</title>
+<meta name="description" content="Posicionar itens no CSS Grid para quem está começando: as linhas numeradas da grade, grid-column e grid-row com início / fim, span para ocupar várias células, -1 para ir até o fim, itens que se sobrepõem e o que acontece quando dá errado (hífen no lugar da barra, pai sem display: grid, número de linha a mais).">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">grid-column e grid-row</span></h1>
+
+<p class="intro">Nas aulas anteriores você criou a grade: as colunas com <code>grid-template-columns</code> e as linhas com <code>grid-template-rows</code>. Até agora, cada item entrou numa célula, um depois do outro, na ordem do código. Nesta aula você vai <strong>escolher</strong> onde cada item fica e quantas células ele ocupa: o "bolo do dia" do cardápio da Ana vai ganhar um cartão duas vezes maior, e o título vai atravessar a grade de ponta a ponta.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>As <strong>linhas numeradas</strong> da grade: a base de tudo nesta aula.</li>
+  <li><code>grid-column</code> e <code>grid-row</code> com <strong>início / fim</strong> (<code>1 / 3</code>).</li>
+  <li><code>span</code>: "ocupe 2 células", sem contar linhas.</li>
+  <li><code>-1</code>: "até o fim da grade", qualquer que seja o número de colunas.</li>
+  <li>O que acontece com os outros itens e quando dois itens caem no mesmo lugar.</li>
+  <li>Os erros comuns: hífen no lugar da barra, pai sem <code>display: grid</code>, contar colunas em vez de linhas.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, dentro de cada caixa. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: as linhas do caderno quadriculado</h2>
+<p>Pense num caderno quadriculado. Para desenhar um retângulo, você não diz "ocupe os quadradinhos 1 e 2": você diz <strong>de qual risco a qual risco</strong> ele vai. "Do risco 1 ao risco 3" cobre dois quadradinhos.</p>
+<p>A grade do CSS funciona assim. Entre as colunas e em volta delas há <strong>linhas</strong> (em inglês, <em>grid lines</em>, "linhas da grade"), numeradas a partir de 1. Uma grade de 3 colunas tem <strong>4 linhas verticais</strong>: a 1 na borda esquerda, a 2 e a 3 entre as colunas, e a 4 na borda direita. Também se contam de trás para a frente: a última é a <code>-1</code>, a penúltima a <code>-2</code>.</p>
+
+<pre class="file" data-file="as linhas de uma grade de 3 colunas">linha:  1         2         3         4
+        |  coluna 1 |  coluna 2 |  coluna 3 |
+       -4        -3        -2        -1
+</pre>
+
+<div class="tip">
+<strong>"Linha" tem dois sentidos no Grid</strong>
+<p>Em português, "linha" pode ser a <strong>fileira</strong> de células (em inglês, <em>row</em>, o assunto de <code>grid-template-rows</code>) ou o <strong>risco</strong> que separa as células (<em>line</em>). Nesta aula, quando o número importa, "linha 3" é sempre o <strong>risco</strong> número 3. Para as fileiras, o texto diz "fileira".</p>
+</div>
+
+<hr>
+
+<h2>1. Do risco 1 ao risco 3: <code>grid-column</code></h2>
+<p>O cardápio da Ana é uma grade de 3 colunas. O primeiro cartão é o destaque do dia, e ela quer que ele ocupe as duas primeiras colunas:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o cartão "Bolo do dia" vai do risco 1 ao risco 3. Troque o <code>3</code> por <code>4</code> e veja ele ocupar a fileira inteira.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cardapio"&gt;
+  &lt;div class="destaque"&gt;Bolo do dia&lt;/div&gt;
+  &lt;div&gt;Pão de queijo&lt;/div&gt;
+  &lt;div&gt;Broa de milho&lt;/div&gt;
+  &lt;div&gt;Sonho&lt;/div&gt;
+  &lt;div&gt;Pão de mel&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cardapio {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.cardapio div {
+  background: #fde2c8;
+  border: 2px solid #c2410c;
+  padding: 12px;
+}
+
+.destaque {
+  grid-column: 1 / 3;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>.destaque</dt><dd>O seletor do <strong>item</strong> que você quer mover. Repare: quem ganha <code>grid-column</code> é o filho, e não a grade (<code>.cardapio</code>).</dd>
+  <dt>grid-column</dt><dd>"Coluna na grade": em que colunas o item fica.</dd>
+  <dt>1</dt><dd>O risco onde o item <strong>começa</strong>.</dd>
+  <dt>/</dt><dd>A barra separa o começo do fim. É obrigatória e não pode ser hífen (veja <a href="#errado">Quando dá errado</a>).</dd>
+  <dt>3</dt><dd>O risco onde o item <strong>termina</strong>. De 1 a 3 são <strong>duas</strong> colunas.</dd>
+</dl>
+
+<p>No resultado, "Bolo do dia" ocupa as duas primeiras colunas, e o "Pão de queijo" ficou ao lado dele, na terceira. Os outros três cartões desceram para a fileira de baixo, um em cada coluna. Ninguém precisou de regra nova: o Grid encaixa os outros itens nas células que sobram.</p>
+
+<h3><code>grid-row</code>: o mesmo, na vertical</h3>
+<p><code>grid-row</code> faz a mesma coisa com os riscos <strong>horizontais</strong>, de cima para baixo. <code>grid-row: 1 / 3</code> estica o item por duas fileiras:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .cardapio {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .cardapio div {
+    background: #fde2c8;
+    border: 2px solid #c2410c;
+    padding: 12px;
+  }
+  .destaque {
+    grid-row: 1 / 3;
+  }
+&lt;/style&gt;
+&lt;div class="cardapio"&gt;
+  &lt;div class="destaque"&gt;Bolo do dia&lt;/div&gt;
+  &lt;div&gt;Pão de queijo&lt;/div&gt;
+  &lt;div&gt;Broa de milho&lt;/div&gt;
+  &lt;div&gt;Sonho&lt;/div&gt;
+  &lt;div&gt;Pão de mel&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Agora o "Bolo do dia" é um cartão alto na primeira coluna, da altura de duas fileiras, e os outros quatro formam um bloco 2 × 2 à direita dele.</p>
+
+<h3>As propriedades longas</h3>
+<p><code>grid-column</code> é um <strong>atalho</strong> de duas propriedades. Você pode escrever cada uma separada:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Atalho</th><th>É o mesmo que</th></tr>
+<tr><td><code>grid-column: 1 / 3;</code></td><td><code>grid-column-start: 1;</code> (começo) e <code>grid-column-end: 3;</code> (fim)</td></tr>
+<tr><td><code>grid-row: 1 / 3;</code></td><td><code>grid-row-start: 1;</code> e <code>grid-row-end: 3;</code></td></tr>
+<tr><td><code>grid-column: 2;</code> (sem barra)</td><td><code>grid-column-start: 2;</code> e o fim fica <code>auto</code>: o item ocupa <strong>uma</strong> coluna, a 2</td></tr>
+</table>
+</div>
+
+<p>No F12, a aba <strong>Computed</strong> (Calculado) mostra as longas: para o <code>.destaque</code> do primeiro exemplo, <code>grid-column-start</code> é <code>1</code> e <code>grid-column-end</code> é <code>3</code>. No dia a dia, use o atalho: é mais curto e mostra começo e fim juntos.</p>
+
+<div class="tryhtml" data-goal="css:.destaque{grid-column-start}=2,css:.destaque{grid-column-end}=4">
+<p class="try-task"><strong>Missão:</strong> o cartão "Bolo do dia" deve ocupar as duas colunas <strong>da direita</strong> (a 2 e a 3). Escreva o <code>grid-column</code> com os números dos riscos.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cardapio"&gt;
+  &lt;div&gt;Pão de queijo&lt;/div&gt;
+  &lt;div class="destaque"&gt;Bolo do dia&lt;/div&gt;
+  &lt;div&gt;Broa de milho&lt;/div&gt;
+  &lt;div&gt;Sonho&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cardapio {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.cardapio div {
+  background: #fde2c8;
+  border: 2px solid #c2410c;
+  padding: 12px;
+}
+
+.destaque {
+  font-weight: bold;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cardapio {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.cardapio div {
+  background: #fde2c8;
+  border: 2px solid #c2410c;
+  padding: 12px;
+}
+
+.destaque {
+  font-weight: bold;
+  grid-column: 2 / 4;
+}
+</pre>
+</div>
+
+<p>A coluna 3 termina no risco <strong>4</strong>: numa grade de 3 colunas, o último risco é sempre "colunas + 1".</p>
+
+<hr>
+
+<h2>2. <code>span</code>: "ocupe tantas células"</h2>
+<p>Às vezes você não liga para <strong>onde</strong> o item fica, só para o <strong>tamanho</strong> dele. A palavra <code>span</code> (em inglês, "abranger", "estender-se por") diz quantas células o item ocupa, a partir de onde ele cairia normalmente:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .cardapio {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .cardapio div {
+    background: #fde2c8;
+    border: 2px solid #c2410c;
+    padding: 12px;
+  }
+  .destaque {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+&lt;/style&gt;
+&lt;div class="cardapio"&gt;
+  &lt;div class="destaque"&gt;Bolo do dia&lt;/div&gt;
+  &lt;div&gt;Pão de queijo&lt;/div&gt;
+  &lt;div&gt;Broa de milho&lt;/div&gt;
+  &lt;div&gt;Sonho&lt;/div&gt;
+  &lt;div&gt;Pão de mel&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>grid-column: span 2</dt><dd>Ocupe <strong>2 colunas</strong>, começando onde o item cairia sozinho.</dd>
+  <dt>grid-row: span 2</dt><dd>Ocupe <strong>2 fileiras</strong>.</dd>
+</dl>
+
+<p>O "Bolo do dia" virou um quadrado grande de 2 × 2 células no canto esquerdo. "Pão de queijo" e "Broa de milho" ficaram empilhados na terceira coluna, ao lado dele, e "Sonho" e "Pão de mel" foram para a fileira de baixo.</p>
+
+<p>No F12, <code>grid-column: span 2</code> aparece como <code>grid-column-start: span 2</code> e <code>grid-column-end: auto</code>: o começo é "estender-se por 2" e o fim fica por conta do Grid.</p>
+
+<h3>Quando usar números e quando usar <code>span</code></h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Quer dizer</th><th>Use quando</th></tr>
+<tr><td><code>grid-column: 1 / 3;</code></td><td>Do risco 1 ao risco 3</td><td>O lugar <strong>exato</strong> importa (o destaque fica sempre à esquerda)</td></tr>
+<tr><td><code>grid-column: span 2;</code></td><td>2 colunas, onde couber</td><td>Só o <strong>tamanho</strong> importa (uma foto larga numa galeria)</td></tr>
+<tr><td><code>grid-column: 2 / span 2;</code></td><td>Começa no risco 2 e ocupa 2 colunas</td><td>Você sabe o começo e o tamanho, e não quer calcular o fim</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>3. <code>-1</code>: até o fim, seja qual for</h2>
+<p>O título do cardápio deve atravessar a grade inteira. Com 3 colunas, seria <code>1 / 4</code>. Mas se a Ana mudar para 4 colunas, o <code>4</code> deixa de ser o fim. O <code>-1</code> é sempre o <strong>último risco</strong>, então <code>1 / -1</code> quer dizer "de ponta a ponta":</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque o <code>grid-template-columns</code> para <code>1fr 1fr 1fr 1fr</code> (4 colunas). O título continua atravessando tudo, sem você mexer nele.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cardapio"&gt;
+  &lt;h2 class="titulo"&gt;Cardápio da Padaria da Ana&lt;/h2&gt;
+  &lt;div&gt;Pão de queijo&lt;/div&gt;
+  &lt;div&gt;Broa de milho&lt;/div&gt;
+  &lt;div&gt;Sonho&lt;/div&gt;
+  &lt;div&gt;Pão de mel&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cardapio {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.cardapio div {
+  background: #fde2c8;
+  border: 2px solid #c2410c;
+  padding: 12px;
+}
+
+.titulo {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+</pre>
+</div>
+
+<div class="warning">
+<strong>O <code>-1</code> conta só as colunas que você criou</strong>
+<p>O <code>-1</code> é o último risco das colunas <strong>definidas</strong> no <code>grid-template-columns</code>. Para as <strong>fileiras</strong>, que o Grid costuma criar sozinho conforme os itens chegam (sem <code>grid-template-rows</code>), <code>grid-row: 1 / -1</code> não estica o item até embaixo: ele ocupa só a primeira fileira. Para esticar por todas as fileiras, defina as fileiras ou use <code>span</code>.</p>
+</div>
+
+<hr>
+
+<h2>4. O que acontece com os outros itens</h2>
+<p>O Grid primeiro coloca os itens que têm lugar marcado e depois encaixa os outros, na ordem do código, nas células livres. Às vezes um item "pula" para cima para tapar um buraco:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .cardapio {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .cardapio div {
+    background: #fde2c8;
+    border: 2px solid #c2410c;
+    padding: 12px;
+  }
+  .destaque {
+    grid-column: 2 / 4;
+    grid-row: 2;
+  }
+&lt;/style&gt;
+&lt;div class="cardapio"&gt;
+  &lt;div&gt;A&lt;/div&gt;
+  &lt;div&gt;B&lt;/div&gt;
+  &lt;div class="destaque"&gt;C (destaque)&lt;/div&gt;
+  &lt;div&gt;D&lt;/div&gt;
+  &lt;div&gt;E&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<p>O C foi para a segunda fileira, nas colunas 2 e 3, como pedido. O D, que vem depois dele no código, subiu para a primeira fileira e ocupou a célula que sobrou ao lado do B. O E ficou na segunda fileira, à esquerda do C. A ordem <strong>na tela</strong> (A, B, D, E, C) não é mais a ordem <strong>do código</strong>.</p>
+
+<div class="warning">
+<strong>Cuidado com a ordem para quem usa teclado e leitor de tela</strong>
+<p>O leitor de tela lê, e a tecla <kbd>Tab</kbd> percorre, na ordem do <strong>código</strong>, e não na da tela. Mudar muito a posição dos itens pode deixar a navegação confusa. Use o posicionamento para o desenho; se a ordem de leitura precisa mudar, mude no HTML.</p>
+</div>
+
+<h3>Dois itens no mesmo lugar</h3>
+<p>Nada impede dois itens de ocupar a mesma célula. Eles se <strong>sobrepõem</strong>, e o que vem depois no código fica por cima:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .cardapio {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .cardapio div {
+    background: #fde2c8;
+    border: 2px solid #c2410c;
+    padding: 12px;
+  }
+  .a {
+    grid-column: 1 / 3;
+    grid-row: 1;
+  }
+  .cardapio .b {
+    grid-column: 2 / 4;
+    grid-row: 1;
+    background: #c7e0f4;
+    border-color: #1d4ed8;
+  }
+&lt;/style&gt;
+&lt;div class="cardapio"&gt;
+  &lt;div class="a"&gt;A&lt;/div&gt;
+  &lt;div class="b"&gt;B&lt;/div&gt;
+  &lt;div&gt;C&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<p>O A vai do risco 1 ao 3, o B do 2 ao 4: os dois dividem a coluna 2. O B, azul, cobre a metade direita do A. Isso é útil de propósito (um texto por cima de uma foto); para escolher quem fica por cima sem mudar o HTML, use <code>z-index</code> (aula <a href="z-index.html">Camadas</a>).</p>
+
+<hr>
+
+<h2>5. Vendo os riscos no F12</h2>
+<p>Contar riscos de cabeça é fácil de errar. O F12 ajuda (aula <a href="devtools.html">Inspecionando com o F12</a>): no painel de elementos, o Chrome, o Edge e o Firefox mostram uma etiqueta <strong>grid</strong> ao lado do elemento com <code>display: grid</code>. Clicando nela, o navegador desenha a grade por cima da página, com os <strong>números dos riscos</strong> (positivos e negativos) nas bordas. Os nomes exatos dos menus mudam de navegador para navegador.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Hífen no lugar da barra: <code>CSS: Parse Error</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.destaque {
+  grid-column: 1 - 3;
+}
+</pre>
+<p><strong>O que você vê:</strong> nada muda. O "Bolo do dia" continua numa célula só.</p>
+<p><strong>Por quê:</strong> <code>1 - 3</code> não é um valor que o <code>grid-column</code> entenda, e o navegador ignora a declaração inteira. No F12, ela aparece <strong>riscada</strong>, com um ícone de aviso, e a aba Computed mostra <code>grid-column-start: auto</code>.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":2.22-2.22: error: CSS: Parse Error.
+"file:/home/ana/site/style.css":3.2-4.1: error: CSS: Parse Error.</pre>
+<p><strong>O que significa:</strong> "erro de leitura" na linha 2, coluna 22, logo depois do <code>3</code>. O validador se perdeu ali e reclamou de novo no fim da regra. É uma mensagem genérica: olhe a linha indicada.</p>
+<p><strong>Como consertar:</strong> <code>grid-column: 1 / 3;</code>, com barra.</p>
+</div>
+
+<div class="cenario">
+<strong>Esqueceu o <code>;</code>: as duas declarações somem</strong>
+<pre class="file" data-file="style.css · erro de propósito">.destaque {
+  grid-column: 1 / 3
+  grid-row: 1 / 3;
+}
+</pre>
+<p><strong>O que você vê:</strong> o destaque não cresce nem para o lado nem para baixo.</p>
+<p><strong>Por quê:</strong> sem o <code>;</code>, o navegador lê <code>1 / 3 grid-row: 1 / 3</code> como o valor do <code>grid-column</code>. É inválido, e a declaração inteira cai, levando junto o <code>grid-row</code>, que ficou "dentro" dela. Os dois ficam <code>auto</code>.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":3.3-3.10: error: CSS: “grid-column”: Missing a semicolon before the property name “grid-row”.</pre>
+<p><strong>O que significa:</strong> "falta um ponto e vírgula antes do nome da propriedade <code>grid-row</code>". Aqui o validador acerta em cheio.</p>
+</div>
+
+<div class="cenario">
+<strong>O pai não é <code>display: grid</code></strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  .cardapio {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .cardapio div {
+    background: #fde2c8;
+    border: 2px solid #c2410c;
+    padding: 12px;
+  }
+  .destaque {
+    grid-column: 1 / 3;
+  }
+&lt;/style&gt;
+&lt;div class="cardapio"&gt;
+  &lt;div class="destaque"&gt;Bolo do dia&lt;/div&gt;
+  &lt;div&gt;Pão de queijo&lt;/div&gt;
+  &lt;div&gt;Broa de milho&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> os cartões ficam um embaixo do outro, cada um com a largura toda, como blocos comuns.</p>
+<p><strong>Por quê:</strong> faltou o <code>display: grid</code> no <code>.cardapio</code>. Sem grade, não há riscos, e o <code>grid-column</code> não tem onde agir. A declaração é válida, então o navegador não a risca: o F12 mostra <code>grid-column-start: 1</code>, ela só não faz nada. O validador também não reclama.</p>
+<p><strong>Como consertar:</strong> <code>display: grid;</code> no <strong>pai</strong>. <code>grid-column</code> e <code>grid-row</code> vão nos <strong>filhos</strong> diretos dele.</p>
+</div>
+
+<div class="cenario">
+<strong>Contou colunas em vez de riscos</strong>
+<p>A Ana quer o destaque nas colunas 1 e 2 e escreve <code>grid-column: 1 / 2;</code>.</p>
+<p><strong>O que você vê:</strong> o destaque fica numa coluna só, do mesmo tamanho dos outros.</p>
+<p><strong>Por quê:</strong> do risco 1 ao risco 2 há <strong>uma</strong> coluna. Para duas colunas, o fim é o risco 3: <code>1 / 3</code>, ou <code>span 2</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Um risco que não existe: a grade cresce sozinha</strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  .cardapio {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .cardapio div {
+    background: #fde2c8;
+    border: 2px solid #c2410c;
+    padding: 12px;
+  }
+  .destaque {
+    grid-column: 1 / 5;
+  }
+&lt;/style&gt;
+&lt;div class="cardapio"&gt;
+  &lt;div class="destaque"&gt;Bolo do dia&lt;/div&gt;
+  &lt;div&gt;Pão de queijo&lt;/div&gt;
+  &lt;div&gt;Broa de milho&lt;/div&gt;
+  &lt;div&gt;Sonho&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> o destaque ocupa a fileira inteira, mas os três cartões de baixo ficam um pouco mais estreitos e sobra uma faixa vazia à direita deles.</p>
+<p><strong>Por quê:</strong> a grade tem só 4 riscos verticais. Para chegar ao risco 5, o Grid cria uma <strong>quarta coluna</strong> extra (uma coluna "implícita"). Ela não tem nada dentro, então fica com largura 0, mas ganha mais um <code>gap</code> de 8px: é a faixa vazia. O F12 mostra <code>grid-template-columns</code> com quatro tamanhos, o último <code>0px</code>.</p>
+<p><strong>Como consertar:</strong> numa grade de 3 colunas, o último risco é o 4, ou simplesmente <code>-1</code>: <code>grid-column: 1 / -1;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Nome errado: <code>Property “grid-columns” doesn't exist</code></strong>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":2.21-2.21: error: CSS: “grid-columns”: Property “grid-columns” doesn't exist.</pre>
+<p><strong>O que significa:</strong> "a propriedade <code>grid-columns</code> não existe". O nome é no singular: <code>grid-column</code>. O plural aparece só em <code>grid-template-columns</code>, na grade. No F12, a declaração errada aparece riscada.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>grid-column: 1 / 3;</code></td><td>Do risco vertical 1 ao 3: duas colunas</td></tr>
+<tr><td><code>grid-row: 1 / 3;</code></td><td>Do risco horizontal 1 ao 3: duas fileiras</td></tr>
+<tr><td><code>grid-column: 2;</code></td><td>Só a coluna 2</td></tr>
+<tr><td><code>grid-column: span 2;</code></td><td>Duas colunas, onde o item cair</td></tr>
+<tr><td><code>grid-column: 2 / span 2;</code></td><td>Começa no risco 2 e ocupa duas colunas</td></tr>
+<tr><td><code>grid-column: 1 / -1;</code></td><td>De ponta a ponta (das colunas definidas)</td></tr>
+<tr><td><code>grid-column-start</code>, <code>grid-column-end</code>, <code>grid-row-start</code>, <code>grid-row-end</code></td><td>As propriedades longas, uma para cada ponta</td></tr>
+<tr><td>Onde escrever</td><td>No <strong>filho</strong> de um elemento com <code>display: grid</code></td></tr>
+</table>
+</div>
+
+<p>Para dar <strong>nomes</strong> às regiões da grade em vez de números, veja a próxima aula, <a href="grid-areas.html">Áreas com Nome</a>.</p>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O separador</h3>
+<p>Complete para o item ir do risco 1 ao risco 3:</p>
+<div class="ex-code">grid-column: 1 <input data-answer="/" aria-label="separador"> 3;</div>
+</div>
+
+<div class="exercise">
+<h3>2. Ocupar três colunas</h3>
+<p>Complete com a palavra que faz o item ocupar 3 colunas, onde ele cair:</p>
+<div class="ex-code">grid-column: <input data-answer="span" aria-label="palavra"> 3;</div>
+</div>
+
+<div class="exercise">
+<h3>3. Até o fim</h3>
+<p>Complete para o título atravessar todas as colunas, qualquer que seja o número delas:</p>
+<div class="ex-code">grid-column: 1 / <input data-answer="-1" aria-label="último risco">;</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. Numa grade de 4 colunas, quantos riscos verticais existem?</p>
+<label><input type="radio" name="q4"> 3</label>
+<label><input type="radio" name="q4"> 4</label>
+<label><input type="radio" name="q4"> 5</label>
+<label><input type="radio" name="q4"> 8</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. A Ana escreveu <code>grid-column: 1 / 3;</code> no item, mas nada mudou, e o F12 não risca a declaração. Qual é a causa mais provável?</p>
+<label><input type="radio" name="q5"> Faltou o <code>span</code></label>
+<label><input type="radio" name="q5"> O pai do item não tem <code>display: grid</code></label>
+<label><input type="radio" name="q5"> O certo é <code>1 - 3</code></label>
+<label><input type="radio" name="q5"> O <code>grid-column</code> deveria estar no pai</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Dois itens com o mesmo <code>grid-column</code> e o mesmo <code>grid-row</code>. O que acontece?</p>
+<label><input type="radio" name="q6"> Eles se sobrepõem; o que vem depois no código fica por cima</label>
+<label><input type="radio" name="q6"> O segundo vai para a célula livre seguinte</label>
+<label><input type="radio" name="q6"> O navegador ignora o segundo</label>
+<label><input type="radio" name="q6"> A grade dá erro e não aparece</label>
+</div>
+
+<h3>Missão final: o cardápio da padaria</h3>
+
+<div class="tryhtml" data-goal="css:.titulo{grid-column-start}=1,css:.titulo{grid-column-end}=-1,css:.destaque{grid-column-start}=span 2,css:.destaque{grid-row-start}=span 2">
+<p class="try-task"><strong>Missão:</strong> monte o cardápio da Ana em 3 colunas. (1) O título <code>.titulo</code> atravessa a grade de ponta a ponta com <code>1 / -1</code>. (2) O <code>.destaque</code> ocupa 2 colunas e 2 fileiras com <code>span</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cardapio"&gt;
+  &lt;h2 class="titulo"&gt;Padaria da Ana&lt;/h2&gt;
+  &lt;div class="destaque"&gt;Bolo do dia: cenoura com chocolate&lt;/div&gt;
+  &lt;div&gt;Pão de queijo&lt;/div&gt;
+  &lt;div&gt;Broa de milho&lt;/div&gt;
+  &lt;div&gt;Sonho&lt;/div&gt;
+  &lt;div&gt;Pão de mel&lt;/div&gt;
+  &lt;div&gt;Rosca&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cardapio {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.cardapio div {
+  background: #fde2c8;
+  border: 2px solid #c2410c;
+  padding: 12px;
+}
+
+.titulo {
+  margin: 0;
+}
+
+.destaque {
+  font-weight: bold;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cardapio {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.cardapio div {
+  background: #fde2c8;
+  border: 2px solid #c2410c;
+  padding: 12px;
+}
+
+.titulo {
+  margin: 0;
+  grid-column: 1 / -1;
+}
+
+.destaque {
+  font-weight: bold;
+  grid-column: span 2;
+  grid-row: span 2;
+}
+</pre>
+</div>
+
+<p>Com a solução, o título fica sozinho na primeira fileira; o destaque é um bloco grande de 2 × 2 à esquerda, com "Pão de queijo" e "Broa de milho" empilhados ao lado; e os três últimos cartões fecham a grade embaixo. Tente trocar o <code>span 2</code> do <code>grid-row</code> por <code>span 3</code> e veja o que muda.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>A grade tem <strong>riscos numerados</strong> a partir de 1: com 3 colunas, os riscos verticais vão de 1 a 4. De trás para a frente, o último é <code>-1</code>.</li>
+  <li><code>grid-column: início / fim</code> e <code>grid-row: início / fim</code> vão no <strong>filho</strong> de um elemento com <code>display: grid</code>. São atalhos de <code>grid-column-start</code>/<code>-end</code> e <code>grid-row-start</code>/<code>-end</code>.</li>
+  <li><code>span N</code> ocupa N células a partir de onde o item cairia; <code>1 / -1</code> vai de ponta a ponta das colunas definidas.</li>
+  <li>Os outros itens se encaixam nas células livres, às vezes fora da ordem do código. Dois itens no mesmo lugar se sobrepõem.</li>
+  <li>Erros comuns: hífen no lugar da barra (<code>Parse Error</code>), <code>;</code> esquecido (o validador avisa), pai sem <code>display: grid</code> (ninguém avisa), contar colunas em vez de riscos, risco a mais (cria uma coluna extra).</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
