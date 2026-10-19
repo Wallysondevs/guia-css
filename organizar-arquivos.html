@@ -186,7 +186,7 @@ h2,
 
 <p>No Chromium, com a ordem original, o título do cartão sai cor de tomate (<code>rgb(255, 99, 71)</code> no estilo calculado). Com o <code>cartao.css</code> antes do <code>base.css</code>, sai azul-marinho (<code>rgb(0, 0, 128)</code>): as duas regras <code>.cartao__titulo</code> têm a mesma especificidade, e a que vem depois vence.</p>
 
-<div class="tryhtml" data-goal="sel:link[href='css/botao.css'],css:.botao{background-color}=rgb(255, 99, 71)">
+<div class="tryhtml" data-goal="sel:link[href='css/botao.css'],css:.botao{background-color}=rgb(178, 34, 34)">
 <p class="try-task"><strong>Missão:</strong> a Ana criou o arquivo <code>css/botao.css</code> (está na aba), mas o botão continua sem estilo: falta ligar o arquivo. Acrescente o <code>&lt;link&gt;</code> que falta no <code>index.html</code>, depois do <code>base.css</code>.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="css/base.css"&gt;
 &lt;h1&gt;Encomendas&lt;/h1&gt;
@@ -199,7 +199,7 @@ h2,
 <pre class="script" data-file="css/botao.css">.botao {
   padding: 8px 16px;
   border: none;
-  background-color: tomato;
+  background-color: firebrick;
   color: white;
 }
 </pre>
