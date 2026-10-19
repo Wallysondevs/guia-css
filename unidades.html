@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Unidades — px, em, rem e % com a conta de cada uma | Guia CSS</title>
+<meta name="description" content="As unidades do CSS para quem nunca escreveu CSS: px, em, rem e %, com a conta de cada uma e o valor calculado conferido no navegador; em que cresce em cascata nas listas, rem que obedece ao html, % que depende do pai, qual usar em fonte, espaçamento, largura e borda, e os erros comuns (número sem unidade, espaço antes da unidade).">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Unidades</span>: px, em, rem e %</h1>
+
+<p class="intro">Todo tamanho no CSS é um número com uma <strong>unidade</strong>: <code>16px</code>, <code>1.5em</code>, <code>2rem</code>, <code>50%</code>. A unidade diz "16 de quê?". Algumas são fixas, outras dependem de outro tamanho, e é aí que mora a confusão: por que o mesmo <code>1.2em</code> deu 19px num lugar e 27px no outro? Nesta aula você vai conhecer as quatro unidades mais usadas, fazer a conta de cada uma e conferir o resultado no valor calculado do navegador.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li><code>px</code>: a medida fixa.</li>
+  <li><code>em</code>: relativa à letra do próprio elemento (ou do pai, no <code>font-size</code>), e o efeito "bola de neve" nas listas.</li>
+  <li><code>rem</code>: relativa à letra do <code>&lt;html&gt;</code>, igual em toda a página.</li>
+  <li><code>%</code>: relativa a um tamanho do pai.</li>
+  <li>Por que fontes em <code>rem</code> respeitam quem aumenta a letra do navegador.</li>
+  <li>Qual unidade usar em cada propriedade.</li>
+  <li>Os erros comuns: número sem unidade e espaço antes da unidade, com as mensagens do validador W3C.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. Os valores calculados das tabelas foram conferidos no Chromium, com o tamanho de letra padrão do navegador (16px); as mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: centímetro, palmo e "metade da mesa"</h2>
+<p>Para dizer o tamanho de alguma coisa, você pode usar uma <strong>régua</strong> (10 centímetros, sempre iguais), o seu <strong>palmo</strong> ("dois palmos", que muda com o tamanho da mão de quem mede) ou uma <strong>fração</strong> de outra coisa ("metade da mesa", que muda com a mesa).</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>No dia a dia</th><th>No CSS</th><th>Depende de</th></tr>
+<tr><td>Centímetro da régua</td><td><code>px</code></td><td>Nada: é fixo</td></tr>
+<tr><td>O palmo de quem mede</td><td><code>em</code></td><td>O tamanho da letra do elemento (ou do pai)</td></tr>
+<tr><td>O palmo do dono da casa, igual para todos</td><td><code>rem</code></td><td>O tamanho da letra do <code>&lt;html&gt;</code></td></tr>
+<tr><td>"Metade da mesa"</td><td><code>%</code></td><td>Um tamanho do pai</td></tr>
+</table>
+</div>
+
+<p>O navegador sempre termina a conta em <strong>pixels</strong>: na aba <strong>Computed</strong> (Calculado) do F12, <code>1.5em</code>, <code>1.5rem</code> e <code>150%</code> aparecem como <code>24px</code>. As metas das missões leem esse valor calculado.</p>
+
+<hr>
+
+<h2>1. <code>px</code>: a medida fixa</h2>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  h2 {
+    font-size: 24px;
+  }
+  .caixa {
+    width: 200px;
+    border: 2px solid navy;
+    padding: 8px;
+  }
+&lt;/style&gt;
+&lt;h2&gt;Receitas da Ana&lt;/h2&gt;
+&lt;div class="caixa"&gt;Uma caixa de 200px de largura.&lt;/div&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>24</dt><dd>O número.</dd>
+  <dt>px</dt><dd>A unidade: "pixel". No CSS, 1px não é exatamente um pontinho da tela: é uma medida padrão que o navegador ajusta para telas de alta definição (num celular moderno, 1px do CSS pode usar 3 ou 4 pontinhos de verdade). Para você, basta saber que <code>24px</code> é sempre o mesmo tamanho, onde quer que esteja.</dd>
+</dl>
+<p>O <code>px</code> é fácil de entender e previsível. O defeito dele: não acompanha nada. Se o leitor aumentar a letra padrão do navegador porque enxerga pouco, um <code>font-size</code> em <code>px</code> não cresce (veja a seção 3).</p>
+
+<hr>
+
+<h2>2. <code>em</code>: o tamanho da letra</h2>
+<p>Um <code>em</code> é o tamanho da letra (<code>font-size</code>). De <strong>quem</strong>, depende da propriedade:</p>
+<ul>
+  <li>No <code>font-size</code>, é a letra do <strong>pai</strong> (a do próprio elemento ainda está sendo decidida).</li>
+  <li>Em qualquer outra propriedade (<code>padding</code>, <code>margin</code>, <code>width</code>…), é a letra do <strong>próprio</strong> elemento.</li>
+</ul>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .caixa {
+    font-size: 20px;
+  }
+  .caixa p {
+    font-size: 1.5em;
+  }
+&lt;/style&gt;
+&lt;div class="caixa"&gt;
+  &lt;p&gt;Pão de queijo&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<p><strong>A conta:</strong> o pai (<code>.caixa</code>) tem letra de 20px, então <code>1.5em</code> = 20 × 1,5 = <strong>30px</strong>. É o valor calculado do <code>p</code>.</p>
+
+<h3>O melhor uso: espaçamento que acompanha a letra</h3>
+<p>Um botão com <code>padding</code> em <code>em</code> fica proporcional em qualquer tamanho. Os três botões abaixo têm <strong>a mesma regra</strong> de <code>padding</code>; só a letra muda:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .botao {
+    display: inline-block;
+    padding: 0.5em 1em;
+    border: 2px solid navy;
+    background-color: aliceblue;
+  }
+  .pequeno { font-size: 12px; }
+  .medio { font-size: 16px; }
+  .grande { font-size: 24px; }
+&lt;/style&gt;
+&lt;a class="botao pequeno" href="#"&gt;Comprar&lt;/a&gt;
+&lt;a class="botao medio" href="#"&gt;Comprar&lt;/a&gt;
+&lt;a class="botao grande" href="#"&gt;Comprar&lt;/a&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Botão</th><th>Letra</th><th><code>padding-top</code>: 0.5em</th><th><code>padding-left</code>: 1em</th></tr>
+<tr><td>.pequeno</td><td>12px</td><td>12 × 0,5 = <code>6px</code></td><td>12 × 1 = <code>12px</code></td></tr>
+<tr><td>.medio</td><td>16px</td><td>16 × 0,5 = <code>8px</code></td><td>16 × 1 = <code>16px</code></td></tr>
+<tr><td>.grande</td><td>24px</td><td>24 × 0,5 = <code>12px</code></td><td>24 × 1 = <code>24px</code></td></tr>
+</table>
+</div>
+
+<div class="tryhtml" data-goal="css:.botao{padding-top}=10px,css:.botao{padding-left}=20px,nsrc:padding:\s*\d+px">
+<p class="try-task"><strong>Missão:</strong> o botão da lojinha tem letra de 20px e <code>padding</code> em pixels. Troque o <code>padding</code> por <code>0.5em 1em</code>, para ele acompanhar a letra. Faça a conta antes: quantos pixels vão dar? Depois, mude o <code>font-size</code> e veja o botão inteiro crescer junto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;a class="botao" href="#"&gt;Encomendar bolo&lt;/a&gt;
+</pre>
+<pre class="script" data-file="style.css">.botao {
+  display: inline-block;
+  font-size: 20px;
+  padding: 6px 12px;
+  border: 2px solid tomato;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.botao {
+  display: inline-block;
+  font-size: 20px;
+  padding: 0.5em 1em;
+  border: 2px solid tomato;
+}
+</pre>
+</div>
+
+<p>A conta: 20 × 0,5 = 10px em cima e embaixo; 20 × 1 = 20px dos lados.</p>
+
+<h3>O cuidado: a bola de neve</h3>
+<p>Como o <code>em</code> do <code>font-size</code> parte do pai, elementos <strong>dentro</strong> de elementos iguais multiplicam de novo a cada nível. Uma lista com <code>li { font-size: 1.2em; }</code>, com sublistas:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  li {
+    font-size: 1.2em;
+  }
+&lt;/style&gt;
+&lt;ul&gt;
+  &lt;li&gt;Doces
+    &lt;ul&gt;
+      &lt;li&gt;Bolos
+        &lt;ul&gt;
+          &lt;li&gt;Bolo de cenoura&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Item</th><th>A conta</th><th>Valor calculado</th></tr>
+<tr><td>Doces</td><td>16 × 1,2</td><td><code>19.2px</code></td></tr>
+<tr><td>Bolos</td><td>19,2 × 1,2</td><td><code>23.04px</code></td></tr>
+<tr><td>Bolo de cenoura</td><td>23,04 × 1,2</td><td><code>27.648px</code></td></tr>
+</table>
+</div>
+
+<p>Cada nível ficou 20% maior que o anterior. Às vezes é isso que você quer; quase sempre não é. A solução é a próxima unidade.</p>
+
+<hr>
+
+<h2>3. <code>rem</code>: a letra da raiz</h2>
+<p>O <code>rem</code> (<em>root em</em>, "em da raiz") é sempre o tamanho da letra do <code>&lt;html&gt;</code>, o elemento raiz da página. Não importa onde o elemento está: a conta é a mesma. A mesma lista, com <code>rem</code>:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  li {
+    font-size: 1.2rem;
+  }
+&lt;/style&gt;
+&lt;ul&gt;
+  &lt;li&gt;Doces
+    &lt;ul&gt;
+      &lt;li&gt;Bolos
+        &lt;ul&gt;
+          &lt;li&gt;Bolo de cenoura&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+<p><strong>A conta:</strong> 16 × 1,2 = <strong>19.2px</strong> nos três níveis (o valor calculado dos três <code>li</code>, no Chromium). Sem bola de neve.</p>
+
+<h3>Por que o guia recomenda <code>rem</code> para a letra</h3>
+<p>O <code>&lt;html&gt;</code> começa com a letra padrão do navegador, normalmente 16px. Quem enxerga pouco pode aumentar esse padrão nas configurações do navegador (por exemplo, para 20px). Aí:</p>
+<ul>
+  <li>um título com <code>font-size: 2rem</code> vai de 32px para <strong>40px</strong>: respeita a escolha do leitor;</li>
+  <li>um título com <code>font-size: 32px</code> continua com 32px: ignora a escolha.</li>
+</ul>
+<p>Por isso: <strong>tamanho de letra em <code>rem</code></strong>. E não ponha <code>html { font-size: 10px; }</code> "para facilitar a conta": isso também passa por cima do padrão que o leitor escolheu.</p>
+
+<div class="tryhtml" data-goal="css:h1{font-size}=40px,css:.sub li{font-size}=24px,src:h1\s*\{[^}]*font-size:\s*2rem">
+<p class="try-task"><strong>Missão:</strong> neste site, o <code>&lt;html&gt;</code> tem letra de 20px (a regra já está no CSS, como se fosse a escolha do leitor). (1) Dê ao título <code>2rem</code>. (2) A sublista está na bola de neve: troque o <code>em</code> por <code>rem</code> para todos os itens terem 1.2 vez a letra da raiz. Faça as contas: quantos pixels dá cada um?</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Cardápio&lt;/h1&gt;
+&lt;ul class="sub"&gt;
+  &lt;li&gt;Salgados
+    &lt;ul&gt;
+      &lt;li&gt;Pão de queijo&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">html {
+  font-size: 20px;
+}
+
+h1 {
+  font-size: 32px;
+}
+
+li {
+  font-size: 1.2em;
+}
+</pre>
+<pre class="solucao" data-file="style.css">html {
+  font-size: 20px;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+li {
+  font-size: 1.2rem;
+}
+</pre>
+</div>
+
+<p>As contas: 20 × 2 = 40px no título; 20 × 1,2 = 24px nos dois itens. Com o <code>em</code> do começo, "Pão de queijo" tinha 20 × 1,2 × 1,2 = 28,8px.</p>
+
+<hr>
+
+<h2>4. <code>%</code>: uma parte do pai</h2>
+<p>A porcentagem é sempre "tantos por cento <strong>de alguma coisa do pai</strong>". O quê, depende da propriedade:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th><code>%</code> de quê</th><th>Exemplo (pai com 400px de largura e letra de 16px)</th></tr>
+<tr><td><code>width</code></td><td>Da largura do conteúdo do pai</td><td><code>width: 50%</code> → 400 × 50 ÷ 100 = <code>200px</code></td></tr>
+<tr><td><code>font-size</code></td><td>Da letra do pai (igual ao <code>em</code>)</td><td><code>font-size: 150%</code> → 16 × 1,5 = <code>24px</code></td></tr>
+<tr><td><code>padding</code> e <code>margin</code></td><td>Da <strong>largura</strong> do pai, até em cima e embaixo</td><td><code>padding: 10%</code> → <code>40px</code> nos quatro lados</td></tr>
+<tr><td><code>line-height</code></td><td>Da letra do próprio elemento</td><td><code>150%</code> → <code>24px</code> (aula <a href="line-height.html">Espaçamento</a>)</td></tr>
+</table>
+</div>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .pai {
+    width: 400px;
+    border: 2px solid gray;
+  }
+  .filho {
+    width: 50%;
+    background-color: aliceblue;
+  }
+&lt;/style&gt;
+&lt;div class="pai"&gt;
+  &lt;div class="filho"&gt;50% do pai: 200px&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<p>A caixa azul ocupa a metade esquerda do pai. Se o pai mudar de largura, o filho muda junto: é por isso que <code>%</code> é a base de layouts que se adaptam à tela (aula <a href="responsivo.html">O que é Design Responsivo</a>). O <code>padding</code> em <code>%</code> calculado pela <strong>largura</strong>, mesmo em cima e embaixo, surpreende muita gente: no exemplo da tabela, <code>padding: 10%</code> dá 40px também no <code>padding-top</code> (conferido no Chromium).</p>
+
+<hr>
+
+<h2>5. Qual unidade usar</h2>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Para</th><th>Use</th><th>Por quê</th></tr>
+<tr><td>Tamanho da letra (<code>font-size</code>)</td><td><code>rem</code></td><td>Respeita a letra padrão do leitor e não faz bola de neve</td></tr>
+<tr><td><code>padding</code> e <code>margin</code> de botões, etiquetas</td><td><code>em</code></td><td>Acompanha a letra do próprio elemento</td></tr>
+<tr><td>Espaços entre seções da página</td><td><code>rem</code></td><td>Um ritmo igual na página toda</td></tr>
+<tr><td>Larguras que se adaptam</td><td><code>%</code> (e, depois, <code>fr</code>, <code>vw</code>, <code>max-width</code>)</td><td>Acompanha o pai</td></tr>
+<tr><td>Bordas, sombras finas</td><td><code>px</code></td><td>Uma borda de <code>1px</code> deve continuar fina</td></tr>
+<tr><td><code>line-height</code></td><td>Número sem unidade</td><td>Aula <a href="line-height.html">Espaçamento</a></td></tr>
+</table>
+</div>
+
+<p>Existem outras unidades: as da tela (<code>vw</code>, <code>vh</code>), na próxima aula, <a href="unidades-viewport.html">Unidades da Tela</a>, e a lista completa em <a href="ref-unidades.html">Referência: Unidades</a>.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Número sem unidade, e espaço antes da unidade</strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  p {
+    font-size: 30;
+  }
+  h2 {
+    font-size: 3 rem;
+  }
+&lt;/style&gt;
+&lt;h2&gt;Receitas da Ana&lt;/h2&gt;
+&lt;p&gt;Bolo de cenoura&lt;/p&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> o título e o parágrafo com os tamanhos padrão do navegador, como se as regras não existissem. No Chromium, o valor calculado do <code>p</code> continua <code>16px</code>, e o do <code>h2</code>, <code>24px</code> (o padrão de um <code>h2</code>).</p>
+<p><strong>Por quê:</strong> <code>30</code> sozinho não diz "30 de quê", e só o <code>0</code> pode ficar sem unidade (zero é zero em qualquer unidade). E o número e a unidade são uma coisa só: com espaço, <code>3 rem</code> vira dois valores, <code>3</code> e <code>rem</code>, e nenhum dos dois faz sentido. O navegador ignora as duas declarações; no F12, no painel <strong>Styles</strong> (Estilos), elas aparecem riscadas, com um ícone de aviso.</p>
+<p><strong>O que o validador diz:</strong></p>
+<pre class="term" data-cwd="~/site">$ cat style.css
+p {
+  font-size: 30;
+}
+h2 {
+  font-size: 3 rem;
+}
+$ vnu --css style.css
+"file:/home/ana/site/style.css":2.14-2.15: error: CSS: “font-size”: only “0” can be a “unit”. You must put a unit after your number.
+"file:/home/ana/site/style.css":5.16-5.18: error: CSS: “font-size”: Too many values or values are not recognized.</pre>
+<p>"Só o <code>0</code> pode ficar sem unidade. Você precisa pôr uma unidade depois do número" e "valores demais, ou valores não reconhecidos".</p>
+<p><strong>Como consertar:</strong> <code>font-size: 1.875rem;</code> (ou <code>30px</code>) e <code>font-size: 3rem;</code>, colado.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>em</code> que virou bola de neve</strong>
+<p>A Ana escreveu <code>.cartao { font-size: 1.25em; }</code> e pôs um cartão dentro de outro. O de dentro ficou com a letra maior que o de fora: 16 × 1,25 = 20px no primeiro, 20 × 1,25 = 25px no segundo. O validador não reclama, porque tudo é válido. A pista está na aba Computed: o mesmo <code>1.25em</code>, dois valores calculados diferentes.</p>
+<p><strong>Como consertar:</strong> <code>font-size: 1.25rem;</code>, que dá 20px nos dois.</p>
+</div>
+
+<div class="cenario">
+<strong>O botão que não acompanhou o <code>em</code></strong>
+<p>Num <code>&lt;button&gt;</code> de verdade, o <code>em</code> parece não obedecer o tamanho da página: um botão com <code>padding: 0.5em 1em</code> ficou com o padding de 6,67px em cima, e não 8px. É que o navegador dá aos botões e campos de formulário uma letra própria, menor (13,33px no Chromium), em vez de herdar a da página.</p>
+<p><strong>Como consertar:</strong> <code>button { font-size: 1rem; }</code> (ou <code>font: inherit;</code>), e o <code>em</code> volta a funcionar como esperado. Mais na aula <a href="botoes.html">Estilizando Botões</a>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Unidade</th><th>Relativa a</th><th>Exemplo (letra da página de 16px)</th></tr>
+<tr><td><code>px</code></td><td>Nada (fixa)</td><td><code>24px</code> → <code>24px</code></td></tr>
+<tr><td><code>em</code></td><td>Letra do pai (no <code>font-size</code>) ou do próprio elemento (no resto)</td><td><code>1.5em</code> → <code>24px</code></td></tr>
+<tr><td><code>rem</code></td><td>Letra do <code>&lt;html&gt;</code></td><td><code>1.5rem</code> → <code>24px</code></td></tr>
+<tr><td><code>%</code></td><td>Um tamanho do pai (largura, letra)</td><td><code>font-size: 150%</code> → <code>24px</code></td></tr>
+<tr><td><code>0</code></td><td>O único número que dispensa unidade</td><td><code>margin: 0;</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A conta do <code>rem</code></h3>
+<p>Com a letra do <code>html</code> em 16px, quantos pixels dá <code>2.5rem</code>? (só o número)</p>
+<div class="ex-code">16 × 2,5 = <input data-answer="40|40px" aria-label="resultado">px</div>
+</div>
+
+<div class="exercise">
+<h3>2. A conta do <code>em</code></h3>
+<p>O pai tem letra de 18px. Quanto dá <code>font-size: 2em</code> no filho? (só o número)</p>
+<div class="ex-code">18 × 2 = <input data-answer="36|36px" aria-label="resultado">px</div>
+</div>
+
+<div class="exercise">
+<h3>3. A unidade da raiz</h3>
+<p>Complete com a unidade que não faz bola de neve:</p>
+<div class="ex-code">li { font-size: 1.2<input data-answer="rem" aria-label="unidade">; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. O pai tem <code>width: 600px</code>. Qual a largura do filho com <code>width: 25%</code>?</p>
+<label><input type="radio" name="q4"> 25px</label>
+<label><input type="radio" name="q4"> 150px</label>
+<label><input type="radio" name="q4"> 4px</label>
+<label><input type="radio" name="q4"> 240px</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Um botão tem <code>font-size: 20px; padding: 0.5em;</code>. Quanto é o <code>padding</code>?</p>
+<label><input type="radio" name="q5"> 8px (metade de 16)</label>
+<label><input type="radio" name="q5"> 0.5px</label>
+<label><input type="radio" name="q5"> 10px (metade da letra do próprio botão)</label>
+<label><input type="radio" name="q5"> 40px</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Por que usar <code>rem</code>, e não <code>px</code>, no tamanho da letra?</p>
+<label><input type="radio" name="q6"> Porque acompanha a letra padrão que o leitor escolheu no navegador</label>
+<label><input type="radio" name="q6"> Porque <code>px</code> está proibido no CSS moderno</label>
+<label><input type="radio" name="q6"> Porque <code>rem</code> deixa a página mais rápida</label>
+<label><input type="radio" name="q6"> Porque o validador reclama de <code>px</code></label>
+</div>
+
+<h3>Missão final: a página do produto</h3>
+
+<div class="tryhtml" data-goal="css:h1{font-size}=40px,css:.foto{width}=300px,css:.botao{font-size}=20px,css:.botao{padding-top}=10px,css:.botao{padding-left}=20px,src:2rem,src:50%,src:1rem,src:0?\.5em 1em">
+<p class="try-task"><strong>Missão:</strong> o site da Ana tem a letra da raiz em 20px e a página com 600px. Troque os pixels por unidades relativas: (1) título com <code>2rem</code>; (2) foto com <code>50%</code> da largura da página; (3) botão com letra de <code>1rem</code> e <code>padding</code> de <code>0.5em 1em</code>. Antes de testar, faça as contas: o título, a foto e o padding vão dar quantos pixels? A borda fica em <code>px</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main class="pagina"&gt;
+  &lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+  &lt;img class="foto" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="800" height="600"&gt;
+  &lt;p&gt;&lt;a class="botao" href="#"&gt;Encomendar&lt;/a&gt;&lt;/p&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">html {
+  font-size: 20px;
+}
+
+.pagina {
+  width: 600px;
+}
+
+h1 {
+  font-size: 36px;
+}
+
+.foto {
+  width: 250px;
+  height: auto;
+}
+
+.botao {
+  display: inline-block;
+  font-size: 16px;
+  padding: 8px 16px;
+  border: 2px solid tomato;
+}
+</pre>
+<pre class="solucao" data-file="style.css">html {
+  font-size: 20px;
+}
+
+.pagina {
+  width: 600px;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+.foto {
+  width: 50%;
+  height: auto;
+}
+
+.botao {
+  display: inline-block;
+  font-size: 1rem;
+  padding: 0.5em 1em;
+  border: 2px solid tomato;
+}
+</pre>
+</div>
+
+<p>As contas: título 20 × 2 = 40px; foto 600 × 50 ÷ 100 = 300px; botão com letra de 20 × 1 = 20px e padding de 20 × 0,5 = 10px e 20 × 1 = 20px.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Todo número no CSS precisa de unidade, menos o <code>0</code>. Número e unidade vão colados: <code>2rem</code>, nunca <code>2 rem</code>.</li>
+  <li><code>px</code> é fixo. <code>em</code> é a letra do pai (no <code>font-size</code>) ou do próprio elemento (no resto). <code>rem</code> é a letra do <code>&lt;html&gt;</code>. <code>%</code> é uma parte de um tamanho do pai.</li>
+  <li>O navegador termina toda conta em pixels: é o que mostra a aba Computed e o que as metas conferem.</li>
+  <li><code>em</code> no <code>font-size</code> faz bola de neve em elementos aninhados (19,2 → 23,04 → 27,648px); <code>rem</code> não.</li>
+  <li>Letra em <code>rem</code> (respeita o leitor), <code>padding</code> de botão em <code>em</code>, larguras em <code>%</code>, bordas em <code>px</code>.</li>
+  <li>Erros: <code>only “0” can be a “unit”</code> (faltou a unidade) e <code>Too many values or values are not recognized</code> (espaço antes da unidade).</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
