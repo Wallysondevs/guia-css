@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Camadas da Cascata — @layer | Guia CSS</title>
+<meta name="description" content="Camadas da cascata (@layer) para quem está começando: agrupar o CSS em reset, base e componentes, decidir quem vence pela ordem das camadas e não pela especificidade, o CSS fora de camada que vence todas, o !important ao contrário, camadas aninhadas e anônimas, @import com layer() e os erros reais do validador.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Camadas da Cascata</span></h1>
+
+<p class="intro">O CSS da lojinha da Ana cresceu: um reset, os estilos básicos de links e títulos, os componentes (botão, cartão, menu) e uns ajustes de última hora. E começou a briga: o botão não fica vermelho porque uma regra antiga, <code>nav a</code>, é mais <a href="especificidade.html">específica</a>. A saída de sempre seria um <code>!important</code>, ou um seletor ainda mais comprido. O <code>@layer</code> ("camada") resolve de outro jeito: você separa o CSS em camadas e diz <strong>a ordem</strong> delas. A camada de cima vence a de baixo, seja qual for a especificidade.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A ideia: grupos de regras com uma ordem de prioridade que você decide.</li>
+  <li>Como criar camadas com <code>@layer nome { }</code> e definir a ordem com <code>@layer a, b, c;</code>.</li>
+  <li>Onde as camadas entram na <a href="cascata.html">cascata</a>: antes da especificidade.</li>
+  <li>A surpresa: o CSS <strong>fora</strong> de qualquer camada vence todas elas.</li>
+  <li>O <code>!important</code> nas camadas, que funciona ao contrário.</li>
+  <li>Camadas aninhadas, camadas sem nome e <code>@import … layer()</code>.</li>
+  <li>Os erros mais comuns e as mensagens reais do validador.</li>
+</ul>
+</div>
+
+<p>Antes, é preciso ter visto <a href="cascata.html">A Cascata: Quem Vence</a> e <a href="especificidade.html">Especificidade</a>; ajuda ter visto <a href="important.html">!important</a>. Os resultados são desenhados agora pelo seu navegador, e as mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: a pilha de folhas na mesa</h2>
+<p>Imagine o CSS como folhas transparentes empilhadas numa mesa. Cada folha é uma <strong>camada</strong>, e cada uma pinta algumas coisas da página. Olhando de cima, você vê o que a folha de <strong>cima</strong> pintou; as de baixo só aparecem onde as de cima não pintaram nada. Não importa se a folha de baixo pintou com uma caneta mais grossa (a especificidade maior): quem está em cima cobre.</p>
+
+<p>Sem camadas, todo o CSS fica numa folha só, e a briga é decidida pela especificidade e pela ordem no arquivo. Com <code>@layer</code>, você separa o CSS em folhas (<code>reset</code>, <code>base</code>, <code>componentes</code>…) e escolhe a ordem da pilha. A especificidade só desempata dentro da mesma folha.</p>
+
+<hr>
+
+<h2>1. A primeira camada</h2>
+<p>O problema da Ana: se a regra antiga do menu fosse só <code>nav a</code> (dois elementos), a classe <code>.botao</code> ganharia dela. Mas a regra era <code>nav#menu a</code>, com um ID, e contra um ID a classe perde. Com camadas, quem decide é a ordem delas:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  @layer base {
+    nav#menu a {
+      color: navy;
+      background-color: lightgray;
+      padding: 8px 16px;
+      text-decoration: none;
+    }
+  }
+
+  @layer componentes {
+    .botao {
+      color: white;
+      background-color: tomato;
+    }
+  }
+&lt;/style&gt;
+&lt;nav id="menu"&gt;
+  &lt;a href="#"&gt;Bolos&lt;/a&gt;
+  &lt;a class="botao" href="#"&gt;Encomendar&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+
+<p>"Bolos" é um link azul-marinho com fundo cinza-claro. "Encomendar" tem o mesmo espaço interno e não tem sublinhado (isso veio da camada <code>base</code>), mas o texto é branco e o fundo é <code>tomato</code>: as cores vieram da camada <code>componentes</code>, mesmo com a regra <code>nav#menu a</code>, com ID, sendo muito mais específica que <code>.botao</code>.</p>
+
+<dl class="anatomy">
+  <dt>@layer</dt><dd>Uma <strong>regra @</strong> ("at-rule"), como a <code>@media</code>: começa com arroba e envolve outras regras. <em>Layer</em> = "camada".</dd>
+  <dt>base</dt><dd>O nome da camada. Você escolhe, como um nome de classe: minúsculas, com hífen se precisar.</dd>
+  <dt>{ … }</dt><dd>As regras que moram nessa camada: seletores e declarações normais.</dd>
+  <dt>a ordem</dt><dd>A camada que aparece <strong>primeiro</strong> no CSS fica embaixo na pilha; a que aparece <strong>depois</strong> fica em cima e vence. Aqui, <code>base</code> e depois <code>componentes</code>.</dd>
+</dl>
+
+<p>Repare: a camada não "apaga" a outra. O <code>.botao</code> só disse a cor do texto e a do fundo; o <code>padding</code> e o <code>text-decoration</code> da camada <code>base</code> continuam valendo, porque ninguém em cima falou deles. É igual à cascata de sempre: a disputa é por <strong>propriedade</strong>.</p>
+
+<hr>
+
+<h2>2. A ordem numa linha só: @layer a, b, c;</h2>
+<p>Num arquivo grande, a ordem "pela primeira aparição" fica difícil de enxergar. Por isso o costume é declarar a ordem <strong>no começo</strong> do CSS, numa linha só, sem chaves:</p>
+
+<pre class="file" data-file="style.css">@layer reset, base, componentes;
+
+@layer componentes {
+  .botao {
+    background-color: tomato;
+  }
+}
+
+@layer reset {
+  * {
+    margin: 0;
+  }
+}
+
+@layer base {
+  a {
+    color: navy;
+  }
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>@layer reset, base, componentes;</dt><dd>A <strong>declaração da ordem</strong>: os nomes, separados por vírgula, de baixo para cima na pilha. Termina com <code>;</code>, sem chaves. Daqui em diante, <code>componentes</code> vence <code>base</code>, que vence <code>reset</code>.</dd>
+  <dt>@layer componentes { … } (antes dos outros)</dt><dd>Depois da linha da ordem, os blocos podem vir em qualquer sequência no arquivo, e uma camada pode ganhar regras em vários blocos: tudo é somado na camada, e a ordem da pilha não muda.</dd>
+</dl>
+
+<div class="tryhtml" data-goal="css:.botao{background-color}=rgb(255, 99, 71)">
+<p class="try-task"><strong>Missão:</strong> o botão deveria ficar <code>tomato</code>, mas a camada <code>base</code> está ganhando. Sem mexer nos seletores nem nos blocos, mude só a <strong>linha da ordem</strong>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;main&gt;
+  &lt;button class="botao" type="button"&gt;Encomendar bolo&lt;/button&gt;
+&lt;/main&gt;
+</pre>
+<pre class="script" data-file="style.css">@layer componentes, base;
+
+@layer base {
+  main button {
+    background-color: lightgray;
+    padding: 8px 16px;
+  }
+}
+
+@layer componentes {
+  .botao {
+    background-color: tomato;
+    color: white;
+  }
+}
+</pre>
+<pre class="solucao" data-file="style.css">@layer base, componentes;
+
+@layer base {
+  main button {
+    background-color: lightgray;
+    padding: 8px 16px;
+  }
+}
+
+@layer componentes {
+  .botao {
+    background-color: tomato;
+    color: white;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Onde as camadas entram na cascata</h2>
+<p>Na aula <a href="cascata.html">A Cascata</a>, o navegador decide quem vence olhando, em ordem: a importância (<code>!important</code>), a especificidade e a ordem no código. As camadas entram <strong>antes</strong> da especificidade:</p>
+
+<ol class="passo">
+  <li><strong>Importância</strong>: uma declaração com <code>!important</code> vence uma sem.</li>
+  <li><strong>Camada</strong>: entre declarações normais, a da camada mais alta na pilha vence. E o CSS <strong>sem camada</strong> fica acima de todas as camadas.</li>
+  <li><strong>Especificidade</strong>: só desempata dentro da mesma camada.</li>
+  <li><strong>Ordem no código</strong>: o último desempate.</li>
+</ol>
+
+<h3>A surpresa: o CSS sem camada vence</h3>
+<p>Uma regra escrita fora de qualquer <code>@layer</code> fica numa "camada invisível" no <strong>topo</strong> da pilha. Ela vence as regras de todas as camadas, mesmo com especificidade menor, e mesmo escrita antes delas:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  p {
+    color: tomato;
+  }
+
+  @layer base {
+    #aviso.destaque {
+      color: navy;
+    }
+  }
+&lt;/style&gt;
+&lt;p id="aviso" class="destaque"&gt;Encomendas até sexta-feira.&lt;/p&gt;
+</pre>
+
+<p>O texto ficou <code>tomato</code>. A regra <code>#aviso.destaque</code> tem um ID e uma classe, e veio depois; mas está numa camada, e o simples <code>p</code>, fora de camada, está acima dela.</p>
+
+<p>Isso parece estranho, mas é de propósito: você pode pôr o CSS de outra pessoa (um framework, um tema baixado) numa camada, e o <strong>seu</strong> CSS, sem camada, vence o dele sem precisar de seletores compridos. A ordem completa, de quem perde para quem vence:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Posição na pilha (declarações normais)</th><th>Exemplo</th></tr>
+<tr><td>1 (perde de todos)</td><td>a primeira camada: <code>reset</code></td></tr>
+<tr><td>2</td><td><code>base</code></td></tr>
+<tr><td>3</td><td><code>componentes</code></td></tr>
+<tr><td>4 (vence todos)</td><td>o CSS sem camada</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>4. O !important ao contrário</h2>
+<p>Com <code>!important</code>, a pilha se <strong>inverte</strong>: um <code>!important</code> na camada mais <strong>baixa</strong> vence um <code>!important</code> numa camada mais alta, e vence também um <code>!important</code> fora de camada.</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  @layer reset, componentes;
+
+  @layer reset {
+    .aviso {
+      color: navy !important;
+    }
+  }
+
+  .aviso {
+    color: tomato !important;
+  }
+&lt;/style&gt;
+&lt;p class="aviso"&gt;Loja fechada no feriado.&lt;/p&gt;
+</pre>
+
+<p>O texto ficou <code>navy</code>: o <code>!important</code> da camada <code>reset</code>, a mais baixa, ganhou do <code>!important</code> sem camada.</p>
+
+<p>Por que assim? A camada de baixo costuma ser a "fundação" (um reset, as regras de acessibilidade). Quando ela diz "isto é importante", é para valer: nenhuma camada de cima pode desfazer. Na prática, o recado é o mesmo da aula <a href="important.html">!important</a>: com camadas, você quase nunca precisa dele. Se for usar, use só nas camadas de baixo e com motivo.</p>
+
+<hr>
+
+<h2>5. Camadas sem nome, aninhadas e no @import</h2>
+
+<h3>Camada sem nome</h3>
+<pre class="file" data-file="style.css">@layer {
+  p {
+    color: gray;
+  }
+}
+</pre>
+<p>Funciona como uma camada com nome, na posição em que aparece. Mas, como não tem nome, ninguém consegue acrescentar regras nela depois, nem citá-la na linha da ordem. Prefira dar nome.</p>
+
+<h3>Camadas dentro de camadas</h3>
+<pre class="file" data-file="style.css">@layer componentes {
+  @layer botoes {
+    .botao {
+      background-color: tomato;
+    }
+  }
+}
+
+@layer componentes.botoes {
+  .botao {
+    color: white;
+  }
+}
+</pre>
+<p>A camada <code>botoes</code> mora dentro de <code>componentes</code>. Para chegar nela de fora, use o ponto: <code>componentes.botoes</code>. É útil em projetos grandes; num site pequeno, uma pilha de três ou quatro camadas basta.</p>
+
+<h3>Um arquivo inteiro numa camada</h3>
+<pre class="file" data-file="style.css">@import url("reset.css") layer(reset);
+@import url("tema-baixado.css") layer(tema);
+
+@layer reset, tema, componentes;
+</pre>
+<p>O <code>@import</code> (que traz outro arquivo de CSS) aceita <code>layer(nome)</code>: todo o arquivo importado entra naquela camada. É o jeito de "domar" um CSS que você não escreveu. Os <code>@import</code> precisam vir no começo do arquivo, antes de qualquer outra regra (só a linha <code>@layer …;</code> pode vir antes deles).</p>
+
+<div class="note">
+<p><strong>Suporte:</strong> o <code>@layer</code> funciona em todos os navegadores atuais desde março de 2022 (o MDN o marca como <em>Baseline: amplamente disponível</em>): Chrome e Edge 99, Firefox 97, Safari 15.4. Um navegador mais antigo não entende a regra <code>@layer</code> e ignora o bloco inteiro, com todas as regras de dentro. O validador W3C (<code>vnu</code> 26.10.12) já conhece o <code>@layer</code> e não acusa as formas certas.</p>
+</div>
+
+<hr>
+
+<h2>6. Uma organização que funciona</h2>
+<p>Uma pilha comum, de baixo para cima:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Camada</th><th>O que vai nela</th><th>Exemplo</th></tr>
+<tr><td><code>reset</code></td><td>zerar as diferenças entre navegadores (aula <a href="reset.html">Reset e Normalize</a>)</td><td><code>* { margin: 0; box-sizing: border-box; }</code></td></tr>
+<tr><td><code>base</code></td><td>o visual dos elementos soltos: corpo, títulos, links, listas</td><td><code>a { color: navy; }</code></td></tr>
+<tr><td><code>layout</code></td><td>as grandes áreas: cabeçalho, colunas, rodapé</td><td><code>.pagina { display: grid; }</code></td></tr>
+<tr><td><code>componentes</code></td><td>as peças: botão, cartão, menu</td><td><code>.botao { … }</code></td></tr>
+<tr><td><code>utilitarios</code></td><td>classes de um efeito só, que devem vencer tudo</td><td><code>.escondido { display: none; }</code></td></tr>
+</table>
+</div>
+
+<p>Com essa ordem escrita na primeira linha (<code>@layer reset, base, layout, componentes, utilitarios;</code>), cada regra fica com o seletor mais simples possível, e quem vence fica previsível. A aula <a href="organizar-arquivos.html">Organizando os Arquivos de CSS</a> mostra como dividir isso em arquivos.</p>
+
+<h3>Formas diferentes de ganhar uma briga de estilos</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Problema</th><th>Quando usar</th></tr>
+<tr><td>Um seletor mais específico (<code>nav#menu a.botao</code>)</td><td>A próxima briga pede um seletor maior ainda</td><td>Ajustes pontuais, num CSS pequeno.</td></tr>
+<tr><td>Mudar a ordem das regras no arquivo</td><td>Só desempata com especificidade igual</td><td>Regras simples e parecidas.</td></tr>
+<tr><td><code>!important</code></td><td>Para vencer, só outro <code>!important</code>; a briga continua num nível acima</td><td>Quase nunca (aula <a href="important.html">!important</a>).</td></tr>
+<tr><td><code>@layer</code></td><td>Uma regra sem camada vence todas: precisa de combinado</td><td>CSS médio ou grande, ou com CSS de terceiros: a ordem fica escrita numa linha.</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Com <code>@layer</code>, um erro de escrita costuma apagar um bloco inteiro de regras, e um erro de ordem faz a regra "certa" perder sem aviso.</p>
+
+<div class="cenario">
+<strong><code>error: CSS: Unrecognized at-rule “@layers”</code></strong>
+<p><strong>O que aconteceu:</strong> <code>@layers base { … }</code>, no plural.</p>
+<pre class="term" data-cwd="~/camadas">$ vnu --css layers.css
+"file:/home/ana/camadas/layers.css":1.1-1.7: error: CSS: Unrecognized at-rule “@layers”</pre>
+<p>"Regra @ não reconhecida: <code>@layers</code>." O navegador também não a conhece e joga fora o bloco inteiro: todas as regras de dentro somem.</p>
+<p><strong>Como consertar:</strong> <code>@layer</code>, no singular, mesmo na linha que lista várias camadas.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: Parse Error.</code> — faltou o <code>;</code> na linha da ordem</strong>
+<p><strong>O que aconteceu:</strong> a linha <code>@layer base, componentes</code> ficou sem o <code>;</code>:</p>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  @layer base, componentes
+
+  @layer base {
+    a {
+      color: navy;
+      text-decoration: none;
+    }
+  }
+&lt;/style&gt;
+&lt;a href="#"&gt;Ver os bolos&lt;/a&gt;
+</pre>
+<p>O link voltou ao azul e ao sublinhado padrão do navegador: a camada <code>base</code> sumiu inteira. Sem o <code>;</code>, o navegador leu <code>@layer base, componentes @layer base { … }</code> como uma regra só, com um nome sem sentido, e jogou fora o bloco.</p>
+<pre class="term" data-cwd="~/camadas">$ vnu --css sem-pv.css
+"file:/home/ana/camadas/sem-pv.css":7.2-8.1: error: CSS: Parse Error.</pre>
+<p>"Erro de leitura." Repare que a posição aponta para o fim do bloco (linhas 7 e 8), e não para a linha 1, onde está o erro: o validador só percebe o problema quando o bloco termina.</p>
+<p><strong>Como consertar:</strong> <code>@layer base, componentes;</code>. A linha da ordem sempre termina com <code>;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: Parse Error.</code> — faltou a vírgula</strong>
+<p><strong>O que aconteceu:</strong> <code>@layer base componentes;</code>, os nomes separados só por espaço.</p>
+<pre class="term" data-cwd="~/camadas">$ vnu --css sem-virgula.css
+"file:/home/ana/camadas/sem-virgula.css":1.25-2.1: error: CSS: Parse Error.</pre>
+<p>A linha da ordem é ignorada, e as camadas ficam na ordem em que os blocos aparecem no arquivo, que pode não ser a que você queria.</p>
+<p><strong>Como consertar:</strong> <code>@layer base, componentes;</code>, com vírgula.</p>
+</div>
+
+<div class="cenario">
+<strong>Pus tudo em camadas, e uma regra velha continua vencendo</strong>
+<p><strong>O que aconteceu:</strong> a Ana organizou o CSS em camadas, mas sobrou, no fim do arquivo, um <code>a { color: purple; }</code> fora de qualquer <code>@layer</code>. Ele vence todas as camadas (seção 3), e os botões, que são links, ficaram roxos. O validador não reclama: não há erro.</p>
+<p><strong>Como consertar:</strong> no F12, clique no elemento e olhe o painel <em>Styles</em> (Estilos): a regra vencedora aparece no topo. Os navegadores atuais mostram, junto das regras que estão numa camada, o nome dela (ilustrativo: o texto exato muda de navegador para navegador); a regra sem esse nome é a que está fora. Mova-a para a camada certa.</p>
+</div>
+
+<div class="cenario">
+<strong>A linha da ordem veio depois</strong>
+<p><strong>O que aconteceu:</strong> o arquivo começa com <code>@layer componentes { … }</code> e só depois tem <code>@layer base, componentes;</code>. A ordem já foi decidida na primeira vez que cada nome apareceu: <code>componentes</code> ficou primeiro (embaixo), e a linha de baixo só acrescentou <code>base</code> depois dela, em cima. A camada <code>base</code> passou a vencer.</p>
+<p><strong>Como consertar:</strong> a linha da ordem é sempre a <strong>primeira</strong> do arquivo (depois dela, só os <code>@import</code>).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Código</th><th>O que faz</th></tr>
+<tr><td><code>@layer reset, base, componentes;</code></td><td>Define a ordem: de baixo (perde) para cima (vence)</td></tr>
+<tr><td><code>@layer base { … }</code></td><td>Põe regras na camada <code>base</code> (pode repetir: as regras se somam)</td></tr>
+<tr><td>regra fora de <code>@layer</code></td><td>Vence todas as camadas (declarações normais)</td></tr>
+<tr><td><code>!important</code> numa camada</td><td>Ordem invertida: a camada mais baixa vence, inclusive o <code>!important</code> sem camada</td></tr>
+<tr><td><code>@layer { … }</code></td><td>Camada sem nome</td></tr>
+<tr><td><code>@layer a { @layer b { … } }</code> / <code>@layer a.b { … }</code></td><td>Camada aninhada</td></tr>
+<tr><td><code>@import url("x.css") layer(nome);</code></td><td>Um arquivo inteiro numa camada</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A linha da ordem</h3>
+<p>Complete para que <code>componentes</code> vença <code>base</code>:</p>
+<div class="ex-code">@layer <input data-answer="base, componentes|base,componentes" aria-label="ordem das camadas">;</div>
+</div>
+
+<div class="exercise">
+<h3>2. Um arquivo numa camada</h3>
+<p>Complete para pôr o arquivo do tema na camada <code>tema</code>:</p>
+<div class="ex-code">@import url("tema.css") <input data-answer="layer(tema)" aria-label="camada">;</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. Com <code>@layer base, componentes;</code>, quem vence: <code>#menu a { color: navy; }</code> na camada <code>base</code>, ou <code>.botao { color: white; }</code> na camada <code>componentes</code>?</p>
+<label><input type="radio" name="q3"> A de <code>base</code>, porque tem um ID</label>
+<label><input type="radio" name="q3"> A que vier por último no arquivo</label>
+<label><input type="radio" name="q3"> A de <code>componentes</code>, porque a camada é mais alta</label>
+<label><input type="radio" name="q3"> Nenhuma: o navegador usa a cor padrão</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">4. Uma regra escrita fora de qualquer <code>@layer</code>, sem <code>!important</code>…</p>
+<label><input type="radio" name="q4"> vence as regras de todas as camadas</label>
+<label><input type="radio" name="q4"> perde para as regras de todas as camadas</label>
+<label><input type="radio" name="q4"> é ignorada</label>
+<label><input type="radio" name="q4"> vai para a primeira camada declarada</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. A Ana escreveu <code>@layers base { … }</code>. O que acontece com as regras de dentro?</p>
+<label><input type="radio" name="q5"> Funcionam, mas fora de camada</label>
+<label><input type="radio" name="q5"> Somem todas: a regra @ não existe e o bloco é jogado fora</label>
+<label><input type="radio" name="q5"> Funcionam normalmente: o navegador corrige o nome</label>
+<label><input type="radio" name="q5"> Vão para uma camada sem nome</label>
+</div>
+
+<h3>Missão final: adeus, !important</h3>
+
+<div class="tryhtml" data-goal="css:.botao{background-color}=rgb(255, 99, 71),css:.botao{color}=rgb(255, 255, 255),src:@layer\s+reset\s*\,\s*base\s*\,\s*componentes\s*;,nsrc:!important">
+<p class="try-task"><strong>Missão:</strong> o botão só fica <code>tomato</code> por causa de dois <code>!important</code>. Organize o CSS em camadas: (1) na primeira linha, <code>@layer reset, base, componentes;</code>; (2) a regra do <code>*</code> na camada <code>reset</code>, a do <code>nav a</code> na <code>base</code> e a do <code>.botao</code> na <code>componentes</code>; (3) tire os <code>!important</code>. O botão tem de continuar branco com fundo <code>tomato</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav&gt;
+  &lt;a href="#"&gt;Bolos&lt;/a&gt;
+  &lt;a href="#"&gt;Tortas&lt;/a&gt;
+  &lt;a class="botao" href="#"&gt;Encomendar&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+<pre class="script" data-file="style.css">* {
+  margin: 0;
+  box-sizing: border-box;
+}
+
+nav a {
+  display: inline-block;
+  padding: 8px 16px;
+  color: navy;
+  background-color: lightgray;
+  text-decoration: none;
+}
+
+.botao {
+  color: white !important;
+  background-color: tomato !important;
+  border-radius: 8px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">@layer reset, base, componentes;
+
+@layer reset {
+  * {
+    margin: 0;
+    box-sizing: border-box;
+  }
+}
+
+@layer base {
+  nav a {
+    display: inline-block;
+    padding: 8px 16px;
+    color: navy;
+    background-color: lightgray;
+    text-decoration: none;
+  }
+}
+
+@layer componentes {
+  .botao {
+    color: white;
+    background-color: tomato;
+    border-radius: 8px;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>@layer</code> separa o CSS em camadas, como folhas empilhadas: entre declarações normais, a camada de cima vence a de baixo, seja qual for a especificidade.</li>
+  <li>A ordem vem da primeira aparição de cada nome; escreva-a na primeira linha: <code>@layer reset, base, componentes;</code> (de baixo para cima, com vírgulas e <code>;</code>).</li>
+  <li>Na cascata, as camadas vêm antes da especificidade. A especificidade só desempata dentro da mesma camada.</li>
+  <li>CSS fora de camada vence todas as camadas. Com <code>!important</code>, a ordem se inverte: o da camada mais baixa vence.</li>
+  <li>Camadas sem nome (<code>@layer { }</code>), aninhadas (<code>a.b</code>) e arquivos inteiros com <code>@import … layer(nome)</code>.</li>
+  <li><code>@layers</code> (plural) ou um <code>;</code> esquecido na linha da ordem apagam blocos inteiros. Baseline desde março de 2022 (Chrome/Edge 99, Firefox 97, Safari 15.4).</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
