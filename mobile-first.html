@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Mobile First — começar pelo celular e crescer com min-width | Guia CSS</title>
+<meta name="description" content="Mobile first para quem está começando: escrever primeiro o CSS do celular e acrescentar ajustes para telas maiores com @media (min-width), a comparação com o desktop first (max-width), uma página construída em três versões (celular, tablet, computador), como escolher os pontos de quebra, a ordem das media queries e os erros mais comuns.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Mobile First</span></h1>
+
+<p class="intro">Com <a href="media-queries.html">media queries</a>, dá para fazer uma página responsiva de dois jeitos: começar pelo computador e ir <strong>tirando</strong> coisas para caber no celular, ou começar pelo celular e ir <strong>acrescentando</strong> coisas conforme a tela cresce. O segundo jeito se chama <strong>mobile first</strong> ("celular primeiro"), e é o que o guia recomenda: o CSS fica mais curto, mais fácil de entender e de consertar.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A diferença entre <em>desktop first</em> (<code>max-width</code>) e <em>mobile first</em> (<code>min-width</code>).</li>
+  <li>Por que começar pelo celular dá menos trabalho.</li>
+  <li>Uma página construída em três versões: celular, tablet e computador.</li>
+  <li>Como escolher os pontos de quebra, e em que ordem escrever as media queries.</li>
+  <li>Os erros mais comuns: a ordem trocada, os pontos sobrepostos e o conteúdo escondido no celular.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador. Os quadros começam numa largura fixa: use os botões <strong>375</strong>, <strong>768</strong> e <strong>cheia</strong> da barra do quadro para ver cada versão.</p>
+
+<hr>
+
+<h2>A ideia: a mochila e a mala</h2>
+<p>Para uma viagem curta, você enche primeiro uma <strong>mochila</strong> com o essencial: documento, escova de dente, uma muda de roupa. Se a viagem for maior e couber uma <strong>mala</strong>, você acrescenta: o casaco, o segundo sapato. Fazer o contrário dá mais trabalho: encher a mala até a boca e depois tentar enfiar tudo numa mochila, tirando peça por peça.</p>
+<p>No CSS, a tela do celular é a mochila. Você escreve primeiro o que a página precisa em qualquer tela (cores, letras, uma coluna). Depois, em <code>@media (min-width: …)</code>, acrescenta o que só faz sentido com mais espaço: colunas lado a lado, menu em linha, margens maiores.</p>
+
+<hr>
+
+<h2>1. O mesmo layout, dos dois jeitos</h2>
+<p>Um menu de três links: no celular, um embaixo do outro; a partir de 600 px, lado a lado. Primeiro, começando pelo computador (<em>desktop first</em>):</p>
+
+<pre class="file" data-file="style.css · desktop first">.menu a {
+  display: block;
+}
+
+.menu {
+  display: flex;
+  gap: 1rem;
+}
+
+@media (max-width: 599px) {
+  .menu {
+    display: block;   /* desfaz o flex */
+    gap: 0;           /* desfaz o gap */
+  }
+}
+</pre>
+
+<p>Agora começando pelo celular (<em>mobile first</em>):</p>
+
+<pre class="file" data-file="style.css · mobile first">.menu a {
+  display: block;   /* no celular: cada link é um bloco, um embaixo do outro */
+}
+
+@media (min-width: 600px) {
+  .menu {
+    display: flex;
+    gap: 1rem;
+  }
+}
+</pre>
+
+<p>O resultado é o mesmo. A diferença está no trabalho:</p>
+<ul>
+  <li>No <strong>desktop first</strong>, a media query <strong>desfaz</strong> o que foi feito antes. Cada propriedade do computador precisa de um "desfazer" no celular, e é fácil esquecer um (o <code>gap</code>, uma margem, uma largura).</li>
+  <li>No <strong>mobile first</strong>, o celular usa o comportamento <strong>normal</strong> das caixas de bloco (uma embaixo da outra, a largura toda), que já é quase o layout de celular. Os links são elementos em linha, por isso a base os transforma em blocos (<code>display: block</code>, aula <a href="display.html">display</a>). A media query só <strong>acrescenta</strong>.</li>
+</ul>
+
+<div class="tryhtml" data-largura="375">
+<p class="try-task"><strong>Experimente:</strong> o menu está escrito em mobile first. Em 375 px, um link embaixo do outro. Clique em <strong>768</strong>: lado a lado.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav class="menu"&gt;
+  &lt;a href="index.html"&gt;Início&lt;/a&gt;
+  &lt;a href="bolos.html"&gt;Bolos&lt;/a&gt;
+  &lt;a href="contato.html"&gt;Contato&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu a {
+  display: block;
+  padding: 0.75rem;
+  background-color: #fff3e0;
+  margin-bottom: 0.25rem;
+}
+
+@media (min-width: 600px) {
+  .menu {
+    display: flex;
+    gap: 1rem;
+  }
+}
+</pre>
+</div>
+
+<p>Repare que no celular cada link virou uma faixa larga (<code>display: block</code> no <code>a</code>, com <code>padding</code>): fácil de tocar com o dedo. A partir de 600 px, o <code>.menu</code> vira flex e os três ficam lado a lado.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th>Desktop first</th><th>Mobile first</th></tr>
+<tr><td>A base (sem media query) é</td><td>o computador</td><td>o celular</td></tr>
+<tr><td>As media queries usam</td><td><code>max-width</code> ("até")</td><td><code>min-width</code> ("a partir de")</td></tr>
+<tr><td>As media queries</td><td>desfazem coisas</td><td>acrescentam coisas</td></tr>
+<tr><td>Ordem no arquivo</td><td>da maior largura para a menor</td><td>da menor largura para a maior</td></tr>
+<tr><td>Quando usar</td><td>Ao consertar um site antigo, feito para o computador</td><td><strong>Em todo projeto novo</strong></td></tr>
+</table>
+</div>
+
+<div class="tryhtml" data-largura="375" data-goal="css:.menu{display}=block,src:@media\s*\(\s*(min-width:\s*600px|width\s*&gt;=\s*600px)\s*\),nsrc:max-width">
+<p class="try-task"><strong>Missão:</strong> reescreva este CSS em mobile first. Mantenha a regra <code>.menu a</code>, tire a regra <code>.menu</code> de fora, troque a <code>@media (max-width: 599px)</code> por uma <code>@media (min-width: 600px)</code> e ponha o <code>flex</code> dentro dela. Em 375 px, os links continuam um embaixo do outro; confira em <strong>768</strong> que eles ficam lado a lado.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav class="menu"&gt;
+  &lt;a href="index.html"&gt;Início&lt;/a&gt;
+  &lt;a href="bolos.html"&gt;Bolos&lt;/a&gt;
+  &lt;a href="contato.html"&gt;Contato&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu a {
+  display: block;
+  padding: 0.5rem;
+}
+
+.menu {
+  display: flex;
+  gap: 1rem;
+}
+
+@media (max-width: 599px) {
+  .menu {
+    display: block;
+  }
+}
+</pre>
+<pre class="solucao" data-file="style.css">.menu a {
+  display: block;
+  padding: 0.5rem;
+}
+
+@media (min-width: 600px) {
+  .menu {
+    display: flex;
+    gap: 1rem;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. Uma página em três versões</h2>
+<p>Vamos construir a página da lojinha da Ana do jeito mobile first, uma versão de cada vez.</p>
+
+<h3>Versão 1: o celular (sem nenhuma media query)</h3>
+<p>Só o essencial: cores, letra, espaços, tudo numa coluna. É o CSS que vale em <strong>todas</strong> as telas.</p>
+
+<div class="tryhtml" data-largura="375">
+<p class="try-task"><strong>Experimente:</strong> em 375 px, a página está pronta. Clique em <strong>cheia</strong>: tudo continua numa coluna só, e numa tela larga os cartões ficam compridos demais. É o que a versão 2 resolve.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+  &lt;div class="cartoes"&gt;
+    &lt;div class="cartao"&gt;Bolo de cenoura&lt;/div&gt;
+    &lt;div class="cartao"&gt;Pão de queijo&lt;/div&gt;
+    &lt;div class="cartao"&gt;Café coado&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">/* versão 1: celular, a base de tudo */
+.pagina {
+  padding: 1rem;
+}
+
+h1 {
+  font-size: 1.75rem;
+  color: tomato;
+}
+
+.cartoes {
+  display: grid;
+  gap: 1rem;
+}
+
+.cartao {
+  padding: 2rem 1rem;
+  background-color: #fff3e0;
+  border: 2px solid tomato;
+}
+</pre>
+</div>
+
+<h3>Versão 2: a partir de 600 px, duas colunas</h3>
+<p>Acrescente <strong>no fim</strong> do arquivo uma media query que só mexe no que muda:</p>
+
+<div class="tryhtml" data-largura="768">
+<p class="try-task"><strong>Experimente:</strong> em 768 px, duas colunas de cartões. Clique em <strong>375</strong>: a versão 1, intacta.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+  &lt;div class="cartoes"&gt;
+    &lt;div class="cartao"&gt;Bolo de cenoura&lt;/div&gt;
+    &lt;div class="cartao"&gt;Pão de queijo&lt;/div&gt;
+    &lt;div class="cartao"&gt;Café coado&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">/* versão 1: celular, a base de tudo */
+.pagina {
+  padding: 1rem;
+}
+
+h1 {
+  font-size: 1.75rem;
+  color: tomato;
+}
+
+.cartoes {
+  display: grid;
+  gap: 1rem;
+}
+
+.cartao {
+  padding: 2rem 1rem;
+  background-color: #fff3e0;
+  border: 2px solid tomato;
+}
+
+/* versão 2: a partir de 600 px */
+@media (min-width: 600px) {
+  .cartoes {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+</pre>
+</div>
+
+<h3>Versão 3: a partir de 900 px, três colunas e a página centralizada</h3>
+
+<div class="tryhtml" data-largura="768">
+<p class="try-task"><strong>Experimente:</strong> em 768 px, ainda a versão 2. Clique em <strong>cheia</strong>: se a sua tela tiver espaço (o quadro precisa passar de 900 px), aparecem três colunas, o título maior e a página com largura máxima. Em <strong>375</strong>, a versão 1.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+  &lt;div class="cartoes"&gt;
+    &lt;div class="cartao"&gt;Bolo de cenoura&lt;/div&gt;
+    &lt;div class="cartao"&gt;Pão de queijo&lt;/div&gt;
+    &lt;div class="cartao"&gt;Café coado&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">/* versão 1: celular, a base de tudo */
+.pagina {
+  padding: 1rem;
+}
+
+h1 {
+  font-size: 1.75rem;
+  color: tomato;
+}
+
+.cartoes {
+  display: grid;
+  gap: 1rem;
+}
+
+.cartao {
+  padding: 2rem 1rem;
+  background-color: #fff3e0;
+  border: 2px solid tomato;
+}
+
+/* versão 2: a partir de 600 px */
+@media (min-width: 600px) {
+  .cartoes {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* versão 3: a partir de 900 px */
+@media (min-width: 900px) {
+  .pagina {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  .cartoes {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+</pre>
+</div>
+
+<p>Repare na forma do arquivo: a base primeiro, e as media queries em ordem <strong>crescente</strong> (600, depois 900). Numa tela de 1024 px, as duas valem; a de 900 vem depois e ganha onde as duas mudam a mesma coisa (o <code>grid-template-columns</code>). Cada media query só tem o que muda naquela faixa: a cor do título, a borda e o fundo dos cartões nunca foram repetidos.</p>
+
+<hr>
+
+<h2>3. Escolhendo os pontos de quebra</h2>
+<ul>
+  <li><strong>Deixe o conteúdo mandar.</strong> Abra a versão de celular e vá alargando a janela. Quando os cartões ficarem largos demais, ou sobrar espaço vazio dos lados, ali está o ponto de quebra. Pode ser 560 px, 620 px; não precisa ser um número "de aparelho".</li>
+  <li><strong>Poucos pontos.</strong> Dois ou três costumam bastar. Cada um a mais é um layout a mais para testar.</li>
+  <li><strong>Mesmos pontos no site todo.</strong> Se o menu muda em 600 e os cartões em 620, entre 600 e 620 a página fica num meio-termo estranho. Com o tempo, você vai querer guardar os números num só lugar (o <a href="variaveis.html">CSS com variáveis</a> ajuda a organizar o resto; para os números das media queries, o costume é anotar num comentário no topo do arquivo).</li>
+  <li><strong>Lembre do componente.</strong> Quando o que importa é o espaço de um cartão, e não da tela toda, existem as <a href="container-queries.html">container queries</a>.</li>
+</ul>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Ponto comum</th><th>Faixa que começa ali</th></tr>
+<tr><td>(base, sem media query)</td><td>Celular em pé, de 320 px para cima</td></tr>
+<tr><td><code>min-width: 600px</code></td><td>Celular deitado, tablet pequeno</td></tr>
+<tr><td><code>min-width: 900px</code></td><td>Tablet deitado, notebook</td></tr>
+<tr><td><code>min-width: 1200px</code></td><td>Computador com tela larga (se precisar)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>As media queries fora de ordem: a menor ganha da maior</strong>
+<div class="tryhtml" data-largura="768">
+<p class="try-task"><strong>Erro de propósito:</strong> numa tela de 900 px ou mais, deveriam ser três colunas. Clique em <strong>cheia</strong> (se a sua tela for larga): continuam duas. Troque a ordem das duas <code>@media</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartoes"&gt;
+  &lt;div class="cartao"&gt;Bolo&lt;/div&gt;
+  &lt;div class="cartao"&gt;Pão&lt;/div&gt;
+  &lt;div class="cartao"&gt;Café&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartoes {
+  display: grid;
+  gap: 1rem;
+}
+
+.cartao {
+  padding: 2rem 1rem;
+  border: 2px solid tomato;
+}
+
+@media (min-width: 900px) {
+  .cartoes {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@media (min-width: 600px) {
+  .cartoes {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+</pre>
+</div>
+<p><strong>O que você vê:</strong> em 768 px, duas colunas (certo). Numa tela de 1024 px, também duas, e não três.</p>
+<p><strong>Por quê:</strong> em 1024 px, as duas media queries valem (1024 é mais que 900 e mais que 600). Com o mesmo seletor e a mesma força, ganha a <strong>última</strong> do arquivo, e a última é a de 600. No F12, o <code>grid-template-columns: 1fr 1fr 1fr</code> aparece riscado. O validador não reclama.</p>
+<p><strong>Como consertar:</strong> em mobile first, as media queries vão da <strong>menor</strong> largura para a <strong>maior</strong>: 600, depois 900.</p>
+</div>
+
+<div class="cenario">
+<strong>Misturar <code>min-width</code> e <code>max-width</code> no mesmo número</strong>
+<p><strong>O que acontece:</strong> com <code>@media (max-width: 600px)</code> para o celular e <code>@media (min-width: 600px)</code> para o tablet, numa tela de exatamente 600 px as duas valem, e a página mistura os dois layouts. Num site só com <code>min-width</code>, isso não acontece: cada faixa começa onde a outra começou.</p>
+<p><strong>Como consertar:</strong> escolha um jeito (mobile first: só <code>min-width</code>). Se precisar de uma faixa fechada, use <code>max-width: 599px</code>, ou a escrita nova <code>(width &lt; 600px)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Esconder conteúdo no celular</strong>
+<p><strong>O que acontece:</strong> para "caber", a página esconde no celular uma parte (<code>display: none</code> na tabela de preços, no endereço da loja). Mas quem está no celular quer as mesmas informações, às vezes mais (o endereço, o telefone). Mobile first não é "versão reduzida": é o mesmo conteúdo, arrumado para a tela pequena.</p>
+<p><strong>Como consertar:</strong> reorganize em vez de esconder: uma coluna, a tabela rolando para o lado dentro de uma caixa (<code>overflow-x: auto</code>), o menu numa lista.</p>
+</div>
+
+<div class="cenario">
+<strong>Base escrita para o computador, com <code>min-width</code> por cima</strong>
+<p><strong>O que acontece:</strong> a regra de fora já tem <code>grid-template-columns: 1fr 1fr 1fr</code>, e a <code>@media (min-width: 900px)</code> repete as três colunas. No celular, as três colunas ficam espremidas: a base não é de celular. Usar <code>min-width</code> não basta; a regra de fora precisa ser a de celular.</p>
+<p><strong>Como consertar:</strong> confira a página em 375 px <strong>sem</strong> nenhuma media query (comente-as com <code>/* */</code>): o que aparece é a sua base, e tem de ficar bom no celular.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Mobile first</th><th>Como</th></tr>
+<tr><td>A base (fora de media query)</td><td>O layout do celular: uma coluna, letra legível, alvos grandes para o dedo</td></tr>
+<tr><td>As media queries</td><td>Só <code>min-width</code> (ou <code>width &gt;=</code>), acrescentando o que muda</td></tr>
+<tr><td>A ordem</td><td>Base → <code>min-width: 600px</code> → <code>min-width: 900px</code> (crescente)</td></tr>
+<tr><td>Os pontos de quebra</td><td>Onde o conteúdo pede; poucos; os mesmos no site todo</td></tr>
+<tr><td>O conteúdo</td><td>O mesmo em todas as telas; muda a arrumação</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A pergunta do mobile first</h3>
+<p>Complete a media query de um CSS mobile first:</p>
+<div class="ex-code">@media (<input data-answer="min-width" aria-label="pergunta">: 600px) { … }</div>
+</div>
+
+<div class="exercise">
+<h3>2. A ordem</h3>
+<p>Depois da <code>@media (min-width: 600px)</code>, qual largura vem na próxima media query: 400 ou 900?</p>
+<div class="ex-code">@media (min-width: <input data-answer="900px|900" aria-label="largura">) { … }</div>
+</div>
+
+<div class="exercise">
+<h3>3. A base</h3>
+<p>Complete: no mobile first, as regras de fora das media queries são as do…</p>
+<div class="ex-code"><input data-answer="celular|telefone|smartphone" aria-label="aparelho"></div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Por que o CSS mobile first costuma ser mais curto?</p>
+<label><input type="radio" name="q4"> Porque o celular baixa menos CSS</label>
+<label><input type="radio" name="q4"> Porque o layout de celular é quase o comportamento normal das caixas, e as media queries só acrescentam, sem desfazer</label>
+<label><input type="radio" name="q4"> Porque <code>min-width</code> tem menos letras que <code>max-width</code></label>
+<label><input type="radio" name="q4"> Porque não precisa de meta viewport</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. O CSS tem <code>@media (min-width: 900px)</code> e, depois, <code>@media (min-width: 600px)</code>, as duas mudando o <code>grid-template-columns</code>. Numa tela de 1200 px, qual vale?</p>
+<label><input type="radio" name="q5"> A de 900, porque é a maior</label>
+<label><input type="radio" name="q5"> Nenhuma</label>
+<label><input type="radio" name="q5"> A de 600, porque as duas valem e ela vem depois</label>
+<label><input type="radio" name="q5"> As duas se somam</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. Qual destas é uma boa prática de mobile first?</p>
+<label><input type="radio" name="q6"> Esconder no celular tudo o que não couber</label>
+<label><input type="radio" name="q6"> Ter um ponto de quebra para cada modelo de celular</label>
+<label><input type="radio" name="q6"> Escrever a base para o computador e usar <code>min-width</code> por cima</label>
+<label><input type="radio" name="q6"> Escrever a base para o celular e acrescentar com <code>min-width</code>, em ordem crescente</label>
+</div>
+
+<h3>Missão final: o cardápio da padaria</h3>
+
+<div class="tryhtml" data-largura="768" data-goal="css:.topo{display}=flex,css:.itens{grid-template-columns}=372px 372px,nsrc:max-width,nsrc:^\.topo\s*\{[^}]*display:\s*flex,nsrc:^\.itens\s*\{[^}]*grid-template-columns,src:@media\s*\(\s*(min-width:\s*600px|width\s*&gt;=\s*600px)\s*\)">
+<p class="try-task"><strong>Missão:</strong> a base deste CSS já é a do celular (clique em <strong>375</strong> para ver). Acrescente no fim uma <code>@media (min-width: 600px)</code> com duas mudanças: (1) o <code>.topo</code> vira <code>display: flex</code>, com <code>justify-content: space-between</code> (o nome de um lado, o telefone do outro); (2) os <code>.itens</code> ficam em duas colunas (<code>grid-template-columns: 1fr 1fr</code>). Não mexa nas regras de fora. O quadro está em 768 px.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+  &lt;p&gt;Encomendas: (31) 5555-0100&lt;/p&gt;
+&lt;/header&gt;
+&lt;div class="itens"&gt;
+  &lt;p class="item"&gt;Pão francês&lt;/p&gt;
+  &lt;p class="item"&gt;Pão de queijo&lt;/p&gt;
+  &lt;p class="item"&gt;Rosca de coco&lt;/p&gt;
+  &lt;p class="item"&gt;Broa de fubá&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.topo {
+  border-bottom: 3px solid tomato;
+  margin-bottom: 1rem;
+}
+
+.itens {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.item {
+  margin: 0;
+  padding: 1rem;
+  background-color: #fff3e0;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.topo {
+  border-bottom: 3px solid tomato;
+  margin-bottom: 1rem;
+}
+
+.itens {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.item {
+  margin: 0;
+  padding: 1rem;
+  background-color: #fff3e0;
+}
+
+@media (min-width: 600px) {
+  .topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .itens {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><strong>Mobile first</strong>: a base do CSS (fora das media queries) é o layout do celular; as media queries com <code>min-width</code> <strong>acrescentam</strong> o que muda nas telas maiores.</li>
+  <li><strong>Desktop first</strong>: a base é o computador, e as <code>max-width</code> <strong>desfazem</strong> coisas. Serve para consertar site antigo; em projeto novo, prefira mobile first.</li>
+  <li>Construa em versões: celular (sem media query), depois cada ponto de quebra, só com o que muda.</li>
+  <li>Media queries em ordem <strong>crescente</strong> (600, depois 900): fora de ordem, a menor ganha da maior.</li>
+  <li>Pontos de quebra onde o conteúdo pede, poucos e iguais no site todo. Não misture <code>max-width: 600px</code> com <code>min-width: 600px</code>. Não esconda conteúdo no celular: reorganize.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
