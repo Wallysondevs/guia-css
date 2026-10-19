@@ -318,6 +318,24 @@ li::before {
 &lt;p&gt;Resultado em 320 px, tema escuro&lt;/p&gt;
 </pre>
 
+<h2>13. CSS: altura fixa do quadro (<code>data-altura="300"</code>) e <code>vh</code></h2>
+<div class="tryhtml" data-largura="375" data-altura="300" data-goal="css:.capa{height}=150px">
+<p class="try-task"><strong>Missão:</strong> a capa ocupa metade da tela (<code>50vh</code>). O quadro tem 300 px de altura.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="capa"&gt;Lojinha da Ana&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.capa {
+  height: 100px;
+  background-color: wheat;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.capa {
+  height: 50vh;
+  background-color: wheat;
+}
+</pre>
+</div>
+
 <script src="../assets/htmlsim.js"></script>
 <script>
 document.getElementById("tema").addEventListener("click", function () {

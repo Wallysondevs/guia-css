@@ -135,7 +135,7 @@ Antes de descrever um resultado ("os cartões ficam lado a lado", "o botão fica
 - `--estado hover:SELETOR` / `--estado foco:SELETOR`: força o estado, como o testador faz (pode repetir).
 - `--escuro`: tema escuro no quadro (`prefers-color-scheme: dark`); `--menos-movimento`: `prefers-reduced-motion: reduce`; `--simples`: o editor no modo simples (sem service worker).
 - Sem `--largura`, a foto usa o `data-largura` da caixa ou, sem ele, **728 px** (a largura do quadro numa janela de 1100 px, a mesma do testador).
-- A altura é a do conteúdo (até 4000 px); `--altura PX` fixa. As animações e transições finitas são esperadas até o fim (até 6 s); `--sem-fim` tira a foto no instante em que a página carregou.
+- A altura é a do `data-altura` ou, sem ele, a do conteúdo (até 4000 px); `--altura PX` fixa (e o `vh` do quadro passa a valer isso). As animações e transições finitas são esperadas até o fim (até 6 s); `--sem-fim` tira a foto no instante em que a página carregou.
 - Com `--caixa`, também mostra as metas (✓/✗) e o console daquele código.
 - `--html`/`--css`: os arquivos podem estar no notebook (o `foto` manda para a VPS). O HTML precisa do `<link rel="stylesheet" href="…css">` para usar o CSS (a aba ganha o nome do `href`); um `<style>` também serve. `assets/midia/…` funciona.
 - Na VPS: `node tools/foto.js …` (as mesmas opções; `node tools/foto.js -h` mostra a ajuda).
@@ -146,6 +146,12 @@ Antes de descrever um resultado ("os cartões ficam lado a lado", "o botão fica
 - Na barra do Resultado de toda caixa há os botões **375 · 768 · cheia** e a largura atual em px (`375 px`). O leitor clica e vê a `@media` mudar **ao vivo**, sem desenhar de novo. Mais largo que a caixa, o quadro ganha rolagem lateral.
 - **As metas são conferidas na largura que o quadro tem.** O testador usa o `data-largura` (sem ele, 728 px). Se o leitor trocar a largura, a missão continua conferindo, e o "Ainda falta" avisa: "(a missão é conferida com o quadro em 375 px)".
 - Regra: missão cuja meta depende da largura (`flex-direction` dentro de uma `@media`, por exemplo) **tem de ter `data-largura`**. Escreva na missão: "com o quadro em 375 px (botão 375)".
+
+**Altura do quadro (aulas de `vh`, `dvh`, `svh`, `100vh`):**
+- Sem atributo, o quadro **acompanha a altura do conteúdo** (de 120 a 460 px numa caixa; até 640 px num Resultado). Por isso, lá dentro, `vh` **não tem valor fixo**: `100vh` acaba valendo a altura que o quadro tiver (até 460 px), e `50vh` depende do resto da página.
+- `data-altura="300"` na caixa (ou num `pre.file[data-resultado]`) deixa o quadro com **300 px fixos** (de 100 a 2000): `100vh` = 300 px, `50vh` = 150 px, e o conteúdo que passar disso rola dentro do quadro. **Toda caixa cuja meta ou cujo texto dependa de `vh`/`dvh` precisa de `data-altura`** (e, se a largura também importa, de `data-largura`). Exemplo conferido: `tools/demo.html`, caixa 12 (`css:.capa{height}=150px` com `height: 50vh` em `data-altura="300"`).
+- Dentro do quadro, `dvh`, `svh` e `lvh` valem o mesmo que `vh` (não há barra de endereço de celular que aparece e some): para mostrar a diferença entre eles, descreva o celular de verdade.
+- O `foto.js` usa o `data-altura` como altura da foto; sem ele, a altura do conteúdo. `--altura PX` força outra altura (e o `vh` passa a valer isso).
 
 **Tema claro/escuro (`prefers-color-scheme`):**
 - O botão **◐** da barra liga o tema escuro **só no quadro**: o `@media (prefers-color-scheme: dark)` da página do leitor passa a valer. Funciona porque o editor põe `color-scheme: dark` no `<iframe>`, e o navegador passa isso para a página de dentro (conferido no Chromium 155).
@@ -182,7 +188,7 @@ Antes de descrever um resultado ("os cartões ficam lado a lado", "o botão fica
 - Confere o **escape** de todo `<pre>`:
   - `<` ou `&` cru dentro de `pre.file`, `pre.script` ou `pre.solucao` é **falha** (inclusive o `&` do aninhamento: `&amp;:hover`; o `>` do combinador fica legível, mas escreva `&gt;`);
   - uma entidade como `&copy;` crua é **aviso**: o leitor veria `©` no código; para mostrar `&copy;`, escreva `&amp;copy;`.
-- Confere o contrato: meta desconhecida, seletor ou regex inválidos, missão sem `pre.solucao`, abas com o mesmo nome, caixa sem aba `.html`, `data-largura` fora de 200–2000, `data-tema` diferente de `escuro`/`claro`.
+- Confere o contrato: meta desconhecida, seletor ou regex inválidos, missão sem `pre.solucao`, abas com o mesmo nome, caixa sem aba `.html`, `data-largura` fora de 200–2000, `data-altura` fora de 100–2000, `data-tema` diferente de `escuro`/`claro`.
 - **Avisos** (`!`, não são falha):
   - erro no console da solução, de uma caixa livre ou de um Resultado (por exemplo, `Não foi possível carregar "bolo.jpg" (<img>)`);
   - solução desenhada em modo quirks;
@@ -196,7 +202,8 @@ Antes de descrever um resultado ("os cartões ficam lado a lado", "o botão fica
   - O `vnu --also-check-css` 26.10.12 conta as linhas do HTML uma a menos. Por isso o testador valida o HTML e o CSS em rodadas separadas: as posições que ele mostra são as mesmas de `vnu arquivo.html` e `vnu --css estilo.css`.
 - **CSS moderno no validador (conferido em 19/10/2026 com o vnu 26.10.12):**
   - **aceita** (sem erro): aninhamento (`&`), `@layer`, `@scope`, `:has()`, `:is()`, `:where()`, `oklch()`, `oklab()`, `lch()`, `color-mix()`, `rgb(from …)`, `light-dark()`, `clamp()`, `round()`, `dvh`/`svh`, `subgrid`, `text-wrap`, `aspect-ratio`, `translate`/`rotate`/`scale`, `@media (400px <= width <= 700px)`, `::marker`, `::backdrop`, `:user-invalid`, `@counter-style`;
-  - **acusa erro FALSO** em: `@container` e `container`/`container-type`/`container-name`, as unidades `cqi`/`cqw`/`cqh`…, `@property`, `@starting-style`, `@view-transition` e `view-transition-name`, posicionamento por âncora (`anchor-name`, `position-anchor`, `anchor()`, `anchor-center`), animações ligadas à rolagem (`animation-timeline`, `animation-range`), `transition-behavior`, `interpolate-size`, `field-sizing`, `text-box`, `color(display-p3 …)`.
+  - **acusa erro FALSO** em (CSS correto, que os navegadores entendem): `@container` e `container`/`container-type`/`container-name`; as unidades `cqw`/`cqi`/`cqh`/`cqmin`/`cqmax` (`Unknown dimension`); `@property`; `@starting-style`; `@view-transition` e `view-transition-name`; posicionamento por âncora (`anchor-name`, `position-anchor`, `anchor()`, `anchor-center`); animações ligadas à rolagem (`animation-timeline`, `animation-range`); `transition-behavior` e `allow-discrete`; `interpolate-size`; `field-sizing`; `text-box`; `color(display-p3 …)`/`color(srgb …)`; `image-set()`; a curva `linear(…)` de transição/animação; `sibling-index()`/`sibling-count()` (às vezes só `Parse Error`).
+  - **aceita sem reclamar CSS ERRADO** (o validador não pega; confira olhando a foto): `grid-template-areas` com linhas de tamanhos diferentes (`"a a" "b b b"`), media feature com nome errado (`@media (max-widht: 600px)`), `list-style-type: squared` (não existe), `vertical-align: center` (não existe; o certo é `middle`). Num "quando dá errado" com esses, não diga que o validador acusa.
   - O testador mostra esses erros como **aviso** ("erro FALSO do vnu 26.10.12…"), não como falha. Na aula, quando o leitor puder usar o validador do W3C nesse CSS, diga numa `div.note` que o validador ainda acusa erro, embora os navegadores entendam (confira o suporte no MDN). Achou outro erro falso? Anote no relatório; o agente do simulador põe na lista (`VNU_FALSOS` no testador).
 - As metas são conferidas logo depois que a página carrega, **sem cliques** (o `:hover`/`:focus` é forçado, não clicado). Uma missão do tipo "clique no botão" não dá para testar: use `src:` e deixe o leitor clicar.
 

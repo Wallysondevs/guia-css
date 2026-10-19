@@ -13,7 +13,8 @@
      --solucao           a caixa com a solução (padrão: o código inicial)
      --largura PX        largura do quadro (padrão: o data-largura da caixa, senão a largura que o
                          quadro tem no guia numa janela de 1100 px, como no testador: 728 px)
-     --altura PX         altura da foto (padrão: a altura do conteúdo, até 4000)
+     --altura PX         altura do quadro e da foto (padrão: o data-altura da caixa, senão a
+                         altura do conteúdo, até 4000; com vh, use --altura ou data-altura)
      --estado hover:SEL  força :hover no primeiro SEL (e nos pais), como o mouse em cima
      --estado foco:SEL   força :focus e :focus-visible no SEL (e :focus-within nos pais)
      --estilo "SEL{prop1,prop2}"   imprime os valores calculados (getComputedStyle) do
@@ -189,7 +190,11 @@ async function main() {
     const alt = await pg.evaluate((ehRes, i, altura) => {
       const q = ehRes ? window.HtmlSim.resultados[i].quadro : window.HtmlSim.caixas[i].quadro;
       const f = q.frame, d = f.contentDocument;
-      const h = altura || Math.min(4000, Math.max(f.offsetHeight, d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0));
+      // data-altura: a foto tem a altura do quadro (o 100vh do leitor); sem ela, a do conteúdo
+      const h = altura || q.alturaFixa || Math.min(4000, Math.max(f.offsetHeight, d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0));
+      // trava a altura: sem isso, o ajuste automático do editor encolhia o quadro de volta (até 460 px)
+      // quando o conteúdo usa vh, e a página do guia aparecia embaixo na foto
+      q.alturaFixa = h;
       f.style.height = h + "px";
       return h;
     }, ehRes, idx, o.altura || 0);

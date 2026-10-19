@@ -84,6 +84,7 @@ function todosPres(html) {
 function atributosQuadro(a) {
   const p = [];
   if (a["data-largura"] !== undefined && !(/^\d+$/.test(a["data-largura"]) && +a["data-largura"] >= 200 && +a["data-largura"] <= 2000)) p.push("data-largura=\"" + a["data-largura"] + "\": use um número de px entre 200 e 2000 (ex.: data-largura=\"375\")");
+  if (a["data-altura"] !== undefined && !(/^\d+$/.test(a["data-altura"]) && +a["data-altura"] >= 100 && +a["data-altura"] <= 2000)) p.push("data-altura=\"" + a["data-altura"] + "\": use um número de px entre 100 e 2000 (ex.: data-altura=\"400\")");
   if (a["data-tema"] !== undefined && !/^(escuro|claro)$/.test(a["data-tema"])) p.push("data-tema=\"" + a["data-tema"] + "\": use \"escuro\" ou \"claro\"");
   return p;
 }
@@ -292,14 +293,14 @@ async function main() {
       if (new Set(nomes).size !== nomes.length) problemas.push("duas abas com o mesmo data-file");
       HS.dividirMetas(meta).forEach((g) => { const r = HS.analisarMeta(g); if (r.erro) problemas.push(r.erro); });
       problemas.push(...atributosQuadro(a));
-      const chave = crypto.createHash("sha1").update(versaoMotor + JSON.stringify(["caixa", meta, abas, solucao, a["data-largura"], a["data-tema"]])).digest("hex");
+      const chave = crypto.createHash("sha1").update(versaoMotor + JSON.stringify(["caixa", meta, abas, solucao, a["data-largura"], a["data-tema"], a["data-altura"]])).digest("hex");
       return { i, linha: c.linha, meta, abas, solucao, problemas, chave, rot: "linha " + c.linha + (meta ? " missão [" + meta + "]" : " (livre)") };
     });
     const resultados = pres.filter((p) => temClasse(p.a, "file") && p.a["data-resultado"] !== undefined).map((p, i) => {
       const nome = p.a["data-file"] || "index.html";
       const problemas = HS.naoDesenha(nome) ? ["data-resultado desenha HTML; \"" + nome + "\" não é HTML (para CSS/JS junto, use um .tryhtml com abas)"] : [];
       problemas.push(...atributosQuadro(p.a));
-      return { i, linha: p.linha, nome, codigo: p.codigo, problemas, chave: crypto.createHash("sha1").update(versaoMotor + JSON.stringify(["res", nome, p.codigo, p.a["data-largura"], p.a["data-tema"]])).digest("hex"), rot: "linha " + p.linha + " Resultado de " + nome };
+      return { i, linha: p.linha, nome, codigo: p.codigo, problemas, chave: crypto.createHash("sha1").update(versaoMotor + JSON.stringify(["res", nome, p.codigo, p.a["data-largura"], p.a["data-tema"], p.a["data-altura"]])).digest("hex"), rot: "linha " + p.linha + " Resultado de " + nome };
     });
     lista.forEach((c) => { if (c.problemas.length) falha(c.rot + "\n" + c.problemas.map((p) => "      " + p).join("\n")); });
     resultados.forEach((r) => { if (r.problemas.length) falha(r.rot + "\n" + r.problemas.map((p) => "      " + p).join("\n")); });

@@ -309,11 +309,17 @@
     [/Unrecognized at-rule “@(container|property|starting-style|view-transition|position-try|font-palette-values|function)”/, "at-rule moderna"],
     [/“(color\()?(display-p3|srgb|srgb-linear|a98-rgb|prophoto-rgb|rec2020|xyz|xyz-d50|xyz-d65)\b[^”]*” is not a “[\w-]+” value/, "color() com espaço de cor"],
     [/“(anchor|anchor-size)\(|“anchor-center”/, "posicionamento por âncora"],
+    [/“(-webkit-)?image-set\(/, "image-set()"],
+    [/“linear\([^”]*” is not a/, "a curva linear() de transição/animação"],
+    [/“sibling-(index|count)\(\)”/, "sibling-index()/sibling-count()"],
+    [/“allow-discrete” is not a/, "transition-behavior: allow-discrete"],
   ];
   // "Unknown dimension" é falso quando o valor usa as unidades de contêiner (cqi, cqw…)
+  // "Parse Error" sem pista na mensagem: olha o trecho (extract) do código
+  function vnuFalsoTrecho(m) { return /Parse Error/.test(m.message || "") && /sibling-(index|count)\(\)/.test(m.extract || "") ? "sibling-index()/sibling-count()" : null; }
   function vnuFalsoUnidade(m) { return /Unknown dimension/.test(m.message || "") && /\d(cqi|cqb|cqw|cqh|cqmin|cqmax)\b/.test(m.extract || "") ? "unidade de contêiner (cq…)" : null; }
   // mensagem do validador → nome do recurso moderno (erro falso) ou null
-  function vnuFalso(m) { for (var i = 0; i < VNU_FALSOS.length; i++) if (VNU_FALSOS[i][0].test(m.message || "")) return VNU_FALSOS[i][1]; return vnuFalsoUnidade(m); }
+  function vnuFalso(m) { for (var i = 0; i < VNU_FALSOS.length; i++) if (VNU_FALSOS[i][0].test(m.message || "")) return VNU_FALSOS[i][1]; return vnuFalsoUnidade(m) || vnuFalsoTrecho(m); }
   HS.vnuFalso = vnuFalso;
   HS.VNU_FALSOS = VNU_FALSOS;
 
@@ -449,6 +455,7 @@
     this.frame = null; this.atual = null; this.endereco = ""; this.geracao = 0;
     this.largura = opts.largura || null; // px (null = a largura toda da caixa)
     this.escuro = !!opts.escuro;          // color-scheme: dark no <iframe> → prefers-color-scheme: dark lá dentro
+    this.alturaFixa = opts.alturaFixa || null; // px: altura fixa (data-altura); sem ela, o quadro acompanha o conteúdo
   }
   /* largura do quadro em px (null = cheia): a página lá dentro vê essa largura de janela
      (as @media e as unidades vw mudam ao vivo, sem desenhar de novo) */
@@ -527,6 +534,7 @@
     this.endereco = extra.endereco || (nome + (extra.busca || "") + (extra.hash || ""));
     if (antigo) { f.style.height = antigo.style.height; f.classList.add("hs-novo"); }
     else if (this.opts.altura) f.style.height = this.opts.altura.min + "px";
+    if (this.alturaFixa) f.style.height = this.alturaFixa + "px";
     f.addEventListener("load", function () { if (ger === self.geracao) self.carregou(f, ger); });
     if (md === "sw") {
       f.src = extra.html ? this.pasta + "__htmlsim__.html" : this.pasta + nome.split("/").map(encodeURIComponent).join("/") + (extra.busca || "") + (extra.hash || "");
@@ -749,7 +757,7 @@
   Quadro.prototype.ajustarAltura = function (f, win, doc) {
     var self = this, alt = this.opts.altura;
     function medir() {
-      if (f !== self.frame) return;
+      if (f !== self.frame || self.alturaFixa) return; // data-altura: a altura não acompanha o conteúdo (vh fixo)
       var de = doc.documentElement; if (!de) return;
       var h = Math.ceil(de.getBoundingClientRect().height);
       if (de.scrollHeight > f.clientHeight + 1) h = Math.max(h, de.scrollHeight);
@@ -832,6 +840,8 @@
   HS.lerPre = lerPre;
   // data-largura="375" → 375 (entre 200 e 2000 px); sem o atributo → null (a largura toda)
   function larguraDe(e) { var n = parseInt(e.getAttribute("data-largura"), 10); return n >= 200 && n <= 2000 ? n : null; }
+  // data-altura="400" → 400 (entre 100 e 2000 px): o quadro fica com essa altura, e 100vh vale isso
+  function alturaDe(e) { var n = parseInt(e.getAttribute("data-altura"), 10); return n >= 100 && n <= 2000 ? n : null; }
 
   /* ---------- console (o painel) ---------- */
   function Painel(dentro, sempre) {
@@ -929,11 +939,11 @@
 
     function arquivos() { return abas.map(function (a) { return { nome: a.nome, codigo: a.atual }; }); }
     function fonte() { return abas.map(function (a) { return a.atual; }).join("\n"); }
-    var largInicial = larguraDe(box), temaInicial = box.getAttribute("data-tema") === "escuro";
+    var largInicial = larguraDe(box), alturaInicial = alturaDe(box), temaInicial = box.getAttribute("data-tema") === "escuro";
     var vistos = {};
     var quadro = new Quadro(w.querySelector(".hs-frame-host"), {
       arquivos: arquivos,
-      largura: largInicial, escuro: temaInicial,
+      largura: largInicial, escuro: temaInicial, alturaFixa: alturaInicial,
       altura: { min: 120, max: 460 },
       aoConsole: function (t, txt) { painel.add(t, txt); agendarMetas(); },
       aoEndereco: function (e) { endTxt.textContent = e; },
@@ -1152,7 +1162,7 @@
     var endTxt = caixa.querySelector(".hs-end");
     var esperando = [];
     var q = new Quadro(caixa.querySelector(".hs-frame-host"), {
-      largura: larguraDe(pre), escuro: pre.getAttribute("data-tema") === "escuro",
+      largura: larguraDe(pre), escuro: pre.getAttribute("data-tema") === "escuro", alturaFixa: alturaDe(pre),
       arquivos: function () { return [{ nome: nome, codigo: r.codigo }]; },
       altura: { min: 40, max: 640 },
       aoConsole: function (t, txt) { painel.add(t, txt); },
