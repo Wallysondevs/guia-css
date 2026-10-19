@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Pseudo-elementos — ::first-letter, ::first-line, ::marker, ::placeholder e ::selection | Guia CSS</title>
+<meta name="description" content="Pseudo-elementos do CSS para quem está começando: estilizar a primeira letra (capitular) com ::first-letter, a primeira linha com ::first-line, a bolinha da lista com ::marker, o texto de exemplo dos campos com ::placeholder, o texto selecionado com ::selection e o botão do campo de arquivo com ::file-selector-button. Os dois-pontos duplos, as propriedades que cada um aceita e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Pseudo-elementos</span></h1>
+
+<p class="intro">Algumas partes da página não têm tag nenhuma no HTML: a primeira letra de um parágrafo, a primeira linha, a bolinha de uma lista, o texto cinza de exemplo dentro de um campo, o pedaço de texto que o leitor selecionou com o mouse. Mesmo assim, o CSS consegue pintar cada uma delas, com os <strong>pseudo-elementos</strong>. Na aula anterior você viu os dois mais famosos, <a href="before-after.html"><code>::before</code> e <code>::after</code></a>, que <em>criam</em> conteúdo. Nesta aula ficam os outros: os que <strong>escolhem um pedaço</strong> que já existe.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que é um pseudo-elemento e por que ele usa <strong>dois</strong> dois-pontos (<code>::</code>).</li>
+  <li><code>::first-letter</code>: a primeira letra, para fazer uma letra capitular de revista.</li>
+  <li><code>::first-line</code>: a primeira linha, que muda conforme a largura da caixa.</li>
+  <li><code>::marker</code>: a bolinha (ou o número) de cada item de lista.</li>
+  <li><code>::placeholder</code>: o texto de exemplo dentro de um campo de formulário.</li>
+  <li><code>::selection</code>: o texto que o leitor seleciona com o mouse.</li>
+  <li><code>::file-selector-button</code>: o botão "Escolher arquivo".</li>
+  <li>Quais propriedades cada um aceita, e os erros reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: o marca-texto</h2>
+<p>Pense num livro impresso. Você não pode pôr uma etiqueta em cada letra, mas pode dizer a quem vai diagramar: "a <strong>primeira letra</strong> de cada capítulo fica grande e vermelha" ou "a <strong>primeira linha</strong> fica em versalete". Você não sabe que letra ou que palavras serão; a regra vale para o que estiver naquele lugar.</p>
+<p>O pseudo-elemento é isso: um <strong>pedaço</strong> de um elemento que o navegador encontra sozinho. Não existe <code>&lt;primeira-letra&gt;</code> no HTML; quem decide qual é a primeira letra (ou onde a primeira linha acaba) é o navegador, na hora de desenhar.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Tipo</th><th>Escreve com</th><th>Escolhe</th><th>Exemplo</th></tr>
+<tr><td>Pseudo-<strong>classe</strong></td><td>um <code>:</code></td><td>um elemento <strong>inteiro</strong>, num estado ou posição</td><td><code>a:hover</code>, <code>li:first-child</code></td></tr>
+<tr><td>Pseudo-<strong>elemento</strong></td><td>dois <code>::</code></td><td>um <strong>pedaço</strong> do elemento (ou algo que o CSS cria)</td><td><code>p::first-letter</code>, <code>li::marker</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. A primeira letra: <code>::first-letter</code></h2>
+<p>A letra capitular, aquela letra grande que abre um texto de revista, é o uso clássico:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque a cor, o tamanho e a fonte da primeira letra. Depois apague o <code>float: left;</code> e veja a letra grande empurrar a primeira linha para baixo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;p class="abertura"&gt;Era domingo e a cozinha da Ana já cheirava a chocolate. O bolo de cenoura da avó tem só sete ingredientes, uma batedeira velha e quarenta minutos de forno.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.abertura::first-letter {
+  font-size: 3.5rem;
+  font-weight: bold;
+  color: tomato;
+  float: left;
+  line-height: 1;
+  margin-right: 0.5rem;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>.abertura</dt><dd>O elemento dono do pedaço: o parágrafo com a classe <code>abertura</code>.</dd>
+  <dt>::first-letter</dt><dd>O pedaço: a primeira letra (<em>first letter</em>) do texto. Os <strong>dois</strong> dois-pontos dizem "isto é um pseudo-elemento". Não há espaço entre <code>.abertura</code> e <code>::</code>.</dd>
+  <dt>font-size: 3.5rem;</dt><dd>A letra fica três vezes e meia o tamanho da letra padrão da página (veja <a href="unidades.html">Unidades</a>).</dd>
+  <dt>float: left;</dt><dd>A letra "flutua" à esquerda e o texto contorna, ocupando duas ou três linhas ao lado dela (o <code>float</code> tem aula própria, <a href="float.html">float: o Jeito Antigo</a>; aqui é um dos poucos usos em que ele ainda é a ferramenta certa).</dd>
+  <dt>line-height: 1;</dt><dd>Tira a sobra de altura de cima e de baixo da letra grande, para ela encostar no texto.</dd>
+</dl>
+
+<p>Repare no resultado: o "E" de "Era" fica grande, em negrito e da cor <code>tomato</code>; o texto contorna a letra pela direita. Só o <strong>E</strong> mudou: o resto da palavra continua normal.</p>
+
+<h3>O que conta como "primeira letra"</h3>
+<ul>
+  <li>Se o texto começa com uma pontuação, como as aspas de uma citação, o navegador leva a pontuação junto: em <code>"Era…</code>, o pedaço é <code>"E</code>.</li>
+  <li>Só funciona em elementos de <strong>bloco</strong>, como <code>p</code>, <code>div</code>, <code>h1</code>, <code>li</code> (veja <a href="display.html">display</a>). Num <code>span</code>, que é em linha, nada acontece (veja <a href="#errado">Quando dá errado</a>).</li>
+  <li>Aceita as propriedades de fonte, cor, fundo, margem, preenchimento (<code>padding</code>), borda, <code>float</code> e <code>line-height</code>. Uma propriedade fora da lista, como <code>width</code>, é ignorada.</li>
+</ul>
+
+<div class="tryhtml" data-goal="src:\.receita\s*p::first-letter\s*\{[^}]*font-size,src:\.receita\s*p::first-letter\s*\{[^}]*color">
+<p class="try-task"><strong>Missão:</strong> na página de receitas da Ana, faça uma capitular em <strong>cada</strong> parágrafo de dentro de <code>.receita</code>: escreva a regra <code>.receita p::first-letter</code> com um <code>font-size</code> maior e uma <code>color</code> (por exemplo, <code>darkgreen</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="receita"&gt;
+  &lt;h2&gt;Pão de queijo&lt;/h2&gt;
+  &lt;p&gt;Ferva o leite, a água e o óleo e despeje sobre o polvilho.&lt;/p&gt;
+  &lt;p&gt;Quando amornar, junte os ovos e o queijo e sove bem.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.receita p {
+  line-height: 1.5;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.receita p {
+  line-height: 1.5;
+}
+
+.receita p::first-letter {
+  font-size: 2rem;
+  color: darkgreen;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. A primeira linha: <code>::first-line</code></h2>
+<p><code>::first-line</code> pinta a primeira <strong>linha</strong> como ela aparece na tela, e não a primeira frase. Onde a linha quebra depende da largura da caixa: numa caixa estreita, a primeira linha tem poucas palavras; numa larga, muitas. Os dois parágrafos abaixo têm o mesmo texto e a mesma regra, só a largura muda:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> mude o <code>width</code> do <code>.estreito</code> para <code>320px</code> e veja mais palavras entrarem na primeira linha.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="estreito"&gt;Na lojinha da Ana, todo sábado tem pão de queijo saindo do forno às oito.&lt;/p&gt;
+&lt;p class="largo"&gt;Na lojinha da Ana, todo sábado tem pão de queijo saindo do forno às oito.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">p::first-line {
+  font-weight: bold;
+  color: navy;
+  text-transform: uppercase;
+}
+
+.estreito {
+  width: 180px;
+}
+
+.largo {
+  width: 420px;
+}
+</pre>
+</div>
+
+<p>Repare: no parágrafo estreito, só "NA LOJINHA DA ANA," ficou em maiúsculas azuis e em negrito (pode variar uma palavra, conforme a fonte do seu computador); no largo, a primeira linha vai até "PÃO DE". O resto do texto continua normal. O navegador refaz a conta sempre que a largura muda, por exemplo quando o leitor gira o celular.</p>
+<p><code>::first-line</code> aceita menos propriedades que <code>::first-letter</code>: fonte, cor, fundo, <code>text-transform</code>, <code>letter-spacing</code>, <code>word-spacing</code>, <code>text-decoration</code> e <code>line-height</code>. Nada de margem, borda ou <code>float</code>: a linha não é uma caixa.</p>
+
+<hr>
+
+<h2>3. A bolinha da lista: <code>::marker</code></h2>
+<p>Cada <code>&lt;li&gt;</code> tem um marcador: a bolinha de <code>&lt;ul&gt;</code> ou o número de <code>&lt;ol&gt;</code>. O <code>::marker</code> pinta só ele, sem mexer no texto do item:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque as cores e o tamanho. Na aba <code>index.html</code>, troque <code>ul</code> por <code>ol</code> (nas duas tags) e veja os números ganharem o mesmo estilo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Ingredientes&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;3 cenouras&lt;/li&gt;
+  &lt;li&gt;4 ovos&lt;/li&gt;
+  &lt;li&gt;2 xícaras de açúcar&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">li::marker {
+  color: tomato;
+  font-size: 1.5rem;
+}
+</pre>
+</div>
+
+<p>Antes do <code>::marker</code>, para ter uma bolinha de outra cor, era preciso esconder a bolinha (<code>list-style: none</code>) e desenhar outra com <code>::before</code>. Hoje, para mudar só a cor e o tamanho, o <code>::marker</code> resolve em duas linhas. O resto das listas (o tipo de marcador, a posição, imagem no lugar da bolinha) está em <a href="listas.html">Estilizando Listas</a>.</p>
+
+<h3>Trocar o símbolo: <code>content</code></h3>
+<p>O <code>::marker</code> também aceita <code>content</code>, que troca a bolinha por um texto qualquer:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque o <code>"✔ "</code> por outro símbolo. Repare no espaço dentro das aspas: sem ele, o símbolo encosta no texto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Já comprei&lt;/h2&gt;
+&lt;ul class="feito"&gt;
+  &lt;li&gt;Cenouras&lt;/li&gt;
+  &lt;li&gt;Ovos&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.feito li::marker {
+  content: "✔ ";
+  color: green;
+}
+</pre>
+</div>
+
+<div class="note">
+<strong>Suporte do <code>::marker</code></strong>
+<p>Chrome e Edge (desde a versão 86) e Firefox (68) aceitam tudo o que está nesta aula. O <strong>Safari</strong> aceita o <code>::marker</code> há anos, mas só com <code>color</code> e <code>font-size</code> (dados do MDN, outubro de 2026): no iPhone, o <code>content: "✔ "</code> acima é ignorado e a bolinha normal continua. Se o símbolo é importante, use o jeito de <a href="listas.html">Estilizando Listas</a> (<code>list-style-type: "✔ "</code>), que funciona nos três.</p>
+</div>
+
+<p>O <code>::marker</code> aceita poucas propriedades: <code>color</code>, as de fonte (<code>font-size</code>, <code>font-weight</code>…), <code>content</code> e as de animação. <code>background-color</code>, <code>padding</code> e <code>margin</code> são ignorados em silêncio (veja <a href="#errado">Quando dá errado</a>).</p>
+
+<hr>
+
+<h2>4. O texto de exemplo dos campos: <code>::placeholder</code></h2>
+<p>O atributo <code>placeholder</code> do HTML mostra um texto de exemplo dentro do campo vazio, que some quando o leitor começa a digitar (no Guia HTML: <a href="https://wallysondevs.github.io/guia-html/">formulários</a>). O <code>::placeholder</code> estiliza esse texto:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> digite no segundo campo: o texto de exemplo some, e o que você digita tem a cor normal. O <code>::placeholder</code> só vale para o texto de exemplo.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;&lt;label&gt;Sem estilo &lt;input type="email" placeholder="ana@exemplo.com"&gt;&lt;/label&gt;&lt;/p&gt;
+&lt;p&gt;&lt;label&gt;Com estilo &lt;input class="contato" type="email" placeholder="ana@exemplo.com"&gt;&lt;/label&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.contato::placeholder {
+  color: #6b6b6b;
+  font-style: italic;
+}
+</pre>
+</div>
+
+<div class="warning">
+<strong>Contraste e o <code>placeholder</code></strong>
+<p>A tentação é deixar o texto de exemplo bem clarinho. Mas um cinza fraco sobre branco fica ilegível para muita gente. A regra de acessibilidade (WCAG) pede contraste de pelo menos <strong>4,5 para 1</strong> no texto: <code>#6b6b6b</code> sobre branco dá cerca de 5,3 para 1 e passa; <code>#bbbbbb</code> dá menos de 2 para 1 e não passa. E o <code>placeholder</code> <strong>não substitui</strong> o <code>&lt;label&gt;</code>: ele some quando o leitor digita, e aí ninguém lembra o que o campo pedia.</p>
+</div>
+
+<hr>
+
+<h2>5. O texto selecionado: <code>::selection</code></h2>
+<p>Quando o leitor arrasta o mouse sobre um texto, o navegador pinta a seleção de azul (a cor exata depende do sistema). O <code>::selection</code> troca essa cor:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> selecione com o mouse um pedaço dos dois parágrafos. O de cima usa a cor do sistema; o de baixo, a da Ana.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;Parágrafo comum: selecione este texto.&lt;/p&gt;
+&lt;p class="marca"&gt;Parágrafo da Ana: selecione este também.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.marca::selection {
+  background-color: gold;
+  color: black;
+}
+</pre>
+</div>
+
+<ul>
+  <li>Sem nada na frente (<code>::selection { … }</code>), a regra vale para a página toda.</li>
+  <li>Aceita, na prática, <code>color</code> e <code>background-color</code> (e <code>text-shadow</code>). Margem, borda e tamanho de letra são ignorados: a seleção não pode mudar o desenho do texto.</li>
+  <li>Escolha cores com bom contraste entre si: o leitor precisa continuar lendo o que selecionou.</li>
+</ul>
+
+<hr>
+
+<h2>6. O botão do campo de arquivo: <code>::file-selector-button</code></h2>
+<p>O <code>&lt;input type="file"&gt;</code> desenha um botão ("Escolher arquivo", "Procurar…", o texto muda com o navegador e o idioma) e o nome do arquivo ao lado. Não há tag para o botão, mas há pseudo-elemento:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> mude a cor de fundo do botão. O texto do botão não muda: quem escreve é o navegador.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;&lt;label&gt;Foto do bolo: &lt;input type="file" accept="image/*"&gt;&lt;/label&gt;&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">input::file-selector-button {
+  background-color: navy;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+</pre>
+</div>
+
+<p>Diferente dos outros desta aula, este pseudo-elemento é quase uma caixa normal: aceita fundo, borda, cantos arredondados, preenchimento. Funciona em todos os navegadores atuais (Chrome e Edge 89, Firefox 82, Safari 14.1).</p>
+
+<hr>
+
+<h2>7. Um <code>:</code> ou dois <code>::</code>?</h2>
+<p>No CSS antigo (CSS2, de 1998), os quatro primeiros pseudo-elementos eram escritos com <strong>um</strong> dois-pontos: <code>:first-letter</code>, <code>:first-line</code>, <code>:before</code> e <code>:after</code>. Depois, o CSS3 criou o <code>::</code> para separar pseudo-elementos de pseudo-classes. Os navegadores continuam aceitando o jeito antigo <strong>só para esses quatro</strong>, para não quebrar sites velhos.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Funciona?</th><th>Qual usar</th></tr>
+<tr><td><code>p::first-letter</code></td><td>Sim</td><td>Esta. O <code>::</code> deixa claro que é um pedaço.</td></tr>
+<tr><td><code>p:first-letter</code></td><td>Sim (só por compatibilidade)</td><td>Só para reconhecer em código antigo.</td></tr>
+<tr><td><code>input::placeholder</code></td><td>Sim</td><td>Esta.</td></tr>
+<tr><td><code>input:placeholder</code></td><td><strong>Não</strong>: a regra inteira é ignorada</td><td>Nunca. Os pseudo-elementos novos só existem com <code>::</code>.</td></tr>
+</table>
+</div>
+
+<p>Regra simples: <strong>sempre <code>::</code></strong> para pseudo-elementos. Assim você nunca precisa lembrar quais são os quatro antigos.</p>
+
+<div class="tip">
+<strong>No F12</strong>
+<p>No painel de estilos (aba <em>Elements</em>/<em>Elementos</em>), as regras de pseudo-elementos aparecem em blocos separados, com o nome do pseudo-elemento no título do bloco (no Chrome, "Pseudo ::first-letter element" ou parecido; o texto muda de navegador para navegador). O <code>::marker</code> e o <code>::placeholder</code> aparecem como "filhos" na árvore de elementos, em cinza.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Um dois-pontos só: <code>Unknown pseudo-element or pseudo-class “:placeholder”</code></strong>
+<div class="tryhtml">
+<p class="try-task"><strong>Erro de propósito:</strong> o texto de exemplo deveria ficar verde e não fica. Ponha o segundo <code>:</code> e veja a cor aparecer.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;input type="text" placeholder="Seu nome"&gt;
+</pre>
+<pre class="script" data-file="style.css">input:placeholder {
+  color: green;
+}
+</pre>
+</div>
+<p><strong>O que você vê:</strong> o texto de exemplo continua com a cor padrão do navegador, cinza. Nenhuma mensagem aparece na página.</p>
+<p><strong>Por quê:</strong> <code>:placeholder</code>, com um dois-pontos, seria uma pseudo-classe, e ela não existe. Quando o navegador não entende o seletor, ele joga fora <strong>a regra inteira</strong>, com todas as declarações dentro das chaves. No F12, a regra nem aparece no painel de estilos do <code>input</code>. O validador avisa:</p>
+<pre class="term" data-cwd="~/site">$ vnu --css dois-pontos.css
+"file:/home/ana/site/dois-pontos.css":1.7-1.17: error: CSS: Unknown pseudo-element or pseudo-class “:placeholder”</pre>
+<p><strong>O que significa:</strong> "pseudo-elemento ou pseudo-classe desconhecido: <code>:placeholder</code>", na linha 1, colunas 7 a 17. O mesmo erro aparece com uma letra errada: <code>p::first-leter</code> dá <code>Unknown pseudo-element or pseudo-class “::first-leter”.</code></p>
+<p><strong>Como consertar:</strong> <code>input::placeholder</code>, com dois <code>::</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>::first-letter</code> num <code>span</code>: nada muda, e o validador não avisa</strong>
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  span::first-letter {
+    color: tomato;
+    font-size: 2rem;
+  }
+&lt;/style&gt;
+&lt;p&gt;&lt;span&gt;Bolo de fubá&lt;/span&gt; com erva-doce.&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> o "B" de "Bolo" continua do tamanho e da cor do resto do texto.</p>
+<p><strong>Por quê:</strong> o <code>::first-letter</code> só existe em elementos de <strong>bloco</strong> (ou <code>inline-block</code>, <code>list-item</code>, células de tabela). O <code>span</code> é em linha, então não tem "primeira letra" para o CSS. O seletor é válido, por isso o validador fica quieto.</p>
+<p><strong>Como consertar:</strong> ponha a regra no bloco (<code>p::first-letter</code>), ou transforme o <code>span</code> em <code>display: inline-block</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Propriedade que o pseudo-elemento não aceita: ignorada em silêncio</strong>
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  li::marker {
+    background-color: yellow;
+    color: tomato;
+  }
+&lt;/style&gt;
+&lt;ul&gt;
+  &lt;li&gt;Cenouras&lt;/li&gt;
+  &lt;li&gt;Ovos&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<p><strong>O que você vê:</strong> as bolinhas ficam cor de tomate, mas <strong>sem fundo amarelo</strong>. A cor funcionou; o fundo, não.</p>
+<p><strong>Por quê:</strong> cada pseudo-elemento tem uma lista curta de propriedades permitidas, e <code>background-color</code> não está na lista do <code>::marker</code>. O navegador ignora só essa declaração; a regra continua valendo. O validador não reclama (<code>vnu --css</code> não mostra nada para este arquivo): para ele, o seletor e a declaração estão bem escritos.</p>
+<p><strong>Como consertar:</strong> confira a tabela de <a href="#referencia">Referência</a> abaixo. Para uma bolinha com fundo, esconda o marcador (<code>list-style: none</code>) e desenhe outro com <a href="before-after.html"><code>::before</code></a>, que aceita tudo.</p>
+</div>
+
+<div class="cenario">
+<strong>Espaço antes dos <code>::</code></strong>
+<p><strong>O que acontece:</strong> <code>p ::first-letter</code>, com espaço, quer dizer "a primeira letra de <strong>qualquer elemento dentro</strong> de um <code>p</code>" (o espaço é o combinador descendente, de <a href="combinadores.html">Combinadores</a>). Num <code>&lt;p&gt;</code> só com texto, não há elemento dentro, e nada muda. O validador não reclama: o seletor é válido.</p>
+<p><strong>Como consertar:</strong> cole o pseudo-elemento no seletor: <code>p::first-letter</code>.</p>
+</div>
+
+<hr>
+
+<h2 id="referencia">Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Pseudo-elemento</th><th>Escolhe</th><th>Aceita (principais)</th></tr>
+<tr><td><code>::first-letter</code></td><td>A primeira letra de um bloco (com a pontuação antes dela)</td><td>Fonte, cor, fundo, margem, <code>padding</code>, borda, <code>float</code>, <code>line-height</code></td></tr>
+<tr><td><code>::first-line</code></td><td>A primeira linha, como aparece na tela</td><td>Fonte, cor, fundo, <code>text-transform</code>, <code>letter-spacing</code>, <code>word-spacing</code>, <code>text-decoration</code>, <code>line-height</code></td></tr>
+<tr><td><code>::marker</code></td><td>A bolinha ou o número de um <code>li</code></td><td><code>color</code>, fonte, <code>content</code> (no Safari, só <code>color</code> e <code>font-size</code>)</td></tr>
+<tr><td><code>::placeholder</code></td><td>O texto de exemplo de <code>input</code> e <code>textarea</code></td><td>Fonte, cor, fundo e outras de texto</td></tr>
+<tr><td><code>::selection</code></td><td>O texto selecionado pelo leitor</td><td><code>color</code>, <code>background-color</code>, <code>text-shadow</code></td></tr>
+<tr><td><code>::file-selector-button</code></td><td>O botão de <code>&lt;input type="file"&gt;</code></td><td>Quase tudo de uma caixa: fundo, borda, <code>padding</code>, <code>border-radius</code>…</td></tr>
+<tr><td><code>::before</code>, <code>::after</code></td><td>Conteúdo novo, criado pelo CSS</td><td>Tudo (aula <a href="before-after.html">::before e ::after</a>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Os dois-pontos</h3>
+<p>Complete o seletor da primeira letra de cada parágrafo:</p>
+<div class="ex-code">p<input data-answer="::" aria-label="dois-pontos">first-letter { color: tomato; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. A bolinha</h3>
+<p>Complete o pseudo-elemento que pinta só a bolinha dos itens da lista:</p>
+<div class="ex-code">li::<input data-answer="marker" aria-label="pseudo-elemento"> { color: navy; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. O texto de exemplo</h3>
+<p>Complete para o texto de exemplo dos campos ficar cinza-escuro:</p>
+<div class="ex-code">input::<input data-answer="placeholder" aria-label="pseudo-elemento"> { color: #6b6b6b; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. A Ana escreveu <code>p::first-line { color: navy; }</code>. Ao estreitar a janela, o que acontece?</p>
+<label><input type="radio" name="q4"> Nada: a primeira linha é sempre a primeira frase</label>
+<label><input type="radio" name="q4"> Menos palavras ficam azuis, porque a primeira linha fica mais curta</label>
+<label><input type="radio" name="q4"> O parágrafo inteiro fica azul</label>
+<label><input type="radio" name="q4"> A regra para de funcionar</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Por que <code>input:placeholder { color: green; }</code> não funciona?</p>
+<label><input type="radio" name="q5"> Porque <code>green</code> não é uma cor válida</label>
+<label><input type="radio" name="q5"> Porque falta o <code>;</code></label>
+<label><input type="radio" name="q5"> Porque <code>placeholder</code> é pseudo-elemento novo e só existe com <code>::</code>; com um <code>:</code>, a regra inteira é ignorada</label>
+<label><input type="radio" name="q5"> Porque o <code>input</code> precisa de uma classe</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. <code>li::marker { background-color: yellow; color: red; }</code>: o que o leitor vê?</p>
+<label><input type="radio" name="q6"> Bolinhas vermelhas, sem fundo amarelo</label>
+<label><input type="radio" name="q6"> Bolinhas vermelhas com fundo amarelo</label>
+<label><input type="radio" name="q6"> Bolinhas pretas: a regra inteira é ignorada</label>
+<label><input type="radio" name="q6"> O texto dos itens fica vermelho</label>
+</div>
+
+<h3>Missão final: o formulário de encomendas</h3>
+
+<div class="tryhtml" data-goal="src:\.passos\s+li::marker\s*\{[^}]*color,src:input::placeholder\s*\{[^}]*color,src:(^|[\s}])::selection\s*\{[^}]*background-color,nsrc:[^:]:placeholder">
+<p class="try-task"><strong>Missão:</strong> deixe a página de encomendas da lojinha com a cara da Ana. (1) Os números da lista <code>.passos</code> ficam da cor <code>tomato</code> (<code>.passos li::marker</code>). (2) O texto de exemplo dos campos fica <code>#6b6b6b</code> (conserte o seletor quebrado). (3) A seleção de texto da página <strong>toda</strong> ganha fundo <code>gold</code> e letra <code>black</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Encomende um bolo&lt;/h1&gt;
+&lt;ol class="passos"&gt;
+  &lt;li&gt;Escolha o sabor.&lt;/li&gt;
+  &lt;li&gt;Diga o dia da festa.&lt;/li&gt;
+  &lt;li&gt;Espere a confirmação por e-mail.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;form&gt;
+  &lt;p&gt;&lt;label&gt;Sabor &lt;input type="text" name="sabor" placeholder="Cenoura com chocolate"&gt;&lt;/label&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;label&gt;E-mail &lt;input type="email" name="email" placeholder="voce@exemplo.com"&gt;&lt;/label&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;button&gt;Encomendar&lt;/button&gt;&lt;/p&gt;
+&lt;/form&gt;
+</pre>
+<pre class="script" data-file="style.css">input {
+  padding: 0.4rem;
+}
+
+input:placeholder {
+  color: #bbbbbb;
+}
+</pre>
+<pre class="solucao" data-file="style.css">input {
+  padding: 0.4rem;
+}
+
+input::placeholder {
+  color: #6b6b6b;
+}
+
+.passos li::marker {
+  color: tomato;
+}
+
+::selection {
+  background-color: gold;
+  color: black;
+}
+</pre>
+</div>
+
+<p>Depois de cumprir a missão, selecione um pedaço do texto do resultado e digite nos campos: o texto de exemplo some, a cor do que você digita é a normal.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Um <strong>pseudo-elemento</strong> escolhe um <strong>pedaço</strong> de um elemento que não tem tag própria. Escreve-se com <code>::</code>, colado no seletor: <code>p::first-letter</code>.</li>
+  <li><code>::first-letter</code>: a primeira letra de um bloco (capitular, com <code>float: left</code>). <code>::first-line</code>: a primeira linha como aparece na tela, que muda com a largura.</li>
+  <li><code>::marker</code>: a bolinha ou o número da lista (<code>color</code> e <code>font-size</code> funcionam em todos; <code>content</code> não funciona no Safari).</li>
+  <li><code>::placeholder</code>: o texto de exemplo dos campos (contraste de 4,5 para 1; não substitui o <code>label</code>). <code>::selection</code>: a cor do texto selecionado. <code>::file-selector-button</code>: o botão do campo de arquivo.</li>
+  <li>Cada pseudo-elemento aceita uma lista curta de propriedades; o resto é ignorado em silêncio, sem aviso do validador.</li>
+  <li>Um dois-pontos só (<code>input:placeholder</code>) ou um nome errado derruba a regra inteira; o validador avisa: <code>Unknown pseudo-element or pseudo-class</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
