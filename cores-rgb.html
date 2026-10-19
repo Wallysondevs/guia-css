@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS rgb() — a cor como mistura de vermelho, verde e azul | Guia CSS</title>
+<meta name="description" content="A função rgb() do CSS para quem nunca escreveu CSS: rgb(255 99 71) parte por parte, a forma moderna com espaços e a antiga com vírgulas, rgba(), a transparência com a barra, porcentagens, números fora de 0 a 255, quando usar rgb() ou hexadecimal e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">rgb()</span></h1>
+
+<p class="intro">Na aula <a href="cores-hex.html">Cores Hexadecimais</a>, você viu que toda cor da tela é uma mistura de três luzes, escrita em pares como <code>ff</code> e <code>63</code>. A função <code>rgb()</code> escreve a <strong>mesma</strong> mistura com os números de todo dia: <code>rgb(255 99 71)</code>. É também a forma que o navegador usa para mostrar qualquer cor no F12, e a mais fácil para deixar uma cor meio transparente.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Como escrever <code>rgb(255 99 71)</code>, parte por parte.</li>
+  <li>A forma moderna (com espaços) e a antiga (com vírgulas), e o <code>rgba()</code> que você vai ver em códigos mais velhos.</li>
+  <li>Como deixar a cor transparente com a barra: <code>rgb(255 99 71 / 50%)</code>.</li>
+  <li>Porcentagens no lugar de 0 a 255, e o que acontece com <code>300</code> ou <code>-20</code>.</li>
+  <li>Quando usar <code>rgb()</code> e quando usar hexadecimal.</li>
+  <li>Os erros reais: vírgula misturada, espaço antes do parêntese e o parêntese que não fecha (e apaga a regra seguinte!).</li>
+</ul>
+</div>
+
+<p>Os quadros "Resultado" e as caixas "Experimente" são desenhados agora pelo <strong>seu</strong> navegador. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: três botões de luz</h2>
+<p>Imagine um palco com três refletores: um vermelho, um verde e um azul, todos apontados para o mesmo ponto. Cada um tem um botão que vai de 0 (apagado) a 255 (no máximo). Com os três apagados, o ponto fica preto; com os três no máximo, branco; mexendo em cada botão, aparece qualquer cor. O <code>rgb()</code> é você dizendo a posição dos três botões, nesta ordem: <strong>r</strong>ed (vermelho), <strong>g</strong>reen (verde), <strong>b</strong>lue (azul).</p>
+
+<hr>
+
+<h2>1. A anatomia de <code>rgb(255 99 71)</code></h2>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura com cobertura de chocolate.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: rgb(255 99 71);
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>rgb</dt><dd>O nome da <strong>função</strong>. No CSS, uma função é um nome seguido de parênteses com valores dentro; ela "calcula" um valor, aqui uma cor. Escreva colado no parêntese: <code>rgb(</code>.</dd>
+  <dt>255</dt><dd>A luz <strong>vermelha</strong>, de 0 a 255. 255 é o máximo.</dd>
+  <dt>99</dt><dd>A luz <strong>verde</strong>.</dd>
+  <dt>71</dt><dd>A luz <strong>azul</strong>.</dd>
+  <dt>( )</dt><dd>Os parênteses guardam os três números, separados por espaço. O parêntese de fechar é obrigatório (veja "Quando dá errado").</dd>
+</dl>
+
+<p>É o mesmo tomate de <code>tomato</code> e de <code>#ff6347</code>: <code>ff</code> = 255, <code>63</code> = 99, <code>47</code> = 71. Na caixa acima, mude um número de cada vez: suba o verde (<code>99</code>) até <code>200</code> e o tomate vira um amarelo-alaranjado; zere o vermelho e sobra um azul-esverdeado escuro.</p>
+
+<hr>
+
+<h2>2. Mexendo em um botão de cada vez</h2>
+<p>Cada faixa abaixo tem os números escritos dentro e o fundo pintado com eles. Na primeira família, só o vermelho sobe; na segunda, os três sobem juntos:</p>
+
+<pre class="file" data-file="botoes.html" data-resultado>&lt;style&gt;
+  p {
+    margin: 4px 0;
+    padding: 6px 10px; /* espaço em volta do texto (aula Espaço Interno) */
+    font-family: monospace;
+  }
+  .v0 { background-color: rgb(0 0 0); color: white; }
+  .v1 { background-color: rgb(64 0 0); color: white; }
+  .v2 { background-color: rgb(128 0 0); color: white; }
+  .v3 { background-color: rgb(192 0 0); color: white; }
+  .v4 { background-color: rgb(255 0 0); color: white; }
+  .c1 { background-color: rgb(64 64 64); color: white; }
+  .c2 { background-color: rgb(128 128 128); color: white; }
+  .c3 { background-color: rgb(192 192 192); color: black; }
+  .c4 { background-color: rgb(240 240 240); color: black; }
+&lt;/style&gt;
+&lt;p class="v0"&gt;rgb(0 0 0)&lt;/p&gt;
+&lt;p class="v1"&gt;rgb(64 0 0)&lt;/p&gt;
+&lt;p class="v2"&gt;rgb(128 0 0)&lt;/p&gt;
+&lt;p class="v3"&gt;rgb(192 0 0)&lt;/p&gt;
+&lt;p class="v4"&gt;rgb(255 0 0)&lt;/p&gt;
+&lt;p class="c1"&gt;rgb(64 64 64)&lt;/p&gt;
+&lt;p class="c2"&gt;rgb(128 128 128)&lt;/p&gt;
+&lt;p class="c3"&gt;rgb(192 192 192)&lt;/p&gt;
+&lt;p class="c4"&gt;rgb(240 240 240)&lt;/p&gt;
+</pre>
+
+<p>Com só o vermelho subindo, a cor sai do preto e chega ao vermelho puro, passando por um vinho escuro (<code>rgb(128 0 0)</code> é o <code>maroon</code>). Com os três números iguais, a cor é sempre um <strong>cinza</strong>, cada vez mais claro: os três refletores com a mesma força dão luz "sem cor".</p>
+
+<div class="tryhtml" data-goal="css:h1{color}=rgb(29, 111, 106),css:p{color}=rgb(51, 51, 51)">
+<p class="try-task"><strong>Missão:</strong> use <code>rgb()</code>. O título deve ficar com o verde-petróleo do logo da Ana, <code>rgb(29 111 106)</code>, e o parágrafo com um cinza-escuro: os três números valendo <code>51</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;p&gt;Bolos e doces por encomenda.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: black;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: rgb(29 111 106);
+}
+
+p {
+  color: rgb(51 51 51);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. A forma antiga: vírgulas e <code>rgba()</code></h2>
+<p>Até uns anos atrás, o <code>rgb()</code> só aceitava os números separados por <strong>vírgulas</strong>. Você vai encontrar essa forma em quase todo tutorial e site antigo, e no próprio F12:</p>
+
+<pre class="file" data-file="duas-formas.html" data-resultado>&lt;style&gt;
+  .moderna { color: rgb(255 99 71); }
+  .antiga { color: rgb(255, 99, 71); }
+&lt;/style&gt;
+&lt;h2 class="moderna"&gt;rgb(255 99 71)&lt;/h2&gt;
+&lt;h2 class="antiga"&gt;rgb(255, 99, 71)&lt;/h2&gt;
+</pre>
+
+<p>Mesma cor. As duas formas funcionam e passam no validador; a única regra é <strong>não misturar</strong>: ou só espaços, ou só vírgulas. O guia usa a forma moderna, com espaços, porque é a mesma das funções de cor mais novas (<code>hsl()</code>, <code>oklch()</code>).</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Exemplo</th><th>Situação</th></tr>
+<tr><td>Moderna (espaços)</td><td><code>rgb(255 99 71)</code></td><td>A recomendada hoje</td></tr>
+<tr><td>Antiga (vírgulas)</td><td><code>rgb(255, 99, 71)</code></td><td>Funciona; muito comum em código existente</td></tr>
+<tr><td>Antiga com transparência</td><td><code>rgba(255, 99, 71, 0.5)</code></td><td>O <code>a</code> de <code>rgba</code> é de <em>alpha</em> (transparência). Hoje o <code>rgba()</code> é só outro nome do <code>rgb()</code></td></tr>
+</table>
+</div>
+
+<p>E o valor que o navegador guarda (o "calculado", aba <em>Computed</em> do F12) é sempre com vírgulas: <code>rgb(255 99 71)</code> aparece como <code>rgb(255, 99, 71)</code>. Não estranhe a diferença: é a mesma cor.</p>
+
+<div class="note">
+<strong>Suporte</strong>
+<p>A forma com espaços e a barra da transparência (próxima seção) funcionam em todos os navegadores atuais: Chrome 65 e Firefox 52 (de 2018 e 2017), Safari 12.1 (de 2019) e o Edge novo, desde a primeira versão. Só o Internet Explorer exigia as vírgulas.</p>
+</div>
+
+<hr>
+
+<h2>4. Transparência: a barra <code>/</code></h2>
+<p>Um quarto valor, depois de uma <strong>barra</strong>, diz quanto a cor é opaca: o <strong>alfa</strong>. Pode ser um número de 0 a 1 (<code>0.5</code>) ou uma porcentagem (<code>50%</code>). Com 0, a cor some; com 1 (ou 100%), fica inteira.</p>
+
+<pre class="file" data-file="alfa.html" data-resultado>&lt;style&gt;
+  p {
+    margin: 4px 0;
+    padding: 6px 10px;
+    font-family: monospace;
+  }
+  .a100 { background-color: rgb(255 99 71); }
+  .a75 { background-color: rgb(255 99 71 / 75%); }
+  .a50 { background-color: rgb(255 99 71 / 50%); }
+  .a25 { background-color: rgb(255 99 71 / 25%); }
+  .a0 { background-color: rgb(255 99 71 / 0); }
+&lt;/style&gt;
+&lt;p class="a100"&gt;rgb(255 99 71)&lt;/p&gt;
+&lt;p class="a75"&gt;rgb(255 99 71 / 75%)&lt;/p&gt;
+&lt;p class="a50"&gt;rgb(255 99 71 / 50%)&lt;/p&gt;
+&lt;p class="a25"&gt;rgb(255 99 71 / 25%)&lt;/p&gt;
+&lt;p class="a0"&gt;rgb(255 99 71 / 0)&lt;/p&gt;
+</pre>
+
+<p>O tomate vai clareando porque o fundo branco aparece através dele, até sumir de vez com o alfa <code>0</code> (a última faixa só tem o texto). O navegador guarda <code>rgb(255 99 71 / 50%)</code> como <code>rgba(255, 99, 71, 0.5)</code>. A aula <a href="opacity.html">Transparência</a> mostra a diferença entre uma cor transparente e o elemento inteiro transparente.</p>
+
+<hr>
+
+<h2>5. Porcentagens no lugar de 0 a 255</h2>
+<p>Cada luz também pode ir de <code>0%</code> a <code>100%</code>, em vez de 0 a 255:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você escreve</th><th>Valor calculado</th></tr>
+<tr><td><code>rgb(100% 50% 0%)</code></td><td><code>rgb(255, 128, 0)</code> (um laranja)</td></tr>
+<tr><td><code>rgb(100% 39% 28%)</code></td><td><code>rgb(255, 99, 71)</code> (o tomate, arredondado)</td></tr>
+</table>
+</div>
+
+<p>Funciona, mas é raro: quase todo programa de desenho mostra os números de 0 a 255. Prefira os números.</p>
+
+<hr>
+
+<h2>6. Números fora de 0 a 255</h2>
+<p>O que acontece com <code>rgb(300 0 0)</code>? O navegador não dá erro nem ignora: ele <strong>corta</strong> no limite. Acima de 255 vira 255; abaixo de 0 vira 0. Números com vírgula decimal também valem e são arredondados:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você escreve</th><th>Valor calculado</th></tr>
+<tr><td><code>rgb(300 0 0)</code></td><td><code>rgb(255, 0, 0)</code></td></tr>
+<tr><td><code>rgb(-20 0 0)</code></td><td><code>rgb(0, 0, 0)</code></td></tr>
+<tr><td><code>rgb(255 99.5 71)</code></td><td><code>rgb(255, 100, 71)</code></td></tr>
+<tr><td><code>rgb(255 99 71 / 2)</code></td><td><code>rgb(255, 99, 71)</code> (alfa acima de 1 vira 1)</td></tr>
+</table>
+</div>
+
+<p>O validador também aceita <code>rgb(300 0 0)</code> sem reclamar. Por isso, se você digitar <code>2550</code> no lugar de <code>255</code>, nada avisa: a cor só fica diferente do que você queria. Confira no F12 o valor calculado.</p>
+
+<hr>
+
+<h2>7. <code>rgb()</code> ou hexadecimal?</h2>
+<p>Desenham exatamente as mesmas cores. A escolha é de leitura:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Melhor forma</th><th>Por quê</th></tr>
+<tr><td>Copiar a cor de um logo ou de um desenho</td><td><code>#c7401f</code></td><td>É o que os programas entregam; mais curto</td></tr>
+<tr><td>Cor meio transparente</td><td><code>rgb(0 0 0 / 60%)</code></td><td>O <code>60%</code> é fácil de ler; em hexadecimal seria <code>#00000099</code></td></tr>
+<tr><td>Entender ou ajustar a mistura</td><td><code>rgb(199 64 31)</code></td><td>Números de 0 a 255 são mais naturais que <code>c7</code></td></tr>
+<tr><td>Criar tons mais claros e mais escuros da mesma cor</td><td><code>hsl()</code></td><td>Aula <a href="cores-hsl.html">hsl()</a>: um número só para a claridade</td></tr>
+</table>
+</div>
+
+<p>Um uso muito comum de <code>rgb()</code> com alfa: uma faixa escura e transparente por cima de uma foto, para o texto ficar legível. <code>rgb(0 0 0 / 60%)</code> é "60% de preto": escurece sem esconder a imagem.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Como toda cor inválida, o navegador <strong>ignora</strong> a declaração em silêncio, e o texto fica com a cor de antes. Os títulos abaixo queriam ser tomate:</p>
+
+<pre class="file" data-file="erros.html · erro de propósito" data-resultado>&lt;style&gt;
+  .a { color: rgb(255, 99 71); }
+  .b { color: rgb (255 99 71); }
+  .c { color: rgb(255 99); }
+  .d { color: rgb(255 99 71 0.5); }
+  .e { color: rgb(255; 99; 71); }
+&lt;/style&gt;
+&lt;h2 class="a"&gt;rgb(255, 99 71)&lt;/h2&gt;
+&lt;h2 class="b"&gt;rgb (255 99 71)&lt;/h2&gt;
+&lt;h2 class="c"&gt;rgb(255 99)&lt;/h2&gt;
+&lt;h2 class="d"&gt;rgb(255 99 71 0.5)&lt;/h2&gt;
+&lt;h2 class="e"&gt;rgb(255; 99; 71)&lt;/h2&gt;
+</pre>
+
+<p>Os cinco ficaram pretos. O validador explica cada um:</p>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: Invalid RGB function.</code></strong>
+<p><strong>O que aconteceu:</strong> vírgula e espaço misturados (<code>rgb(255, 99 71)</code>), ou faltou um número (<code>rgb(255 99)</code>).</p>
+<pre class="term" data-cwd="~/rgb">$ vnu --css mistura.css
+"file:/home/ana/rgb/mistura.css":2.24-2.24: error: CSS: “color”: Invalid RGB function.
+$ vnu --css dois.css
+"file:/home/ana/rgb/dois.css":2.20-2.20: error: CSS: “color”: Invalid RGB function.</pre>
+<p>"Função RGB inválida." As duas formas existem, mas cada uma inteira: só espaços ou só vírgulas. E são sempre três números (mais o alfa, se quiser).</p>
+<p><strong>Como consertar:</strong> <code>rgb(255 99 71)</code> ou <code>rgb(255, 99, 71)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: “rgb” is not a “color” value.</code></strong>
+<p><strong>O que aconteceu:</strong> um espaço entre o nome e o parêntese: <code>rgb (255 99 71)</code>.</p>
+<pre class="term" data-cwd="~/rgb">$ vnu --css espaco.css
+"file:/home/ana/rgb/espaco.css":2.13-2.13: error: CSS: “color”: “rgb” is not a “color” value.
+"file:/home/ana/rgb/espaco.css":2.26-2.26: error: CSS: Parse Error.
+"file:/home/ana/rgb/espaco.css":3.2-4.1: error: CSS: Parse Error.</pre>
+<p>"<code>rgb</code> não é um valor de cor." Com o espaço, o CSS não vê mais uma função: vê a palavra solta <code>rgb</code> (que não é nome de cor) e, depois, uns parênteses sem dono. Os <code>Parse Error</code> ("erro de leitura") são o validador se perdendo nesse resto.</p>
+<p><strong>Como consertar:</strong> cole o nome no parêntese: <code>rgb(</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: “0.5” is not a valid LCH color.</code></strong>
+<p><strong>O que aconteceu:</strong> o alfa foi escrito sem a barra: <code>rgb(255 99 71 0.5)</code>.</p>
+<pre class="term" data-cwd="~/rgb">$ vnu --css sem-barra.css
+"file:/home/ana/rgb/sem-barra.css":2.27-2.27: error: CSS: “color”: “0.5” is not a valid LCH color.</pre>
+<p>A mensagem fala de "LCH", outro tipo de cor, e confunde; o que importa é a posição (coluna 27, o <code>0.5</code>): o quarto número está no lugar errado. Na forma moderna, o alfa vem <strong>depois de uma barra</strong>.</p>
+<p><strong>Como consertar:</strong> <code>rgb(255 99 71 / 0.5)</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: Parse Error.</code></strong>
+<p><strong>O que aconteceu:</strong> ponto e vírgula no lugar das vírgulas: <code>rgb(255; 99; 71)</code>.</p>
+<pre class="term" data-cwd="~/rgb">$ vnu --css pontovirgula.css
+"file:/home/ana/rgb/pontovirgula.css":2.14-2.16: error: CSS: “color”: Parse Error.
+"file:/home/ana/rgb/pontovirgula.css":2.22-2.22: error: CSS: Parse Error.
+"file:/home/ana/rgb/pontovirgula.css":2.27-2.27: error: CSS: Parse Error.
+"file:/home/ana/rgb/pontovirgula.css":3.2-4.1: error: CSS: Parse Error.</pre>
+<p>O <code>;</code> encerra declarações; dentro do <code>rgb()</code> ele não tem lugar, e o validador se perde em vários "erros de leitura".</p>
+<p><strong>Como consertar:</strong> espaços (ou vírgulas) entre os números.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: Parse Error.</code> (o parêntese que não fecha)</strong>
+<p><strong>O que aconteceu:</strong> faltou o <code>)</code> no fim: <code>color: rgb(255 99 71;</code>. Este é o pior, porque o estrago <strong>não fica só nessa linha</strong>:</p>
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o parágrafo deveria estar verde, e a regra dele está certinha. Mas os dois estão pretos. Feche o parêntese do <code>h1</code> e veja os dois ganharem cor.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;p&gt;Bolos e doces por encomenda.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: rgb(255 99 71;
+}
+
+p {
+  color: rgb(29 111 106);
+}
+</pre>
+</div>
+<p>Enquanto o parêntese está aberto, o navegador considera que tudo o que vem depois (o <code>;</code>, o <code>}</code>, a regra do <code>p</code> inteira) ainda está <strong>dentro</strong> do <code>rgb(</code>. A regra do parágrafo é engolida e some junto. O validador acusa o ponto em que se perdeu:</p>
+<pre class="term" data-cwd="~/rgb">$ vnu --css parenteses.css
+"file:/home/ana/rgb/parenteses.css":2.21-2.22: error: CSS: “color”: Parse Error.</pre>
+<p><strong>Como consertar:</strong> feche o parêntese. Quando uma regra <strong>certa</strong> não funciona, olhe a regra de cima: um <code>)</code> ou um <code>}</code> esquecido lá costuma ser o culpado.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th><th>Valor calculado</th></tr>
+<tr><td><code>rgb(255 99 71)</code></td><td>Vermelho, verde e azul, de 0 a 255</td><td><code>rgb(255, 99, 71)</code></td></tr>
+<tr><td><code>rgb(255, 99, 71)</code></td><td>A forma antiga, com vírgulas</td><td><code>rgb(255, 99, 71)</code></td></tr>
+<tr><td><code>rgb(255 99 71 / 50%)</code></td><td>Com alfa (opacidade): <code>0</code> a <code>1</code> ou <code>0%</code> a <code>100%</code></td><td><code>rgba(255, 99, 71, 0.5)</code></td></tr>
+<tr><td><code>rgba(255, 99, 71, 0.5)</code></td><td>A forma antiga com alfa; <code>rgba()</code> = <code>rgb()</code></td><td><code>rgba(255, 99, 71, 0.5)</code></td></tr>
+<tr><td><code>rgb(100% 50% 0%)</code></td><td>Porcentagens no lugar de 0 a 255</td><td><code>rgb(255, 128, 0)</code></td></tr>
+<tr><td><code>rgb(300 0 0)</code></td><td>Fora do intervalo: cortado no limite</td><td><code>rgb(255, 0, 0)</code></td></tr>
+<tr><td>Números iguais</td><td>Cinza</td><td><code>rgb(51 51 51)</code> → <code>rgb(51, 51, 51)</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O preto</h3>
+<p>Complete para o texto ficar preto (as três luzes apagadas):</p>
+<div class="ex-code">p { color: rgb(<input data-answer="0 0 0|0, 0, 0" aria-label="três números">); }</div>
+</div>
+
+<div class="exercise">
+<h3>2. A barra</h3>
+<p>Complete para o fundo ficar preto com 60% de opacidade:</p>
+<div class="ex-code">.faixa { background-color: rgb(0 0 0 <input data-answer="/ 60%|/ 0.6|/60%|/0.6" aria-label="alfa">); }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. Qual destas declarações o navegador <strong>ignora</strong>?</p>
+<label><input type="radio" name="q3"> <code>color: rgb(255 99 71);</code></label>
+<label><input type="radio" name="q3"> <code>color: rgb(255, 99, 71);</code></label>
+<label><input type="radio" name="q3"> <code>color: rgb(255, 99 71);</code></label>
+<label><input type="radio" name="q3"> <code>color: rgba(255, 99, 71, 1);</code></label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. No F12, aba Computed, como aparece <code>color: rgb(29 111 106 / 50%)</code>?</p>
+<label><input type="radio" name="q4"> <code>rgb(29 111 106 / 50%)</code></label>
+<label><input type="radio" name="q4"> <code>rgba(29, 111, 106, 0.5)</code></label>
+<label><input type="radio" name="q4"> <code>#1d6f6a</code></label>
+<label><input type="radio" name="q4"> <code>rgb(29, 111, 106)</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. A regra do <code>p</code> está certa, mas o parágrafo não muda de cor. Na regra de cima está <code>color: rgb(0 0 128;</code>. Por quê?</p>
+<label><input type="radio" name="q5"> Porque <code>128</code> é um número grande demais</label>
+<label><input type="radio" name="q5"> Porque o <code>p</code> não aceita <code>rgb()</code></label>
+<label><input type="radio" name="q5"> Porque falta o <code>#</code> antes do <code>rgb</code></label>
+<label><input type="radio" name="q5"> Porque o parêntese aberto engoliu o resto do arquivo, inclusive a regra do <code>p</code></label>
+</div>
+
+<h3>Missão final: a faixa de promoção</h3>
+
+<div class="tryhtml" data-goal="css:h1{color}=rgb(199, 64, 31),css:.preco{color}=rgb(29, 111, 106),css:.faixa{background-color}=rgba(255, 209, 102, 0.5)">
+<p class="try-task"><strong>Missão:</strong> três cores do cartaz estão com erro e não aparecem. Conserte: o título <code>rgb(199 64 31)</code>, o preço <code>rgb(29 111 106)</code> e o fundo da <code>.faixa</code> com o amarelo <code>rgb(255 209 102)</code> a <strong>50%</strong> de opacidade.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;p class="preco"&gt;Torta de limão: R$ 42,00&lt;/p&gt;
+&lt;p class="faixa"&gt;Só nesta semana!&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: rgb(199, 64 31);
+}
+
+.preco {
+  color: rgb (29 111 106);
+}
+
+.faixa {
+  background-color: rgb(255 209 102 0.5);
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: rgb(199 64 31);
+}
+
+.preco {
+  color: rgb(29 111 106);
+}
+
+.faixa {
+  background-color: rgb(255 209 102 / 50%);
+}
+</pre>
+</div>
+
+<p>Os três erros: vírgula misturada com espaço, espaço antes do parêntese, e o alfa sem a barra.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>rgb(vermelho verde azul)</code>: três números de 0 a 255, separados por espaço. <code>rgb(255 99 71)</code> é o tomate (<code>#ff6347</code>).</li>
+  <li>Números iguais dão cinza; todos 0, preto; todos 255, branco.</li>
+  <li>A forma antiga usa vírgulas (<code>rgb(255, 99, 71)</code>) e <code>rgba()</code> para a transparência. Funciona, mas não misture vírgulas e espaços.</li>
+  <li>Transparência com a barra: <code>rgb(255 99 71 / 50%)</code>. O navegador guarda como <code>rgba(255, 99, 71, 0.5)</code>.</li>
+  <li>Números fora de 0 a 255 são cortados no limite, sem aviso.</li>
+  <li>Espaço antes do parêntese, vírgula misturada ou alfa sem barra: a cor é ignorada. Um parêntese sem fechar engole as regras seguintes.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
