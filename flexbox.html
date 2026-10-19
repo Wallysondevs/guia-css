@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Flexbox — introdução: display: flex, o pai e os itens | Guia CSS</title>
+<meta name="description" content="Introdução ao Flexbox em CSS para quem está começando: display: flex no pai, os itens lado a lado, a direção principal e a cruzada, o que muda nos itens (mesma altura, largura do conteúdo, encolher), só os filhos diretos, flex × inline-flex, as propriedades do pai e dos itens e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Flexbox</span></h1>
+
+<p class="intro">Pôr coisas lado a lado já foi a parte mais difícil do CSS: menus com <code>float</code>, cartões com <code>inline-block</code>, centralizar na vertical com truques. O <strong>Flexbox</strong> (de <em>flexible box</em>, "caixa flexível") resolveu isso com uma linha: <code>display: flex</code>. Nesta aula você vai ligar o Flexbox no menu e na vitrine da lojinha da Ana, aprender os nomes das partes (o pai, os itens, a direção principal e a cruzada) e ver o que muda nos itens. As próximas aulas mostram, uma por uma, as propriedades que direcionam e alinham.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que <code>display: flex</code> faz e <strong>onde</strong> ele vai: no pai.</li>
+  <li>Os nomes: pai flex, itens, direção principal e direção cruzada.</li>
+  <li>O que muda nos itens: lado a lado, mesma altura, largura do conteúdo, e encolhem quando falta espaço.</li>
+  <li>Por que só os <strong>filhos diretos</strong> viram itens.</li>
+  <li>A diferença entre <code>flex</code> e <code>inline-flex</code>.</li>
+  <li>O mapa das propriedades do Flexbox e os erros reais do validador.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador; os números em pixels do texto foram medidos no Chromium. As mensagens do validador saíram do validador W3C (<code>vnu</code>), na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: a prateleira</h2>
+<p>Pense numa prateleira da lojinha da Ana. Sem prateleira, os potes de doce ficam empilhados, um em cima do outro. Com a prateleira, eles ficam <strong>lado a lado</strong>, e a Ana decide: juntos à esquerda, espalhados, no meio, encostados no fundo…</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Na lojinha</th><th>No Flexbox</th></tr>
+<tr><td>A prateleira</td><td>O <strong>pai flex</strong>: o elemento com <code>display: flex</code></td></tr>
+<tr><td>Os potes</td><td>Os <strong>itens</strong>: os filhos diretos do pai flex</td></tr>
+<tr><td>O comprimento da prateleira, onde os potes vão um depois do outro</td><td>A <strong>direção principal</strong> (deitada, da esquerda para a direita, no começo)</td></tr>
+<tr><td>A altura da prateleira, do fundo ao topo</td><td>A <strong>direção cruzada</strong> (em pé, de cima para baixo)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. O primeiro Flexbox</h2>
+<p>O menu da Ana é uma lista. Sem nada, cada item fica numa linha, um embaixo do outro (os <code>li</code> são blocos). Uma declaração no <strong>pai</strong>, o <code>ul</code>, e os itens ficam lado a lado:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> os quatro itens estão lado a lado. Apague a linha <code>display: flex;</code> e veja a lista voltar a ficar em pé. Depois devolva a linha.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul class="menu"&gt;
+  &lt;li&gt;Início&lt;/li&gt;
+  &lt;li&gt;Bolos&lt;/li&gt;
+  &lt;li&gt;Doces&lt;/li&gt;
+  &lt;li&gt;Contato&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  background-color: navy;
+}
+
+.menu li {
+  padding: 12px 16px;
+  color: white;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>.menu</dt><dd>O seletor do <strong>pai</strong>: o <code>ul</code>. O Flexbox se liga no pai, e quem muda de lugar são os filhos.</dd>
+  <dt>display: flex;</dt><dd>"Mostre como caixa flexível". O <code>ul</code> vira um <strong>pai flex</strong>, e cada <code>li</code> vira um <strong>item</strong>, posto um depois do outro na direção principal: da esquerda para a direita.</dd>
+  <dt>list-style: none; padding: 0;</dt><dd>Só limpeza: tira as bolinhas e o recuo padrão da lista (aula <a href="listas.html">Estilizando Listas</a>). Não fazem parte do Flexbox.</dd>
+</dl>
+
+<p>Lado a lado, cada valor numa caixa com o nome escrito: o mesmo HTML, sem e com <code>display: flex</code>.</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .pai { border: 2px dashed gray; padding: 4px; margin-bottom: 12px; font-family: sans-serif; }
+  .flex { display: flex; }
+  .item { padding: 8px; margin: 4px; background-color: tomato; color: white; }
+&lt;/style&gt;
+&lt;p&gt;&lt;code&gt;display: block&lt;/code&gt; (o padrão de um &lt;code&gt;div&lt;/code&gt;)&lt;/p&gt;
+&lt;div class="pai"&gt;
+  &lt;div class="item"&gt;Bolo&lt;/div&gt;
+  &lt;div class="item"&gt;Brigadeiro&lt;/div&gt;
+  &lt;div class="item"&gt;Pudim&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;display: flex&lt;/code&gt;&lt;/p&gt;
+&lt;div class="pai flex"&gt;
+  &lt;div class="item"&gt;Bolo&lt;/div&gt;
+  &lt;div class="item"&gt;Brigadeiro&lt;/div&gt;
+  &lt;div class="item"&gt;Pudim&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Repare: sem Flexbox, cada <code>div</code> laranja ocupa a largura toda e fica numa linha própria. Com Flexbox, eles ficam lado a lado, cada um só da largura do seu texto, e sobra espaço à direita. O <strong>pai</strong> continua sendo um bloco da largura toda: o <code>display: flex</code> muda o que acontece <strong>dentro</strong> dele.</p>
+
+<div class="tryhtml" data-goal="css:.categorias{display}=flex">
+<p class="try-task"><strong>Missão:</strong> as categorias da lojinha estão uma embaixo da outra. Ponha-as lado a lado com Flexbox.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav class="categorias"&gt;
+  &lt;a href="bolos.html"&gt;Bolos&lt;/a&gt;
+  &lt;a href="tortas.html"&gt;Tortas&lt;/a&gt;
+  &lt;a href="docinhos.html"&gt;Docinhos&lt;/a&gt;
+  &lt;a href="salgados.html"&gt;Salgados&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+<pre class="script" data-file="style.css">.categorias {
+  background-color: darkslateblue;
+}
+
+.categorias a {
+  display: block;
+  padding: 12px 16px;
+  color: white;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.categorias {
+  display: flex;
+  background-color: darkslateblue;
+}
+
+.categorias a {
+  display: block;
+  padding: 12px 16px;
+  color: white;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. As duas direções</h2>
+<p>Todo o Flexbox gira em torno de duas direções. Vale a pena decorar os nomes, porque as próximas aulas usam os dois o tempo todo:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Direção</th><th>No começo (o padrão)</th><th>Quem a controla</th></tr>
+<tr><td><strong>Principal</strong></td><td>Deitada: da esquerda para a direita, a direção em que os itens vão um depois do outro</td><td><code>flex-direction</code> escolhe qual é; <code>justify-content</code> alinha nela</td></tr>
+<tr><td><strong>Cruzada</strong></td><td>Em pé: de cima para baixo, atravessando a principal</td><td><code>align-items</code> alinha nela</td></tr>
+</table>
+</div>
+
+<p>A principal pode virar: com <code>flex-direction: column</code>, os itens vão de cima para baixo, e a cruzada passa a ser a deitada (aula <a href="flex-direction.html">Direção</a>). Por isso o Flexbox fala em "principal" e "cruzada", e não em "horizontal" e "vertical".</p>
+
+<hr>
+
+<h2>3. O que muda nos itens</h2>
+<p>Ao virarem itens, os filhos ganham alguns comportamentos novos. Os três mais visíveis, num exemplo só:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> repare nas três coisas listadas embaixo. Depois aumente o texto do primeiro cartão (escreva uma frase longa) e veja os três cartões continuarem da mesma altura.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;div class="produto"&gt;Bolo de cenoura com cobertura de chocolate, receita da vó&lt;/div&gt;
+  &lt;div class="produto"&gt;Pudim&lt;/div&gt;
+  &lt;div class="produto"&gt;Torta de limão&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.vitrine {
+  display: flex;
+  width: 360px;
+  border: 2px dashed gray;
+}
+
+.produto {
+  margin: 4px;
+  padding: 8px;
+  background-color: seagreen;
+  color: white;
+}
+</pre>
+</div>
+
+<ul>
+  <li><strong>Mesma altura.</strong> O "Pudim" tem uma palavra, mas o cartão dele é tão alto quanto o do bolo, que ocupa várias linhas. Por padrão, os itens <strong>esticam</strong> na direção cruzada até a altura do mais alto (é o <code>align-items: stretch</code>, aula <a href="align-items.html">align-items</a>).</li>
+  <li><strong>Largura pelo conteúdo.</strong> Um <code>div</code> comum ocupa a largura toda; como item, ele fica do tamanho do conteúdo.</li>
+  <li><strong>Encolhem quando falta espaço.</strong> A vitrine tem 360&nbsp;px, pouco para o texto do bolo numa linha só. Em vez de passar da borda, os itens <strong>encolhem</strong> e o texto quebra em linhas. Quem controla isso é o <code>flex-shrink</code> (aula <a href="flex-grow.html">Crescer e Encolher</a>); e, para os itens irem para a linha de baixo em vez de encolher, existe o <code>flex-wrap</code> (aula <a href="flex-wrap.html">Quebrando Linha</a>).</li>
+</ul>
+
+<hr>
+
+<h2>4. Só os filhos diretos</h2>
+<p>O <code>display: flex</code> vale para os <strong>filhos</strong> do pai, e não para os netos. Na vitrine abaixo, cada produto tem um nome e um preço dentro; o nome e o preço <strong>não</strong> ficam lado a lado:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> os dois produtos estão lado a lado (são filhos da <code>.vitrine</code>), mas dentro de cada um o nome e o preço continuam um embaixo do outro (são netos). Ponha <code>display: flex;</code> também no <code>.produto</code> e veja o nome e o preço ficarem lado a lado.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;div class="produto"&gt;
+    &lt;p class="nome"&gt;Bolo de fubá&lt;/p&gt;
+    &lt;p class="preco"&gt;R$ 35,00&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="produto"&gt;
+    &lt;p class="nome"&gt;Pudim&lt;/p&gt;
+    &lt;p class="preco"&gt;R$ 40,00&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.vitrine {
+  display: flex;
+}
+
+.produto {
+  margin: 4px;
+  padding: 0 12px;
+  border: 2px solid peru;
+  background-color: linen;
+}
+
+.preco {
+  margin-left: 12px;
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<p>Um item pode ser, ao mesmo tempo, <strong>pai flex</strong> dos seus próprios filhos. É assim que se montam as páginas: uma prateleira de cartões, e dentro de cada cartão outra arrumação.</p>
+
+<hr>
+
+<h2>5. <code>flex</code> e <code>inline-flex</code></h2>
+<p>Existem dois valores que ligam o Flexbox. A arrumação dos itens é a mesma; o que muda é como o <strong>pai</strong> se comporta por fora (a mesma diferença entre <code>block</code> e <code>inline-block</code>, aula <a href="display.html">display</a>):</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  .pai { border: 2px dashed gray; padding: 4px; font-family: sans-serif; }
+  .item { padding: 6px; margin: 2px; background-color: tomato; color: white; }
+  .flex { display: flex; }
+  .inline-flex { display: inline-flex; }
+&lt;/style&gt;
+&lt;div class="pai flex"&gt;
+  &lt;span class="item"&gt;display: flex&lt;/span&gt;
+  &lt;span class="item"&gt;ocupa a linha toda&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Texto antes
+  &lt;span class="pai inline-flex"&gt;
+    &lt;span class="item"&gt;display: inline-flex&lt;/span&gt;
+    &lt;span class="item"&gt;fica no meio do texto&lt;/span&gt;
+  &lt;/span&gt;
+  texto depois.&lt;/p&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O pai, por fora</th><th>Use para</th></tr>
+<tr><td><code>display: flex</code></td><td>Um bloco: linha própria, largura toda</td><td>Quase tudo: menus, vitrines, cabeçalhos, cartões</td></tr>
+<tr><td><code>display: inline-flex</code></td><td>Em linha: só da largura do conteúdo, no meio do texto</td><td>Um botão com ícone e texto, uma etiqueta dentro de uma frase</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>6. O mapa do Flexbox</h2>
+<p>O <code>display: flex</code> é só o começo. As outras propriedades se dividem em dois grupos: as que vão no <strong>pai</strong> (arrumam todos os itens de uma vez) e as que vão num <strong>item</strong> (mudam só ele). Cada uma tem a sua aula:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Vai no</th><th>Propriedade</th><th>O que faz</th><th>Aula</th></tr>
+<tr><td>Pai</td><td><code>display: flex</code></td><td>Liga o Flexbox</td><td>esta</td></tr>
+<tr><td>Pai</td><td><code>flex-direction</code></td><td>Em linha ou em coluna</td><td><a href="flex-direction.html">Direção</a></td></tr>
+<tr><td>Pai</td><td><code>justify-content</code></td><td>Alinha e distribui na direção principal</td><td><a href="justify-content.html">justify-content</a></td></tr>
+<tr><td>Pai</td><td><code>align-items</code></td><td>Alinha na direção cruzada</td><td><a href="align-items.html">align-items</a></td></tr>
+<tr><td>Pai</td><td><code>flex-wrap</code></td><td>Deixa os itens irem para a linha de baixo</td><td><a href="flex-wrap.html">Quebrando Linha</a></td></tr>
+<tr><td>Pai</td><td><code>gap</code></td><td>Espaço entre os itens</td><td><a href="gap.html">gap</a></td></tr>
+<tr><td>Item</td><td><code>flex-grow</code>, <code>flex-shrink</code>, <code>flex-basis</code>, <code>flex</code></td><td>Quanto o item cresce, encolhe e o tamanho de partida</td><td><a href="flex-grow.html">Crescer e Encolher</a></td></tr>
+<tr><td>Item</td><td><code>align-self</code>, <code>order</code></td><td>Um item alinhado diferente; a ordem de exibição</td><td><a href="align-self.html">Um Item Diferente</a></td></tr>
+</table>
+</div>
+
+<div class="note">
+<strong>Suporte dos navegadores</strong>
+<p>O Flexbox funciona em todos os navegadores atuais, há anos. Em códigos antigos você pode ver <code>display: -webkit-box</code> ou <code>display: -ms-flexbox</code>: são versões provisórias, com prefixo, de antes de a especificação ficar pronta. Não são mais necessárias.</p>
+</div>
+
+<hr>
+
+<h2>Flexbox, float ou inline-block?</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Para pôr itens lado a lado</th><th>Problemas</th><th>Hoje</th></tr>
+<tr><td><code>float: left</code> nos itens</td><td>O pai encolhe, as alturas são diferentes, precisa de <code>clear</code></td><td>Só para texto em volta de imagem (aula <a href="float.html">float</a>)</td></tr>
+<tr><td><code>display: inline-block</code> nos itens</td><td>Um espaço extra entre os itens (o espaço do HTML), alinhamento difícil</td><td>Ainda funciona para coisas simples</td></tr>
+<tr><td><code>display: flex</code> no pai</td><td>—</td><td>O jeito certo para uma fila de itens</td></tr>
+<tr><td><code>display: grid</code> no pai</td><td>—</td><td>Quando a arrumação é em linhas <strong>e</strong> colunas (aula <a href="flex-ou-grid.html">Flexbox ou Grid?</a>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong><code>display: flex</code> nos itens, e não no pai</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .menu li { display: flex; background-color: navy; color: white; padding: 8px; }
+&lt;/style&gt;
+&lt;ul class="menu"&gt;
+  &lt;li&gt;Início&lt;/li&gt;
+  &lt;li&gt;Bolos&lt;/li&gt;
+  &lt;li&gt;Contato&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<p><strong>O que o leitor vê:</strong> os itens continuam um embaixo do outro (e as bolinhas da lista sumiram, porque um <code>li</code> com <code>display: flex</code> deixa de ser um item de lista).</p>
+<p><strong>Por quê:</strong> o <code>display: flex</code> arruma os <strong>filhos</strong> do elemento onde ele está. Aqui ele está em cada <code>li</code>, então arruma o que está dentro de cada <code>li</code> (só o texto). Quem tem de ser flex é o <code>ul</code>, o pai dos <code>li</code>. O validador não reclama: o código é válido.</p>
+<p><strong>Como consertar:</strong> <code>.menu { display: flex; }</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>display: flexbox</code>: <code>“flexbox” is not a “display” value</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.menu {
+  display: flexbox;
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":2.12-2.18: error: CSS: “display”: “flexbox” is not a “display” value.</pre>
+<p><strong>O que o leitor vê:</strong> nada muda: a lista continua em pé. O navegador ignorou a declaração; no F12, ela aparece riscada.</p>
+<p><strong>Por quê:</strong> o recurso se chama Flexbox, mas o valor é só <code>flex</code>.</p>
+<p><strong>Como consertar:</strong> <code>display: flex;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Uma propriedade de Flexbox sem o <code>display: flex</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.menu {
+  justify-content: center;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> nada muda.</p>
+<p><strong>Por quê:</strong> o <code>justify-content</code> (e o <code>align-items</code>, o <code>flex-direction</code>…) só tem efeito num pai flex (ou grid). Sem o <code>display: flex</code>, ele é ignorado em silêncio. A declaração é válida, então o validador não reclama e o F12 não a risca.</p>
+<p><strong>Como consertar:</strong> comece sempre pelo <code>display: flex;</code> no mesmo elemento.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>display: flex;</code> (no pai)</td><td>Os filhos diretos viram itens, lado a lado</td></tr>
+<tr><td><code>display: inline-flex;</code></td><td>O mesmo, mas o pai fica em linha, no meio do texto</td></tr>
+<tr><td>Direção principal</td><td>Onde os itens vão um depois do outro (deitada, no padrão)</td></tr>
+<tr><td>Direção cruzada</td><td>A que atravessa a principal (em pé, no padrão)</td></tr>
+<tr><td>Itens, por padrão</td><td>Mesma altura (esticam), largura do conteúdo, encolhem se falta espaço</td></tr>
+<tr><td>Netos</td><td>Não são afetados: ponha <code>display: flex</code> também no filho</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Ligar o Flexbox</h3>
+<p>Complete para os itens da lista ficarem lado a lado:</p>
+<div class="ex-code">ul { display: <input data-answer="flex" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. No meio do texto</h3>
+<p>Complete para o pai flex ficar em linha, no meio de uma frase:</p>
+<div class="ex-code">.etiqueta { display: <input data-answer="inline-flex" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. A outra direção</h3>
+<p>Complete: a direção que atravessa a principal se chama direção <input data-answer="cruzada" aria-label="nome">.</p>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Para pôr os <code>li</code> de um menu lado a lado, onde vai o <code>display: flex</code>?</p>
+<label><input type="radio" name="q4"> Em cada <code>li</code></label>
+<label><input type="radio" name="q4"> No <code>ul</code>, o pai dos <code>li</code></label>
+<label><input type="radio" name="q4"> No <code>body</code></label>
+<label><input type="radio" name="q4"> Em qualquer um, dá no mesmo</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Num pai flex, um item tem uma palavra e o vizinho, três linhas de texto. Por padrão…</p>
+<label><input type="radio" name="q5"> cada um fica com a altura do seu texto</label>
+<label><input type="radio" name="q5"> o item de uma palavra some</label>
+<label><input type="radio" name="q5"> os dois ficam com a mesma altura, a do mais alto</label>
+<label><input type="radio" name="q5"> o de três linhas vai para baixo</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. O que o validador diz de <code>display: flexbox</code>?</p>
+<label><input type="radio" name="q6"> Que <code>flexbox</code> não é um valor de <code>display</code></label>
+<label><input type="radio" name="q6"> Nada: é o mesmo que <code>flex</code></label>
+<label><input type="radio" name="q6"> Que falta o prefixo <code>-webkit-</code></label>
+<label><input type="radio" name="q6"> Que o <code>display</code> precisa de <code>position</code></label>
+</div>
+
+<h3>Missão final: a vitrine da lojinha</h3>
+
+<div class="tryhtml" data-goal="css:.vitrine{display}=flex,css:.produto{display}=flex">
+<p class="try-task"><strong>Missão:</strong> ponha os três produtos lado a lado (Flexbox na <code>.vitrine</code>) e, dentro de cada produto, a foto ao lado do nome (Flexbox também no <code>.produto</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="vitrine"&gt;
+  &lt;div class="produto"&gt;
+    &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="" width="48" height="48"&gt;
+    &lt;p&gt;Bolo de cenoura&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="produto"&gt;
+    &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="" width="48" height="48"&gt;
+    &lt;p&gt;Bolo de fubá&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="produto"&gt;
+    &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="" width="48" height="48"&gt;
+    &lt;p&gt;Bolo de laranja&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.produto {
+  margin: 4px;
+  padding: 8px;
+  border: 2px solid peru;
+  background-color: linen;
+}
+
+.produto p {
+  margin: 0 0 0 8px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.vitrine {
+  display: flex;
+}
+
+.produto {
+  display: flex;
+  margin: 4px;
+  padding: 8px;
+  border: 2px solid peru;
+  background-color: linen;
+}
+
+.produto p {
+  margin: 0 0 0 8px;
+}
+</pre>
+</div>
+
+<p>Repare que, dentro de cada produto, o nome ficou no alto, alinhado com o topo da foto. Para centralizá-lo na altura da foto, você vai usar o <code>align-items</code> (aula <a href="align-items.html">Alinhando na Coluna</a>).</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>display: flex</code> vai no <strong>pai</strong>; os filhos diretos viram <strong>itens</strong> e ficam lado a lado. Netos não são afetados.</li>
+  <li>Duas direções: a <strong>principal</strong> (onde os itens se enfileiram; deitada no padrão) e a <strong>cruzada</strong> (em pé no padrão).</li>
+  <li>Os itens, por padrão: mesma altura (esticam), largura do conteúdo, encolhem quando falta espaço.</li>
+  <li><code>inline-flex</code> arruma os itens do mesmo jeito, mas o pai fica em linha.</li>
+  <li>As outras propriedades (<code>flex-direction</code>, <code>justify-content</code>, <code>align-items</code>, <code>flex-wrap</code>, <code>gap</code>…) só funcionam com o <code>display: flex</code> ligado. O valor é <code>flex</code>, não <code>flexbox</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
