@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Sintaxe — regras, seletores, declarações, propriedades e valores | Guia CSS</title>
+<meta name="description" content="A sintaxe do CSS para quem nunca escreveu CSS: regra, seletor, bloco de declarações, declaração, propriedade e valor, o papel de cada sinal (chaves, dois-pontos, ponto e vírgula), espaços, maiúsculas, unidades, e o que acontece de verdade quando falta um ; um : ou uma } (com as mensagens reais do validador W3C).">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Sintaxe</span></h1>
+
+<p class="intro">Você já escreveu as primeiras regras de CSS copiando o formato. Agora é hora de entender cada pedaço: o que é uma regra, um seletor, uma declaração, e para que serve cada sinal (<code>{ }</code>, <code>:</code>, <code>;</code>). Saber os nomes certos ajuda a ler qualquer tutorial e qualquer mensagem de erro. E, como o CSS não avisa quando você erra, saber o que cada sinal faz é o que permite achar o erro sozinho.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Os nomes das partes: <strong>regra</strong>, <strong>seletor</strong>, <strong>bloco de declarações</strong>, <strong>declaração</strong>, <strong>propriedade</strong> e <strong>valor</strong>.</li>
+  <li>O papel de cada sinal: chaves, dois-pontos e ponto e vírgula.</li>
+  <li>O que é livre (espaços, quebras de linha, maiúsculas) e o que não é (o espaço entre o número e a unidade).</li>
+  <li>Valores com várias partes, como <code>2px solid teal</code>.</li>
+  <li>O que acontece de verdade quando falta um <code>;</code>, um <code>:</code> ou uma <code>}</code>, e o que o validador diz.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo seu navegador. As mensagens de erro são do validador W3C (<code>vnu --css</code>), rodado na máquina fictícia da Ana, na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a etiqueta e a lista de instruções</h2>
+<p>Imagine a Ana organizando a mudança. Em cada caixa vai uma <strong>etiqueta</strong> dizendo para qual cômodo ela vai ("cozinha"), e um papel com as <strong>instruções</strong>: "frágil: sim; empilhar: não; abrir primeiro: sim".</p>
+<p>Uma regra de CSS é exatamente isso. A etiqueta é o <strong>seletor</strong> (para quem são as instruções); o papel é o <strong>bloco de declarações</strong>; cada linha do papel é uma <strong>declaração</strong>, no formato "o quê: como".</p>
+
+<hr>
+
+<h2>1. As partes de uma regra</h2>
+
+<pre class="file" data-file="style.css">h1 {
+  color: teal;
+  text-align: center;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>h1 { … }</dt><dd>A <strong>regra</strong> inteira (em inglês, <em>rule</em> ou <em>ruleset</em>): o seletor mais o bloco.</dd>
+  <dt>h1</dt><dd>O <strong>seletor</strong>: escolhe <strong>quem</strong> recebe o estilo. Aqui, todos os <code>&lt;h1&gt;</code>. Há muitos tipos de seletor; eles começam na aula <a href="seletores.html">O que é um Seletor</a>.</dd>
+  <dt>{ e }</dt><dd>As <strong>chaves</strong> abrem e fecham o <strong>bloco de declarações</strong>: tudo o que está entre elas vale para o seletor.</dd>
+  <dt>color: teal;</dt><dd>Uma <strong>declaração</strong>: uma instrução completa.</dd>
+  <dt>color</dt><dd>A <strong>propriedade</strong>: <strong>o que</strong> mudar. O CSS tem centenas, cada uma com um nome fixo, em inglês.</dd>
+  <dt>:</dt><dd>Os <strong>dois-pontos</strong> separam a propriedade do valor. Leia como "é" ou "recebe".</dd>
+  <dt>teal</dt><dd>O <strong>valor</strong>: <strong>como</strong> fica. Cada propriedade aceita só certos valores: <code>color</code> aceita cores, <code>text-align</code> aceita <code>left</code>, <code>center</code>, <code>right</code>…</dd>
+  <dt>;</dt><dd>O <strong>ponto e vírgula</strong> separa uma declaração da próxima. É o sinal mais importante para evitar erros (veja <a href="#errado">Quando dá errado</a>).</dd>
+</dl>
+
+<p>Em português, a regra inteira diz: "para todo <code>h1</code>: a cor é verde-azulado; o alinhamento do texto é centro".</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Nome em português</th><th>Em inglês</th><th>No exemplo</th></tr>
+<tr><td>Regra</td><td><em>rule</em>, <em>ruleset</em></td><td><code>h1 { color: teal; text-align: center; }</code></td></tr>
+<tr><td>Seletor</td><td><em>selector</em></td><td><code>h1</code></td></tr>
+<tr><td>Bloco de declarações</td><td><em>declaration block</em></td><td><code>{ color: teal; text-align: center; }</code></td></tr>
+<tr><td>Declaração</td><td><em>declaration</em></td><td><code>color: teal;</code></td></tr>
+<tr><td>Propriedade</td><td><em>property</em></td><td><code>color</code></td></tr>
+<tr><td>Valor</td><td><em>value</em></td><td><code>teal</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>2. Várias declarações e várias regras</h2>
+<p>Um bloco pode ter quantas declarações você quiser, e uma folha de estilo, quantas regras quiser. O navegador lê de cima para baixo:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> acrescente uma terceira declaração na regra do <code>h1</code>, por exemplo <code>font-size: 40px;</code>, numa linha nova antes da <code>}</code>. Depois crie uma regra nova, só para o <code>p</code>, com <code>color: dimgray;</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: teal;
+  text-align: center;
+}
+</pre>
+</div>
+
+<h3>O último <code>;</code></h3>
+<p>Como o <code>;</code> <strong>separa</strong> declarações, o da última declaração é opcional: <code>h1 { color: teal }</code> funciona e o validador aceita. Mesmo assim, este guia sempre põe o <code>;</code>. O motivo: amanhã você acrescenta uma linha embaixo, esquece o <code>;</code> da linha de cima, e as <strong>duas</strong> param de funcionar (é o primeiro erro de <a href="#errado">Quando dá errado</a>).</p>
+
+<hr>
+
+<h2>3. O que é livre: espaços, linhas e maiúsculas</h2>
+<p>Para o navegador, os espaços e as quebras de linha entre as partes não importam. As três regras abaixo são idênticas:</p>
+
+<pre class="file" data-file="style.css">h1 { color: teal; text-align: center; }
+
+h1{color:teal;text-align:center}
+
+h1 {
+  color: teal;
+  text-align: center;
+}
+</pre>
+
+<p>A primeira forma, numa linha só, é comum para regras com uma declaração. A segunda, toda espremida, é como os sites publicam o CSS para ficar menor (o arquivo "minificado"), mas é ruim de ler. A terceira é a deste guia: uma declaração por linha, recuo de 2 espaços.</p>
+<p>Os nomes das propriedades e as palavras-chave dos valores também não diferenciam maiúsculas de minúsculas: <code>COLOR: TEAL;</code> funciona (conferido no Chromium) e o validador aceita. Mas a convenção de todo mundo é escrever <strong>em minúsculas</strong>, e algumas coisas diferenciam, sim: os nomes de classes (aula <a href="seletor-classe.html">Seletor de Classe</a>) e os nomes de arquivos, como em <code>url("Bolo.jpg")</code>. Escreva tudo em minúsculas e não precisa pensar nisso.</p>
+
+<h3>O que não é livre: o número e a unidade</h3>
+<p>Num valor com número, a <strong>unidade</strong> (<code>px</code>, <code>rem</code>, <code>%</code>…) vem <strong>colada</strong> no número: <code>18px</code>. Com espaço (<code>18 px</code>) ou sem unidade (<code>18</code>), a declaração inteira é ignorada. As unidades têm aula própria: <a href="unidades.html">Unidades</a>.</p>
+
+<hr>
+
+<h2>4. Valores com várias partes</h2>
+<p>Algumas propriedades recebem mais de uma coisa no valor. Aí os espaços e as vírgulas <strong>dentro do valor</strong> têm significado:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  h2 {
+    border-bottom: 2px solid teal;
+    font-family: "Trebuchet MS", Arial, sans-serif;
+  }
+&lt;/style&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>2px solid teal</dt><dd>Três partes separadas por <strong>espaço</strong>, cada uma dizendo uma coisa da borda de baixo (<code>border-bottom</code>): a espessura, o tipo de linha (contínua) e a cor. No resultado, uma linha verde-azulada sob o título.</dd>
+  <dt>"Trebuchet MS", Arial, sans-serif</dt><dd>Uma lista de alternativas separadas por <strong>vírgula</strong>: "use Trebuchet MS; se não tiver, Arial; se não tiver, qualquer letra sem serifa". O nome com espaço vai entre aspas. A letra que aparece depende das fontes instaladas no seu computador (aula <a href="font-family.html">Fontes</a>).</dd>
+</dl>
+
+<p>Regra geral: <strong>espaço</strong> separa partes de um mesmo valor; <strong>vírgula</strong> separa alternativas ou itens de uma lista; <strong>ponto e vírgula</strong> separa declarações. Cada propriedade com valor de várias partes é explicada na sua aula.</p>
+
+<hr>
+
+<h2>5. Regras <code>@</code> e comentários</h2>
+<p>Além das regras comuns, você vai encontrar duas outras coisas numa folha de estilo:</p>
+<ul>
+  <li><strong>Regras <code>@</code></strong> (em inglês, <em>at-rules</em>), que começam com arroba e dão instruções especiais, como <code>@media</code> ("só em telas pequenas") ou <code>@font-face</code> ("baixe esta fonte"). Cada uma tem a sua aula; a lista está em <a href="ref-at-rules.html">Regras @</a>.</li>
+  <li><strong>Comentários</strong>, entre <code>/*</code> e <code>*/</code>, que o navegador ignora: são notas para quem lê o código. Aula <a href="comentarios.html">Comentários</a>.</li>
+</ul>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Lembre: o CSS não mostra erro na tela. O navegador descarta o que não entende e continua lendo dali em diante. Saber <strong>até onde</strong> ele descarta é o que explica cada sintoma abaixo. (Todos conferidos no Chromium.)</p>
+
+<div class="cenario">
+<strong>Faltou o <code>;</code>: duas declarações se perdem</strong>
+<pre class="file" data-file="pv.css · erro de propósito">h1 {
+  color: teal
+  text-align: center;
+  font-size: 40px;
+}
+</pre>
+<p><strong>O que você vê:</strong> o título preto e à esquerda, mas com a letra grande (40px). A cor <strong>e</strong> o alinhamento sumiram.</p>
+<p><strong>Por quê:</strong> sem o <code>;</code>, o navegador acha que a declaração continua na linha de baixo e lê o valor da cor como <code>teal text-align: center</code>. Isso não é uma cor, então ele joga fora tudo, até o próximo <code>;</code>. O <code>font-size</code>, depois do <code>;</code>, funciona.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css pv.css
+"file:/home/ana/site/pv.css":3.3-3.12: error: CSS: “color”: Missing a semicolon before the property name “text-align”.</pre>
+<p><strong>O que significa:</strong> "falta um ponto e vírgula antes da propriedade <code>text-align</code>". O validador aponta a linha 3, mas o <code>;</code> que falta é no fim da linha 2.</p>
+<p><strong>Como consertar:</strong> <code>color: teal;</code>.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:h1{color}=rgb(0, 128, 128),css:h1{text-align}=center">
+<p class="try-task"><strong>Missão:</strong> o título deveria estar verde-azulado e centralizado, mas está preto e à esquerda. Ache o sinal que falta e conserte.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Receitas simples, testadas na minha cozinha.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: teal
+  text-align: center;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: teal;
+  text-align: center;
+}
+</pre>
+</div>
+
+<div class="cenario">
+<strong>Faltou o <code>:</code> (ou usou <code>=</code>): <code>Parse Error</code></strong>
+<pre class="file" data-file="doispontos.css · erro de propósito">h1 {
+  color teal;
+  text-align: center;
+}
+</pre>
+<p><strong>O que você vê:</strong> o título centralizado, mas preto. Só a declaração sem os dois-pontos se perdeu; a próxima, depois do <code>;</code>, funcionou.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css doispontos.css
+"file:/home/ana/site/doispontos.css":2.9-2.12: error: CSS: “color”: Parse Error.
+$ vnu --css igual.css
+"file:/home/ana/site/igual.css":2.11-2.14: error: CSS: “color”: Parse Error.</pre>
+<p><strong>O que significa:</strong> "erro de leitura" na declaração de <code>color</code>. O segundo arquivo, <code>igual.css</code>, é o mesmo com <code>color = teal;</code>: o sinal de igual de outras linguagens não vale no CSS.</p>
+<p><strong>Como consertar:</strong> <code>color: teal;</code>, sempre com dois-pontos.</p>
+</div>
+
+<div class="cenario">
+<strong>Faltou a <code>}</code>: a regra seguinte vai parar dentro da anterior, e o validador não avisa</strong>
+<pre class="file" data-file="chave.css · erro de propósito">p {
+  color: dimgray;
+
+h2 {
+  color: navy;
+}
+</pre>
+<p><strong>O que você vê:</strong> o parágrafo fica cinza, como devia, mas o <code>h2</code> continua preto.</p>
+<p><strong>Por quê:</strong> como a regra do <code>p</code> não foi fechada, o navegador lê o <code>h2 { … }</code> como uma regra <strong>dentro</strong> da regra do <code>p</code>. O CSS de hoje permite regras dentro de regras (o "aninhamento", aula <a href="aninhamento.html">CSS Aninhado</a>), e uma regra <code>h2</code> dentro de <code>p</code> quer dizer "um <code>h2</code> que esteja dentro de um <code>p</code>". Na página não há nenhum, então nada fica azul. A última <code>}</code> fecha a regra do <code>h2</code>, e a regra do <code>p</code> termina sozinha no fim do arquivo.</p>
+<p><strong>O que o validador diz:</strong> nada. Para ele, regras aninhadas são CSS válido:</p>
+<pre class="term" data-cwd="~/site">$ vnu --css chave.css; echo "saida: $?"
+saida: 0</pre>
+<p>(O <code>echo</code> mostra o código de saída do <code>vnu</code>: 0 quer dizer "nenhum erro".)</p>
+<p><strong>Como consertar:</strong> feche cada regra com <code>}</code> antes de começar a próxima. O recuo de 2 espaços ajuda a ver: se a <code>h2</code> aparecesse recuada no editor (muitos editores recuam sozinhos), seria o sinal de que ela está dentro de outra regra.</p>
+</div>
+
+<div class="cenario">
+<strong>Espaço entre o número e a unidade, ou unidade esquecida</strong>
+<pre class="file" data-file="espaco.css · erro de propósito">p {
+  font-size: 18 px;
+}
+</pre>
+<p><strong>O que você vê:</strong> a letra do tamanho padrão (16px), como se a declaração não existisse. Com <code>font-size: 18;</code>, sem a unidade, acontece o mesmo.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css espaco.css
+"file:/home/ana/site/espaco.css":2.17-2.18: error: CSS: “font-size”: Too many values or values are not recognized.
+$ vnu --css semunidade.css
+"file:/home/ana/site/semunidade.css":2.14-2.15: error: CSS: “font-size”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<p><strong>O que significa:</strong> o primeiro, "valores demais ou não reconhecidos" (o validador vê <code>18</code> e <code>px</code> como duas coisas separadas); o segundo, "só o 0 pode ficar sem unidade. Você deve pôr uma unidade depois do número". Zero é zero em qualquer unidade, por isso <code>margin: 0;</code> é válido.</p>
+<p><strong>Como consertar:</strong> <code>font-size: 18px;</code>, número e unidade colados.</p>
+</div>
+
+<div class="cenario">
+<strong>Propriedade ou valor com erro de digitação</strong>
+<p>São os erros da aula <a href="introducao.html">Introdução</a>: <code>colr: teal;</code> dá <code>Property “colr” doesn't exist</code>, e <code>color: tomate;</code> dá <code>“tomate” is not a “color” value</code>. Nos dois casos, só aquela declaração é ignorada; as outras do bloco funcionam.</p>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>O erro</th><th>O que o navegador descarta</th><th>O validador avisa?</th></tr>
+<tr><td>Propriedade ou valor que não existe</td><td>Só aquela declaração</td><td>Sim</td></tr>
+<tr><td>Faltou o <code>:</code></td><td>Só aquela declaração</td><td>Sim (<code>Parse Error</code>)</td></tr>
+<tr><td>Faltou o <code>;</code></td><td>Aquela declaração <strong>e a seguinte</strong></td><td>Sim (<code>Missing a semicolon</code>)</td></tr>
+<tr><td><code>18 px</code> ou <code>18</code></td><td>Só aquela declaração</td><td>Sim</td></tr>
+<tr><td>Faltou a <code>}</code></td><td>Nada some, mas a regra seguinte vira "de dentro" e não acha ninguém</td><td><strong>Não</strong></td></tr>
+<tr><td>Faltou o <code>;</code> da última declaração</td><td>Nada (é opcional)</td><td>Não (não é erro)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Sinal</th><th>Nome</th><th>Para que serve</th></tr>
+<tr><td><code>{ }</code></td><td>Chaves</td><td>Abrem e fecham o bloco de declarações de um seletor</td></tr>
+<tr><td><code>:</code></td><td>Dois-pontos</td><td>Separam a propriedade do valor</td></tr>
+<tr><td><code>;</code></td><td>Ponto e vírgula</td><td>Separa uma declaração da próxima (ponha sempre, até na última)</td></tr>
+<tr><td>espaço</td><td></td><td>Separa as partes de um valor (<code>2px solid teal</code>); fora disso, é livre</td></tr>
+<tr><td><code>,</code></td><td>Vírgula</td><td>Separa alternativas num valor (<code>Arial, sans-serif</code>) e seletores num grupo (<a href="seletor-grupo.html">Agrupando Seletores</a>)</td></tr>
+<tr><td><code>/* */</code></td><td>Comentário</td><td>Notas que o navegador ignora (<a href="comentarios.html">Comentários</a>)</td></tr>
+<tr><td><code>@</code></td><td>Arroba</td><td>Começa uma regra especial (<code>@media</code>, <code>@font-face</code>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Separar a propriedade do valor</h3>
+<p>Complete com o sinal que falta:</p>
+<div class="ex-code">h1 {
+  color<input data-answer=":" aria-label="sinal"> teal;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. O nome da parte</h3>
+<p>Em <code>color: teal;</code>, como se chama o <code>color</code>?</p>
+<div class="ex-code">a <input data-answer="propriedade" aria-label="nome da parte"></div>
+</div>
+
+<div class="exercise">
+<h3>3. Número com unidade</h3>
+<p>Complete o valor para a letra ter 20 pixels:</p>
+<div class="ex-code">p {
+  font-size: <input data-answer="20px" aria-label="valor">;
+}</div>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">4. Como se chama a parte <code>h1</code> em <code>h1 { color: teal; }</code>?</p>
+<label><input type="radio" name="q4"> Propriedade</label>
+<label><input type="radio" name="q4"> Valor</label>
+<label><input type="radio" name="q4"> Declaração</label>
+<label><input type="radio" name="q4"> Seletor</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Em <code>h1 { color: teal text-align: center; }</code>, o que funciona?</p>
+<label><input type="radio" name="q5"> Só a cor</label>
+<label><input type="radio" name="q5"> Nada: sem o <code>;</code>, as duas declarações viram uma só, inválida</label>
+<label><input type="radio" name="q5"> Só o alinhamento</label>
+<label><input type="radio" name="q5"> As duas</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">6. A Ana esqueceu a <code>}</code> no fim de uma regra. O que o validador diz?</p>
+<label><input type="radio" name="q6"> <code>Missing a semicolon</code></label>
+<label><input type="radio" name="q6"> <code>Parse Error</code></label>
+<label><input type="radio" name="q6"> Nada: a regra seguinte vira uma regra aninhada, que é CSS válido</label>
+<label><input type="radio" name="q6"> <code>Property doesn't exist</code></label>
+</div>
+
+<h3>Missão final: a regra da caixa da receita</h3>
+
+<div class="tryhtml" data-goal="css:h2{color}=rgb(0, 128, 128),css:h2{font-size}=28px,css:h2{border-bottom-style}=solid,css:p{color}=rgb(105, 105, 105)">
+<p class="try-task"><strong>Missão:</strong> o CSS da Ana tem <strong>três</strong> erros de sinal, e quase nada funciona. Conserte até o <code>h2</code> ficar verde-azulado (<code>teal</code>), com 28px e a linha embaixo, e o parágrafo ficar cinza (<code>dimgray</code>). Dica: confira cada <code>;</code>, cada <code>:</code> e cada número.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;p&gt;Fofinho, com cobertura de chocolate.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h2 {
+  color: teal
+  font-size: 28 px;
+  border-bottom: 2px solid teal;
+}
+
+p {
+  color dimgray;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h2 {
+  color: teal;
+  font-size: 28px;
+  border-bottom: 2px solid teal;
+}
+
+p {
+  color: dimgray;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Uma <strong>regra</strong> = <strong>seletor</strong> (quem) + <strong>bloco de declarações</strong> entre <code>{ }</code>.</li>
+  <li>Uma <strong>declaração</strong> = <strong>propriedade</strong> (o que) <code>:</code> <strong>valor</strong> (como) <code>;</code>.</li>
+  <li>Espaços, quebras de linha e maiúsculas entre as partes são livres; a convenção é minúsculas, uma declaração por linha, recuo de 2 espaços e <code>;</code> sempre.</li>
+  <li>Dentro de um valor: espaço separa partes (<code>2px solid teal</code>), vírgula separa alternativas. Número e unidade vão colados (<code>18px</code>).</li>
+  <li>O navegador descarta só o que não entende: uma declaração com erro some; sem o <code>;</code>, somem duas; sem a <code>}</code>, a regra seguinte vira "de dentro" e o validador não avisa.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
