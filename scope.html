@@ -54,7 +54,7 @@
 <pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
   @scope (.receita) {
     h2 {
-      color: tomato;
+      color: firebrick;
     }
 
     p {
@@ -70,7 +70,7 @@
 &lt;p&gt;Em breve, a torta de limão.&lt;/p&gt;
 </pre>
 
-<p>Dentro do <code>.receita</code>, o título ficou <code>tomato</code> e o parágrafo, um pouco maior. Fora dele, o "Outras receitas" continua preto, e o parágrafo, no tamanho normal.</p>
+<p>Dentro do <code>.receita</code>, o título ficou <code>firebrick</code> e o parágrafo, um pouco maior. Fora dele, o "Outras receitas" continua preto, e o parágrafo, no tamanho normal.</p>
 
 <dl class="anatomy">
   <dt>@scope</dt><dd>Uma regra @, como <code>@media</code> e <code>@layer</code>. <em>Scope</em> = "escopo", "alcance".</dd>
@@ -85,7 +85,7 @@
 
 <pre class="file" data-file="style.css">@scope (.receita) {
   :scope {
-    border: 2px solid tomato;
+    border: 2px solid firebrick;
     padding: 16px;
   }
 
@@ -105,13 +105,13 @@
 <pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
   @scope (.receita) to (.comentarios) {
     :scope {
-      border: 2px solid tomato;
+      border: 2px solid firebrick;
       padding: 0 16px;
       font-family: sans-serif;
     }
 
     p {
-      color: tomato;
+      color: firebrick;
       font-size: 1.2rem;
     }
   }
@@ -130,7 +130,7 @@
 &lt;/article&gt;
 </pre>
 
-<p>O parágrafo da receita ficou <code>tomato</code> e maior. O comentário da Bia, dentro do quadro cinza-claro, continua preto e no tamanho normal, mesmo estando dentro do <code>.receita</code>: ele está no "buraco".</p>
+<p>O parágrafo da receita ficou <code>firebrick</code> e maior. O comentário da Bia, dentro do quadro cinza-claro, continua preto e no tamanho normal, mesmo estando dentro do <code>.receita</code>: ele está no "buraco".</p>
 
 <dl class="anatomy">
   <dt>@scope (.receita)</dt><dd>A raiz: onde o escopo começa. A raiz <strong>faz parte</strong> do escopo (o <code>:scope</code> a alcança).</dd>
@@ -140,8 +140,8 @@
 
 <p>Sem o <code>@scope</code>, para fazer isso você precisaria de um seletor que dissesse "um <code>p</code> dentro de <code>.receita</code>, mas não dentro de <code>.comentarios</code>", algo como <code>.receita p:not(.comentarios p)</code>: difícil de ler e com uma especificidade alta.</p>
 
-<div class="tryhtml" data-goal="css:.comentarios p{color}=rgb(0, 0, 0),css:.receita &gt; p{color}=rgb(255, 99, 71),src:@scope\s*\(\.receita\)\s*to\s*\(\.comentarios\)">
-<p class="try-task"><strong>Missão:</strong> o comentário do leitor também ficou <code>tomato</code>. Ponha um limite no escopo, com <code>to (.comentarios)</code>, para que as regras da receita não entrem nos comentários.</p>
+<div class="tryhtml" data-goal="css:.comentarios p{color}=rgb(0, 0, 0),css:.receita &gt; p{color}=rgb(178, 34, 34),src:@scope\s*\(\.receita\)\s*to\s*\(\.comentarios\)">
+<p class="try-task"><strong>Missão:</strong> o comentário do leitor também ficou <code>firebrick</code>. Ponha um limite no escopo, com <code>to (.comentarios)</code>, para que as regras da receita não entrem nos comentários.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;article class="receita"&gt;
   &lt;h2&gt;Torta de limão&lt;/h2&gt;
@@ -154,7 +154,7 @@
 </pre>
 <pre class="script" data-file="style.css">@scope (.receita) {
   p {
-    color: tomato;
+    color: firebrick;
   }
 }
 
@@ -165,7 +165,7 @@
 </pre>
 <pre class="solucao" data-file="style.css">@scope (.receita) to (.comentarios) {
   p {
-    color: tomato;
+    color: firebrick;
   }
 }
 
@@ -309,7 +309,7 @@
 <pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
   @scope .receita {
     p {
-      color: tomato;
+      color: firebrick;
     }
   }
 &lt;/style&gt;
@@ -383,7 +383,7 @@
 </div>
 
 <div class="mc" data-answer="3">
-<p class="mc-q">3. Com <code>@scope (.receita) to (.comentarios) { p { color: tomato; } }</code>, quais parágrafos ficam <code>tomato</code>?</p>
+<p class="mc-q">3. Com <code>@scope (.receita) to (.comentarios) { p { color: firebrick; } }</code>, quais parágrafos ficam <code>firebrick</code>?</p>
 <label><input type="radio" name="q3"> Todos os da página</label>
 <label><input type="radio" name="q3"> Só os de dentro de <code>.comentarios</code></label>
 <label><input type="radio" name="q3"> Os de dentro de <code>.receita</code>, menos os de dentro de <code>.comentarios</code></label>
