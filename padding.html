@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS padding — o espaço de dentro da caixa | Guia CSS</title>
+<meta name="description" content="A propriedade padding do CSS para quem nunca escreveu CSS: o espaço entre o conteúdo e a borda, um lado de cada vez (padding-top, padding-right…), o atalho com 1, 2, 3 ou 4 valores, unidades (px, rem, em, %), padding × margin, padding em elementos em linha e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">padding</span></h1>
+
+<p class="intro">Um texto encostado na borda da caixa parece apertado, como uma foto colada sem moldura. O <code>padding</code> ("preenchimento", o espaço <strong>de dentro</strong>) afasta o conteúdo da borda e deixa a caixa respirar. Nesta aula você vai dar espaço aos avisos, botões e cartões do site da Ana, um lado de cada vez ou todos juntos, e reconhecer os erros que fazem o navegador ignorar o seu <code>padding</code> em silêncio.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que é o <code>padding</code> e onde ele fica no <a href="box-model.html">modelo de caixa</a>.</li>
+  <li>As quatro propriedades longas: <code>padding-top</code>, <code>padding-right</code>, <code>padding-bottom</code> e <code>padding-left</code>.</li>
+  <li>O atalho <code>padding</code> com 1, 2, 3 ou 4 valores, e a regra do relógio.</li>
+  <li>As unidades: <code>px</code>, <code>rem</code>, <code>em</code> e a surpresa do <code>%</code>.</li>
+  <li>A diferença entre <code>padding</code> e <code>margin</code>, e por que o padding aumenta a caixa.</li>
+  <li>O que acontece com o padding num elemento em linha, como um <code>&lt;a&gt;</code> ou um <code>&lt;span&gt;</code>.</li>
+  <li>Os erros reais do validador: valor negativo, número sem unidade, vírgula e nome errado.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: o passe-partout do quadro</h2>
+<p>Pense num quadro pendurado na parede. Entre a foto e a moldura de madeira costuma haver uma faixa de papel-cartão, o <strong>passe-partout</strong>. Ele não é a foto nem a moldura: é o <strong>espaço de dentro</strong>, que impede a foto de encostar na madeira.</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>No quadro</th><th>Na caixa do CSS</th></tr>
+<tr><td>A foto</td><td>O <strong>conteúdo</strong> (o texto, a imagem)</td></tr>
+<tr><td>O passe-partout</td><td>O <strong><code>padding</code></strong>, o espaço entre o conteúdo e a borda</td></tr>
+<tr><td>A moldura</td><td>A <strong><code>border</code></strong>, a borda (aula <a href="border.html">Bordas</a>)</td></tr>
+<tr><td>O espaço na parede até o próximo quadro</td><td>A <strong><code>margin</code></strong>, o espaço de fora (aula <a href="margin.html">Margem</a>)</td></tr>
+</table>
+</div>
+<p>E, como o passe-partout, o padding tem a <strong>mesma cor do fundo da caixa</strong>: o <code>background-color</code> pinta o conteúdo e o padding juntos.</p>
+
+<hr>
+
+<h2>1. O primeiro padding</h2>
+<p>As duas caixas abaixo têm o mesmo texto, o mesmo fundo e a mesma borda. Só a segunda tem <code>padding</code>:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .aviso {
+    background-color: lightyellow;
+    border: 2px solid orange;
+    margin-bottom: 16px;
+  }
+  .com-espaco {
+    padding: 20px;
+  }
+&lt;/style&gt;
+&lt;p class="aviso"&gt;Sem padding: o texto encosta na borda.&lt;/p&gt;
+&lt;p class="aviso com-espaco"&gt;Com padding: 20px de espaço em volta do texto.&lt;/p&gt;
+</pre>
+
+<dl class="anatomy">
+  <dt>.com-espaco</dt><dd>O seletor: vale para os elementos com <code>class="com-espaco"</code>.</dd>
+  <dt>padding</dt><dd>A propriedade: o espaço <strong>de dentro</strong>, entre o conteúdo e a borda.</dd>
+  <dt>20px</dt><dd>O valor: 20 pixels. Com <strong>um valor só</strong>, ele vale para os quatro lados: em cima, à direita, embaixo e à esquerda.</dd>
+  <dt>;</dt><dd>Fecha a declaração. Ponha sempre, até na última.</dd>
+</dl>
+
+<p>Repare no resultado:</p>
+<ul>
+  <li>Na primeira caixa, as letras quase tocam a linha laranja.</li>
+  <li>Na segunda, há uma faixa de 20px <strong>amarela</strong> entre o texto e a borda, nos quatro lados: o fundo pinta também o padding.</li>
+  <li>A segunda caixa ficou <strong>mais alta</strong>: 20px a mais em cima e 20px embaixo. O padding soma ao tamanho da caixa (veja a seção 6).</li>
+</ul>
+
+<hr>
+
+<h2>2. Um lado de cada vez</h2>
+<p>Às vezes você quer espaço só de um lado. Para isso existem as quatro <strong>propriedades longas</strong>, uma por lado:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>Lado</th><th>Tradução</th></tr>
+<tr><td><code>padding-top</code></td><td>em cima</td><td><em>top</em> = topo</td></tr>
+<tr><td><code>padding-right</code></td><td>à direita</td><td><em>right</em> = direita</td></tr>
+<tr><td><code>padding-bottom</code></td><td>embaixo</td><td><em>bottom</em> = fundo, parte de baixo</td></tr>
+<tr><td><code>padding-left</code></td><td>à esquerda</td><td><em>left</em> = esquerda</td></tr>
+</table>
+</div>
+
+<p>Cada caixa abaixo tem 30px de padding num lado só, com o nome escrito dentro:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .lado {
+    display: inline-block;
+    background-color: lightblue;
+    border: 2px solid steelblue;
+    margin: 6px;
+    font-family: monospace;
+  }
+  .cima     { padding-top: 30px; }
+  .direita  { padding-right: 30px; }
+  .baixo    { padding-bottom: 30px; }
+  .esquerda { padding-left: 30px; }
+&lt;/style&gt;
+&lt;div class="lado"&gt;nenhum&lt;/div&gt;
+&lt;div class="lado cima"&gt;padding-top&lt;/div&gt;
+&lt;div class="lado direita"&gt;padding-right&lt;/div&gt;
+&lt;div class="lado baixo"&gt;padding-bottom&lt;/div&gt;
+&lt;div class="lado esquerda"&gt;padding-left&lt;/div&gt;
+</pre>
+
+<p>Em cada caixa, a faixa azul-clara cresceu só do lado indicado: a de <code>padding-top</code> sobe acima das outras, a de <code>padding-bottom</code> desce abaixo delas, e as de <code>padding-right</code> e <code>padding-left</code> ficam mais compridas, com o texto empurrado para o outro lado na segunda. (O <code>display: inline-block</code> só serve para pôr as caixas lado a lado; ele tem aula própria em <a href="display.html">display</a>.)</p>
+
+<hr>
+
+<h2>3. O atalho: 1, 2, 3 ou 4 valores</h2>
+<p>Escrever as quatro propriedades longas toda vez cansa. O atalho <code>padding</code> aceita de 1 a 4 valores, separados por <strong>espaço</strong>:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Quer dizer</th></tr>
+<tr><td><code>padding: 20px;</code></td><td>20px nos quatro lados</td></tr>
+<tr><td><code>padding: 10px 30px;</code></td><td>10px em cima e embaixo; 30px à direita e à esquerda</td></tr>
+<tr><td><code>padding: 10px 30px 0;</code></td><td>10px em cima; 30px à direita e à esquerda; 0 embaixo</td></tr>
+<tr><td><code>padding: 5px 10px 20px 40px;</code></td><td>em cima 5px, direita 10px, embaixo 20px, esquerda 40px</td></tr>
+</table>
+</div>
+
+<div class="tip">
+<strong>A regra do relógio</strong>
+<p>Com quatro valores, a ordem é a dos ponteiros do relógio, começando ao meio-dia: <strong>cima → direita → baixo → esquerda</strong>. Quando falta um valor, ele copia o do lado oposto: sem o 4º, a esquerda copia a direita; sem o 3º, embaixo copia em cima.</p>
+</div>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .caixa {
+    display: inline-block;
+    background-color: mistyrose;
+    border: 2px solid crimson;
+    margin: 6px;
+    font-family: monospace;
+  }
+  .um     { padding: 20px; }
+  .dois   { padding: 10px 30px; }
+  .tres   { padding: 10px 30px 0; }
+  .quatro { padding: 5px 10px 20px 40px; }
+&lt;/style&gt;
+&lt;div class="caixa um"&gt;20px&lt;/div&gt;
+&lt;div class="caixa dois"&gt;10px 30px&lt;/div&gt;
+&lt;div class="caixa tres"&gt;10px 30px 0&lt;/div&gt;
+&lt;div class="caixa quatro"&gt;5px 10px 20px 40px&lt;/div&gt;
+</pre>
+
+<p>O <code>0</code> pode ir sem unidade: zero pixels e zero rem são a mesma coisa. Qualquer outro número precisa da unidade (veja <a href="#errado">Quando dá errado</a>).</p>
+
+<div class="tryhtml" data-goal="css:.botao{padding-top}=10px,css:.botao{padding-bottom}=10px,css:.botao{padding-left}=20px,css:.botao{padding-right}=20px">
+<p class="try-task"><strong>Missão:</strong> o link "Comprar" da lojinha está apertado. Dê a ele <strong>10px</strong> de padding em cima e embaixo e <strong>20px</strong> dos lados, usando o atalho com <strong>dois valores</strong>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura com chocolate: R$ 35,00&lt;/p&gt;
+&lt;a class="botao" href="#comprar"&gt;Comprar&lt;/a&gt;
+</pre>
+<pre class="script" data-file="style.css">.botao {
+  display: inline-block;
+  background-color: darkgreen;
+  color: white;
+  text-decoration: none;
+  padding: 0;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.botao {
+  display: inline-block;
+  background-color: darkgreen;
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+}
+</pre>
+</div>
+
+<p>Depois de cumprir a missão, troque por <code>padding: 20px 10px;</code> e veja o botão ficar alto e estreito: a ordem dos valores importa.</p>
+
+<hr>
+
+<h2>4. As unidades</h2>
+<p>O padding aceita as unidades de tamanho do CSS (aula <a href="unidades.html">Unidades</a>). As mais usadas:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Unidade</th><th>Exemplo</th><th>O padding fica…</th></tr>
+<tr><td><code>px</code></td><td><code>padding: 16px;</code></td><td>sempre com 16 pixels</td></tr>
+<tr><td><code>rem</code></td><td><code>padding: 1rem;</code></td><td>do tamanho da letra da página (16px no padrão do navegador); cresce se o leitor aumentar a fonte nas configurações</td></tr>
+<tr><td><code>em</code></td><td><code>padding: 0.5em 1em;</code></td><td>proporcional à letra <strong>do próprio elemento</strong>: um botão de letra grande ganha padding grande</td></tr>
+<tr><td><code>%</code></td><td><code>padding: 5%;</code></td><td>uma fração da <strong>largura</strong> do pai, em <strong>todos</strong> os lados, até em cima e embaixo</td></tr>
+</table>
+</div>
+
+<p>O <code>em</code> brilha em botões: o espaço acompanha o tamanho do texto. Os três botões abaixo têm o mesmo <code>padding: 0.5em 1em</code>, mas letras de tamanhos diferentes:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .botao {
+    display: inline-block;
+    background-color: navy;
+    color: white;
+    padding: 0.5em 1em;
+    margin: 4px;
+  }
+  .p { font-size: 12px; }
+  .m { font-size: 16px; }
+  .g { font-size: 24px; }
+&lt;/style&gt;
+&lt;span class="botao p"&gt;Pequeno&lt;/span&gt;
+&lt;span class="botao m"&gt;Médio&lt;/span&gt;
+&lt;span class="botao g"&gt;Grande&lt;/span&gt;
+</pre>
+
+<p>O calculado, como o F12 mostra na aba <em>Computed</em> (Calculado): no botão pequeno, <code>padding-top</code> é <code>6px</code> e <code>padding-left</code> é <code>12px</code>; no grande, <code>12px</code> e <code>24px</code>. O navegador converte <code>em</code> em pixels.</p>
+
+<div class="note">
+<strong>A surpresa do <code>%</code></strong>
+<p>Um <code>padding-top: 10%</code> <strong>não</strong> é 10% da altura: é 10% da <strong>largura</strong> do elemento pai. Num pai de 400px de largura, <code>padding: 10%</code> dá 40px nos quatro lados. É estranho, mas tem uma vantagem: o espaço fica igual em cima e dos lados.</p>
+</div>
+
+<hr>
+
+<h2>5. padding × margin</h2>
+<p>As duas propriedades criam espaço, e por isso se confundem. A diferença está no lado da borda:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .caixa {
+    background-color: lightgreen;
+    border: 2px solid green;
+    font-family: monospace;
+  }
+  .com-padding { padding: 24px; }
+  .com-margin  { margin: 24px; }
+&lt;/style&gt;
+&lt;div class="caixa com-padding"&gt;padding: 24px (dentro da borda)&lt;/div&gt;
+&lt;div class="caixa com-margin"&gt;margin: 24px (fora da borda)&lt;/div&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th><code>padding</code></th><th><code>margin</code></th></tr>
+<tr><td>Onde fica</td><td>Dentro da borda</td><td>Fora da borda</td></tr>
+<tr><td>Tem a cor do fundo?</td><td>Sim</td><td>Não, é transparente</td></tr>
+<tr><td>Aumenta a área de clique de um link?</td><td>Sim</td><td>Não</td></tr>
+<tr><td>Aceita valor negativo?</td><td>Não</td><td>Sim</td></tr>
+<tr><td>Use para…</td><td>afastar o conteúdo da própria borda</td><td>afastar uma caixa das outras</td></tr>
+</table>
+</div>
+
+<p>A área de clique é um bom motivo para preferir o padding num link ou botão: no celular, um alvo pequeno é difícil de acertar com o dedo. Tudo o que fica dentro da borda, padding incluído, recebe o clique.</p>
+
+<hr>
+
+<h2>6. O padding aumenta a caixa</h2>
+<p>Por padrão, quando você dá uma largura com <code>width</code>, ela vale só para o <strong>conteúdo</strong>. O padding é somado por fora:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .caixa {
+    width: 200px;
+    background-color: lavender;
+    border: 2px solid rebeccapurple;
+    margin-bottom: 8px;
+  }
+  .gorda { padding: 0 40px; }
+&lt;/style&gt;
+&lt;div class="caixa"&gt;width: 200px&lt;/div&gt;
+&lt;div class="caixa gorda"&gt;width: 200px + padding&lt;/div&gt;
+</pre>
+
+<p>As duas têm <code>width: 200px</code>, mas a segunda ficou 80px mais larga: 200 + 40 + 40 (e mais os 2px de borda de cada lado, nas duas). Isso pega todo mundo de surpresa. O conserto, usado em quase todo site moderno, é o <code>box-sizing: border-box</code>, que faz a largura já incluir o padding e a borda (aula <a href="box-sizing.html">box-sizing</a>).</p>
+
+<hr>
+
+<h2>7. Padding num elemento em linha</h2>
+<p>Elementos em linha, como <code>&lt;span&gt;</code>, <code>&lt;a&gt;</code> e <code>&lt;strong&gt;</code>, ficam no meio do texto. Neles, o padding dos lados empurra as letras vizinhas, mas o de cima e o de baixo <strong>não</strong> empurram as outras linhas: o fundo cresce e passa por cima delas.</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  p { width: 320px; }
+  .destaque {
+    background-color: gold;
+    padding: 12px 8px;
+  }
+&lt;/style&gt;
+&lt;p&gt;Bata a manteiga com o açúcar até virar um creme clarinho. Depois junte &lt;span class="destaque"&gt;os três ovos&lt;/span&gt;, um de cada vez, e continue batendo sem pressa até a massa ficar fofa.&lt;/p&gt;
+</pre>
+
+<p>O fundo dourado sobe sobre a linha de cima (e chega a esconder parte das letras dela) e desce até a linha de baixo, mas o espaço entre as linhas continua o mesmo: o padding de cima e de baixo não afastou nada. Para o padding de cima e de baixo empurrar o resto, o elemento precisa ser <code>inline-block</code> ou bloco, como o botão da missão (aula <a href="display.html">display</a>).</p>
+
+<hr>
+
+<h2>8. Formas de escrever e qual usar</h2>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Quando usar</th></tr>
+<tr><td><code>padding: 1rem;</code></td><td>O mesmo espaço nos quatro lados: cartões, avisos, caixas de texto.</td></tr>
+<tr><td><code>padding: 0.5em 1em;</code></td><td>Botões e etiquetas: mais espaço dos lados do que em cima.</td></tr>
+<tr><td><code>padding: 5px 10px 20px 40px;</code></td><td>Quatro lados diferentes. Leia em voz alta, no sentido do relógio, antes de salvar.</td></tr>
+<tr><td><code>padding-left: 2rem;</code></td><td>Um lado só, sem mexer nos outros. Ótimo para ajustar um padding que veio de outra regra.</td></tr>
+<tr><td><code>padding-inline: 1rem;</code><br><code>padding-block: 0.5rem;</code></td><td>As versões "lógicas": <em>inline</em> = os dois lados do sentido do texto (esquerda e direita em português), <em>block</em> = em cima e embaixo. Funcionam em todos os navegadores atuais; servem também para idiomas escritos da direita para a esquerda (aula <a href="propriedades-logicas.html">Propriedades Lógicas</a>).</td></tr>
+</table>
+</div>
+
+<div class="warning">
+<strong>Cuidado com a ordem</strong>
+<p>Um atalho escrito <strong>depois</strong> de uma propriedade longa apaga o lado dela. Em <code>padding-left: 40px; padding: 10px;</code>, a esquerda fica com 10px: o atalho redefine os quatro lados. Escreva primeiro o atalho e depois o ajuste: <code>padding: 10px; padding-left: 40px;</code>.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>O CSS quase nunca mostra uma mensagem de erro. Quando uma declaração é inválida, o navegador a <strong>ignora</strong> e segue em frente: na tela, o padding simplesmente não aparece. No F12 (aula <a href="devtools.html">DevTools</a>), no painel de estilos do elemento, a declaração inválida aparece <strong>riscada</strong>, com um ícone de aviso. O validador W3C diz o motivo.</p>
+
+<div class="cenario">
+<strong>Valor negativo: <code>negative values are not allowed</code></strong>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  .aviso {
+    background-color: lightyellow;
+    border: 2px solid orange;
+    padding: -10px;
+  }
+&lt;/style&gt;
+&lt;p class="aviso"&gt;Quero um padding menor que zero.&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> a caixa sem padding nenhum, o texto encostado na borda. A declaração inteira foi jogada fora.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css negativo.css
+"file:/home/ana/site/negativo.css":2.13-2.16: error: CSS: “padding”: “-10px” negative values are not allowed.</pre>
+<p><strong>O que significa:</strong> "valores negativos não são permitidos" no <code>padding</code>. Não existe espaço de dentro menor que nada.</p>
+<p><strong>Como consertar:</strong> use <code>0</code> ou mais. Se a ideia era <strong>aproximar</strong> uma caixa da outra, o caminho é a <code>margin</code>, que aceita valores negativos (aula <a href="margin.html">Margem</a>).</p>
+</div>
+
+<div class="cenario">
+<strong>Número sem unidade: <code>You must put a unit after your number</code></strong>
+<pre class="term" data-cwd="~/site">$ cat semunidade.css
+.aviso {
+  padding: 20;
+}
+$ vnu --css semunidade.css
+"file:/home/ana/site/semunidade.css":2.12-2.13: error: CSS: “padding”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<p><strong>O que você vê:</strong> nenhum padding. O navegador não adivinha se você quis 20 pixels, 20 rem ou 20%.</p>
+<p><strong>O que significa:</strong> "só o <code>0</code> pode ficar sem unidade. Você precisa pôr uma unidade depois do número."</p>
+<p><strong>Como consertar:</strong> <code>padding: 20px;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Vírgula entre os valores: <code>“,” is an incorrect operator</code></strong>
+<pre class="term" data-cwd="~/site">$ cat virgula.css
+.aviso {
+  padding: 10px, 20px;
+}
+$ vnu --css virgula.css
+"file:/home/ana/site/virgula.css":2.18-2.21: error: CSS: “padding”: “,” is an incorrect operator.</pre>
+<p><strong>O que você vê:</strong> nenhum padding: a declaração inteira foi ignorada, não só o segundo valor.</p>
+<p><strong>O que significa:</strong> "a vírgula é um operador incorreto" aqui. Os valores do atalho são separados por <strong>espaço</strong>.</p>
+<p><strong>Como consertar:</strong> <code>padding: 10px 20px;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Cinco valores ou nome errado</strong>
+<pre class="term" data-cwd="~/site">$ vnu --css cinco.css
+"file:/home/ana/site/cinco.css":2.32-2.35: error: CSS: “padding”: Too many values or values are not recognized.
+$ vnu --css nome.css
+"file:/home/ana/site/nome.css":2.11-2.14: error: CSS: “paddng”: Property “paddng” doesn't exist.</pre>
+<p><strong>O que significa:</strong> no primeiro, <code>padding: 10px 20px 30px 40px 50px</code> tem "valores demais" (o máximo são quatro, um por lado). No segundo, faltou um <code>i</code>: "a propriedade <code>paddng</code> não existe". Nos dois casos, o navegador ignora a declaração.</p>
+<p><strong>Como consertar:</strong> no máximo quatro valores; e confira a grafia, letra por letra. Um editor com autocompletar ajuda muito.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:.aviso{padding-top}=16px,css:.aviso{padding-left}=16px,nsrc:paddng">
+<p class="try-task"><strong>Missão:</strong> o aviso deveria ter 16px de padding nos quatro lados, mas a declaração tem um erro de digitação e o navegador a ignorou. Ache e conserte.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="aviso"&gt;Encomendas de bolo só até quinta-feira.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.aviso {
+  background-color: lightyellow;
+  border: 2px solid orange;
+  paddng: 16px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.aviso {
+  background-color: lightyellow;
+  border: 2px solid orange;
+  padding: 16px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>padding: A;</code></td><td>A nos quatro lados</td></tr>
+<tr><td><code>padding: A B;</code></td><td>A em cima e embaixo; B dos lados</td></tr>
+<tr><td><code>padding: A B C;</code></td><td>A em cima; B dos lados; C embaixo</td></tr>
+<tr><td><code>padding: A B C D;</code></td><td>cima, direita, baixo, esquerda (relógio)</td></tr>
+<tr><td><code>padding-top</code>, <code>-right</code>, <code>-bottom</code>, <code>-left</code></td><td>Um lado só</td></tr>
+<tr><td><code>padding-inline</code>, <code>padding-block</code></td><td>Os lados do sentido do texto; em cima e embaixo</td></tr>
+<tr><td>Valor inicial</td><td><code>0</code> (mas o navegador já dá padding a alguns elementos, como o <code>&lt;ul&gt;</code>, com 40px à esquerda)</td></tr>
+<tr><td>Valores aceitos</td><td><code>0</code> ou mais, em <code>px</code>, <code>rem</code>, <code>em</code>, <code>%</code> (da largura do pai)…</td></tr>
+<tr><td>Herdado?</td><td>Não: o filho não ganha o padding do pai</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Só embaixo</h3>
+<p>Complete para dar 12px de espaço interno só embaixo:</p>
+<div class="ex-code">.legenda { <input data-answer="padding-bottom" aria-label="propriedade">: 12px; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Dois valores</h3>
+<p>Complete o atalho para ter 8px em cima e embaixo e 16px dos lados:</p>
+<div class="ex-code">.etiqueta { padding: <input data-answer="8px 16px" aria-label="valores">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. A unidade</h3>
+<p>A Ana escreveu <code>padding: 15;</code> e nada aconteceu. Complete com a unidade de pixels:</p>
+<div class="ex-code">padding: 15<input data-answer="px" aria-label="unidade">;</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Em <code>padding: 5px 10px 15px 20px;</code>, quanto fica à esquerda?</p>
+<label><input type="radio" name="q4"> 5px</label>
+<label><input type="radio" name="q4"> 20px</label>
+<label><input type="radio" name="q4"> 10px</label>
+<label><input type="radio" name="q4"> 15px</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Qual frase sobre o padding é verdadeira?</p>
+<label><input type="radio" name="q5"> Ele fica fora da borda e é transparente.</label>
+<label><input type="radio" name="q5"> Aceita valores negativos, como a margem.</label>
+<label><input type="radio" name="q5"> Fica dentro da borda e é pintado pela cor de fundo.</label>
+<label><input type="radio" name="q5"> <code>padding-top: 10%</code> é 10% da altura do pai.</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Uma caixa tem <code>width: 300px</code> e <code>padding: 20px</code>, sem borda e sem <code>box-sizing</code>. Qual a largura que ela ocupa na tela?</p>
+<label><input type="radio" name="q6"> 340px</label>
+<label><input type="radio" name="q6"> 300px</label>
+<label><input type="radio" name="q6"> 320px</label>
+<label><input type="radio" name="q6"> 260px</label>
+</div>
+
+<h3>Missão final: o cartão de receita</h3>
+
+<div class="tryhtml" data-goal="css:.cartao{padding-top}=24px,css:.cartao{padding-left}=24px,css:.etiqueta{padding-top}=4px,css:.etiqueta{padding-left}=12px,css:.etiqueta{padding-bottom}=4px">
+<p class="try-task"><strong>Missão:</strong> o cartão da receita está todo apertado. (1) Dê ao <code>.cartao</code> um padding de <code>1.5rem</code> nos quatro lados (dá 24px). (2) Dê à <code>.etiqueta</code> 4px em cima e embaixo e 12px dos lados.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;span class="etiqueta"&gt;Sobremesa&lt;/span&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Fofinho, com cobertura de chocolate. 50 minutos.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  max-width: 320px;
+  background-color: oldlace;
+  border: 2px solid peru;
+}
+
+.etiqueta {
+  display: inline-block;
+  background-color: saddlebrown;
+  color: white;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  max-width: 320px;
+  background-color: oldlace;
+  border: 2px solid peru;
+  padding: 1.5rem;
+}
+
+.etiqueta {
+  display: inline-block;
+  background-color: saddlebrown;
+  color: white;
+  padding: 4px 12px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>padding</code> é o espaço <strong>de dentro</strong>, entre o conteúdo e a borda. O fundo da caixa o pinta, e ele recebe cliques.</li>
+  <li>Um lado: <code>padding-top</code>, <code>padding-right</code>, <code>padding-bottom</code>, <code>padding-left</code>.</li>
+  <li>Atalho: 1 valor = os quatro lados; 2 = vertical e horizontal; 3 = cima, lados, baixo; 4 = cima, direita, baixo, esquerda (relógio). Valores separados por espaço, nunca por vírgula.</li>
+  <li><code>em</code> acompanha a letra do elemento (ótimo em botões); <code>%</code> vem da <strong>largura</strong> do pai, até em cima e embaixo.</li>
+  <li>Por padrão, o padding <strong>soma</strong> à <code>width</code>; o <code>box-sizing: border-box</code> muda isso.</li>
+  <li>Em elementos em linha, o padding de cima e de baixo pinta o fundo mas não afasta as linhas.</li>
+  <li>Erros (o navegador ignora em silêncio): valor negativo, número sem unidade, vírgula, mais de quatro valores, nome errado.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
