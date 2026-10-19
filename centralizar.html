@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Centralizar — centralizando qualquer coisa | Guia CSS</title>
+<meta name="description" content="Todas as formas de centralizar em CSS, com o resultado ao vivo: text-align para texto, margin: 0 auto para um bloco, Flexbox com justify-content e align-items, Grid com place-items, position com transform, e uma tabela de qual usar em cada caso. Mais os erros que deixam o centro torto e as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Centralizando</span> Qualquer Coisa</h1>
+
+<p class="intro">"Como centralizar uma <code>div</code>?" é, há anos, uma das perguntas mais feitas sobre CSS. O motivo: não existe uma propriedade <code>center</code> que sirva para tudo. Centralizar um <strong>texto</strong> é uma coisa; centralizar uma <strong>caixa</strong> na largura, outra; centralizar na <strong>altura</strong> também, outra ainda. Nesta aula você vai ver todas as formas lado a lado, entender por que cada uma funciona e sair com uma tabela de "qual usar".</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>As duas perguntas que escolhem o método: <strong>o que</strong> eu quero centralizar (texto ou caixa) e <strong>em que direção</strong> (deitado, em pé ou as duas).</li>
+  <li><code>text-align: center</code>: texto e coisas "em linha".</li>
+  <li><code>margin: 0 auto</code>: uma caixa com largura, na horizontal.</li>
+  <li>Flexbox (<code>justify-content</code> + <code>align-items</code>) e Grid (<code>place-items</code>): nas duas direções.</li>
+  <li><code>position: absolute</code> com <code>transform</code>: por cima de outra coisa.</li>
+  <li>Por que o centro "não funciona" na altura, e as mensagens reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Esta aula junta coisas de várias outras: <a href="text-align.html">text-align</a>, <a href="margin.html">margin</a>, <a href="justify-content.html">justify-content</a>, <a href="align-items.html">align-items</a> e <a href="position-absolute.html">position: absolute</a>. Se alguma parecer nova, a aula dela tem os detalhes. Os exemplos com resultado são desenhados agora pelo <strong>seu</strong> navegador. As mensagens do validador saíram do validador W3C (<code>vnu</code>), na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: pendurar um quadro na parede</h2>
+<p>Para pendurar um quadro bem no meio da parede, a Ana precisa saber duas coisas: a <strong>largura</strong> da parede e a do quadro. Sobra espaço dos lados, e ela divide esse espaço em dois pedaços iguais. Para centralizar também na altura, precisa saber a <strong>altura</strong> da parede.</p>
+<p>No CSS é igual. Todo método de centralizar faz isto: <strong>dividir o espaço que sobra em partes iguais</strong>. Daí vêm as duas regras que explicam quase todo "não funcionou":</p>
+<ol class="passo">
+  <li>Se o elemento ocupa a largura toda (um bloco sem <code>width</code>), não sobra espaço dos lados: não há o que dividir.</li>
+  <li>Se o pai não tem uma altura maior que o filho, não sobra espaço em cima e embaixo. Por padrão, um bloco tem só a altura do seu conteúdo: o "centro na altura" acontece, mas num espaço de zero pixels.</li>
+</ol>
+
+<hr>
+
+<h2>1. Texto: <code>text-align: center</code></h2>
+<p>Para centralizar <strong>o texto</strong> de um título ou de um parágrafo, use <code>text-align: center</code> no próprio elemento (ou num pai: a propriedade é herdada):</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  h1 {
+    text-align: center;
+    background-color: lightyellow;
+  }
+&lt;/style&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+</pre>
+
+<p>Repare no fundo amarelo: o <code>h1</code> continua ocupando a largura toda. Quem foi para o meio foram as <strong>letras</strong>, dentro dele. O <code>text-align</code> centraliza o conteúdo <strong>em linha</strong>: texto, links, <code>&lt;img&gt;</code>, botões, elementos com <code>display: inline-block</code>. Ele não move caixas (blocos) que estão dentro, e não mexe na altura.</p>
+
+<hr>
+
+<h2>2. Uma caixa na largura: <code>margin: 0 auto</code></h2>
+<p>Para pôr <strong>a própria caixa</strong> no meio (um cartão, a coluna de texto do blog), ela precisa de duas coisas: uma <strong>largura menor</strong> que a do pai, e margens automáticas dos lados:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;Bolo de cenoura com cobertura de chocolate&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  max-width: 260px;
+  margin: 0 auto;
+  padding: 12px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>max-width: 260px</dt><dd>A largura máxima. Com ela, sobra espaço dos lados. (<code>max-width</code> em vez de <code>width</code>: numa tela mais estreita que 260 pixels, a caixa encolhe em vez de vazar.)</dd>
+  <dt>margin: 0 auto</dt><dd>Dois valores: <code>0</code> em cima e embaixo, <code>auto</code> na esquerda e na direita. <code>auto</code> nas duas laterais quer dizer "dividam a sobra igualmente". É o quadro na parede.</dd>
+</dl>
+
+<p>Apague a linha do <code>max-width</code>: a caixa volta a ocupar a largura toda, e o <code>margin: 0 auto</code> não tem o que dividir. Repare também que o <strong>texto</strong> do cartão continua à esquerda: a caixa está no meio, as letras não. Para as duas coisas, junte com <code>text-align: center</code>.</p>
+
+<div class="tip">
+<strong>E na altura?</strong>
+<p><code>margin: auto 0</code> num bloco comum <strong>não</strong> centraliza na altura: no fluxo normal da página, a margem automática de cima e de baixo vale zero. Para a altura, use Flexbox ou Grid (as próximas seções). Dentro de um pai flex ou grid, aí sim, <code>margin: auto</code> centraliza nas duas direções.</p>
+</div>
+
+<hr>
+
+<h2>3. Nas duas direções com Flexbox</h2>
+<p>O Flexbox centraliza os <strong>filhos</strong> de um pai, na largura e na altura. São três linhas no pai, mais uma altura:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="palco"&gt;
+  &lt;div class="cartao"&gt;No meio!&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.palco {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  border: 2px dashed gray;
+}
+
+.cartao {
+  padding: 12px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>display: flex</dt><dd>Transforma o <code>.palco</code> num pai flex: os filhos viram itens que ele arruma.</dd>
+  <dt>justify-content: center</dt><dd>Na direção principal (deitado, numa fila em linha): divide a sobra dos lados (aula <a href="justify-content.html">justify-content</a>).</dd>
+  <dt>align-items: center</dt><dd>Na direção cruzada (em pé): divide a sobra em cima e embaixo (aula <a href="align-items.html">align-items</a>).</dd>
+  <dt>height: 200px</dt><dd>A altura do palco. Sem ela, o palco teria só a altura do cartão, e não sobraria nada em cima e embaixo.</dd>
+</dl>
+
+<p>Com <strong>vários</strong> filhos, eles ficam juntos, como um grupo, no meio do palco: troque o HTML por três cartões e veja. Se a fila estiver em coluna (<code>flex-direction: column</code>), as duas propriedades trocam de direção, mas, como as duas são <code>center</code>, o resultado continua no meio.</p>
+
+<h3>Experimente: o aviso no meio da faixa</h3>
+<div class="tryhtml" data-goal="css:.faixa{justify-content}=center,css:.faixa{align-items}=center,css:.faixa{display}=flex">
+<p class="try-task"><strong>Missão:</strong> centralize o aviso "Loja fechada hoje" na faixa de 150 pixels, na largura e na altura, com Flexbox.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="faixa"&gt;
+  &lt;p class="aviso"&gt;Loja fechada hoje&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.faixa {
+  height: 150px;
+  background-color: navy;
+}
+
+.aviso {
+  margin: 0;
+  padding: 8px 16px;
+  background-color: white;
+  font-family: sans-serif;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.faixa {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 150px;
+  background-color: navy;
+}
+
+.aviso {
+  margin: 0;
+  padding: 8px 16px;
+  background-color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>4. Nas duas direções com Grid: <code>place-items</code></h2>
+<p>Com Grid, a receita é ainda mais curta. O <code>place-items</code> ("posicionar os itens") é um atalho que centraliza cada filho dentro do seu espaço, nas duas direções ao mesmo tempo:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="palco"&gt;
+  &lt;div class="cartao"&gt;No meio!&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.palco {
+  display: grid;
+  place-items: center;
+  height: 200px;
+  border: 2px dashed gray;
+}
+
+.cartao {
+  padding: 12px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>display: grid</dt><dd>Transforma o <code>.palco</code> numa grade (aula <a href="grid.html">Introdução ao Grid</a>). Sem colunas definidas, é uma grade de uma célula só.</dd>
+  <dt>place-items: center</dt><dd>Atalho para <code>align-items: center</code> (em pé) + <code>justify-items: center</code> (deitado). No F12, na aba Computed, aparecem as duas propriedades longas.</dd>
+</dl>
+
+<p>O resultado é igual ao do Flexbox com um filho. A diferença aparece com <strong>vários</strong> filhos: no Grid, cada um ganha a sua linha da grade e fica um <strong>embaixo do outro</strong>, cada um centralizado; no Flexbox, eles ficam lado a lado. Ponha três cartões nas duas caixas e compare.</p>
+
+<hr>
+
+<h2>5. Por cima de outra coisa: <code>position</code> + <code>transform</code></h2>
+<p>Às vezes o elemento precisa ficar <strong>por cima</strong> de outro: o "play" no meio de uma foto, o selo no meio de um cartão. Aí entra o <code>position: absolute</code> (aula <a href="position-absolute.html">position: absolute</a>):</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="foto"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="400" height="300"&gt;
+  &lt;span class="selo"&gt;Esgotado&lt;/span&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.foto {
+  position: relative;
+  width: 400px;
+}
+
+.foto img {
+  display: block;
+}
+
+.selo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 8px 16px;
+  background-color: darkred;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>position: relative (no pai)</dt><dd>Faz do <code>.foto</code> a "moldura" de referência: o <code>top</code> e o <code>left</code> do selo são medidos a partir dele.</dd>
+  <dt>top: 50%; left: 50%</dt><dd>Leva o <strong>canto de cima à esquerda</strong> do selo até o meio da foto. Só isso deixa o selo torto, para baixo e para a direita.</dd>
+  <dt>transform: translate(-50%, -50%)</dt><dd>Puxa o selo de volta, para a esquerda e para cima, metade da <strong>largura e da altura dele mesmo</strong> (aula <a href="transform.html">transform</a>). Agora é o meio do selo que está no meio da foto.</dd>
+</dl>
+
+<p>Apague a linha do <code>transform</code> e veja o selo escorregar para baixo e para a direita: é o canto dele que fica no centro. Esse método funciona sem saber o tamanho do selo, mas tira o elemento do fluxo da página (ele não ocupa espaço). Use só quando ele <strong>precisa</strong> ficar por cima.</p>
+
+<hr>
+
+<h2>6. Todos lado a lado</h2>
+<p>Os cinco métodos, cada um num palco de 120 pixels de altura, com o nome do método escrito no cartão:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="palco texto"&gt;
+  &lt;span class="cartao"&gt;text-align&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="palco"&gt;
+  &lt;div class="cartao margem"&gt;margin: 0 auto&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="palco flex"&gt;
+  &lt;div class="cartao"&gt;flex&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="palco grade"&gt;
+  &lt;div class="cartao"&gt;grid&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="palco posicao"&gt;
+  &lt;div class="cartao"&gt;position&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.palco {
+  height: 120px;
+  margin-bottom: 8px;
+  border: 2px dashed gray;
+  font-family: monospace;
+}
+
+.cartao {
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+}
+
+.texto {
+  text-align: center;
+}
+
+.texto .cartao {
+  display: inline-block;
+}
+
+.margem {
+  width: 140px;
+  margin: 0 auto;
+}
+
+.flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.grade {
+  display: grid;
+  place-items: center;
+}
+
+.posicao {
+  position: relative;
+}
+
+.posicao .cartao {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+</pre>
+</div>
+
+<p>Olhando com atenção: <code>text-align</code> e <code>margin: 0 auto</code> centralizaram só na <strong>largura</strong>: os dois cartões ficaram colados no topo do palco. Os três últimos centralizaram nas duas direções. (O cartão do <code>margin</code> tem o texto à esquerda, porque só a caixa foi para o meio. E o cartão do <code>text-align</code> é um <code>&lt;span&gt;</code> com <code>display: inline-block</code>: um elemento em linha, que o <code>text-align</code> consegue mover.)</p>
+
+<hr>
+
+<h2>7. Qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quero centralizar…</th><th>Use</th><th>Precisa de</th></tr>
+<tr><td>O <strong>texto</strong> de um título, parágrafo, botão</td><td><code>text-align: center</code> no elemento</td><td>Nada</td></tr>
+<tr><td>Uma imagem, um link, um <code>inline-block</code>, na largura</td><td><code>text-align: center</code> no <strong>pai</strong></td><td>Nada</td></tr>
+<tr><td>Uma <strong>caixa</strong> (a coluna do blog, um formulário), na largura</td><td><code>margin: 0 auto</code> na caixa</td><td><code>width</code> ou <code>max-width</code> menor que o pai</td></tr>
+<tr><td>Um ou vários filhos, nas <strong>duas direções</strong>, lado a lado</td><td>Flexbox: <code>display: flex</code> + <code>justify-content: center</code> + <code>align-items: center</code></td><td>Uma altura no pai</td></tr>
+<tr><td>Um filho nas duas direções, com o menor código</td><td>Grid: <code>display: grid</code> + <code>place-items: center</code></td><td>Uma altura no pai</td></tr>
+<tr><td>Algo <strong>por cima</strong> de outra coisa (selo, botão de play)</td><td><code>position: absolute</code> + <code>top/left: 50%</code> + <code>transform: translate(-50%, -50%)</code></td><td><code>position: relative</code> no pai</td></tr>
+<tr><td>Uma linha de texto na altura de uma barra</td><td>Flexbox com <code>align-items: center</code></td><td>O truque antigo <code>line-height</code> = altura só serve para uma linha: reconheça, mas não use</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Centralizar é campeão de "não funcionou". Quase sempre, o CSS está certo e falta <strong>espaço para dividir</strong>.</p>
+
+<div class="cenario">
+<strong>Centralizou na largura, mas não na altura</strong>
+<p><strong>O que aconteceu:</strong> o pai tem <code>display: flex</code>, <code>justify-content: center</code> e <code>align-items: center</code>, mas não tem <code>height</code>.</p>
+<p><strong>O que você vê:</strong> o filho está no meio da largura, mas colado no topo, e a borda do pai abraça o filho por cima e por baixo. O <code>align-items: center</code> funcionou: o pai só tem a altura do filho, e não sobra nada para dividir. Apague a linha do <code>height</code> no exemplo da seção 3 e veja.</p>
+<p><strong>Como consertar:</strong> dê altura ao pai: <code>height</code>, <code>min-height</code> ou, para a tela toda, <code>min-height: 100dvh</code> (aula <a href="unidades-viewport.html">Unidades da Tela</a>).</p>
+</div>
+
+<div class="cenario">
+<strong><code>margin: 0 auto</code> não fez nada</strong>
+<p><strong>O que aconteceu:</strong> um destes dois:</p>
+<ul>
+  <li>a caixa não tem <code>width</code> nem <code>max-width</code>: ela ocupa a largura toda, e as margens automáticas valem zero;</li>
+  <li>o elemento é em linha (um <code>&lt;span&gt;</code>, um <code>&lt;a&gt;</code>, um <code>&lt;img&gt;</code>): elementos em linha não recebem margem automática nas laterais.</li>
+</ul>
+<p><strong>O que você vê:</strong> o elemento continua à esquerda. O validador não reclama: tudo está escrito certo.</p>
+<p><strong>Como consertar:</strong> dê uma largura menor que a do pai; num elemento em linha, ou use <code>text-align: center</code> no pai, ou transforme-o em bloco (<code>display: block</code>) e aí use <code>margin: 0 auto</code>. É o jeito comum de centralizar uma imagem sozinha.</p>
+</div>
+
+<div class="cenario">
+<strong><code>text-align: center</code> não moveu a caixa</strong>
+<p><strong>O que aconteceu:</strong> <code>.cartao { width: 200px; text-align: center; }</code>, esperando ver o cartão no meio da página.</p>
+<p><strong>O que você vê:</strong> o cartão continua à esquerda; só o <strong>texto dentro dele</strong> foi para o meio do cartão. O <code>text-align</code> arruma o conteúdo em linha de um elemento, e não o próprio elemento.</p>
+<p><strong>Como consertar:</strong> para mover a caixa, <code>margin: 0 auto</code> nela (ou Flexbox/Grid no pai).</p>
+</div>
+
+<div class="cenario">
+<strong><code>vertical-align: middle</code> numa <code>div</code></strong>
+<p><strong>O que aconteceu:</strong> a Ana pôs <code>vertical-align: middle</code> numa <code>div</code>, esperando centralizá-la na altura.</p>
+<p><strong>O que você vê:</strong> nada muda, e o validador não reclama (a propriedade existe). O <code>vertical-align</code> só vale para elementos em linha (alinha uma imagem com o texto da mesma linha) e para células de tabela. Num bloco, é ignorado.</p>
+<p><strong>Como consertar:</strong> Flexbox ou Grid no pai.</p>
+</div>
+
+<div class="cenario">
+<strong>O selo ficou torto, para baixo e para a direita</strong>
+<p><strong>O que aconteceu:</strong> <code>position: absolute; top: 50%; left: 50%;</code>, sem o <code>transform</code>.</p>
+<p><strong>O que você vê:</strong> o selo começa no centro, em vez de estar centralizado: é o canto de cima à esquerda dele que fica no meio. Quanto maior o selo, mais torto.</p>
+<p><strong>Como consertar:</strong> acrescente <code>transform: translate(-50%, -50%);</code>. Se o selo foi para o canto da <strong>página</strong>, e não da foto, faltou o <code>position: relative</code> no pai.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “justify-content”: “centre” is not a “justify-content” value.</code></strong>
+<p><strong>O que aconteceu:</strong> palavras quase certas: <code>centre</code> (o "center" do inglês britânico) e <code>middle</code>.</p>
+<pre class="term" data-cwd="~/centro">$ vnu --css centre.css
+"file:/home/ana/centro/centre.css":3.20-3.25: error: CSS: “justify-content”: “centre” is not a “justify-content” value.
+$ vnu --css place.css
+"file:/home/ana/centro/place.css":3.16-3.21: error: CSS: “place-items”: “middle” is not a “place-items” value.
+$ vnu --css texto.css
+"file:/home/ana/centro/texto.css":2.15-2.20: error: CSS: “text-align”: “middle” is not a “text-align” value.</pre>
+<p>Em todas as propriedades de centralizar, a palavra é <code>center</code>, com <strong>-er</strong> no fim. A declaração com a palavra errada é ignorada, e o elemento fica onde estava.</p>
+<p><strong>Como consertar:</strong> <code>center</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “margin”: “center” is not a “margin” value.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>margin: 0 center;</code>, misturando as ideias.</p>
+<pre class="term" data-cwd="~/centro">$ vnu --css margem.css
+"file:/home/ana/centro/margem.css":2.13-2.18: error: CSS: “margin”: “center” is not a “margin” value.</pre>
+<p>A margem é um tamanho (ou <code>auto</code>); "centro" não é tamanho. A declaração inteira é ignorada: a caixa fica à esquerda e sem margem.</p>
+<p><strong>Como consertar:</strong> <code>margin: 0 auto;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “align-items”: Missing a semicolon before the property name “justify-content”.</code></strong>
+<p><strong>O que aconteceu:</strong> faltou o <code>;</code> depois de <code>align-items: center</code>.</p>
+<pre class="term" data-cwd="~/centro">$ vnu --css semponto.css
+"file:/home/ana/centro/semponto.css":3.3-3.17: error: CSS: “align-items”: Missing a semicolon before the property name “justify-content”.</pre>
+<p>Sem o <code>;</code>, o navegador lê as duas linhas como uma declaração só, que não faz sentido, e ignora as duas: não centraliza em nenhuma direção.</p>
+<p><strong>Como consertar:</strong> <code>;</code> no fim de toda declaração.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Centraliza</th><th>Onde vai</th></tr>
+<tr><td><code>text-align: center;</code></td><td>Texto e conteúdo em linha, na largura</td><td>No elemento do texto (ou num pai)</td></tr>
+<tr><td><code>margin: 0 auto;</code> + <code>max-width</code></td><td>A própria caixa, na largura</td><td>Na caixa</td></tr>
+<tr><td><code>display: flex; justify-content: center; align-items: center;</code></td><td>Os filhos, nas duas direções (lado a lado)</td><td>No pai (com altura)</td></tr>
+<tr><td><code>display: grid; place-items: center;</code></td><td>Cada filho, nas duas direções (um embaixo do outro)</td><td>No pai (com altura)</td></tr>
+<tr><td><code>margin: auto;</code></td><td>Um filho de pai flex ou grid, nas duas direções</td><td>No filho</td></tr>
+<tr><td><code>position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);</code></td><td>Por cima de outro elemento</td><td>No filho (pai com <code>position: relative</code>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Texto no meio</h3>
+<p>Complete para centralizar o texto do título:</p>
+<div class="ex-code">h1 { text-align: <input data-answer="center" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. A coluna do blog</h3>
+<p>Complete para a coluna de 600 pixels ficar no meio da página:</p>
+<div class="ex-code">.coluna { max-width: 600px; margin: 0 <input data-answer="auto" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. O pai tem <code>display: flex; justify-content: center; align-items: center;</code>, e o filho está no meio da largura, mas colado no topo. O que falta?</p>
+<label><input type="radio" name="q3"> <code>vertical-align: middle</code> no filho</label>
+<label><input type="radio" name="q3"> <code>text-align: center</code> no pai</label>
+<label><input type="radio" name="q3"> Uma altura no pai, maior que o filho</label>
+<label><input type="radio" name="q3"> <code>margin: 0 auto</code> no filho</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">4. Qual atalho do Grid centraliza o filho nas duas direções?</p>
+<label><input type="radio" name="q4"> <code>place-items: center</code></label>
+<label><input type="radio" name="q4"> <code>align: center</code></label>
+<label><input type="radio" name="q4"> <code>grid-center: both</code></label>
+<label><input type="radio" name="q4"> <code>center: true</code></label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Com <code>position: absolute; top: 50%; left: 50%;</code>, o selo ficou um pouco para baixo e para a direita. O que falta?</p>
+<label><input type="radio" name="q5"> <code>margin: 0 auto</code></label>
+<label><input type="radio" name="q5"> <code>transform: translate(-50%, -50%)</code></label>
+<label><input type="radio" name="q5"> <code>text-align: center</code></label>
+<label><input type="radio" name="q5"> <code>align-self: center</code></label>
+</div>
+
+<h3>Missão final: a tela de boas-vindas</h3>
+
+<div class="tryhtml" data-goal="css:.tela{display}=grid,css:.tela{align-items}=center,css:.tela{justify-items}=center,css:.boas-vindas{text-align}=center">
+<p class="try-task"><strong>Missão:</strong> (1) centralize o cartão de boas-vindas na <code>.tela</code>, nas duas direções, com Grid e <code>place-items</code>. (2) Centralize também o texto dentro do cartão.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="tela"&gt;
+  &lt;div class="boas-vindas"&gt;
+    &lt;img src="assets/midia/avatar-ana-96.png" alt="Avatar da Ana" width="96" height="96"&gt;
+    &lt;h1&gt;Olá, eu sou a Ana!&lt;/h1&gt;
+    &lt;p&gt;Bem-vindo à minha cozinha.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.tela {
+  height: 320px;
+  background-color: lavender;
+  font-family: sans-serif;
+}
+
+.boas-vindas {
+  padding: 16px 24px;
+  background-color: white;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.tela {
+  display: grid;
+  place-items: center;
+  height: 320px;
+  background-color: lavender;
+  font-family: sans-serif;
+}
+
+.boas-vindas {
+  padding: 16px 24px;
+  background-color: white;
+  text-align: center;
+}
+</pre>
+</div>
+
+<p>Repare que a imagem também foi para o meio do cartão com o <code>text-align: center</code>: o <code>&lt;img&gt;</code> é um elemento em linha.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Todo método de centralizar divide o <strong>espaço que sobra</strong>. Sem sobra (bloco sem largura, pai sem altura), não há o que dividir.</li>
+  <li>Texto e conteúdo em linha: <code>text-align: center</code>. Uma caixa na largura: <code>max-width</code> + <code>margin: 0 auto</code>.</li>
+  <li>Nas duas direções: Flexbox (<code>justify-content</code> + <code>align-items</code>) ou Grid (<code>place-items: center</code>), com altura no pai.</li>
+  <li>Por cima de outra coisa: <code>position: absolute</code> + <code>top/left: 50%</code> + <code>transform: translate(-50%, -50%)</code>, com o pai em <code>position: relative</code>.</li>
+  <li><code>vertical-align</code> não centraliza blocos; <code>centre</code> e <code>middle</code> não existem nessas propriedades: é <code>center</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
