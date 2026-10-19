@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Listas — marcadores, list-style e ::marker | Guia CSS</title>
+<meta name="description" content="Estilizando listas com CSS para quem nunca escreveu CSS: trocar o marcador com list-style-type (square, upper-roman, um texto qualquer), a posição do marcador, o atalho list-style, pintar o marcador com ::marker, tirar os marcadores para fazer um menu e os erros reais: nome de marcador que vira número, marcador que some da tela e o validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Listas</span></h1>
+
+<p class="intro">Lista de ingredientes, passo a passo do modo de preparo, menu do site: listas estão em todo lugar. O navegador já as desenha com bolinhas (<code>&lt;ul&gt;</code>) ou números (<code>&lt;ol&gt;</code>) e um recuo à esquerda. Nesta aula você vai trocar esses marcadores por quadradinhos, letras, algarismos romanos ou um símbolo qualquer, pintar o marcador de outra cor e, no fim, tirar tudo para transformar uma lista num menu.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que é o <strong>marcador</strong> de uma lista e de onde vem o recuo.</li>
+  <li><code>list-style-type</code>: bolinha, quadrado, letras, romanos ou um texto seu.</li>
+  <li><code>list-style-position</code>: o marcador dentro ou fora do texto.</li>
+  <li>O atalho <code>list-style</code> e o <code>list-style-image</code>.</li>
+  <li><code>::marker</code>: mudar a cor e o tamanho só do marcador.</li>
+  <li>Como tirar marcadores e recuo para fazer um menu.</li>
+  <li>Os erros: o nome de marcador que vira número, o marcador que sai da tela e o que o validador W3C diz.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As listas em HTML (<code>&lt;ul&gt;</code>, <code>&lt;ol&gt;</code> e <code>&lt;li&gt;</code>) foram assunto do <a href="https://wallysondevs.github.io/guia-html/listas.html">Guia HTML</a>; aqui o assunto é só a aparência delas.</p>
+
+<hr>
+
+<h2>A ideia: a etiqueta e o recuo</h2>
+<p>Pense numa lista de compras escrita à mão. Cada item começa com um tracinho, uma bolinha ou um número: é a <strong>etiqueta</strong> que diz "aqui começa um item". E a lista inteira fica um pouco para dentro, para a etiqueta ter onde ficar.</p>
+<p>No CSS é igual. A etiqueta se chama <strong>marcador</strong> (<em>marker</em>, em inglês), e o recuo é um <strong>espaço interno</strong> (<code>padding</code>, "preenchimento") que o navegador põe à esquerda da lista. Veja os dois no resultado:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  ul {
+    border: 2px dashed tomato;
+  }
+&lt;/style&gt;
+&lt;ul&gt;
+  &lt;li&gt;Farinha&lt;/li&gt;
+  &lt;li&gt;Ovos&lt;/li&gt;
+  &lt;li&gt;Cenoura&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+<p>A borda tracejada mostra a caixa do <code>&lt;ul&gt;</code>. Repare:</p>
+<ul>
+  <li>As bolinhas ficam <strong>dentro</strong> da borda, mas num espaço vazio à esquerda do texto. Esse espaço é o <code>padding-left</code> da lista: <strong>40px</strong> no Chrome, no Edge e no Firefox (é o que o F12 mostra na aba <em>Computed</em>).</li>
+  <li>A lista tem uma margem em cima e embaixo (<code>margin-top</code> e <code>margin-bottom</code> de 16px, o tamanho de uma linha de texto).</li>
+  <li>Cada <code>&lt;li&gt;</code> tem <code>display: list-item</code>: é esse valor que faz o navegador desenhar um marcador. Ele volta no <a href="#errado">Quando dá errado</a>.</li>
+</ul>
+
+<hr>
+
+<h2>1. Trocar o marcador: <code>list-style-type</code></h2>
+<p>A propriedade <code>list-style-type</code> ("tipo do estilo da lista") escolhe o desenho do marcador:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque <code>square</code> por <code>circle</code> e veja os marcadores mudarem.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Ingredientes&lt;/h2&gt;
+&lt;ul class="ingredientes"&gt;
+  &lt;li&gt;2 xícaras de farinha&lt;/li&gt;
+  &lt;li&gt;3 ovos&lt;/li&gt;
+  &lt;li&gt;3 cenouras&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.ingredientes {
+  list-style-type: square;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>.ingredientes</dt><dd>O seletor: a lista com <code>class="ingredientes"</code>.</dd>
+  <dt>list-style-type</dt><dd>A propriedade do desenho do marcador.</dd>
+  <dt>square</dt><dd>O valor: "quadrado".</dd>
+</dl>
+
+<div class="tip">
+<strong>Na lista ou no item?</strong>
+<p>O <code>list-style-type</code> é <strong>herdado</strong>: posto no <code>&lt;ul&gt;</code>, ele passa para todos os <code>&lt;li&gt;</code> de dentro (aula <a href="heranca.html">Herança</a>). Por isso o costume é escrever na lista. Escrever num <code>&lt;li&gt;</code> só muda aquele item.</p>
+</div>
+
+<h3>Os valores, lado a lado</h3>
+<p>Cada lista abaixo usa um valor, escrito no próprio item:</p>
+
+<pre class="file" data-file="valores-ul.html" data-resultado>&lt;style&gt;
+  .disc   { list-style-type: disc; }
+  .circle { list-style-type: circle; }
+  .square { list-style-type: square; }
+  .none   { list-style-type: none; }
+&lt;/style&gt;
+&lt;ul class="disc"&gt;&lt;li&gt;disc (o padrão do ul)&lt;/li&gt;&lt;/ul&gt;
+&lt;ul class="circle"&gt;&lt;li&gt;circle&lt;/li&gt;&lt;/ul&gt;
+&lt;ul class="square"&gt;&lt;li&gt;square&lt;/li&gt;&lt;/ul&gt;
+&lt;ul class="none"&gt;&lt;li&gt;none (sem marcador)&lt;/li&gt;&lt;/ul&gt;
+</pre>
+
+<p>Repare no <code>none</code>: o marcador some, mas o texto <strong>continua recuado</strong>. O recuo é o <code>padding</code> da lista, e não o marcador; a seção 5 tira os dois.</p>
+
+<p>Para listas numeradas, há vários tipos de número:</p>
+
+<pre class="file" data-file="valores-ol.html" data-resultado>&lt;style&gt;
+  .decimal { list-style-type: decimal; }
+  .zero    { list-style-type: decimal-leading-zero; }
+  .alpha   { list-style-type: lower-alpha; }
+  .ALPHA   { list-style-type: upper-alpha; }
+  .roman   { list-style-type: lower-roman; }
+  .ROMAN   { list-style-type: upper-roman; }
+&lt;/style&gt;
+&lt;ol class="decimal"&gt;&lt;li&gt;decimal (o padrão do ol)&lt;/li&gt;&lt;li&gt;dois&lt;/li&gt;&lt;/ol&gt;
+&lt;ol class="zero"&gt;&lt;li&gt;decimal-leading-zero&lt;/li&gt;&lt;li&gt;dois&lt;/li&gt;&lt;/ol&gt;
+&lt;ol class="alpha"&gt;&lt;li&gt;lower-alpha&lt;/li&gt;&lt;li&gt;dois&lt;/li&gt;&lt;/ol&gt;
+&lt;ol class="ALPHA"&gt;&lt;li&gt;upper-alpha&lt;/li&gt;&lt;li&gt;dois&lt;/li&gt;&lt;/ol&gt;
+&lt;ol class="roman"&gt;&lt;li&gt;lower-roman&lt;/li&gt;&lt;li&gt;dois&lt;/li&gt;&lt;/ol&gt;
+&lt;ol class="ROMAN"&gt;&lt;li&gt;upper-roman&lt;/li&gt;&lt;li&gt;dois&lt;/li&gt;&lt;/ol&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>Marcador</th><th>Bom para</th></tr>
+<tr><td><code>disc</code></td><td>● bolinha cheia (padrão do <code>ul</code>)</td><td>Qualquer lista sem ordem</td></tr>
+<tr><td><code>circle</code></td><td>○ bolinha vazia</td><td>Sublista (o navegador já usa no 2º nível)</td></tr>
+<tr><td><code>square</code></td><td>■ quadradinho</td><td>Visual mais "reto", sublista do 3º nível</td></tr>
+<tr><td><code>decimal</code></td><td>1. 2. 3. (padrão do <code>ol</code>)</td><td>Passo a passo</td></tr>
+<tr><td><code>decimal-leading-zero</code></td><td>01. 02. 03.</td><td>Listas que passam de 9 itens e devem ficar alinhadas</td></tr>
+<tr><td><code>lower-alpha</code> / <code>upper-alpha</code></td><td>a. b. c. / A. B. C.</td><td>Alternativas, subitens de contrato</td></tr>
+<tr><td><code>lower-roman</code> / <code>upper-roman</code></td><td>i. ii. iii. / I. II. III.</td><td>Capítulos, cláusulas</td></tr>
+<tr><td><code>none</code></td><td>nenhum</td><td>Menus e listas de cartões</td></tr>
+<tr><td><code>"→ "</code> (um texto entre aspas)</td><td>o próprio texto</td><td>Um símbolo seu</td></tr>
+</table>
+</div>
+
+<div class="note">
+<strong>Marcador é aparência; ordem é HTML</strong>
+<p>Trocar o marcador não muda o <strong>significado</strong>. Uma lista em que a ordem importa (os passos da receita) continua sendo <code>&lt;ol&gt;</code>, mesmo que você mostre letras ou romanos. E um <code>&lt;ul&gt;</code> com <code>decimal</code> mostra números, mas para o leitor de tela continua sendo uma lista sem ordem.</p>
+</div>
+
+<h3>Um texto qualquer como marcador</h3>
+<p>Entre aspas, o valor vira o próprio marcador. Deixe um espaço no fim do texto, senão ele gruda no item:</p>
+
+<pre class="file" data-file="seta.html" data-resultado>&lt;style&gt;
+  .seta    { list-style-type: "→ "; }
+  .colado  { list-style-type: "→"; }
+  .estrela { list-style-type: "★ "; }
+&lt;/style&gt;
+&lt;ul class="seta"&gt;&lt;li&gt;com espaço depois da seta&lt;/li&gt;&lt;/ul&gt;
+&lt;ul class="colado"&gt;&lt;li&gt;sem espaço: a seta gruda&lt;/li&gt;&lt;/ul&gt;
+&lt;ul class="estrela"&gt;&lt;li&gt;estrela&lt;/li&gt;&lt;/ul&gt;
+</pre>
+
+<p>O texto como marcador funciona no Chrome e no Edge desde a versão 79, no Firefox desde a 39 e no Safari desde a 14.1: todos os navegadores atuais.</p>
+
+<div class="tryhtml" data-goal="css:.ingredientes li{list-style-type}=square">
+<p class="try-task"><strong>Missão:</strong> a Ana quer quadradinhos na lista de ingredientes. Escreva a regra no <code>style.css</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;ul class="ingredientes"&gt;
+  &lt;li&gt;2 xícaras de farinha&lt;/li&gt;
+  &lt;li&gt;3 ovos&lt;/li&gt;
+  &lt;li&gt;3 cenouras&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.ingredientes {
+
+}
+</pre>
+<pre class="solucao" data-file="style.css">.ingredientes {
+  list-style-type: square;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. Dentro ou fora: <code>list-style-position</code></h2>
+<p>O marcador pode ficar <strong>fora</strong> do texto (<code>outside</code>, o padrão), pendurado no recuo, ou <strong>dentro</strong> (<code>inside</code>), como se fosse a primeira letra do item. A diferença aparece quando o item ocupa mais de uma linha:</p>
+
+<pre class="file" data-file="posicao.html" data-resultado>&lt;style&gt;
+  ul {
+    border: 2px dashed tomato;
+    max-width: 300px;
+  }
+  .fora   { list-style-position: outside; }
+  .dentro { list-style-position: inside; }
+&lt;/style&gt;
+&lt;ul class="fora"&gt;
+  &lt;li&gt;outside: a segunda linha do item fica alinhada com a primeira&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul class="dentro"&gt;
+  &lt;li&gt;inside: o marcador entra no texto, e a segunda linha volta para baixo dele&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+<ul>
+  <li>Com <code>outside</code>, o marcador fica à esquerda e o texto forma um bloco alinhado. É o mais fácil de ler.</li>
+  <li>Com <code>inside</code>, o marcador anda para a direita, para dentro do item, e a segunda linha começa embaixo dele.</li>
+</ul>
+<p>Use <code>inside</code> quando o item tem fundo ou borda e você quer o marcador dentro dessa caixa. No resto, fique com o padrão.</p>
+
+<hr>
+
+<h2>3. O atalho <code>list-style</code> e o <code>list-style-image</code></h2>
+<p>Como em várias propriedades do CSS, existe um <strong>atalho</strong> que junta as três de uma vez: o tipo, a posição e a imagem, em qualquer ordem.</p>
+
+<pre class="file" data-file="style.css">.ingredientes {
+  list-style: square inside;
+}
+
+.menu {
+  list-style: none;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>list-style</dt><dd>O atalho de <code>list-style-type</code>, <code>list-style-position</code> e <code>list-style-image</code>.</dd>
+  <dt>square inside</dt><dd>Tipo <code>square</code> e posição <code>inside</code>. O que você não escreve volta ao padrão: aqui, sem imagem.</dd>
+  <dt>none</dt><dd>O jeito mais comum de usar o atalho: "nenhum marcador".</dd>
+</dl>
+
+<p>O <code>list-style-image</code> ("imagem do estilo da lista") troca o marcador por uma imagem: <code>list-style-image: url(seta.svg);</code>. Ele quase não é usado hoje, porque não dá para controlar o tamanho nem a posição da imagem: ela entra do tamanho que tiver. Para um marcador sob medida, a aula <a href="before-after.html">::before e ::after</a> mostra o jeito moderno.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Para</th><th>Escreva</th><th>Quando usar</th></tr>
+<tr><td>Trocar só o desenho</td><td><code>list-style-type: square;</code></td><td>O mais claro: quem lê sabe o que mudou</td></tr>
+<tr><td>Tirar os marcadores</td><td><code>list-style: none;</code></td><td>Menus; é o jeito que você vai ver em todo site</td></tr>
+<tr><td>Desenho e posição juntos</td><td><code>list-style: square inside;</code></td><td>Quando muda mais de uma coisa</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>4. Pintar só o marcador: <code>::marker</code></h2>
+<p>E se a Ana quiser os números do modo de preparo em laranja, mas o texto em preto? Um <code>color</code> no <code>&lt;li&gt;</code> pinta os dois. Para mexer <strong>só no marcador</strong>, existe o pseudo-elemento <code>::marker</code>:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> mude o <code>font-size</code> para <code>2em</code> e a cor para <code>navy</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Modo de preparo&lt;/h2&gt;
+&lt;ol class="preparo"&gt;
+  &lt;li&gt;Bata as cenouras com os ovos.&lt;/li&gt;
+  &lt;li&gt;Misture a farinha.&lt;/li&gt;
+  &lt;li&gt;Asse por 40 minutos.&lt;/li&gt;
+&lt;/ol&gt;
+</pre>
+<pre class="script" data-file="style.css">.preparo li::marker {
+  color: tomato;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>.preparo li</dt><dd>Os itens da lista do modo de preparo.</dd>
+  <dt>::marker</dt><dd>Os dois-pontos duplos indicam um <strong>pseudo-elemento</strong>: uma parte do elemento que não existe no HTML, mas o CSS consegue estilizar. Aqui, o marcador de cada <code>&lt;li&gt;</code>.</dd>
+  <dt>color, font-size, font-weight</dt><dd>Só valem para o número; o texto do item não muda.</dd>
+</dl>
+
+<p>O <code>::marker</code> aceita poucas propriedades: <code>color</code>, as de fonte (<code>font-size</code>, <code>font-weight</code>, <code>font-family</code>…), <code>content</code> (para trocar o texto do marcador), <code>white-space</code>, animações e transições. Um <code>background</code>, um <code>padding</code> ou uma <code>border</code> no <code>::marker</code> são ignorados.</p>
+
+<div class="note">
+<strong>Suporte</strong>
+<p>O <code>::marker</code> funciona no Chrome e no Edge desde a versão 86 e no Firefox desde a 68. No <strong>Safari</strong>, só <code>color</code> e <code>font-size</code> funcionam: um <code>font-weight</code> ou um <code>content</code> são ignorados lá. Para cor e tamanho, pode usar sem medo.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:.preparo li{list-style-type}=lower-alpha,src:::marker\s*\{[^}]*color\s*:">
+<p class="try-task"><strong>Missão:</strong> deixe os passos com letras minúsculas (a, b, c) e pinte só as letras de <code>tomato</code>, com <code>::marker</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Modo de preparo&lt;/h2&gt;
+&lt;ol class="preparo"&gt;
+  &lt;li&gt;Bata as cenouras com os ovos.&lt;/li&gt;
+  &lt;li&gt;Misture a farinha.&lt;/li&gt;
+  &lt;li&gt;Asse por 40 minutos.&lt;/li&gt;
+&lt;/ol&gt;
+</pre>
+<pre class="script" data-file="style.css">.preparo {
+
+}
+</pre>
+<pre class="solucao" data-file="style.css">.preparo {
+  list-style-type: lower-alpha;
+}
+
+.preparo li::marker {
+  color: tomato;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>5. Sem marcador e sem recuo: a lista vira menu</h2>
+<p>Quase todo menu de site é uma lista de links: são vários itens do mesmo tipo, e o leitor de tela anuncia "lista, 4 itens", o que ajuda quem não enxerga. Mas ninguém quer bolinhas no menu. São <strong>três</strong> coisas a tirar: o marcador, o recuo (<code>padding</code>) e a margem de cima e de baixo.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> apague uma linha de cada vez (o <code>list-style</code>, depois o <code>padding</code>, depois o <code>margin</code>) e veja o que cada uma tirava.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav&gt;
+  &lt;ul class="menu"&gt;
+    &lt;li&gt;&lt;a href="index.html"&gt;Início&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="sobre.html"&gt;Sobre&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 2px dashed tomato;
+}
+</pre>
+</div>
+
+<p>Com as três linhas, os links ficam encostados na borda tracejada, um embaixo do outro. Para pôr os itens <strong>lado a lado</strong>, o caminho moderno é <code>display: flex</code> no <code>&lt;ul&gt;</code>, assunto da aula <a href="flexbox.html">Introdução ao Flexbox</a>. O visual dos links (cor, sublinhado) está na aula <a href="links.html">Estilizando Links</a>.</p>
+
+<div class="warning">
+<strong>Safari e o leitor de tela</strong>
+<p>O Safari, com o leitor de tela VoiceOver, pode deixar de anunciar como lista uma lista com <code>list-style: none</code>. Dentro de um <code>&lt;nav&gt;</code> isso não costuma acontecer. Numa lista sem marcador fora do <code>&lt;nav&gt;</code>, em que o "lista, 4 itens" importa, acrescente <code>role="list"</code> no <code>&lt;ul&gt;</code>.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Nome de marcador errado: aparecem números numa lista com bolinhas</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .ingredientes {
+    list-style-type: squared;
+  }
+&lt;/style&gt;
+&lt;ul class="ingredientes"&gt;
+  &lt;li&gt;Farinha&lt;/li&gt;
+  &lt;li&gt;Ovos&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<p><strong>O que você vê:</strong> a lista ganha <strong>números</strong>, 1. e 2., em vez dos quadradinhos (e em vez das bolinhas).</p>
+<p><strong>Por quê:</strong> o <code>list-style-type</code> aceita, além dos nomes prontos, o nome de um <strong>estilo de contador</strong> que você mesmo pode criar (com <code>@counter-style</code>). Por isso <code>squared</code> é um valor permitido: o navegador procura um estilo com esse nome, não acha e, pela regra do CSS, usa <code>decimal</code>, os números. É um dos raros casos em que o erro não é ignorado: ele muda o resultado.</p>
+<p><strong>O que o validador diz:</strong> nada. <code>vnu --css style.css</code> não mostra nenhum erro, pelo mesmo motivo: <code>squared</code> poderia ser um estilo seu.</p>
+<p><strong>Como consertar:</strong> o nome certo é <code>square</code>. Se aparecerem números onde não devia, confira a grafia do valor.</p>
+</div>
+
+<div class="cenario">
+<strong>Valor errado na posição: a declaração é ignorada</strong>
+<pre class="file" data-file="style.css · erro de propósito">.ingredientes {
+  list-style-position: dentro;
+}
+</pre>
+<p><strong>O que você vê:</strong> nada muda; o marcador continua do lado de fora. No F12, no painel <em>Styles</em> (Estilos), a declaração aparece riscada, com um ícone de aviso.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":2.24-2.29: error: CSS: “list-style-position”: “dentro” is not a “list-style-position” value.</pre>
+<p><strong>O que significa:</strong> "<code>dentro</code> não é um valor de <code>list-style-position</code>". Os valores do CSS são em inglês: <code>inside</code> e <code>outside</code>. Um nome de propriedade errado dá outra mensagem: com <code>list-styl-type</code>, o validador diz <code>Property “list-styl-type” doesn't exist</code>, "a propriedade não existe".</p>
+</div>
+
+<div class="cenario">
+<strong>Tirou o recuo e o marcador sumiu da tela</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .ingredientes {
+    padding: 0;
+    border: 2px dashed tomato;
+  }
+&lt;/style&gt;
+&lt;ul class="ingredientes"&gt;
+  &lt;li&gt;Farinha&lt;/li&gt;
+  &lt;li&gt;Ovos&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<p><strong>O que você vê:</strong> o texto encosta na borda e as bolinhas <strong>desaparecem</strong>.</p>
+<p><strong>Por quê:</strong> com <code>outside</code>, o marcador fica pendurado à esquerda do texto, no espaço do <code>padding</code>. Sem esse espaço, ele é desenhado <strong>fora</strong> da caixa da lista, à esquerda, e aqui sai da área visível. Num site, ele pode aparecer por cima de outra coisa ou ser cortado.</p>
+<p><strong>Como consertar:</strong> se quer o marcador, deixe um recuo (<code>padding-left: 1.5em</code>, por exemplo) ou use <code>list-style-position: inside</code>. Se não quer, tire de propósito, com <code>list-style: none</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>O item virou <code>flex</code> e perdeu o marcador</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .ingredientes li {
+    display: flex;
+  }
+&lt;/style&gt;
+&lt;ul class="ingredientes"&gt;
+  &lt;li&gt;Farinha&lt;/li&gt;
+  &lt;li&gt;Ovos&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<p><strong>O que você vê:</strong> os itens continuam recuados, mas sem bolinha.</p>
+<p><strong>Por quê:</strong> só um elemento com <code>display: list-item</code> ganha marcador. O <code>&lt;li&gt;</code> tem esse valor por padrão; ao trocá-lo por <code>flex</code> (ou <code>block</code>, <code>grid</code>…), o marcador vai junto. O validador não reclama: tudo ali é CSS válido. A aula <a href="display.html">display</a> explica os valores.</p>
+<p><strong>Como consertar:</strong> ponha o <code>display: flex</code> num elemento de dentro do item, ou desenhe o marcador com <code>::before</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>list-style-type: square;</code></td><td>Troca o desenho do marcador (<code>disc</code>, <code>circle</code>, <code>square</code>, <code>decimal</code>, <code>lower-alpha</code>, <code>upper-roman</code>…)</td></tr>
+<tr><td><code>list-style-type: "→ ";</code></td><td>Usa um texto seu como marcador</td></tr>
+<tr><td><code>list-style-position: inside;</code></td><td>Marcador dentro do texto (o padrão é <code>outside</code>)</td></tr>
+<tr><td><code>list-style-image: url(…);</code></td><td>Imagem como marcador (pouco usado)</td></tr>
+<tr><td><code>list-style: none;</code></td><td>Atalho: sem marcador</td></tr>
+<tr><td><code>li::marker { color: tomato; }</code></td><td>Estiliza só o marcador (cor, fonte)</td></tr>
+<tr><td><code>padding: 0; margin: 0;</code></td><td>Tira o recuo (40px) e as margens (16px) padrão da lista</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Quadradinhos</h3>
+<p>Complete o valor para a lista mostrar quadradinhos:</p>
+<div class="ex-code">ul { list-style-type: <input data-answer="square" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Sem marcador</h3>
+<p>Complete o atalho que tira os marcadores:</p>
+<div class="ex-code">.menu { list-style: <input data-answer="none" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. Só o marcador</h3>
+<p>Complete o pseudo-elemento que pinta só os números:</p>
+<div class="ex-code">li<input data-answer="::marker" aria-label="pseudo-elemento"> { color: tomato; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. A Ana pôs <code>list-style: none</code> no menu, mas os links continuam afastados da esquerda. Por quê?</p>
+<label><input type="radio" name="q4"> O <code>none</code> não funciona em <code>&lt;ul&gt;</code></label>
+<label><input type="radio" name="q4"> O recuo é o <code>padding</code> da lista, que continua lá</label>
+<label><input type="radio" name="q4"> Faltou o <code>!important</code></label>
+<label><input type="radio" name="q4"> O marcador invisível ainda ocupa o lugar</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Com <code>list-style-type: quadrado;</code>, o que aparece na lista?</p>
+<label><input type="radio" name="q5"> Quadradinhos</label>
+<label><input type="radio" name="q5"> Bolinhas, porque a declaração é ignorada</label>
+<label><input type="radio" name="q5"> Números, porque o navegador não acha um estilo com esse nome e usa <code>decimal</code></label>
+<label><input type="radio" name="q5"> Nenhum marcador</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Qual valor faz a segunda linha de um item longo começar embaixo do marcador?</p>
+<label><input type="radio" name="q6"> <code>list-style-position: inside</code></label>
+<label><input type="radio" name="q6"> <code>list-style-position: outside</code></label>
+<label><input type="radio" name="q6"> <code>list-style-type: none</code></label>
+<label><input type="radio" name="q6"> <code>padding: 0</code></label>
+</div>
+
+<h3>Missão final: o menu da Ana</h3>
+
+<div class="tryhtml" data-goal="css:.menu li{list-style-type}=none,css:.menu{padding-left}=0px,css:.menu{margin-top}=0px,css:.ingredientes li{list-style-type}=square">
+<p class="try-task"><strong>Missão:</strong> (1) no menu, tire os marcadores, o recuo e as margens; (2) na lista de ingredientes, troque as bolinhas por quadradinhos. Não mexa no HTML.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav&gt;
+  &lt;ul class="menu"&gt;
+    &lt;li&gt;&lt;a href="index.html"&gt;Início&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="sobre.html"&gt;Sobre&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+&lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;ul class="ingredientes"&gt;
+  &lt;li&gt;2 xícaras de farinha&lt;/li&gt;
+  &lt;li&gt;3 ovos&lt;/li&gt;
+  &lt;li&gt;3 cenouras&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu {
+
+}
+
+.ingredientes {
+
+}
+</pre>
+<pre class="solucao" data-file="style.css">.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ingredientes {
+  list-style-type: square;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Toda lista tem um <strong>marcador</strong> por item e um <strong>recuo</strong> à esquerda, que é o <code>padding-left</code> de 40px da lista, além de margens de 16px em cima e embaixo.</li>
+  <li><code>list-style-type</code> troca o desenho: <code>disc</code>, <code>circle</code>, <code>square</code>, <code>decimal</code>, <code>lower-alpha</code>, <code>upper-roman</code>, <code>none</code> ou um texto entre aspas. É herdado: escreva na lista.</li>
+  <li><code>list-style-position</code>: <code>outside</code> (padrão, texto alinhado) ou <code>inside</code> (marcador dentro do texto).</li>
+  <li><code>list-style</code> é o atalho; <code>list-style: none</code> é o mais usado.</li>
+  <li><code>li::marker</code> estiliza só o marcador (no Safari, só <code>color</code> e <code>font-size</code>).</li>
+  <li>Para um menu: <code>list-style: none</code>, <code>padding: 0</code> e <code>margin: 0</code>.</li>
+  <li>Erros: um nome de marcador inexistente (<code>squared</code>) vira <strong>números</strong>, sem aviso do validador; <code>padding: 0</code> joga o marcador para fora da caixa; um <code>&lt;li&gt;</code> com outro <code>display</code> perde o marcador.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
