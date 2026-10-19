@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS align-self e order — um item diferente no Flexbox | Guia CSS</title>
+<meta name="description" content="align-self e order para quem está aprendendo Flexbox: como alinhar um item só de um jeito diferente dos outros, os valores lado a lado, o margin-left: auto para empurrar um item, a ordem visual com order e o cuidado com a acessibilidade, e as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">align-self</span> e <span class="hl">order</span></h1>
+
+<p class="intro">Com <code>justify-content</code> e <code>align-items</code>, a Ana arruma <strong>todos</strong> os itens de uma vez, porque essas propriedades vão no pai. Mas às vezes um item precisa ser diferente: o selo "Promoção" lá em cima, enquanto os outros ficam no meio; o botão "Sair" na outra ponta do menu; o produto em destaque em primeiro lugar, sem mexer no HTML. Esta aula mostra as ferramentas para cuidar de <strong>um item só</strong>: <code>align-self</code> ("alinhar a si mesmo"), o truque do <code>margin: auto</code> e <code>order</code> ("ordem").</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Como <code>align-self</code> troca, para um item, o alinhamento que o pai deu com <code>align-items</code>.</li>
+  <li>Os valores de <code>align-self</code>, desenhados lado a lado.</li>
+  <li>Por que não existe <code>justify-self</code> no Flexbox, e como o <code>margin-left: auto</code> empurra um item para a outra ponta.</li>
+  <li>Como <code>order</code> muda a posição de um item na tela sem mexer no HTML.</li>
+  <li>Por que o <code>order</code> pode atrapalhar quem navega pelo teclado ou ouve a página.</li>
+  <li>Os erros mais comuns e as mensagens reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="justify-content.html">Alinhando na Linha (justify-content)</a> e <a href="align-items.html">Alinhando na Coluna (align-items)</a>. Os exemplos com resultado são desenhados agora pelo <strong>seu</strong> navegador. As mensagens do validador saíram do validador W3C (<code>vnu</code>), na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: a foto da turma</h2>
+<p>Na foto da turma, o fotógrafo dá uma ordem para todo mundo: "todos de pé, alinhados pela cabeça". Isso é o <code>align-items</code>, no pai. Mas a professora fica sentada na frente: ela tem uma <strong>exceção</strong> só para ela. Isso é o <code>align-self</code>, no item.</p>
+<p>E se o aniversariante tiver de ficar em primeiro na fila, sem trocar a lista de chamada? O fotógrafo só diz "você vem antes". Isso é o <code>order</code>: a lista (o HTML) continua igual; só a posição na foto (a tela) muda.</p>
+
+<hr>
+
+<h2>1. <code>align-self</code>: um item com outro alinhamento</h2>
+<p>Uma fila de 120 pixels de altura com <code>align-items: center</code>: todos os itens no meio. O selo "Promoção" ganhou <code>align-self: flex-start</code> e subiu para o topo, sozinho:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="fila"&gt;
+  &lt;div class="item"&gt;Bolo&lt;/div&gt;
+  &lt;div class="item selo"&gt;Promoção&lt;/div&gt;
+  &lt;div class="item"&gt;Torta&lt;/div&gt;
+  &lt;div class="item"&gt;Pão&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.fila {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 120px;
+  border: 2px dashed gray;
+}
+
+.item {
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+
+.selo {
+  align-self: flex-start;
+  background-color: darkgreen;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>.selo</dt><dd>O seletor: <strong>um item</strong> flex (filho do pai com <code>display: flex</code>).</dd>
+  <dt>align-self</dt><dd>"Alinhar a si mesmo": o alinhamento deste item na direção cruzada (de cima para baixo, numa fila em linha). Vence o <code>align-items</code> do pai, só para este item.</dd>
+  <dt>flex-start</dt><dd>O valor: no começo da direção cruzada, ou seja, no topo. Os valores são os mesmos do <code>align-items</code>.</dd>
+</dl>
+
+<h3>Os valores lado a lado</h3>
+<p>Cinco itens na mesma fila (com <code>align-items: center</code> no pai), cada um com um <code>align-self</code> diferente, escrito dentro dele:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="fila"&gt;
+  &lt;div class="item auto"&gt;auto&lt;/div&gt;
+  &lt;div class="item inicio"&gt;flex-start&lt;/div&gt;
+  &lt;div class="item fim"&gt;flex-end&lt;/div&gt;
+  &lt;div class="item centro"&gt;center&lt;/div&gt;
+  &lt;div class="item esticar"&gt;stretch&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.fila {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 140px;
+  border: 2px dashed gray;
+}
+
+.item {
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: monospace;
+}
+
+.auto {
+  align-self: auto;
+}
+
+.inicio {
+  align-self: flex-start;
+}
+
+.fim {
+  align-self: flex-end;
+}
+
+.centro {
+  align-self: center;
+}
+
+.esticar {
+  align-self: stretch;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>Onde o item fica (fila em linha)</th></tr>
+<tr><td><code>auto</code></td><td><strong>Padrão:</strong> obedece o <code>align-items</code> do pai (aqui, <code>center</code>: no meio)</td></tr>
+<tr><td><code>flex-start</code></td><td>No topo</td></tr>
+<tr><td><code>flex-end</code></td><td>No pé</td></tr>
+<tr><td><code>center</code></td><td>No meio</td></tr>
+<tr><td><code>stretch</code></td><td>Esticado do topo ao pé (se o item não tiver <code>height</code>)</td></tr>
+<tr><td><code>baseline</code></td><td>Alinhado pela linha de base do texto (a "linha do caderno" em que as letras se apoiam), junto com os vizinhos que também usam <code>baseline</code></td></tr>
+</table>
+</div>
+
+<p>Você também vai ver <code>start</code> e <code>end</code> no lugar de <code>flex-start</code> e <code>flex-end</code>. São os nomes novos, que servem para Flexbox e Grid; numa fila comum, dão o mesmo resultado.</p>
+
+<div class="note">
+<strong>E se a fila for em coluna?</strong>
+<p>O <code>align-self</code> sempre trabalha na direção <strong>cruzada</strong>. Numa fila em linha (<code>flex-direction: row</code>), a cruzada é de cima para baixo. Numa fila em coluna (<code>flex-direction: column</code>), ela vira da esquerda para a direita: <code>flex-start</code> passa a ser "à esquerda" e <code>flex-end</code>, "à direita". É o mesmo raciocínio da aula <a href="align-items.html">align-items</a>.</p>
+</div>
+
+<h3>Experimente: o botão no pé do cartão</h3>
+<div class="tryhtml" data-goal="css:.comprar{align-self}=flex-end">
+<p class="try-task"><strong>Missão:</strong> o cartão é uma fila em linha com <code>align-items: flex-start</code> (tudo no topo). Leve só o botão <code>.comprar</code> para o pé do cartão, com <code>align-self</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="160" height="120"&gt;
+  &lt;p&gt;Bolo de cenoura, R$ 35&lt;/p&gt;
+  &lt;button class="comprar"&gt;Comprar&lt;/button&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px;
+  border: 2px solid navy;
+  font-family: sans-serif;
+}
+
+.cartao p {
+  margin: 0;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px;
+  border: 2px solid navy;
+  font-family: sans-serif;
+}
+
+.cartao p {
+  margin: 0;
+}
+
+.comprar {
+  align-self: flex-end;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. Um item na outra ponta: <code>margin-left: auto</code></h2>
+<p>O <code>align-self</code> mexe na direção <strong>cruzada</strong>. E para mandar um item só para a outra ponta da <strong>linha</strong> (o botão "Sair" à direita do menu)? A primeira ideia seria um <code>justify-self</code>, mas <strong>no Flexbox ele não existe</strong>: o navegador aceita a palavra (ela funciona no Grid), mas num item flex ela não faz nada.</p>
+<p>O jeito do Flexbox é uma <strong>margem automática</strong>. Uma <code>margin-left: auto</code> num item "come" todo o espaço que sobra à esquerda dele, e ele vai parar na ponta direita, levando junto os itens que vêm depois:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;nav class="menu"&gt;
+  &lt;a href="#"&gt;Início&lt;/a&gt;
+  &lt;a href="#"&gt;Receitas&lt;/a&gt;
+  &lt;a href="#"&gt;Contato&lt;/a&gt;
+  &lt;a href="#" class="sair"&gt;Sair&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu {
+  display: flex;
+  gap: 16px;
+  padding: 8px;
+  background-color: navy;
+  font-family: sans-serif;
+}
+
+.menu a {
+  color: white;
+}
+
+.sair {
+  margin-left: auto;
+}
+</pre>
+</div>
+
+<p>"Início", "Receitas" e "Contato" ficam juntos à esquerda; "Sair" foi para a ponta direita. Troque o <code>margin-left: auto</code> por <code>margin-right: auto</code> no "Início" e veja o contrário: o "Início" fica sozinho à esquerda, e os outros três vão juntos para a direita. Com <code>margin: auto</code> (todos os lados), o item fica no meio do espaço livre, nas duas direções: é um dos jeitos de centralizar (aula <a href="centralizar.html">Centralizando Qualquer Coisa</a>).</p>
+
+<hr>
+
+<h2>3. <code>order</code>: outra posição, o mesmo HTML</h2>
+<p>Todo item flex tem um número de ordem, que por padrão é <code>0</code>. O navegador desenha os itens do <strong>menor número para o maior</strong>; quem tem o mesmo número fica na ordem do HTML. Por isso, para pôr um item em primeiro, basta um número menor que <code>0</code>; para mandá-lo para o fim, um número maior:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="fila"&gt;
+  &lt;div class="item"&gt;1. Bolo&lt;/div&gt;
+  &lt;div class="item"&gt;2. Torta&lt;/div&gt;
+  &lt;div class="item destaque"&gt;3. Brigadeiro (destaque)&lt;/div&gt;
+  &lt;div class="item fim"&gt;4. Encomendas&lt;/div&gt;
+  &lt;div class="item"&gt;5. Pão&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.item {
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+
+.destaque {
+  order: -1;
+  background-color: darkgreen;
+}
+
+.fim {
+  order: 1;
+}
+</pre>
+</div>
+
+<p>Na tela, a ordem ficou: Brigadeiro (que tem <code>-1</code>), depois Bolo, Torta e Pão (os três com <code>0</code>, na ordem do HTML) e, por último, Encomendas (<code>1</code>). Os números escritos dentro dos itens contam a ordem do HTML, que não mudou.</p>
+
+<dl class="anatomy">
+  <dt>order</dt><dd>A posição do item na fila, comparada com a dos irmãos.</dd>
+  <dt>-1</dt><dd>Um número <strong>inteiro</strong> (sem vírgula), que pode ser negativo. Não é "a posição 1, 2, 3": é um peso. Dez itens com <code>order: 5</code> e um com <code>order: 6</code> funcionam igual a dez com <code>0</code> e um com <code>1</code>.</dd>
+</dl>
+
+<div class="warning">
+<strong>O <code>order</code> só muda a tela</strong>
+<p>O leitor de tela (o programa que lê a página em voz alta para quem não enxerga) e a tecla <kbd>Tab</kbd> seguem a ordem do <strong>HTML</strong>. Se o <code>order</code> põe um link em primeiro na tela, mas ele é o quinto no HTML, quem navega pelo teclado vê o foco "pular" de um jeito estranho. Use <code>order</code> para ajustes visuais pequenos (um destaque, uma troca de lugar numa tela estreita); se a ordem importa para entender o conteúdo, mude o HTML. A aula <a href="acessibilidade.html">CSS e Acessibilidade</a> volta a esse assunto.</p>
+</div>
+
+<hr>
+
+<h2>4. Formas de fazer um item diferente</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Quero…</th><th>Use</th><th>Por quê</th></tr>
+<tr><td>Um item no topo, no pé ou no meio, diferente dos outros</td><td><code>align-self</code> no item</td><td>Vence o <code>align-items</code> do pai só para ele</td></tr>
+<tr><td>Todos os itens no topo (ou no meio…)</td><td><code>align-items</code> no pai</td><td>Uma linha no pai em vez de uma em cada item</td></tr>
+<tr><td>Um item na outra ponta da linha</td><td><code>margin-left: auto</code> (ou <code>margin-right: auto</code>) no item</td><td>No Flexbox não há <code>justify-self</code></td></tr>
+<tr><td>Um grupo à esquerda e outro à direita</td><td><code>margin-left: auto</code> no primeiro do grupo da direita, ou <code>justify-content: space-between</code> com dois grupos em <code>div</code></td><td>A margem automática leva junto os que vêm depois</td></tr>
+<tr><td>Um item em outra posição</td><td>Mudar o HTML (o melhor) ou <code>order</code></td><td><code>order</code> não muda o teclado nem o leitor de tela</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>CSS quase nunca mostra mensagem: o navegador ignora em silêncio o que não entende ou o que não se aplica.</p>
+
+<div class="cenario">
+<strong><code>justify-self</code> num item flex não faz nada</strong>
+<p><strong>O que aconteceu:</strong> a Ana tentou mandar o "Sair" para a direita com <code>.sair { justify-self: flex-end; }</code>.</p>
+<p><strong>O que você vê:</strong> nada muda; o "Sair" continua junto dos outros. O validador também não reclama: <code>justify-self</code> é uma propriedade válida do CSS (ela funciona no Grid, aula <a href="grid-alinhar.html">Alinhando no Grid</a>). Só que, num item flex, ela é ignorada: na linha, quem distribui os itens é o <code>justify-content</code> do pai, para todos ao mesmo tempo.</p>
+<p><strong>Como consertar:</strong> <code>margin-left: auto</code> no item (seção 2).</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>align-self</code> foi parar no pai</strong>
+<p><strong>O que aconteceu:</strong> <code>.fila { display: flex; align-self: flex-start; }</code>, esperando subir os itens.</p>
+<p><strong>O que você vê:</strong> os itens não se mexem. O <code>align-self</code> do <code>.fila</code> vale para a <strong>própria</strong> <code>.fila</code> dentro do pai <em>dela</em> (e só se esse pai também for flex ou grid).</p>
+<p><strong>Como consertar:</strong> para todos os itens, <code>align-items</code> no pai; para um só, <code>align-self</code> nesse item.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>align-self: stretch</code> não estica</strong>
+<p><strong>O que aconteceu:</strong> o item tem <code>height: 40px</code> e <code>align-self: stretch</code>.</p>
+<p><strong>O que você vê:</strong> o item continua com 40 pixels. Esticar só acontece quando a altura do item é <code>auto</code>; uma altura escrita vence.</p>
+<p><strong>Como consertar:</strong> apague o <code>height</code> (ou troque por <code>min-height</code>, que deixa crescer).</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “align-self”: “middle” is not a “align-self” value.</code></strong>
+<p><strong>O que aconteceu:</strong> palavras que parecem certas, mas não são do CSS: <code>middle</code> ("meio") e <code>top</code> ("topo").</p>
+<pre class="term" data-cwd="~/item">$ vnu --css middle.css
+"file:/home/ana/item/middle.css":2.15-2.20: error: CSS: “align-self”: “middle” is not a “align-self” value.
+$ vnu --css top.css
+"file:/home/ana/item/top.css":2.15-2.17: error: CSS: “align-self”: “top” is not a “align-self” value.</pre>
+<p>"<code>middle</code> não é um valor de <code>align-self</code>." A declaração é ignorada e o item volta ao alinhamento do pai. (O <code>middle</code> existe, mas em outra propriedade: o <code>vertical-align</code> de tabelas e de elementos em linha.)</p>
+<p><strong>Como consertar:</strong> <code>center</code> para o meio, <code>flex-start</code> (ou <code>start</code>) para o topo.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “order”: This number should be an integer.</code></strong>
+<p><strong>O que aconteceu:</strong> a Ana quis pôr um item "entre o 1 e o 2" com <code>order: 1.5;</code>. Ou escreveu uma palavra: <code>order: first;</code>.</p>
+<pre class="term" data-cwd="~/item">$ vnu --css ordem.css
+"file:/home/ana/item/ordem.css":2.10-2.12: error: CSS: “order”: This number should be an integer.
+$ vnu --css first.css
+"file:/home/ana/item/first.css":2.10-2.14: error: CSS: “order”: “first” is not a “order” value.</pre>
+<p>"Este número deveria ser inteiro." O <code>order</code> só aceita números inteiros (negativos valem: <code>order: -1</code> passa no validador sem nenhum aviso). A declaração errada é ignorada: o item fica com <code>0</code>.</p>
+<p><strong>Como consertar:</strong> use inteiros e deixe "espaço" entre eles se precisar: <code>order: 10</code>, <code>order: 20</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>align-self: auto;</code></td><td>Padrão: segue o <code>align-items</code> do pai</td></tr>
+<tr><td><code>align-self: flex-start;</code> / <code>flex-end;</code> / <code>center;</code></td><td>Este item no começo, no fim ou no meio da direção cruzada</td></tr>
+<tr><td><code>align-self: stretch;</code></td><td>Estica (se não tiver altura escrita)</td></tr>
+<tr><td><code>align-self: baseline;</code></td><td>Alinha pela linha de base do texto</td></tr>
+<tr><td><code>margin-left: auto;</code></td><td>Empurra o item (e os que vêm depois) para a outra ponta da linha</td></tr>
+<tr><td><code>order: -1;</code></td><td>Desenha o item antes dos que têm <code>0</code> (padrão)</td></tr>
+<tr><td><code>order: 1;</code></td><td>Desenha o item depois dos que têm <code>0</code></td></tr>
+<tr><td>Onde vai</td><td>Nos <strong>itens</strong> (filhos do pai flex)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Só este item no meio</h3>
+<p>O pai tem <code>align-items: flex-start</code>. Complete para só o <code>.selo</code> ficar no meio:</p>
+<div class="ex-code">.selo { align-self: <input data-answer="center" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Primeiro da fila</h3>
+<p>Todos os itens estão com o <code>order</code> padrão. Complete com o menor número inteiro que põe o <code>.destaque</code> antes de todos:</p>
+<div class="ex-code">.destaque { order: <input data-answer="-1" aria-label="número">; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. Como mandar só o botão "Sair" para a ponta direita de um menu flex?</p>
+<label><input type="radio" name="q3"> <code>.sair { justify-self: flex-end; }</code></label>
+<label><input type="radio" name="q3"> <code>.sair { margin-left: auto; }</code></label>
+<label><input type="radio" name="q3"> <code>.sair { align-self: flex-end; }</code></label>
+<label><input type="radio" name="q3"> <code>.sair { order: right; }</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">4. O link "Contato" tem <code>order: -1</code> e aparece primeiro na tela. Para quem navega com a tecla <kbd>Tab</kbd>, em que posição ele recebe o foco?</p>
+<label><input type="radio" name="q4"> Primeiro, como na tela</label>
+<label><input type="radio" name="q4"> Por último</label>
+<label><input type="radio" name="q4"> Ele não recebe foco</label>
+<label><input type="radio" name="q4"> Na posição em que está no HTML</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. O pai tem <code>align-items: center</code> e um item tem <code>align-self: auto</code>. Onde fica esse item?</p>
+<label><input type="radio" name="q5"> No meio, como manda o pai</label>
+<label><input type="radio" name="q5"> No topo</label>
+<label><input type="radio" name="q5"> Esticado</label>
+<label><input type="radio" name="q5"> Depende do navegador</label>
+</div>
+
+<h3>Missão final: o cabeçalho da lojinha</h3>
+
+<div class="tryhtml" data-goal="src:\.carrinho\s*\{[^}]*margin-left:\s*auto,css:.aviso{align-self}=flex-start,css:.aviso{order}=-1">
+<p class="try-task"><strong>Missão:</strong> no cabeçalho (todos os itens no meio, com <code>align-items: center</code>): (1) mande o <code>.carrinho</code> e o que vem depois dele para a ponta direita, com <code>margin-left: auto</code>; (2) suba o <code>.aviso</code> para o topo com <code>align-self</code>; (3) ponha o <code>.aviso</code> em primeiro lugar com <code>order: -1</code>, sem mexer no HTML.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;header class="topo"&gt;
+  &lt;strong&gt;Lojinha da Ana&lt;/strong&gt;
+  &lt;a href="#"&gt;Doces&lt;/a&gt;
+  &lt;a href="#"&gt;Salgados&lt;/a&gt;
+  &lt;a href="#" class="carrinho"&gt;Carrinho&lt;/a&gt;
+  &lt;a href="#"&gt;Entrar&lt;/a&gt;
+  &lt;small class="aviso"&gt;Novo!&lt;/small&gt;
+&lt;/header&gt;
+</pre>
+<pre class="script" data-file="style.css">.topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 70px;
+  padding: 0 12px;
+  background-color: lavender;
+  font-family: sans-serif;
+}
+
+.aviso {
+  padding: 2px 6px;
+  background-color: darkgreen;
+  color: white;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 70px;
+  padding: 0 12px;
+  background-color: lavender;
+  font-family: sans-serif;
+}
+
+.carrinho {
+  margin-left: auto;
+}
+
+.aviso {
+  align-self: flex-start;
+  order: -1;
+  padding: 2px 6px;
+  background-color: darkgreen;
+  color: white;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>align-self</code>, no <strong>item</strong>, troca só para ele o alinhamento cruzado que o pai deu com <code>align-items</code>. <code>auto</code> (padrão) = obedecer o pai.</li>
+  <li>Os valores: <code>flex-start</code>, <code>flex-end</code>, <code>center</code>, <code>stretch</code>, <code>baseline</code>. <code>middle</code> e <code>top</code> não existem aqui.</li>
+  <li>No Flexbox não há <code>justify-self</code>: para empurrar um item para a outra ponta da linha, <code>margin-left: auto</code>.</li>
+  <li><code>order</code> (inteiro, padrão <code>0</code>) muda a posição na tela: menor primeiro; empate, ordem do HTML.</li>
+  <li><code>order</code> não muda o <kbd>Tab</kbd> nem o leitor de tela: se a ordem importa, mude o HTML.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
