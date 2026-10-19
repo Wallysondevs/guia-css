@@ -25,8 +25,8 @@
 <h2>Experimente agora</h2>
 <p>A caixa abaixo é o editor <strong>Experimente</strong> do guia. A aba <code>index.html</code> tem o HTML de um cartão da Lojinha da Ana; a aba <code>style.css</code> tem a aparência dele: as cores, os cantos redondos, a sombra. Embaixo, o resultado, desenhado pelo seu navegador. Mude o CSS e veja o cartão mudar junto. Passe o mouse no botão: ele escurece.</p>
 
-<div class="tryhtml" data-goal="css:.botao{background-color}=rgb(46, 139, 87)">
-<p class="try-task"><strong>Missão:</strong> na aba <code>style.css</code>, troque a cor do botão de <code>tomato</code> para <code>seagreen</code> (verde-mar). Mexa só na palavra da cor, na linha <code>background-color: tomato;</code> dentro de <code>.botao</code>.</p>
+<div class="tryhtml" data-goal="css:.botao{background-color}=rgb(0, 100, 0)">
+<p class="try-task"><strong>Missão:</strong> na aba <code>style.css</code>, troque a cor do botão de <code>firebrick</code> para <code>darkgreen</code> (verde-escuro). Mexa só na palavra da cor, na linha <code>background-color: firebrick;</code> dentro de <code>.botao</code>.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;div class="cartao"&gt;
   &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate"&gt;
@@ -61,7 +61,7 @@
   padding: 8px 16px;
   border: 0;
   border-radius: 999px;
-  background-color: tomato;
+  background-color: firebrick;
   color: white;
   font-size: 1rem;
   cursor: pointer;
@@ -95,7 +95,7 @@
   padding: 8px 16px;
   border: 0;
   border-radius: 999px;
-  background-color: seagreen;
+  background-color: darkgreen;
   color: white;
   font-size: 1rem;
   cursor: pointer;
@@ -106,7 +106,7 @@
 </pre>
 </div>
 
-<p>O que aconteceu: o HTML diz <strong>o que</strong> cada coisa é (um título, um parágrafo, um botão), e o CSS diz <strong>como</strong> cada coisa aparece. Cada bloco do <code>style.css</code> é uma <strong>regra</strong>: primeiro o <strong>seletor</strong>, que escolhe os elementos (<code>.botao</code> = "os elementos com <code>class="botao"</code>"), e entre chaves as <strong>declarações</strong>, cada uma com uma propriedade, dois-pontos, um valor e ponto e vírgula. <code>background-color: seagreen;</code> quer dizer "cor de fundo: verde-mar".</p>
+<p>O que aconteceu: o HTML diz <strong>o que</strong> cada coisa é (um título, um parágrafo, um botão), e o CSS diz <strong>como</strong> cada coisa aparece. Cada bloco do <code>style.css</code> é uma <strong>regra</strong>: primeiro o <strong>seletor</strong>, que escolhe os elementos (<code>.botao</code> = "os elementos com <code>class="botao"</code>"), e entre chaves as <strong>declarações</strong>, cada uma com uma propriedade, dois-pontos, um valor e ponto e vírgula. <code>background-color: darkgreen;</code> quer dizer "cor de fundo: verde-escuro".</p>
 <p>Tente mais: troque <code>12px</code> do <code>border-radius</code> do cartão por <code>0</code> (os cantos ficam retos) ou apague a linha do <code>box-shadow</code> (a sombra some). Se algo der errado, o botão <strong>Restaurar</strong> volta tudo ao começo.</p>
 
 <h3>Uma página que se ajeita na tela</h3>
