@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Agrupando Seletores — a vírgula (h1, h2, h3) | Guia CSS</title>
+<meta name="description" content="Agrupar seletores com vírgula no CSS, para quem nunca escreveu CSS: h1, h2, h3 numa regra só, misturar classe, ID e elemento, o grupo com o que é comum e regras separadas com o que muda, vírgula × espaço × nada, e o que acontece quando dá errado (um seletor inválido derruba o grupo inteiro, vírgula sobrando, vírgula esquecida), com as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Agrupando Seletores (,)</span></h1>
+
+<p class="intro">A Ana quer os títulos <code>&lt;h1&gt;</code>, <code>&lt;h2&gt;</code> e <code>&lt;h3&gt;</code> do site com a mesma cor e a mesma fonte. Ela pode escrever três regras iguais, uma para cada título. Ou pode escrever <strong>uma</strong> regra só, com os três seletores separados por <strong>vírgula</strong>. Isso é um <strong>grupo de seletores</strong>: menos código repetido e um lugar só para mudar.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A vírgula no seletor: <code>h1, h2, h3 { … }</code>.</li>
+  <li>Misturar tipos de seletor no mesmo grupo: <code>h1, .aviso, #topo</code>.</li>
+  <li>O padrão "grupo com o que é comum, regra própria com o que muda".</li>
+  <li>A diferença entre vírgula, espaço e nada: <code>h1, p</code> × <code>h1 p</code> × <code>p.destaque</code>.</li>
+  <li>O perigo: um seletor inválido no grupo derruba a regra <strong>inteira</strong>.</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. As mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: um recado para vários</h2>
+<p>A Ana manda no grupo da família: "Pedro, Júlia e Rafa: almoço às 13h". Um recado, três destinatários. Ela não precisa escrever três mensagens iguais. A vírgula no CSS é isso: "<code>h1</code>, <code>h2</code> e <code>h3</code>: cor azul-ardósia".</p>
+
+<hr>
+
+<h2>1. Antes e depois</h2>
+<p>Sem agrupar, o CSS repete as mesmas declarações:</p>
+<pre class="file" data-file="style.css · sem agrupar">h1 {
+  color: darkslateblue;
+  font-family: Georgia, serif;
+}
+
+h2 {
+  color: darkslateblue;
+  font-family: Georgia, serif;
+}
+
+h3 {
+  color: darkslateblue;
+  font-family: Georgia, serif;
+}
+</pre>
+<p>Agrupando, fica uma regra só, com o <strong>mesmo resultado</strong>:</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> os três títulos ficaram azul-ardósia, e com a fonte Georgia, se o seu computador a tiver (fontes têm aula própria: <a href="font-family.html">font-family</a>). O parágrafo não está no grupo e não mudou. Acrescente <code>p</code> ao grupo (<code>h1, h2, h3, p</code>) e veja o parágrafo entrar.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;h2&gt;Bolos&lt;/h2&gt;
+&lt;h3&gt;Bolo de fubá&lt;/h3&gt;
+&lt;p&gt;Fofinho, com erva-doce.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1, h2, h3 {
+  color: darkslateblue;
+  font-family: Georgia, serif;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>h1, h2, h3</dt><dd>A <strong>lista de seletores</strong>: três seletores separados por vírgula. A vírgula quer dizer "e também".</dd>
+  <dt>,</dt><dd>Depois da vírgula pode vir espaço ou quebra de linha, tanto faz. Depois do <strong>último</strong> seletor, <strong>não</strong> vai vírgula.</dd>
+  <dt>{ … }</dt><dd>As declarações valem para cada um dos seletores, como se você tivesse escrito uma regra para cada.</dd>
+</dl>
+
+<p>Para mudar a cor de todos os títulos do site, agora basta trocar <strong>um</strong> valor.</p>
+
+<div class="tryhtml" data-goal="css:h2{color}=rgb(139, 0, 0),css:.aviso{color}=rgb(139, 0, 0),src:,[^{]*\{[^}]*darkred,nsrc:\}[^{]*\{[^}]*darkred">
+<p class="try-task"><strong>Missão:</strong> o CSS tem duas regras com a mesma declaração. Junte as duas numa regra só, com o grupo <code>h2, .aviso</code>, e mude a cor para <code>darkred</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Encomendas&lt;/h2&gt;
+&lt;p class="aviso"&gt;Pedidos até quinta-feira.&lt;/p&gt;
+&lt;p&gt;Entregamos no bairro.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h2 {
+  color: navy;
+}
+
+.aviso {
+  color: navy;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h2,
+.aviso {
+  color: darkred;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. Qualquer seletor entra no grupo</h2>
+<p>O grupo aceita seletores de tipos diferentes: elemento, classe, ID, <code>*</code>, combinações. Cada um continua com o seu sentido:</p>
+
+<pre class="file" data-file="index.html" data-resultado>&lt;style&gt;
+  #topo,
+  .aviso,
+  footer p {
+    background-color: lightyellow;
+  }
+&lt;/style&gt;
+&lt;header id="topo"&gt;Padaria da Ana&lt;/header&gt;
+&lt;p class="aviso"&gt;Fechado no feriado.&lt;/p&gt;
+&lt;p&gt;Pão quentinho às 7 da manhã.&lt;/p&gt;
+&lt;footer&gt;
+  &lt;p&gt;Rua das Flores, 120&lt;/p&gt;
+&lt;/footer&gt;
+</pre>
+
+<p>Ganharam o fundo amarelo: o cabeçalho (<code>#topo</code>), o aviso (<code>.aviso</code>) e o parágrafo do rodapé (<code>footer p</code>, um <code>&lt;p&gt;</code> dentro de um <code>&lt;footer&gt;</code>). O parágrafo do meio não está em nenhum dos três e ficou sem fundo.</p>
+
+<div class="tip">
+<strong>Um seletor por linha</strong>
+<p>Com dois ou três seletores curtos, uma linha só (<code>h1, h2, h3</code>) fica bem. Com seletores maiores, escreva <strong>um por linha</strong>, como no exemplo acima: fica fácil de ler, de acrescentar e de apagar um seletor sem mexer nos outros.</p>
+</div>
+
+<hr>
+
+<h2>3. O que é comum no grupo, o que muda na regra própria</h2>
+<p>Os três títulos têm a mesma cor e a mesma fonte, mas tamanhos diferentes. O padrão é: o <strong>comum</strong> vai no grupo, e cada um ganha uma regra própria só com o que é <strong>dele</strong>.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> o <code>h3</code> tem uma regra própria que o deixa em itálico. Ele continua com a cor e a fonte do grupo. Dê uma regra própria ao <code>h2</code> com <code>text-transform: uppercase;</code> (tudo maiúsculo).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;h2&gt;Bolos&lt;/h2&gt;
+&lt;h3&gt;Bolo de fubá&lt;/h3&gt;
+</pre>
+<pre class="script" data-file="style.css">h1, h2, h3 {
+  color: darkslateblue;
+  font-family: Georgia, serif;
+}
+
+h3 {
+  font-style: italic;
+}
+</pre>
+</div>
+
+<p>Um elemento pode receber declarações de <strong>várias</strong> regras: o <code>&lt;h3&gt;</code> pega a cor e a fonte do grupo, e o itálico da regra dele. Se as duas regras falassem da <strong>mesma</strong> propriedade, uma teria de ganhar: é a <a href="cascata.html">cascata</a>, próxima aula.</p>
+
+<hr>
+
+<h2>4. Vírgula, espaço ou nada</h2>
+<p>Três seletores que parecem quase iguais e fazem coisas bem diferentes:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Seletor</th><th>O que separa</th><th>Pega</th></tr>
+<tr><td><code>h2, p</code></td><td>Vírgula</td><td>Todos os <code>&lt;h2&gt;</code> <strong>e também</strong> todos os <code>&lt;p&gt;</code></td></tr>
+<tr><td><code>div p</code></td><td>Espaço</td><td>Os <code>&lt;p&gt;</code> que estão <strong>dentro</strong> de um <code>&lt;div&gt;</code> (<a href="combinadores.html">combinador</a>)</td></tr>
+<tr><td><code>p.destaque</code></td><td>Nada</td><td>Os <code>&lt;p&gt;</code> que <strong>também</strong> têm a classe <code>destaque</code> (<a href="seletor-classe.html">aula de classe</a>)</td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> com <code>h2, p</code>, o título e os dois parágrafos ficaram vermelhos. Apague a vírgula (<code>h2 p</code>): nada fica vermelho, porque não há nenhum <code>&lt;p&gt;</code> dentro de um <code>&lt;h2&gt;</code>. Agora tente <code>div p</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h2&gt;Encomendas&lt;/h2&gt;
+&lt;p&gt;Pedidos até quinta-feira.&lt;/p&gt;
+&lt;div&gt;
+  &lt;p&gt;Entregamos no bairro.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">h2, p {
+  color: crimson;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Um seletor inválido derruba o grupo inteiro</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  h1,
+  h2:hovr {
+    color: crimson;
+  }
+&lt;/style&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;h2&gt;Bolos&lt;/h2&gt;
+</pre>
+<p><strong>O que você vê:</strong> nada fica vermelho, nem o <code>&lt;h1&gt;</code>, que está escrito certinho.</p>
+<p><strong>Por quê:</strong> <code>:hovr</code> é um erro de digitação de <code>:hover</code> (aula <a href="hover-focus.html">Estados</a>). Pela regra do CSS, se <strong>um</strong> seletor da lista é inválido, a <strong>regra inteira</strong> é ignorada, com todos os seletores. É a pegadinha mais traiçoeira do grupo: um erro num seletor "quebra" outro que não tem nada a ver.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css hovr.css
+"file:/home/ana/site/hovr.css":2.4-2.7: error: CSS: Unknown pseudo-element or pseudo-class “:hovr”</pre>
+<p><strong>O que significa:</strong> "pseudo-elemento ou pseudo-classe desconhecido: <code>:hovr</code>", na linha 2, colunas 4 a 7.</p>
+<p><strong>Como consertar:</strong> corrija o seletor (<code>h2:hover</code>). E, quando um seletor do grupo é novo demais e talvez não funcione em todos os navegadores, deixe-o numa regra separada: assim, se ele falhar, só ele falha. (Os seletores <code>:is()</code> e <code>:where()</code> são "tolerantes" e não têm esse problema: aula <a href="not-is-where.html">:not(), :is() e :where()</a>.)</p>
+</div>
+
+<div class="cenario">
+<strong>Vírgula sobrando no fim: <code>Parse Error</code></strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  h1, h2, h3, {
+    color: darkslateblue;
+  }
+&lt;/style&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;h2&gt;Bolos&lt;/h2&gt;
+</pre>
+<p><strong>O que você vê:</strong> nenhum título muda de cor.</p>
+<p><strong>Por quê:</strong> depois da última vírgula, o navegador espera mais um seletor e encontra o <code>{</code>. Um seletor vazio é inválido, e, como no caso anterior, a regra inteira cai.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css sobra.css
+"file:/home/ana/site/sobra.css":1.11-1.11: error: CSS: Parse Error.</pre>
+<p><strong>O que significa:</strong> "erro de leitura" na linha 1, coluna 11: a vírgula que sobrou. Acontece muito quando se apaga o último seletor de uma lista escrita um por linha.</p>
+<p><strong>Como consertar:</strong> <code>h1, h2, h3 {</code>, sem vírgula antes da chave.</p>
+</div>
+
+<div class="cenario">
+<strong>Esqueceu a vírgula</strong>
+<p><strong>O que você vê:</strong> com <code>h1 h2 { color: crimson; }</code>, nada muda.</p>
+<p><strong>Por quê:</strong> sem a vírgula, o espaço vira um combinador: "um <code>&lt;h2&gt;</code> dentro de um <code>&lt;h1&gt;</code>". Não há nenhum. O validador não reclama, porque o seletor é válido: <code>vnu --css</code> termina sem nenhuma mensagem.</p>
+<p><strong>Como consertar:</strong> <code>h1, h2</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>h1, h2, h3 { … }</code></td><td>A mesma regra para os três</td></tr>
+<tr><td><code>#topo,<br>.aviso,<br>footer p { … }</code></td><td>Seletores de tipos diferentes no mesmo grupo, um por linha</td></tr>
+<tr><td>Grupo + regra própria</td><td>O comum no grupo, o que muda em cada regra</td></tr>
+<tr><td><code>h1, p</code> × <code>div p</code> × <code>p.destaque</code></td><td>"e também" × "dentro de" × "que também é"</td></tr>
+<tr><td>Um seletor inválido</td><td>Derruba a regra inteira</td></tr>
+<tr><td>Vírgula depois do último seletor</td><td>Erro: a regra inteira é ignorada</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O separador</h3>
+<p>Complete o grupo para a regra valer para <code>h1</code> e para <code>h2</code>:</p>
+<div class="ex-code">h1<input data-answer="," aria-label="separador"> h2 {
+  color: darkslateblue;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. Três num só</h3>
+<p>Escreva o grupo que pega os elementos <code>ul</code>, <code>ol</code> e os que têm a classe <code>lista</code>, nessa ordem, separados por vírgula e espaço:</p>
+<div class="ex-code"><input data-answer="ul, ol, .lista|ul,ol,.lista" aria-label="grupo"> {
+  line-height: 1.6;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>3. O que sobrou</h3>
+<p>A regra <code>h1, h2, { color: navy; }</code> não funciona. Que caractere tem de sair?</p>
+<div class="ex-code">O caractere: <input data-answer=",|a vírgula|vírgula|a última vírgula" aria-label="caractere"></div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. O que acontece com <code>h1, .1coluna { color: crimson; }</code>?</p>
+<label><input type="radio" name="q4"> O <code>h1</code> fica vermelho e o <code>.1coluna</code> é ignorado</label>
+<label><input type="radio" name="q4"> Os dois ficam vermelhos</label>
+<label><input type="radio" name="q4"> Nada fica vermelho: o seletor inválido derruba a regra inteira</label>
+<label><input type="radio" name="q4"> O navegador mostra um erro na tela</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">5. Qual seletor pega os parágrafos que estão <strong>dentro</strong> de um <code>&lt;footer&gt;</code>?</p>
+<label><input type="radio" name="q5"> <code>footer, p</code></label>
+<label><input type="radio" name="q5"> <code>footer p</code></label>
+<label><input type="radio" name="q5"> <code>footer.p</code></label>
+<label><input type="radio" name="q5"> <code>footerp</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Os títulos <code>h1</code> e <code>h2</code> têm a mesma cor, mas só o <code>h2</code> é sublinhado. Qual é a melhor organização?</p>
+<label><input type="radio" name="q6"> <code>h1, h2 { color: navy; }</code> e <code>h2 { text-decoration: underline; }</code></label>
+<label><input type="radio" name="q6"> <code>h1, h2 { color: navy; text-decoration: underline; }</code></label>
+<label><input type="radio" name="q6"> <code>h1 h2 { color: navy; }</code></label>
+<label><input type="radio" name="q6"> Duas regras completas, cada uma com a cor repetida</label>
+</div>
+
+<h3>Missão final: o grupo quebrado</h3>
+
+<div class="tryhtml" data-goal="css:h1{color}=rgb(72, 61, 139),css:h3{color}=rgb(72, 61, 139),css:.erro{background-color}=rgb(255, 228, 225),css:.aviso{background-color}=rgb(255, 228, 225)">
+<p class="try-task"><strong>Missão:</strong> o CSS da Ana tem dois grupos com defeito. No primeiro, nenhum título ficou azul-ardósia: ache o caractere que sobrou. No segundo, os avisos <code>.aviso</code> e <code>.erro</code> deviam ter fundo rosado, mas nenhum tem: falta um caractere.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;h2&gt;Bolos&lt;/h2&gt;
+&lt;h3&gt;Bolo de fubá&lt;/h3&gt;
+&lt;p class="aviso"&gt;Fechado no feriado.&lt;/p&gt;
+&lt;p class="erro"&gt;Sem entrega no domingo.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1,
+h2,
+h3, {
+  color: darkslateblue;
+}
+
+.aviso .erro {
+  background-color: mistyrose;
+  padding: 8px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1,
+h2,
+h3 {
+  color: darkslateblue;
+}
+
+.aviso,
+.erro {
+  background-color: mistyrose;
+  padding: 8px;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>A vírgula junta seletores numa regra só: <code>h1, h2, h3 { … }</code>. As declarações valem para cada um.</li>
+  <li>Qualquer seletor entra no grupo: elemento, classe, ID, combinações. Com seletores longos, um por linha.</li>
+  <li>O comum vai no grupo; o que muda vai na regra própria de cada um.</li>
+  <li>Vírgula = "e também"; espaço = "dentro de"; nada = "que também é".</li>
+  <li>Um seletor inválido no grupo derruba a regra <strong>inteira</strong>, e a vírgula sobrando antes do <code>{</code> também. Esquecer a vírgula não dá erro: vira outro seletor.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
