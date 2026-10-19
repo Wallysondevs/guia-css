@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Rápido — performance: carregar, desenhar e animar sem travar | Guia CSS</title>
+<meta name="description" content="CSS rápido para quem está começando: por que o navegador espera o CSS antes de desenhar, link no head em vez de @import, arquivos menores (minificar e tirar o que não é usado), fontes com font-display, animar com transform e opacity, imagens que não fazem a página pular (aspect-ratio), content-visibility, will-change e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Rápido</span></h1>
+
+<p class="intro">Um site lento perde visitantes: quem abre a lojinha da Ana no celular, com a internet do ônibus, desiste se a tela fica branca por vários segundos ou se a página pula bem na hora do toque. O CSS tem um papel grande nisso, porque o navegador <strong>espera o CSS chegar</strong> antes de desenhar qualquer coisa. Nesta aula você vai ver o que deixa o CSS lento e os poucos hábitos que o deixam rápido.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Por que o CSS "segura" o desenho da página, e por que ele vai no <code>&lt;head&gt;</code>.</li>
+  <li>Por que vários <code>&lt;link&gt;</code> são melhores que <code>@import</code>.</li>
+  <li>Arquivos menores: minificar e tirar o CSS que ninguém usa.</li>
+  <li>Fontes da internet sem tela vazia: <code>font-display: swap</code>.</li>
+  <li>Animações leves com <code>transform</code> e <code>opacity</code>.</li>
+  <li>Imagens que não fazem a página pular: <code>aspect-ratio</code>, <code>width</code> e <code>height</code>.</li>
+  <li><code>content-visibility</code> e <code>will-change</code>: quando ajudam e quando atrapalham.</li>
+</ul>
+</div>
+
+<hr>
+
+<h2>A ideia: o cozinheiro que lê a receita inteira</h2>
+<p>Um cozinheiro cuidadoso lê a receita <strong>toda</strong> antes de começar. Se ele começasse a montar o bolo e só depois descobrisse que a massa leva fermento, teria de desmanchar tudo. O navegador faz o mesmo com o CSS: ele não desenha a página antes de ter o CSS na mão, senão mostraria a página "pelada" (texto preto, fundo branco, tudo empilhado) e depois a redesenharia de repente. Esse "flash" de página sem estilo tem até nome em inglês: <em>FOUC</em>, <em>flash of unstyled content</em>.</p>
+<p>Por isso o CSS é chamado de recurso que <strong>bloqueia a renderização</strong> (<em>render-blocking</em>): enquanto o <code>style.css</code> não chega, a tela fica em branco. Daí vem a regra de ouro desta aula:</p>
+
+<div class="tip">
+<strong>CSS rápido = chegar cedo, ser pequeno, dar pouco trabalho</strong>
+<p><strong>Chegar cedo:</strong> o <code>&lt;link&gt;</code> no <code>&lt;head&gt;</code>, sem cadeias de arquivos. <strong>Ser pequeno:</strong> sem regras que ninguém usa. <strong>Dar pouco trabalho:</strong> animações e imagens que não obrigam o navegador a recalcular a página toda.</p>
+</div>
+
+<hr>
+
+<h2>1. O <code>&lt;link&gt;</code> no <code>&lt;head&gt;</code></h2>
+<pre class="file" data-file="index.html">&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;Lojinha da Ana&lt;/title&gt;
+  &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  …
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+<p>No <code>&lt;head&gt;</code>, o navegador descobre o <code>style.css</code> logo nas primeiras linhas e já começa a baixá-lo enquanto lê o resto. Um <code>&lt;link&gt;</code> esquecido no fim do <code>&lt;body&gt;</code> é descoberto tarde: o navegador pode desenhar a página sem estilo e depois redesenhá-la, o FOUC que você viu acima (aula <a href="onde-colocar.html">Três Jeitos de Usar CSS</a>).</p>
+
+<hr>
+
+<h2>2. Vários <code>&lt;link&gt;</code> em vez de <code>@import</code></h2>
+<p>O CSS tem a regra-at <code>@import</code>, que puxa um arquivo de dentro do outro:</p>
+
+<pre class="file" data-file="style.css">@import url("cores.css");
+
+h1 {
+  font-family: sans-serif;
+}
+</pre>
+
+<p>Funciona, mas cria uma <strong>fila</strong>: o navegador só descobre que precisa do <code>cores.css</code> <strong>depois</strong> de baixar e ler o <code>style.css</code>. São duas viagens pela internet, uma depois da outra, e a tela fica em branco durante as duas. Com dois <code>&lt;link&gt;</code> no HTML, o navegador vê os dois arquivos de uma vez e baixa os dois <strong>ao mesmo tempo</strong>:</p>
+
+<pre class="file" data-file="index.html">&lt;link rel="stylesheet" href="cores.css"&gt;
+&lt;link rel="stylesheet" href="style.css"&gt;
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Como o navegador baixa</th><th>Use?</th></tr>
+<tr><td>Um <code>&lt;link&gt;</code> só</td><td>Uma viagem</td><td>Sim: o melhor para um site pequeno</td></tr>
+<tr><td>Vários <code>&lt;link&gt;</code> no <code>&lt;head&gt;</code></td><td>Todas as viagens ao mesmo tempo</td><td>Sim, quando você separa os arquivos (aula <a href="organizar-arquivos.html">Organizando os Arquivos</a>)</td></tr>
+<tr><td><code>@import</code> dentro do CSS</td><td>Em fila: um arquivo, depois o outro</td><td>Evite no site publicado</td></tr>
+</table>
+</div>
+
+<p>A ordem dos <code>&lt;link&gt;</code> continua importando para a cascata: o que vem depois vence os empates (aula <a href="cascata.html">A Cascata</a>).</p>
+
+<hr>
+
+<h2>3. Arquivos menores</h2>
+
+<h3>Minificar: tirar o que só serve para pessoas</h3>
+<p>Espaços, quebras de linha e comentários ajudam você a ler o CSS, mas o navegador não precisa deles. <strong>Minificar</strong> é apagar tudo isso (e encurtar o que der, como <code>#ffffff</code> → <code>#fff</code>) numa cópia para publicar. Veja os dois arquivos na pasta da Ana:</p>
+
+<pre class="term" data-cwd="~/site">$ cat style.min.css
+.botao{background-color:#ff6347;color:#fff;padding:12px 24px;border-radius:8px}.botao:hover{background-color:#e5533d}
+$ wc -c style.css style.min.css
+217 style.css
+117 style.min.css
+334 total</pre>
+
+<p>O <code>wc -c</code> conta os bytes: a mesma regra caiu de 217 para 117 bytes, quase metade. Num arquivo de verdade, com centenas de regras, a economia é parecida. A versão minificada é feita por um programa (os <em>minificadores</em>, que costumam vir junto das ferramentas de publicação de sites), nunca à mão: você continua editando o <code>style.css</code> legível, e o programa gera o <code>style.min.css</code>. Os servidores ainda <strong>compactam</strong> o arquivo na viagem (gzip ou brotli), o que ajuda muito em arquivos grandes.</p>
+
+<h3>Tirar o CSS que ninguém usa</h3>
+<p>Com o tempo, o <code>style.css</code> junta regras de páginas que não existem mais, classes que ninguém usa e frameworks inteiros dos quais só um botão é aproveitado. Tudo isso é baixado e lido em cada visita. No Chrome, as ferramentas do desenvolvedor (F12) têm um painel de <strong>cobertura</strong> (<em>Coverage</em>) que pinta de vermelho as linhas do CSS que a página não usou; os nomes exatos do menu mudam de versão para versão. Antes de apagar, lembre que uma regra não usada nesta página pode ser usada em outra.</p>
+
+<hr>
+
+<h2>4. Fontes da internet sem tela vazia</h2>
+<p>Uma fonte baixada com <code>@font-face</code> (aula <a href="fontes-web.html">Fontes da Internet</a>) é mais um arquivo na fila. Enquanto ela não chega, alguns navegadores deixam o texto <strong>invisível</strong> por até alguns segundos. O descritor <code>font-display</code> diz o que fazer enquanto isso:</p>
+
+<pre class="file" data-file="style.css">@font-face {
+  font-family: "Lato";
+  src: url("fontes/lato.woff2") format("woff2");
+  font-display: swap;
+}
+</pre>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th><code>font-display</code></th><th>Enquanto a fonte não chega</th></tr>
+<tr><td><code>swap</code></td><td>Mostra o texto <strong>já</strong>, com uma fonte do sistema, e troca ("<em>swap</em>") quando a fonte chega. O mais usado.</td></tr>
+<tr><td><code>optional</code></td><td>Se a fonte não chegar quase na hora, fica a do sistema nesta visita. A página nunca muda depois de aparecer.</td></tr>
+<tr><td><code>block</code></td><td>Esconde o texto por um tempo, esperando a fonte. Evite em textos.</td></tr>
+<tr><td><code>auto</code></td><td>O navegador decide (em geral, igual ao <code>block</code>).</td></tr>
+</table>
+</div>
+
+<p>Outras economias: use o formato <code>woff2</code> (o mais compacto) e só os pesos que a página usa. Cada peso (400, 700, itálico…) é um arquivo a mais.</p>
+
+<hr>
+
+<h2>5. Animações leves: <code>transform</code> e <code>opacity</code></h2>
+<p>Para desenhar uma página, o navegador faz três trabalhos, nesta ordem:</p>
+<ol class="passo">
+  <li><strong>Layout</strong> (organizar): calcula onde fica cada caixa e o tamanho de cada uma. Mudar <code>width</code>, <code>height</code>, <code>margin</code>, <code>top</code>, <code>left</code> ou <code>font-size</code> obriga a refazer isto, e às vezes a página toda.</li>
+  <li><strong>Pintura</strong>: pinta as cores, as bordas, as sombras, o texto. Mudar <code>color</code>, <code>background-color</code> ou <code>box-shadow</code> refaz a pintura.</li>
+  <li><strong>Composição</strong>: junta as camadas já pintadas, como folhas de papel vegetal umas sobre as outras. Mudar <code>transform</code> ou <code>opacity</code> pode ser feito só aqui, deslizando ou clareando uma camada pronta, muitas vezes pela placa de vídeo.</li>
+</ol>
+<p>Numa animação, o navegador refaz esse trabalho até 60 vezes por segundo (ou mais, nas telas mais rápidas). Animar <code>left</code> refaz o layout em todas elas; animar <code>transform</code> só mexe na composição. Num computador rápido você não vê diferença; num celular simples, a primeira pode "engasgar".</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Para…</th><th>Em vez de animar…</th><th>Anime…</th></tr>
+<tr><td>Mover</td><td><code>left</code>, <code>top</code>, <code>margin-left</code></td><td><code>transform: translateX(20px)</code></td></tr>
+<tr><td>Aumentar</td><td><code>width</code>, <code>height</code></td><td><code>transform: scale(1.1)</code></td></tr>
+<tr><td>Aparecer e sumir</td><td><code>display</code>, <code>visibility</code> sozinhos</td><td><code>opacity</code></td></tr>
+<tr><td>Girar</td><td>(não há outro jeito)</td><td><code>transform: rotate(10deg)</code></td></tr>
+</table>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> passe o mouse sobre as duas caixas. As duas andam 40 pixels para a direita, com a mesma transição. O resultado parece igual, mas a de cima refaz o layout a cada quadro da animação, e a de baixo só desliza uma camada. Troque <code>translateX(40px)</code> por <code>scale(1.2)</code> e veja a de baixo crescer sem empurrar o texto ao redor.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="caixa com-margem"&gt;margin-left&lt;/div&gt;
+&lt;p&gt;Texto logo embaixo.&lt;/p&gt;
+&lt;div class="caixa com-transform"&gt;transform&lt;/div&gt;
+&lt;p&gt;Texto logo embaixo.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  width: 160px;
+  padding: 12px;
+  color: white;
+  font-family: sans-serif;
+}
+.com-margem {
+  background-color: tomato;
+  transition: margin-left 0.4s;
+}
+.com-margem:hover {
+  margin-left: 40px;
+}
+.com-transform {
+  background-color: navy;
+  transition: transform 0.4s;
+}
+.com-transform:hover {
+  transform: translateX(40px);
+}
+</pre>
+</div>
+
+<div class="tryhtml" data-goal="src::hover\s*\{[^}]*transform:\s*translateY,src:transition:[^;]*transform,nsrc:margin-top">
+<p class="try-task"><strong>Missão:</strong> o botão "Comprar" da lojinha sobe um pouquinho quando o mouse passa, mas a Ana fez isso animando <code>margin-top</code>, que refaz o layout. Troque pela versão leve: no <code>:hover</code>, <code>transform: translateY(-4px)</code>; na transição, <code>transform</code> no lugar de <code>margin-top</code>. Depois passe o mouse no botão para conferir.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;button class="comprar" type="button"&gt;Comprar&lt;/button&gt;
+</pre>
+<pre class="script" data-file="style.css">.comprar {
+  margin-top: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  background-color: navy;
+  color: white;
+  transition: margin-top 0.2s;
+}
+.comprar:hover {
+  margin-top: 4px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.comprar {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  background-color: navy;
+  color: white;
+  transition: transform 0.2s;
+}
+.comprar:hover {
+  transform: translateY(-4px);
+}
+</pre>
+</div>
+
+<p>Transições e animações têm aulas próprias: <a href="transition.html">Transições</a> e <a href="animation.html">Animações</a>. E lembre de quem prefere menos movimento: <a href="reduced-motion.html">Respeitando Quem Prefere Menos Movimento</a>.</p>
+
+<hr>
+
+<h2>6. Imagens que não fazem a página pular</h2>
+<p>Você está lendo uma notícia no celular e, de repente, o texto desce meio palmo: uma imagem acabou de chegar e empurrou tudo. Pior: você ia tocar num link e tocou num anúncio. Isso se chama <strong>deslocamento do layout</strong> (<em>layout shift</em>), e o Google mede (o "CLS", uma das notas de qualidade de um site).</p>
+<p>O motivo: enquanto a imagem não chega, o navegador não sabe a altura dela e reserva <strong>zero</strong>. A cura é dizer a <strong>proporção</strong> antes, de um destes jeitos:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Exemplo</th><th>Quando usar</th></tr>
+<tr><td><code>width</code> e <code>height</code> no HTML</td><td><code>&lt;img src="bolo-800.jpg" alt="…" width="800" height="600"&gt;</code> com <code>img { max-width: 100%; height: auto; }</code> no CSS</td><td>Sempre que você souber o tamanho da imagem: o navegador calcula a proporção sozinho</td></tr>
+<tr><td><code>aspect-ratio</code> no CSS</td><td><code>.foto { width: 100%; aspect-ratio: 4 / 3; }</code></td><td>Quando todas as fotos de um lugar têm a mesma proporção, ou num vídeo e num <code>iframe</code> (aula <a href="aspect-ratio.html">Proporção</a>)</td></tr>
+</table>
+</div>
+
+<p>Com o <code>aspect-ratio: 4 / 3</code> e a largura de 100% numa janela de 600 pixels (584 de área útil, descontada a margem do <code>body</code>), o Chromium reserva 438 pixels de altura antes mesmo de a imagem chegar (conferido: altura calculada <code>438px</code>). O valor calculado de <code>aspect-ratio</code> é <code>4 / 3</code>.</p>
+
+<hr>
+
+<h2>7. <code>content-visibility</code>: só desenhe o que está na tela</h2>
+<p>Numa página muito comprida (o blog com 200 receitas), o navegador organiza e pinta tudo, até o que está lá embaixo e ninguém viu. Com <code>content-visibility: auto</code>, ele <strong>pula</strong> o trabalho das seções que estão longe da tela e só as desenha quando o leitor rola até perto delas:</p>
+
+<pre class="file" data-file="style.css">.receita {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>content-visibility: auto;</dt><dd>"Visibilidade do conteúdo: automática". Fora da tela, o conteúdo da seção não é organizado nem pintado. O texto continua na página: a busca do navegador (<kbd>Ctrl</kbd>+<kbd>F</kbd>) e os leitores de tela o encontram.</dd>
+  <dt>contain-intrinsic-size: auto 500px;</dt><dd>Um tamanho "de mentirinha" para a seção enquanto ela não é desenhada. Sem ele, a seção pulada mede quase zero, e a barra de rolagem salta quando ela finalmente é desenhada. O <code>auto</code> diz: "depois de desenhar uma vez, lembre o tamanho de verdade".</dd>
+</dl>
+
+<div class="note">
+<strong>Suporte</strong>
+<p><code>content-visibility</code> é <strong>Baseline 2024</strong> no MDN (desde setembro de 2024 nas versões atuais do Chrome, Edge, Firefox e Safari). Num navegador antigo, a propriedade é ignorada e a página só fica como era: é uma melhoria segura. Só vale a pena em páginas <strong>longas</strong>; numa página curta não muda nada.</p>
+</div>
+
+<hr>
+
+<h2>8. <code>will-change</code>: um aviso, não um turbo</h2>
+<pre class="file" data-file="style.css">.carrinho-aberto {
+  will-change: transform;
+}
+</pre>
+<p><code>will-change</code> ("vai mudar") avisa o navegador de que aquela propriedade vai ser animada logo, para ele se preparar (por exemplo, criando uma camada só para o elemento). Uma camada custa memória. Por isso:</p>
+<ul>
+  <li>use só num elemento que <strong>de fato</strong> vai ser animado e que mostrou engasgo;</li>
+  <li><strong>nunca</strong> em tudo (<code>* { will-change: transform; }</code>): o navegador gasta memória em centenas de camadas e a página fica <strong>mais lenta</strong>;</li>
+  <li>na dúvida, não use: para a maioria das animações com <code>transform</code>, o navegador já se vira bem sozinho.</li>
+</ul>
+
+<hr>
+
+<h2>9. Um mito: "seletor comprido deixa o site lento"</h2>
+<p>Você vai ler em textos antigos que <code>.menu ul li a</code> é lento e que seletores devem ser curtos. Os navegadores de hoje casam milhares de seletores em milésimos de segundo; numa página comum, a diferença não se mede. Escolha o seletor que deixa o código <strong>claro</strong> (aulas <a href="especificidade.html">Especificidade</a> e <a href="bem.html">BEM</a>) e gaste o esforço de performance nos itens desta aula, que fazem diferença de verdade.</p>
+
+<h3>Qual usar: o que vale mais a pena</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Hábito</th><th>Ganho</th><th>Esforço</th></tr>
+<tr><td><code>&lt;link&gt;</code> no <code>&lt;head&gt;</code>, sem <code>@import</code></td><td>Grande: a página aparece antes</td><td>Nenhum</td></tr>
+<tr><td><code>width</code>/<code>height</code> ou <code>aspect-ratio</code> nas imagens</td><td>Grande: a página não pula</td><td>Pequeno</td></tr>
+<tr><td><code>font-display: swap</code></td><td>Grande: o texto aparece na hora</td><td>Uma linha</td></tr>
+<tr><td>Animar <code>transform</code> e <code>opacity</code></td><td>Médio: animações lisas no celular</td><td>Pequeno</td></tr>
+<tr><td>Minificar e tirar o CSS não usado</td><td>Médio: arquivo menor</td><td>Uma ferramenta</td></tr>
+<tr><td><code>content-visibility: auto</code></td><td>Grande só em páginas longas</td><td>Pequeno</td></tr>
+<tr><td><code>will-change</code></td><td>Pequeno, e pode piorar</td><td>Só quando medir um problema</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong><code>@import</code> depois de outra regra: o arquivo nem é baixado</strong>
+<pre class="file" data-file="style.css · erro de propósito">h1 {
+  font-family: sans-serif;
+}
+@import url("cores.css");
+</pre>
+<p><strong>O que o leitor vê:</strong> o título continua preto, como se o <code>cores.css</code> (que pinta o <code>h1</code> de <code>tomato</code>) não existisse. Conferido no Chromium: a cor calculada do <code>h1</code> fica <code>rgb(0, 0, 0)</code>.</p>
+<p><strong>Por quê:</strong> o <code>@import</code> só vale <strong>no começo</strong> do arquivo, antes de qualquer regra. Depois de uma regra, o navegador o ignora em silêncio.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":4.26-5.1: error: CSS: @import are not allowed after any valid statement other than @charset and @import.</pre>
+<p>"<code>@import</code> não é permitido depois de nenhuma instrução válida, a não ser <code>@charset</code> e <code>@import</code>". <strong>Como consertar:</strong> melhor ainda que subir o <code>@import</code> para a primeira linha: troque-o por um <code>&lt;link&gt;</code> no HTML.</p>
+</div>
+
+<div class="cenario">
+<strong><code>font-display</code> fora do <code>@font-face</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">h1 {
+  font-display: swap;
+}
+</pre>
+<p><strong>O que o leitor vê:</strong> nada muda: o texto continua esperando a fonte. <strong>Por quê:</strong> <code>font-display</code> não é uma propriedade de elementos; é um <strong>descritor</strong> que só existe dentro do <code>@font-face</code>, junto do <code>src</code>. Fora dele, o navegador ignora a linha.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":2.17-2.20: error: CSS: “font-display”: Property “font-display” doesn't exist.</pre>
+<p>"A propriedade <code>font-display</code> não existe" (como propriedade de um elemento). <strong>Como consertar:</strong> mova a linha para dentro do <code>@font-face</code> da fonte.</p>
+</div>
+
+<div class="cenario">
+<strong>O CSS no fim do <code>&lt;body&gt;</code>: o flash de página sem estilo</strong>
+<p><strong>O que o leitor vê:</strong> numa internet lenta, a página aparece por um instante com texto preto em fundo branco, tudo empilhado, e depois "se arruma". Num computador com internet rápida, quase não se nota, e é por isso que o erro passa despercebido. <strong>Por quê:</strong> o navegador começou a desenhar antes de descobrir o <code>&lt;link&gt;</code>. O validador não reclama: <code>&lt;link rel="stylesheet"&gt;</code> no <code>&lt;body&gt;</code> é permitido. <strong>Como consertar:</strong> o <code>&lt;link&gt;</code> no <code>&lt;head&gt;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>will-change</code> em tudo: a página ficou mais lenta</strong>
+<p><code>* { will-change: transform; }</code> é CSS válido (o validador não reclama), mas cria uma camada para cada elemento da página. Em celulares, isso pode gastar tanta memória que a rolagem engasga. <strong>Como consertar:</strong> apague a regra; se uma animação específica engasgar, ponha <code>will-change</code> só naquele elemento.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>&lt;link rel="stylesheet" href="style.css"&gt;</code> no <code>&lt;head&gt;</code></td><td>O CSS chega cedo; sem flash de página sem estilo</td></tr>
+<tr><td><code>@import url("x.css");</code></td><td>Puxa outro arquivo em fila (evite); só vale no começo do arquivo</td></tr>
+<tr><td><code>font-display: swap;</code> (dentro do <code>@font-face</code>)</td><td>Mostra o texto já, com a fonte do sistema, e troca depois</td></tr>
+<tr><td><code>transform</code>, <code>opacity</code></td><td>As propriedades baratas de animar</td></tr>
+<tr><td><code>width</code>, <code>height</code>, <code>margin</code>, <code>top</code>, <code>left</code></td><td>Caras de animar: refazem o layout</td></tr>
+<tr><td><code>aspect-ratio: 4 / 3;</code></td><td>Reserva a altura antes de a imagem chegar</td></tr>
+<tr><td><code>content-visibility: auto;</code> + <code>contain-intrinsic-size: auto 500px;</code></td><td>Pula o desenho das seções longe da tela (Baseline 2024)</td></tr>
+<tr><td><code>will-change: transform;</code></td><td>Avisa que vai animar; use pouco</td></tr>
+<tr><td>Minificar</td><td>Tirar espaços e comentários numa cópia para publicar</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Mover sem refazer o layout</h3>
+<p>Complete para mover a caixa 20 pixels para a direita do jeito leve:</p>
+<div class="ex-code">.caixa:hover { <input data-answer="transform" aria-label="propriedade">: translateX(20px); }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Texto sem esperar a fonte</h3>
+<p>Complete o descritor do <code>@font-face</code>:</p>
+<div class="ex-code">font-display: <input data-answer="swap" aria-label="valor">;</div>
+</div>
+
+<div class="exercise">
+<h3>3. A proporção da foto</h3>
+<p>Complete para reservar o espaço de uma foto 4 por 3:</p>
+<div class="ex-code">.foto { width: 100%; <input data-answer="aspect-ratio" aria-label="propriedade">: 4 / 3; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Por que dois <code>&lt;link&gt;</code> no HTML costumam ser mais rápidos que um <code>@import</code> dentro do CSS?</p>
+<label><input type="radio" name="q4"> Porque o <code>@import</code> é proibido</label>
+<label><input type="radio" name="q4"> Porque o navegador vê os dois arquivos de uma vez e baixa os dois ao mesmo tempo, em vez de um depois do outro</label>
+<label><input type="radio" name="q4"> Porque o <code>&lt;link&gt;</code> deixa o arquivo menor</label>
+<label><input type="radio" name="q4"> Não há diferença</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Qual destas animações dá menos trabalho ao navegador?</p>
+<label><input type="radio" name="q5"> Animar <code>width</code> de 100px a 200px</label>
+<label><input type="radio" name="q5"> Animar <code>left</code> de 0 a 50px</label>
+<label><input type="radio" name="q5"> Animar <code>opacity</code> de 0 a 1</label>
+<label><input type="radio" name="q5"> Animar <code>margin-top</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. A Ana pôs <code>* { will-change: transform; }</code> para "deixar o site mais rápido". O que acontece?</p>
+<label><input type="radio" name="q6"> O site fica mais rápido em todo lugar</label>
+<label><input type="radio" name="q6"> O validador recusa o arquivo</label>
+<label><input type="radio" name="q6"> Nada, o navegador ignora</label>
+<label><input type="radio" name="q6"> Cada elemento pode ganhar uma camada própria, gastando memória: a página pode ficar mais lenta</label>
+</div>
+
+<h3>Missão final: a página da lojinha mais rápida</h3>
+
+<div class="tryhtml" data-goal="nsrc:@import,sel:link[href='cores.css'],css:h1{color}=rgb(255, 99, 71),css:.foto{aspect-ratio}=4 / 3">
+<p class="try-task"><strong>Missão:</strong> deixe a página da lojinha mais rápida. (1) Tire o <code>@import</code> do <code>style.css</code> e ligue o <code>cores.css</code> com um <code>&lt;link&gt;</code> no <code>index.html</code>, <strong>antes</strong> do <code>style.css</code>. O título tem de continuar <code>tomato</code>. (2) Reserve o espaço da foto: na regra <code>.foto</code>, ponha <code>aspect-ratio: 4 / 3</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;img class="foto" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate"&gt;
+&lt;p&gt;Bolo de cenoura: R$ 35,00&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">@import url("cores.css");
+
+body {
+  font-family: sans-serif;
+}
+.foto {
+  width: 100%;
+  height: auto;
+}
+</pre>
+<pre class="script" data-file="cores.css">h1 {
+  color: tomato;
+}
+</pre>
+<pre class="solucao" data-file="index.html">&lt;link rel="stylesheet" href="cores.css"&gt;
+&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;img class="foto" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate"&gt;
+&lt;p&gt;Bolo de cenoura: R$ 35,00&lt;/p&gt;
+</pre>
+<pre class="solucao" data-file="style.css">body {
+  font-family: sans-serif;
+}
+.foto {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+}
+</pre>
+</div>
+
+<p>No quadro, a página parece igual antes e depois, e é isso mesmo: performance raramente se vê numa página pequena, num computador rápido. Ela aparece no celular simples, na internet lenta e na página com cem fotos.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>O navegador espera o CSS para desenhar (<em>render-blocking</em>): o <code>&lt;link&gt;</code> vai no <code>&lt;head&gt;</code>, ou a página pisca sem estilo.</li>
+  <li>Vários <code>&lt;link&gt;</code> baixam ao mesmo tempo; <code>@import</code> cria uma fila (e só vale no começo do arquivo: <code>@import are not allowed after any valid statement</code>).</li>
+  <li>Arquivo menor: minificar numa cópia para publicar e tirar as regras que ninguém usa (painel de cobertura do F12).</li>
+  <li><code>font-display: swap</code>, dentro do <code>@font-face</code>, mostra o texto já; fora dele, <code>Property “font-display” doesn't exist</code>.</li>
+  <li>Anime <code>transform</code> e <code>opacity</code>; evite animar <code>width</code>, <code>margin</code>, <code>top</code>, <code>left</code>.</li>
+  <li><code>width</code>/<code>height</code> no <code>&lt;img&gt;</code> ou <code>aspect-ratio</code> reservam o espaço e a página não pula.</li>
+  <li><code>content-visibility: auto</code> ajuda em páginas longas; <code>will-change</code> só onde precisa. Seletor comprido não é problema de velocidade.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
