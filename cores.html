@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Cores por Nome — tomato, navy e os outros nomes de cor | Guia CSS</title>
+<meta name="description" content="Cores por nome no CSS para quem nunca escreveu CSS: color com tomato, navy, seagreen, as famílias de cores lado a lado, maiúsculas, gray e grey, transparent e currentcolor, contraste, o valor rgb() que o navegador guarda e o que acontece quando o nome está errado.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Cores por Nome</span></h1>
+
+<p class="intro">A primeira coisa que quase todo mundo quer mudar num site é a cor. No CSS, o jeito mais fácil de escolher uma cor é pelo <strong>nome</strong>, em inglês: <code>red</code> ("vermelho"), <code>navy</code> ("azul-marinho"), <code>tomato</code> ("tomate"). O navegador conhece quase 150 nomes. Nesta aula você vai usar esses nomes, ver as famílias de cores lado a lado e descobrir o que o navegador faz quando o nome está errado.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Como pintar o texto com a propriedade <code>color</code> e um nome de cor.</li>
+  <li>As famílias de cores (vermelhos, azuis, verdes, cinzas) desenhadas lado a lado.</li>
+  <li>Que <code>Tomato</code> e <code>tomato</code> são a mesma cor, e que <code>gray</code> e <code>grey</code> também.</li>
+  <li>As surpresas dos nomes: <code>darkgray</code> é <strong>mais clara</strong> que <code>gray</code>.</li>
+  <li>As duas palavras especiais: <code>transparent</code> e <code>currentcolor</code>.</li>
+  <li>Por que o navegador guarda <code>tomato</code> como <code>rgb(255, 99, 71)</code>.</li>
+  <li>O que acontece com um nome errado (<code>tomate</code>, <code>light blue</code>, <code>"red"</code>) e as mensagens reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter feito <a href="primeiro-estilo.html">Seu Primeiro Estilo</a> e <a href="sintaxe.html">Regras, Seletores e Declarações</a>. Os quadros "Resultado" e as caixas "Experimente" são desenhados agora pelo <strong>seu</strong> navegador. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>, o mesmo do validator.w3.org) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: a caixa de lápis de cor</h2>
+<p>Pense numa caixa de lápis de cor. Cada lápis tem o nome escrito: "vermelho", "azul-marinho", "verde-musgo". Você não precisa saber como a fábrica misturou a tinta; basta pedir o lápis pelo nome. Os nomes de cor do CSS são essa caixa: você escreve <code>navy</code> e o navegador sabe exatamente qual azul usar.</p>
+<p>A caixa tem um limite: são só os lápis que vieram nela, quase 150. Quando a Ana quiser o laranja exato do logo da lojinha, vai precisar das próximas aulas (<a href="cores-hex.html">hexadecimal</a>, <a href="cores-rgb.html">rgb()</a> e <a href="cores-hsl.html">hsl()</a>), que deixam escolher qualquer uma de 16 milhões de cores.</p>
+
+<hr>
+
+<h2>1. A primeira cor: <code>color</code></h2>
+<p>A propriedade <code>color</code> ("cor") pinta o <strong>texto</strong> de um elemento. O título da Ana fica cor de tomate assim:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Receitas da Ana&lt;/h1&gt;
+&lt;p&gt;Bolo de cenoura com cobertura de chocolate.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: tomato;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>h1</dt><dd>O seletor: a regra vale para todos os <code>&lt;h1&gt;</code> da página.</dd>
+  <dt>color</dt><dd>A propriedade: a cor do <strong>texto</strong>. Escreve-se no inglês dos Estados Unidos, <code>color</code>, e não <code>colour</code> nem <code>cor</code>.</dd>
+  <dt>tomato</dt><dd>O valor: um <strong>nome de cor</strong>, sem aspas, numa palavra só. Tomato é um vermelho alaranjado, cor de tomate maduro.</dd>
+  <dt>;</dt><dd>Fecha a declaração. Sempre, até na última.</dd>
+</dl>
+
+<p>Só o título mudou: o parágrafo continua preto, porque a regra escolheu só o <code>h1</code>. Na caixa acima, troque <code>tomato</code> por <code>navy</code>, <code>seagreen</code> ou <code>purple</code> e veja a cor mudar enquanto você digita.</p>
+
+<h3>Onde mais uma cor entra</h3>
+<p>O mesmo nome serve em toda propriedade que pede uma cor. As mais comuns, cada uma com a sua aula:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Propriedade</th><th>O que ela pinta</th><th>Exemplo</th></tr>
+<tr><td><code>color</code></td><td>o texto (e o que usa a cor do texto)</td><td><code>color: navy;</code></td></tr>
+<tr><td><code>background-color</code></td><td>o fundo do elemento (aula <a href="background-color.html">Cor de Fundo</a>)</td><td><code>background-color: lightyellow;</code></td></tr>
+<tr><td><code>border-color</code></td><td>a borda (aula <a href="border.html">Bordas</a>)</td><td><code>border-color: crimson;</code></td></tr>
+</table>
+</div>
+<p>Nesta aula, o assunto é o <strong>nome</strong> da cor. Para mostrar as cores lado a lado, alguns exemplos pintam o fundo com <code>background-color</code>: leia como "pinte o fundo desta cor".</p>
+
+<hr>
+
+<h2>2. Os nomes lado a lado</h2>
+<p>Os nomes vêm em famílias. Cada caixinha abaixo foi pintada com o nome escrito dentro dela:</p>
+
+<pre class="file" data-file="familias.html" data-resultado>&lt;style&gt;
+  p {
+    margin: 4px 0;
+    padding: 6px 10px; /* espaço em volta do nome (aula Espaço Interno) */
+    font-family: monospace;
+  }
+  .red { background-color: red; color: white; }
+  .crimson { background-color: crimson; color: white; }
+  .tomato { background-color: tomato; color: black; }
+  .coral { background-color: coral; color: black; }
+  .salmon { background-color: salmon; color: black; }
+  .navy { background-color: navy; color: white; }
+  .royalblue { background-color: royalblue; color: white; }
+  .steelblue { background-color: steelblue; color: white; }
+  .skyblue { background-color: skyblue; color: black; }
+  .darkgreen { background-color: darkgreen; color: white; }
+  .seagreen { background-color: seagreen; color: white; }
+  .limegreen { background-color: limegreen; color: black; }
+&lt;/style&gt;
+&lt;p class="red"&gt;red&lt;/p&gt;
+&lt;p class="crimson"&gt;crimson&lt;/p&gt;
+&lt;p class="tomato"&gt;tomato&lt;/p&gt;
+&lt;p class="coral"&gt;coral&lt;/p&gt;
+&lt;p class="salmon"&gt;salmon&lt;/p&gt;
+&lt;p class="navy"&gt;navy&lt;/p&gt;
+&lt;p class="royalblue"&gt;royalblue&lt;/p&gt;
+&lt;p class="steelblue"&gt;steelblue&lt;/p&gt;
+&lt;p class="skyblue"&gt;skyblue&lt;/p&gt;
+&lt;p class="darkgreen"&gt;darkgreen&lt;/p&gt;
+&lt;p class="seagreen"&gt;seagreen&lt;/p&gt;
+&lt;p class="limegreen"&gt;limegreen&lt;/p&gt;
+</pre>
+
+<p>Repare como cada família vai do escuro ao claro: o <code>crimson</code> ("carmim") é um vermelho mais fechado que o <code>red</code>; o <code>salmon</code> ("salmão") quase vira rosa. Nas caixas escuras, o nome está em branco; nas claras, em preto, para dar para ler (veja a seção 6).</p>
+
+<p>Muitos nomes são compostos, sempre <strong>numa palavra só</strong>, em minúsculas: <code>dark</code> + <code>green</code> = <code>darkgreen</code> ("verde-escuro"), <code>light</code> + <code>blue</code> = <code>lightblue</code> ("azul-claro"), <code>steel</code> + <code>blue</code> = <code>steelblue</code> ("azul-aço"). A lista completa, com cada cor desenhada, está na <a href="ref-cores.html">Referência: Nomes de Cores</a>.</p>
+
+<h3>Uma seleção para começar</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Família</th><th>Nomes (do mais escuro ao mais claro)</th></tr>
+<tr><td>Vermelhos</td><td><code>maroon</code>, <code>brown</code>, <code>crimson</code>, <code>red</code>, <code>tomato</code>, <code>coral</code>, <code>salmon</code></td></tr>
+<tr><td>Laranjas e amarelos</td><td><code>chocolate</code>, <code>darkorange</code>, <code>orange</code>, <code>gold</code>, <code>yellow</code>, <code>khaki</code>, <code>lightyellow</code></td></tr>
+<tr><td>Verdes</td><td><code>darkgreen</code>, <code>green</code>, <code>seagreen</code>, <code>olive</code>, <code>limegreen</code>, <code>lime</code></td></tr>
+<tr><td>Azuis</td><td><code>navy</code>, <code>blue</code>, <code>royalblue</code>, <code>steelblue</code>, <code>teal</code>, <code>skyblue</code></td></tr>
+<tr><td>Roxos e rosas</td><td><code>indigo</code>, <code>purple</code>, <code>rebeccapurple</code>, <code>orchid</code>, <code>hotpink</code></td></tr>
+<tr><td>Cinzas</td><td><code>black</code>, <code>dimgray</code>, <code>gray</code>, <code>darkgray</code>, <code>silver</code>, <code>lightgray</code>, <code>gainsboro</code>, <code>white</code></td></tr>
+</table>
+</div>
+
+<div class="tryhtml" data-goal="css:h1{color}=rgb(0, 0, 128),css:p{color}=rgb(105, 105, 105)">
+<p class="try-task"><strong>Missão:</strong> o cardápio da padaria está todo preto. Deixe o título <code>navy</code> (azul-marinho) e o parágrafo <code>dimgray</code> (um cinza-escuro, bom para texto).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;p&gt;Pão francês quentinho às 7h e às 17h.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: black;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: navy;
+}
+
+p {
+  color: dimgray;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Maiúsculas não importam (mas escreva em minúsculas)</h2>
+<p>Para o navegador, <code>tomato</code>, <code>Tomato</code> e <code>TOMATO</code> são a mesma cor. O validador também aceita as três. Veja os três títulos:</p>
+
+<pre class="file" data-file="maiusculas.html" data-resultado>&lt;style&gt;
+  .a { color: tomato; }
+  .b { color: Tomato; }
+  .c { color: TOMATO; }
+&lt;/style&gt;
+&lt;h2 class="a"&gt;color: tomato&lt;/h2&gt;
+&lt;h2 class="b"&gt;color: Tomato&lt;/h2&gt;
+&lt;h2 class="c"&gt;color: TOMATO&lt;/h2&gt;
+</pre>
+
+<p>Os três ficaram exatamente da mesma cor. Mesmo assim, o costume (e o estilo do guia) é escrever <strong>tudo em minúsculas</strong>: o código fica uniforme e mais fácil de procurar.</p>
+
+<hr>
+
+<h2>4. As surpresas dos nomes</h2>
+<p>Os nomes vieram de programas antigos e foram juntados ao longo dos anos, sem muito capricho. Algumas coisas parecem erro, mas são assim mesmo.</p>
+
+<h3><code>darkgray</code> é mais clara que <code>gray</code></h3>
+<pre class="file" data-file="cinzas.html" data-resultado>&lt;style&gt;
+  p {
+    margin: 4px 0;
+    padding: 6px 10px;
+    font-family: monospace;
+  }
+  .dimgray { background-color: dimgray; color: white; }
+  .gray { background-color: gray; color: white; }
+  .darkgray { background-color: darkgray; color: black; }
+  .silver { background-color: silver; color: black; }
+  .lightgray { background-color: lightgray; color: black; }
+&lt;/style&gt;
+&lt;p class="dimgray"&gt;dimgray&lt;/p&gt;
+&lt;p class="gray"&gt;gray&lt;/p&gt;
+&lt;p class="darkgray"&gt;darkgray (o "cinza-escuro"!)&lt;/p&gt;
+&lt;p class="silver"&gt;silver&lt;/p&gt;
+&lt;p class="lightgray"&gt;lightgray&lt;/p&gt;
+</pre>
+<p>O <code>darkgray</code> ("cinza-escuro") ficou entre o <code>gray</code> e o <code>silver</code>: mais claro que o cinza "normal". É uma herança histórica: o <code>gray</code> veio de uma lista e o <code>darkgray</code> de outra, e ninguém pôde mudar depois sem estragar os sites que já existiam. Se você quer um cinza escuro de verdade, use <code>dimgray</code>.</p>
+
+<h3>Nomes repetidos</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Estes nomes…</th><th>…são a mesma cor</th></tr>
+<tr><td><code>gray</code> e <code>grey</code></td><td>as duas grafias do inglês (EUA e Reino Unido); vale para todos os cinzas: <code>darkgray</code>/<code>darkgrey</code>, <code>lightgray</code>/<code>lightgrey</code>…</td></tr>
+<tr><td><code>aqua</code> e <code>cyan</code></td><td>o mesmo azul-piscina, bem forte</td></tr>
+<tr><td><code>fuchsia</code> e <code>magenta</code></td><td>o mesmo rosa-choque</td></tr>
+</table>
+</div>
+<p>Atenção: só a palavra <strong>cor</strong> aceita as duas grafias. A propriedade é sempre <code>color</code>; <code>colour</code> não existe (seção "Quando dá errado").</p>
+
+<h3><code>green</code> não é o verde mais forte</h3>
+<p>O <code>green</code> é um verde médio, meio escuro. O verde mais vivo da tela se chama <code>lime</code> ("lima"). E o <code>rebeccapurple</code>, um roxo, tem uma história: foi acrescentado em 2014 em homenagem a Rebecca, filha de Eric Meyer, um dos pioneiros do CSS. É o único nome de cor com nome de gente.</p>
+
+<hr>
+
+<h2>5. Duas palavras especiais: <code>transparent</code> e <code>currentcolor</code></h2>
+<p>Além das cores da caixa, o CSS tem duas palavras que funcionam no lugar de uma cor:</p>
+<dl class="anatomy">
+  <dt>transparent</dt><dd>"Transparente": cor nenhuma, dá para ver o que está atrás. É a cor de fundo que todo elemento já tem quando você não escolhe outra. A aula <a href="opacity.html">Transparência</a> mostra as cores "meio transparentes".</dd>
+  <dt>currentcolor</dt><dd>"A cor atual": a mesma cor do <strong>texto</strong> (<code>color</code>) daquele elemento. Útil numa borda que deve acompanhar o texto.</dd>
+</dl>
+
+<pre class="file" data-file="currentcolor.html" data-resultado>&lt;style&gt;
+  .aviso {
+    color: crimson;
+    border: 3px solid currentcolor; /* borda da cor do texto */
+    padding: 8px;
+  }
+&lt;/style&gt;
+&lt;p class="aviso"&gt;Hoje não tem pão de queijo.&lt;/p&gt;
+</pre>
+<p>O texto e a borda saíram no mesmo <code>crimson</code>, mas a cor foi escrita uma vez só. Troque <code>crimson</code> por outra cor e os dois mudam juntos. (A propriedade <code>border</code> é da aula <a href="border.html">Bordas</a>.)</p>
+
+<hr>
+
+<h2>6. Escolha cores que dá para ler</h2>
+<p>Uma cor bonita sozinha pode ficar ilegível sobre um fundo. O que conta é o <strong>contraste</strong>: a diferença de claridade entre o texto e o fundo. Compare:</p>
+
+<pre class="file" data-file="contraste.html" data-resultado>&lt;style&gt;
+  .ruim1 { color: yellow; }
+  .ruim2 { color: lightgray; }
+  .boa1 { color: navy; }
+  .boa2 { color: dimgray; }
+&lt;/style&gt;
+&lt;p class="ruim1"&gt;yellow no fundo branco: difícil de ler.&lt;/p&gt;
+&lt;p class="ruim2"&gt;lightgray no fundo branco: quase some.&lt;/p&gt;
+&lt;p class="boa1"&gt;navy no fundo branco: fácil de ler.&lt;/p&gt;
+&lt;p class="boa2"&gt;dimgray no fundo branco: fácil de ler.&lt;/p&gt;
+</pre>
+
+<p>As duas primeiras linhas mal aparecem sobre o branco. Pense em quem lê no celular, no sol, ou em quem enxerga pouco: com pouco contraste, essa pessoa simplesmente não lê. Regra prática: texto <strong>escuro</strong> em fundo <strong>claro</strong>, ou o contrário. A aula <a href="acessibilidade.html">CSS e Acessibilidade</a> mostra como medir o contraste com números.</p>
+
+<hr>
+
+<h2>7. O nome vira número: <code>rgb(255, 99, 71)</code></h2>
+<p>O nome é só um apelido. Por dentro, toda cor da tela é uma mistura de três luzes: <strong>vermelho, verde e azul</strong>, cada uma de 0 a 255. Quando lê <code>tomato</code>, o navegador troca pelo número dessa mistura e guarda <code>rgb(255, 99, 71)</code>: 255 de vermelho, 99 de verde e 71 de azul.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você escreve</th><th>O navegador guarda (valor calculado)</th></tr>
+<tr><td><code>color: tomato;</code></td><td><code>rgb(255, 99, 71)</code></td></tr>
+<tr><td><code>color: TOMATO;</code></td><td><code>rgb(255, 99, 71)</code></td></tr>
+<tr><td><code>color: navy;</code></td><td><code>rgb(0, 0, 128)</code></td></tr>
+<tr><td><code>color: gray;</code> ou <code>grey</code></td><td><code>rgb(128, 128, 128)</code></td></tr>
+<tr><td><code>color: darkgray;</code></td><td><code>rgb(169, 169, 169)</code> (mais claro que o <code>gray</code>: mais luz)</td></tr>
+<tr><td><code>color: white;</code></td><td><code>rgb(255, 255, 255)</code> (as três luzes no máximo)</td></tr>
+<tr><td><code>color: black;</code></td><td><code>rgb(0, 0, 0)</code> (tudo apagado)</td></tr>
+<tr><td><code>color: transparent;</code></td><td><code>rgba(0, 0, 0, 0)</code> (o último 0 quer dizer "nada opaco")</td></tr>
+</table>
+</div>
+
+<p>É esse número que aparece no F12 (aula <a href="devtools.html">Inspecionando com o F12</a>): selecione o título no painel de elementos e abra a aba <em>Computed</em> ("Calculado"). Na linha <code>color</code>, aparece <code>rgb(255, 99, 71)</code>, e não <code>tomato</code>. Ver uma cor como número vai ficar natural nas aulas <a href="cores-hex.html">Hexadecimal</a> e <a href="cores-rgb.html">rgb()</a>.</p>
+
+<hr>
+
+<h2>8. Nome, hexadecimal, rgb() ou hsl()?</h2>
+<p>As quatro formas desenham as mesmas cores; muda o jeito de escrever. O mesmo tomate:</p>
+<pre class="file" data-file="quatro-formas.html" data-resultado>&lt;style&gt;
+  .nome { color: tomato; }
+  .hex { color: #ff6347; }
+  .rgb { color: rgb(255 99 71); }
+  .hsl { color: hsl(9 100% 64%); }
+&lt;/style&gt;
+&lt;p class="nome"&gt;tomato&lt;/p&gt;
+&lt;p class="hex"&gt;#ff6347&lt;/p&gt;
+&lt;p class="rgb"&gt;rgb(255 99 71)&lt;/p&gt;
+&lt;p class="hsl"&gt;hsl(9 100% 64%)&lt;/p&gt;
+</pre>
+<p>As quatro linhas saíram iguais. Não se preocupe ainda com os números: cada forma tem a sua aula.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Quando usar</th></tr>
+<tr><td>Nome (<code>tomato</code>)</td><td>Exemplos, testes rápidos, <code>white</code>, <code>black</code> e <code>transparent</code>. Fácil de ler, mas só quase 150 opções.</td></tr>
+<tr><td>Hexadecimal (<code>#ff6347</code>)</td><td>A cor exata de um logo ou de um programa de desenho, que quase sempre entrega o código <code>#</code>. É a forma mais comum nos sites.</td></tr>
+<tr><td><code>rgb()</code></td><td>Quando você pensa na mistura de luzes ou precisa de transparência.</td></tr>
+<tr><td><code>hsl()</code></td><td>Para criar variações (mais clara, mais escura) da mesma cor.</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Um nome de cor errado <strong>não</strong> mostra mensagem nenhuma na página. O navegador lê a declaração, não entende, <strong>joga fora</strong> e segue em frente: o texto fica com a cor que já tinha (no exemplo, o preto padrão). Todos os casos abaixo estão desenhados de verdade no Resultado:</p>
+
+<pre class="file" data-file="erros.html · erro de propósito" data-resultado>&lt;style&gt;
+  .a { color: tomate; }
+  .b { color: light blue; }
+  .c { color: "red"; }
+  .d { colour: tomato; }
+  .e {
+    color: tomato
+    background-color: lightyellow;
+  }
+&lt;/style&gt;
+&lt;p class="a"&gt;color: tomate&lt;/p&gt;
+&lt;p class="b"&gt;color: light blue&lt;/p&gt;
+&lt;p class="c"&gt;color: "red"&lt;/p&gt;
+&lt;p class="d"&gt;colour: tomato&lt;/p&gt;
+&lt;p class="e"&gt;faltou o ; depois de tomato&lt;/p&gt;
+</pre>
+
+<p>As cinco linhas ficaram pretas, sem fundo. Nenhuma das cores pegou. No F12, no painel de estilos (<em>Styles</em>), a declaração inválida aparece <strong>riscada</strong>, com um ícone de aviso ao lado: é o jeito do navegador dizer "li, mas não entendi". Para saber o motivo, use o validador:</p>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: “tomate” is not a “color” value.</code></strong>
+<p><strong>O que aconteceu:</strong> o nome foi escrito em português (ou com uma letra trocada): <code>color: tomate;</code>.</p>
+<pre class="term" data-cwd="~/cores">$ vnu --css nome-errado.css
+"file:/home/ana/cores/nome-errado.css":2.10-2.15: error: CSS: “color”: “tomate” is not a “color” value.</pre>
+<p>"<code>tomate</code> não é um valor de cor." O <code>2.10-2.15</code> é a linha 2, das colunas 10 a 15: a palavra exata. O texto fica com a cor de antes.</p>
+<p><strong>Como consertar:</strong> os nomes são em inglês: <code>tomato</code>. Na dúvida, confira na <a href="ref-cores.html">lista de nomes</a>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: Too many values or values are not recognized.</code></strong>
+<p><strong>O que aconteceu:</strong> o nome composto foi escrito separado: <code>color: light blue;</code>.</p>
+<pre class="term" data-cwd="~/cores">$ vnu --css espaco.css
+"file:/home/ana/cores/espaco.css":2.16-2.19: error: CSS: “color”: Too many values or values are not recognized.</pre>
+<p>"Valores demais ou valores não reconhecidos": o <code>color</code> espera <strong>uma</strong> cor, e recebeu duas palavras.</p>
+<p><strong>Como consertar:</strong> junte as palavras: <code>lightblue</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: “"red"” is not a “color” value.</code></strong>
+<p><strong>O que aconteceu:</strong> o nome está entre aspas: <code>color: "red";</code>. No HTML os valores de atributo têm aspas, e o costume vem junto.</p>
+<pre class="term" data-cwd="~/cores">$ vnu --css aspas.css
+"file:/home/ana/cores/aspas.css":2.10-2.14: error: CSS: “color”: “"red"” is not a “color” value.</pre>
+<p>Com aspas, <code>"red"</code> vira um <strong>texto</strong>, e não o nome de uma cor.</p>
+<p><strong>Como consertar:</strong> tire as aspas: <code>color: red;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “colour”: Property “colour” doesn't exist.</code></strong>
+<p><strong>O que aconteceu:</strong> a propriedade foi escrita no inglês britânico: <code>colour: tomato;</code>.</p>
+<pre class="term" data-cwd="~/cores">$ vnu --css colour.css
+"file:/home/ana/cores/colour.css":2.11-2.16: error: CSS: “colour”: Property “colour” doesn't exist.</pre>
+<p>"A propriedade <code>colour</code> não existe." Aqui o erro está no nome da propriedade, e não no valor.</p>
+<p><strong>Como consertar:</strong> <code>color</code>, sem o <code>u</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “color”: Missing a semicolon before the property name “background-color”.</code></strong>
+<p><strong>O que aconteceu:</strong> faltou o <code>;</code> no fim de <code>color: tomato</code>, e a linha de baixo era outra declaração.</p>
+<pre class="term" data-cwd="~/cores">$ vnu --css ponto.css
+"file:/home/ana/cores/ponto.css":3.3-3.18: error: CSS: “color”: Missing a semicolon before the property name “background-color”.</pre>
+<p>"Falta um ponto e vírgula antes do nome da propriedade <code>background-color</code>." Sem o <code>;</code>, o navegador lê as duas linhas como uma declaração só (<code>color: tomato background-color: lightyellow</code>), que não faz sentido. Ele joga fora <strong>as duas</strong>: por isso a última linha do Resultado ficou sem a cor e sem o fundo.</p>
+<p><strong>Como consertar:</strong> ponha o <code>;</code> no fim de toda declaração, até da última.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>color: tomato;</code></td><td>Pinta o texto com uma cor pelo nome</td></tr>
+<tr><td><code>background-color: lightyellow;</code></td><td>Pinta o fundo (aula <a href="background-color.html">Cor de Fundo</a>)</td></tr>
+<tr><td><code>darkgreen</code>, <code>lightblue</code></td><td>Nomes compostos: uma palavra só, sem espaço nem hífen</td></tr>
+<tr><td><code>Tomato</code> = <code>tomato</code></td><td>Maiúsculas não importam; o costume é minúsculas</td></tr>
+<tr><td><code>gray</code> = <code>grey</code></td><td>As duas grafias valem para os cinzas</td></tr>
+<tr><td><code>transparent</code></td><td>Cor nenhuma: aparece o que está atrás</td></tr>
+<tr><td><code>currentcolor</code></td><td>A mesma cor do texto (<code>color</code>) do elemento</td></tr>
+<tr><td>Valor calculado</td><td>O navegador guarda o nome como <code>rgb(…)</code>: <code>tomato</code> → <code>rgb(255, 99, 71)</code></td></tr>
+<tr><td>Nome errado</td><td>A declaração é ignorada em silêncio; o validador acusa</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A propriedade do texto</h3>
+<p>Complete com a propriedade que pinta o texto:</p>
+<div class="ex-code">h1 {
+  <input data-answer="color" aria-label="propriedade">: navy;
+}</div>
+</div>
+
+<div class="exercise">
+<h3>2. O nome composto</h3>
+<p>Escreva o nome da cor "verde-escuro" (dark + green) do jeito que o CSS entende:</p>
+<div class="ex-code">p { color: <input data-answer="darkgreen" aria-label="nome da cor">; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. A Ana escreveu <code>h1 { color: vermelho; }</code>. O que acontece?</p>
+<label><input type="radio" name="q3"> O título fica vermelho</label>
+<label><input type="radio" name="q3"> A página mostra uma mensagem de erro</label>
+<label><input type="radio" name="q3"> O navegador ignora a declaração e o título fica com a cor de antes</label>
+<label><input type="radio" name="q3"> A página inteira fica em branco</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Qual destes cinzas é o mais <strong>escuro</strong>?</p>
+<label><input type="radio" name="q4"> <code>darkgray</code></label>
+<label><input type="radio" name="q4"> <code>dimgray</code></label>
+<label><input type="radio" name="q4"> <code>silver</code></label>
+<label><input type="radio" name="q4"> <code>lightgray</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. No F12, na aba Computed, qual valor aparece para <code>color: navy</code>?</p>
+<label><input type="radio" name="q5"> <code>rgb(0, 0, 128)</code></label>
+<label><input type="radio" name="q5"> <code>navy</code></label>
+<label><input type="radio" name="q5"> <code>"navy"</code></label>
+<label><input type="radio" name="q5"> <code>azul-marinho</code></label>
+</div>
+
+<h3>Missão final: o cartaz da lojinha</h3>
+
+<div class="tryhtml" data-goal="css:h1{color}=rgb(220, 20, 60),css:.preco{color}=rgb(46, 139, 87),css:.aviso{color}=rgb(105, 105, 105),css:.aviso{border-top-color}=rgb(105, 105, 105)">
+<p class="try-task"><strong>Missão:</strong> a Ana escolheu as cores do cartaz, mas nenhuma apareceu: está tudo preto. Encontre os erros no <code>style.css</code> e conserte. O título deve ficar <code>crimson</code>, o preço <code>seagreen</code>, e o aviso <code>dimgray</code>, com a borda da mesma cor do texto.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+&lt;p class="preco"&gt;Bolo de cenoura: R$ 35,00&lt;/p&gt;
+&lt;p class="aviso"&gt;Encomendas até quinta-feira.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  colour: crimson;
+}
+
+.preco {
+  color: "seagreen";
+}
+
+.aviso {
+  color: dim gray;
+  border: 2px solid currentcolor;
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: crimson;
+}
+
+.preco {
+  color: seagreen;
+}
+
+.aviso {
+  color: dimgray;
+  border: 2px solid currentcolor;
+}
+</pre>
+</div>
+
+<p>Os três erros: <code>colour</code> não existe (é <code>color</code>), o <code>"seagreen"</code> com aspas vira texto, e <code>dim gray</code> separado não é um nome. Repare que a borda do aviso, com <code>currentcolor</code>, mudou sozinha quando o texto ganhou a cor.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>color</code> pinta o texto. O valor pode ser um <strong>nome de cor</strong> em inglês: <code>tomato</code>, <code>navy</code>, <code>seagreen</code>. São quase 150 nomes.</li>
+  <li>Nomes compostos são uma palavra só (<code>darkgreen</code>, <code>lightblue</code>), sem aspas. Maiúsculas não importam, mas escreva em minúsculas.</li>
+  <li>Surpresas: <code>gray</code> = <code>grey</code>; <code>aqua</code> = <code>cyan</code>; <code>darkgray</code> é mais clara que <code>gray</code>; o verde vivo é <code>lime</code>.</li>
+  <li><code>transparent</code> é cor nenhuma; <code>currentcolor</code> é a cor do texto do elemento.</li>
+  <li>Texto escuro em fundo claro (ou o contrário): contraste baixo deixa o texto ilegível.</li>
+  <li>O navegador guarda o nome como <code>rgb(…)</code>: é o que aparece no F12, na aba Computed.</li>
+  <li>Nome errado, aspas, espaço no meio, <code>colour</code> ou falta de <code>;</code>: o navegador ignora em silêncio, e o validador W3C mostra o motivo.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
