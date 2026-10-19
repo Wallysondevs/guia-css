@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS grid-template-rows — as linhas da grade | Guia CSS</title>
+<meta name="description" content="As linhas do CSS Grid: a altura automática de cada linha, grid-template-rows para linhas com altura definida, as linhas que o navegador cria sozinho e grid-auto-rows para elas, minmax para uma altura mínima, fr nas linhas (e por que precisa de altura), o layout com rodapé no pé e as mensagens reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Linhas</span> (grid-template-rows)</h1>
+
+<p class="intro">Até aqui, a Ana só desenhou as <strong>colunas</strong> das grades, e o navegador criou as linhas sozinho, cada uma com a altura do conteúdo. Muitas vezes isso basta. Mas a galeria de fotos fica mais bonita com todas as linhas da mesma altura, e no layout do blog ela quer o rodapé sempre no pé da página, mesmo quando o texto é curto. Nesta aula você vai controlar as <strong>linhas</strong> com <code>grid-template-rows</code> e <code>grid-auto-rows</code>.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Qual altura as linhas têm quando você não diz nada, e por que todos os itens de uma linha ficam da mesma altura.</li>
+  <li><code>grid-template-rows</code>: linhas com altura definida.</li>
+  <li>As linhas que o navegador cria sozinho (a grade implícita) e o <code>grid-auto-rows</code>, que dá altura a elas.</li>
+  <li><code>minmax()</code> para uma altura mínima que pode crescer.</li>
+  <li><code>fr</code> nas linhas: por que precisa de uma altura no pai, e o layout com o rodapé no pé.</li>
+  <li>O texto que vaza de uma linha baixa demais, e as mensagens reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="grid.html">Introdução ao Grid</a> e <a href="grid-colunas.html">Colunas (grid-template-columns e fr)</a>: quase tudo das colunas vale para as linhas. Os exemplos com resultado são desenhados agora pelo <strong>seu</strong> navegador; os números em pixels do texto foram medidos no Chromium. As mensagens do validador saíram do validador W3C (<code>vnu</code>), na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: as prateleiras de uma estante</h2>
+<p>As colunas de uma grade são como as divisórias em pé de uma estante. As linhas são as <strong>prateleiras</strong>. Numa estante montada sob medida, cada prateleira tem a altura do objeto mais alto que vai nela: se um livro grande entra, a prateleira inteira fica alta, e os livros pequenos ao lado ganham um espaço sobrando em cima. Numa estante comprada pronta, as prateleiras têm alturas fixas: ou o objeto cabe, ou fica para fora.</p>
+<p>No Grid, as linhas são "sob medida" por padrão. Com <code>grid-template-rows</code> e <code>grid-auto-rows</code>, você escolhe as alturas.</p>
+
+<hr>
+
+<h2>1. Sem dizer nada: linhas sob medida</h2>
+<p>Uma grade de três colunas e cinco itens. O item 2 tem um texto mais comprido:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="grade"&gt;
+  &lt;div class="item"&gt;1&lt;/div&gt;
+  &lt;div class="item"&gt;2. Um texto maior, que quebra em várias linhas&lt;/div&gt;
+  &lt;div class="item"&gt;3&lt;/div&gt;
+  &lt;div class="item"&gt;4&lt;/div&gt;
+  &lt;div class="item"&gt;5&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.grade {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  width: 400px;
+  border: 2px dashed gray;
+}
+
+.item {
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<p>A primeira linha ficou da altura do item 2, e os itens 1 e 3 <strong>esticaram</strong> até essa altura, com espaço vazio embaixo do número. A segunda linha, só com textos curtos, ficou baixinha. Cada linha tem a altura do seu item mais alto (o valor <code>auto</code>), e os itens esticam para preencher a casa (o alinhamento padrão, <code>stretch</code>, que você controla na aula <a href="grid-alinhar.html">Alinhando no Grid</a>).</p>
+
+<hr>
+
+<h2>2. <code>grid-template-rows</code>: alturas definidas</h2>
+<p>O <code>grid-template-rows</code> ("modelo das linhas") funciona igual ao <code>grid-template-columns</code>: <strong>um tamanho para cada linha</strong>, separados por espaço, de cima para baixo.</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="grade"&gt;
+  &lt;div class="item"&gt;1&lt;/div&gt;&lt;div class="item"&gt;2&lt;/div&gt;&lt;div class="item"&gt;3&lt;/div&gt;
+  &lt;div class="item"&gt;4&lt;/div&gt;&lt;div class="item"&gt;5&lt;/div&gt;&lt;div class="item"&gt;6&lt;/div&gt;
+  &lt;div class="item"&gt;7&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.grade {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 60px 100px;
+  gap: 8px;
+  width: 400px;
+  border: 2px dashed gray;
+}
+
+.item {
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>grid-template-rows</dt><dd>Desenha as linhas da grade. Vai no <strong>pai</strong>, junto do <code>display: grid</code>.</dd>
+  <dt>60px</dt><dd>A altura da primeira linha (itens 1, 2 e 3).</dd>
+  <dt>100px</dt><dd>A altura da segunda linha (itens 4, 5 e 6).</dd>
+</dl>
+
+<p>E o item 7? A Ana desenhou só duas linhas, mas há sete itens em três colunas. O navegador não joga o item fora: ele cria uma <strong>terceira linha</strong> por conta própria, com altura <code>auto</code> (o tamanho do conteúdo). Repare que ela é a mais baixa das três.</p>
+
+<hr>
+
+<h2>3. As linhas que o navegador cria: <code>grid-auto-rows</code></h2>
+<p>A grade que você desenha com <code>grid-template-rows</code> e <code>grid-template-columns</code> se chama <strong>grade explícita</strong> (escrita por você). As linhas que o navegador acrescenta quando sobram itens formam a <strong>grade implícita</strong> (subentendida). Numa galeria ou numa lista de produtos, você nem sabe quantas linhas vão existir: depende de quantos itens há. Por isso, o mais comum é não escrever <code>grid-template-rows</code> e dizer a altura de <strong>todas</strong> as linhas criadas com <code>grid-auto-rows</code>:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="grade"&gt;
+  &lt;div class="item"&gt;1&lt;/div&gt;&lt;div class="item"&gt;2&lt;/div&gt;&lt;div class="item"&gt;3&lt;/div&gt;
+  &lt;div class="item"&gt;4&lt;/div&gt;&lt;div class="item"&gt;5&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.grade {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-auto-rows: 80px;
+  gap: 8px;
+  width: 400px;
+  border: 2px dashed gray;
+}
+
+.item {
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>grid-auto-rows</dt><dd>"Linhas automáticas": a altura de cada linha que o navegador criar por conta própria.</dd>
+  <dt>80px</dt><dd>Todas as linhas criadas terão 80 pixels. Acrescente mais itens no HTML: cada linha nova também terá 80.</dd>
+</dl>
+
+<p>Com <code>grid-template-rows</code> e <code>grid-auto-rows</code> juntos, o primeiro vale para as linhas que você desenhou, e o segundo para as que vierem depois. Volte ao exemplo da seção 2, acrescente <code>grid-auto-rows: 100px</code> e veja o item 7 ganhar uma linha de 100 pixels.</p>
+
+<h3>Experimente: a galeria com linhas iguais</h3>
+<div class="tryhtml" data-goal="css:.galeria{grid-auto-rows}=100px">
+<p class="try-task"><strong>Missão:</strong> sem altura nas linhas, cada linha ficou da altura da foto mais alta, e a galeria ficou enorme. Faça <strong>todas</strong> as linhas terem <code>100px</code> de altura, com <code>grid-auto-rows</code>. (O <code>object-fit: cover</code> recorta cada foto para preencher a casa sem deformar: aula <a href="imagens-responsivas.html">Imagens que se Adaptam</a>.)</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="galeria"&gt;
+  &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura com cobertura de chocolate"&gt;
+  &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="O mesmo bolo, visto mais de perto"&gt;
+  &lt;img src="assets/midia/mapa-400.png" alt="Mapa do bairro com a Lojinha da Ana"&gt;
+  &lt;img src="assets/midia/avatar-ana-192.png" alt="Avatar da Ana"&gt;
+  &lt;img src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura em tamanho grande"&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.galeria img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.galeria {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-auto-rows: 100px;
+  gap: 8px;
+}
+
+.galeria img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>4. Altura mínima que cresce: <code>minmax()</code></h2>
+<p>Uma altura fixa tem um risco: se o conteúdo for maior, ele <strong>vaza</strong> da linha (veja <a href="#errado">Quando dá errado</a>). Muitas vezes você quer outra coisa: "todas as linhas com pelo menos 60 pixels, mas, se o texto precisar, a linha cresce". Isso se escreve com a função <code>minmax(mínimo, máximo)</code>:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="grade"&gt;
+  &lt;div class="item"&gt;1&lt;/div&gt;
+  &lt;div class="item"&gt;Bolo de cenoura com cobertura de chocolate e granulado&lt;/div&gt;
+  &lt;div class="item"&gt;3&lt;/div&gt;
+  &lt;div class="item"&gt;4&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.grade {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-auto-rows: minmax(60px, auto);
+  gap: 8px;
+  width: 400px;
+  border: 2px dashed gray;
+}
+
+.item {
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>minmax(</dt><dd>Uma função: um tamanho "entre um mínimo e um máximo".</dd>
+  <dt>60px,</dt><dd>O mínimo: a linha nunca fica mais baixa que 60 pixels. A vírgula separa os dois valores (dentro de funções, a vírgula é permitida).</dd>
+  <dt>auto)</dt><dd>O máximo: <code>auto</code>, o tamanho do conteúdo. Se o texto precisar de mais que 60, a linha cresce.</dd>
+</dl>
+
+<p>A primeira linha cresceu para caber o texto comprido; a segunda, só com o item 4, ficou com os 60 pixels mínimos (sem <code>minmax</code>, ela teria só a altura de uma linha de texto). O <code>minmax()</code> também funciona nas colunas; a aula <a href="grid-repeat.html">repeat, minmax e auto-fit</a> vai mais fundo.</p>
+
+<hr>
+
+<h2>5. <code>fr</code> nas linhas e o rodapé no pé</h2>
+<p>O <code>fr</code> funciona nas linhas, mas com uma condição: ele divide o espaço que <strong>sobra</strong>, e só sobra altura se o pai <strong>tiver uma altura</strong>. Um pai sem <code>height</code> tem só a altura do conteúdo: não sobra nada, e as linhas <code>1fr</code> ficam com a altura do conteúdo, como <code>auto</code>.</p>
+<p>O uso clássico é o layout da página: cabeçalho, conteúdo e rodapé. Com <code>grid-template-rows: auto 1fr auto</code>, o cabeçalho e o rodapé ficam com a altura deles, e o conteúdo estica para ocupar o resto. Assim, o rodapé fica no pé mesmo com pouco texto:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;header class="topo"&gt;Receitas da Ana&lt;/header&gt;
+  &lt;main class="conteudo"&gt;Só uma receita por enquanto.&lt;/main&gt;
+  &lt;footer class="rodape"&gt;© Ana, 2026&lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 250px;
+  gap: 8px;
+  font-family: sans-serif;
+}
+
+.topo,
+.rodape {
+  padding: 8px;
+  background-color: navy;
+  color: white;
+}
+
+.conteudo {
+  padding: 8px;
+  background-color: lightyellow;
+}
+</pre>
+</div>
+
+<p>O cabeçalho e o rodapé têm a altura de uma linha de texto (mais o <code>padding</code>), e o conteúdo ficou com todo o meio. Apague o <code>height: 250px</code>: a página encolhe para o tamanho do conteúdo e o <code>1fr</code> não tem mais o que dividir. Numa página de verdade, em vez de <code>height: 250px</code>, use <code>min-height: 100dvh</code> no pai: "no mínimo a altura da tela, mas cresça se o texto for longo" (aula <a href="unidades-viewport.html">Unidades da Tela</a>).</p>
+
+<hr>
+
+<h2>6. Formas de definir as linhas</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Linhas</th><th>Quando usar</th></tr>
+<tr><td>(nada)</td><td>Cada uma com a altura do seu item mais alto</td><td>Na maioria das grades: o conteúdo decide</td></tr>
+<tr><td><code>grid-auto-rows: 120px</code></td><td>Todas as linhas criadas com 120 px</td><td>Galerias, cartões de mesmo tamanho, quando você não sabe quantas linhas haverá</td></tr>
+<tr><td><code>grid-auto-rows: minmax(120px, auto)</code></td><td>No mínimo 120 px, crescendo com o conteúdo</td><td>Cartões com texto: mesma altura mínima, sem vazar</td></tr>
+<tr><td><code>grid-template-rows: 60px 100px</code></td><td>As primeiras linhas com alturas escolhidas; as outras, <code>auto</code></td><td>Grades com número fixo de linhas e alturas diferentes</td></tr>
+<tr><td><code>grid-template-rows: auto 1fr auto</code> + altura no pai</td><td>Topo e rodapé do tamanho do conteúdo; o meio pega o resto</td><td>O layout da página, com o rodapé no pé</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>CSS quase nunca mostra mensagem: o navegador ignora em silêncio o que não entende.</p>
+
+<div class="cenario">
+<strong>O texto vazou da linha</strong>
+<p><strong>O que aconteceu:</strong> <code>grid-auto-rows: 40px</code>, e um dos itens tem um texto que precisa de mais de 40 pixels:</p>
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="grade"&gt;
+  &lt;div class="item"&gt;1&lt;/div&gt;
+  &lt;div class="item"&gt;Bolo de cenoura com cobertura de chocolate e granulado&lt;/div&gt;
+  &lt;div class="item"&gt;3&lt;/div&gt;
+  &lt;div class="item"&gt;4&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.grade {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-auto-rows: 40px;
+  gap: 8px;
+  width: 400px;
+  border: 2px dashed gray;
+}
+
+.item {
+  padding: 8px;
+  background-color: tomato;
+  color: white;
+  font-family: sans-serif;
+}
+</pre>
+</div>
+<p><strong>O que você vê:</strong> o fundo vermelho do item 2 acaba nos 40 pixels, e o resto do texto continua para baixo, por cima do vão e da linha seguinte. Como a letra é branca, a parte que saiu do fundo vermelho quase some na página. A linha não cresce: você disse "40 pixels", e o navegador obedece. O validador não reclama: está tudo escrito certo.</p>
+<p><strong>Como consertar:</strong> troque por <code>grid-auto-rows: minmax(40px, auto)</code> (seção 4), ou apague o <code>grid-auto-rows</code> e deixe o conteúdo decidir.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>1fr</code> nas linhas não fez nada</strong>
+<p><strong>O que aconteceu:</strong> <code>grid-template-rows: auto 1fr auto</code>, mas o pai não tem <code>height</code> nem <code>min-height</code>.</p>
+<p><strong>O que você vê:</strong> o rodapé logo abaixo do conteúdo, e não no pé. As linhas ficam com a altura do conteúdo, como se fossem <code>auto</code>. Não sobra altura para dividir.</p>
+<p><strong>Como consertar:</strong> dê altura ao pai (<code>min-height: 100dvh</code> numa página, ou uma altura fixa num componente).</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “grid-template-row”: Property “grid-template-row” doesn't exist.</code></strong>
+<p><strong>O que aconteceu:</strong> o nome sem o <strong>s</strong> do fim.</p>
+<pre class="term" data-cwd="~/grade">$ vnu --css rowsing.css
+"file:/home/ana/grade/rowsing.css":3.28-3.32: error: CSS: “grid-template-row”: Property “grid-template-row” doesn't exist.</pre>
+<p>"A propriedade não existe." O navegador ignora a linha: as linhas voltam a ser automáticas. No F12, a declaração aparece riscada, com um ícone de aviso.</p>
+<p><strong>Como consertar:</strong> <code>grid-template-rows</code>, no plural (e <code>grid-auto-rows</code>, também no plural).</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “grid-template-rows”: “,” is an incorrect operator.</code></strong>
+<p><strong>O que aconteceu:</strong> as alturas separadas por vírgula: <code>grid-template-rows: 100px, 100px;</code>.</p>
+<pre class="term" data-cwd="~/grade">$ vnu --css rowsvirg.css
+"file:/home/ana/grade/rowsvirg.css":3.30-3.34: error: CSS: “grid-template-rows”: “,” is an incorrect operator.</pre>
+<p>Como nas colunas, os tamanhos são separados por <strong>espaço</strong>. A vírgula só aparece dentro de funções, como o <code>minmax(60px, auto)</code>. A declaração errada é ignorada inteira.</p>
+<p><strong>Como consertar:</strong> <code>grid-template-rows: 100px 100px;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “grid-auto-rows”: “x” is not a “grid-auto-rows” value.</code></strong>
+<p><strong>O que aconteceu:</strong> um valor que não é tamanho no meio da lista (aqui, um <code>x</code> que sobrou de uma edição).</p>
+<pre class="term" data-cwd="~/grade">$ vnu --css autox.css
+"file:/home/ana/grade/autox.css":3.35-3.35: error: CSS: “grid-auto-rows”: “x” is not a “grid-auto-rows” value.</pre>
+<p>"<code>x</code> não é um valor de <code>grid-auto-rows</code>." Basta um valor errado para a declaração inteira ser ignorada.</p>
+<p><strong>Como consertar:</strong> só tamanhos (<code>80px</code>, <code>1fr</code>, <code>auto</code>, <code>minmax(…)</code>), separados por espaço.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>grid-template-rows: 60px 100px;</code></td><td>A 1ª linha com 60 px, a 2ª com 100 px; as que sobrarem, <code>auto</code></td></tr>
+<tr><td><code>grid-auto-rows: 80px;</code></td><td>Altura das linhas criadas pelo navegador (a grade implícita)</td></tr>
+<tr><td><code>grid-auto-rows: minmax(60px, auto);</code></td><td>Pelo menos 60 px, crescendo com o conteúdo</td></tr>
+<tr><td><code>grid-template-rows: auto 1fr auto;</code></td><td>Topo e rodapé do tamanho do conteúdo, meio com o resto (o pai precisa de altura)</td></tr>
+<tr><td>Sem nada</td><td>Cada linha com a altura do seu item mais alto (<code>auto</code>)</td></tr>
+<tr><td>O valor no F12 (Computed)</td><td>O <code>grid-template-rows</code> aparece em pixels, com <strong>todas</strong> as linhas, inclusive as criadas. No exemplo da seção 2, o Chromium mostrou <code>60px 100px 34px</code> (a última depende da fonte)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. As linhas desenhadas</h3>
+<p>Complete com a propriedade que define a altura das linhas da grade:</p>
+<div class="ex-code">.grade { display: grid; <input data-answer="grid-template-rows" aria-label="propriedade">: 100px 200px; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Todas as linhas criadas</h3>
+<p>Complete para todas as linhas que o navegador criar terem 120 pixels:</p>
+<div class="ex-code">.galeria { display: grid; <input data-answer="grid-auto-rows" aria-label="propriedade">: 120px; }</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. Uma grade tem 3 colunas, <code>grid-template-rows: 60px 100px</code> e 7 itens. Qual a altura da linha do 7º item?</p>
+<label><input type="radio" name="q3"> 60 px</label>
+<label><input type="radio" name="q3"> 100 px</label>
+<label><input type="radio" name="q3"> A altura do conteúdo (<code>auto</code>)</label>
+<label><input type="radio" name="q3"> O 7º item não aparece</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. O que <code>grid-auto-rows: minmax(60px, auto)</code> faz?</p>
+<label><input type="radio" name="q4"> Todas as linhas com exatamente 60 px</label>
+<label><input type="radio" name="q4"> Linhas de no mínimo 60 px, que crescem se o conteúdo precisar</label>
+<label><input type="radio" name="q4"> Linhas de no máximo 60 px</label>
+<label><input type="radio" name="q4"> Só a primeira linha com 60 px</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. <code>grid-template-rows: auto 1fr auto</code>, e o rodapé não foi para o pé da página. O que falta?</p>
+<label><input type="radio" name="q5"> Trocar <code>1fr</code> por <code>100%</code></label>
+<label><input type="radio" name="q5"> Um <code>grid-auto-rows</code></label>
+<label><input type="radio" name="q5"> Vírgulas entre os valores</label>
+<label><input type="radio" name="q5"> Uma altura no pai (<code>height</code> ou <code>min-height</code>)</label>
+</div>
+
+<h3>Missão final: o blog com rodapé no pé</h3>
+
+<div class="tryhtml" data-goal="css:.pagina{display}=grid,src:grid-template-rows:\s*auto\s+1fr\s+auto\s*;,css:.pagina{min-height}=300px">
+<p class="try-task"><strong>Missão:</strong> monte a página do blog em três linhas. (1) Transforme a <code>.pagina</code> numa grade. (2) Use <code>grid-template-rows: auto 1fr auto</code>. (3) Dê à página <code>min-height: 300px</code>, para o rodapé ir para o pé.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;header class="topo"&gt;Blog da Ana&lt;/header&gt;
+  &lt;main class="conteudo"&gt;
+    &lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+    &lt;p&gt;A receita sai amanhã!&lt;/p&gt;
+  &lt;/main&gt;
+  &lt;footer class="rodape"&gt;Feito com carinho pela Ana&lt;/footer&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+  font-family: sans-serif;
+}
+
+.topo,
+.rodape {
+  padding: 8px;
+  background-color: darkgreen;
+  color: white;
+}
+
+.conteudo {
+  padding: 0 8px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.pagina {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 300px;
+  font-family: sans-serif;
+}
+
+.topo,
+.rodape {
+  padding: 8px;
+  background-color: darkgreen;
+  color: white;
+}
+
+.conteudo {
+  padding: 0 8px;
+}
+</pre>
+</div>
+
+<p>Acrescente vários parágrafos no <code>main</code>: quando o texto passa dos 300 pixels, a página cresce e o rodapé desce junto. É a vantagem do <code>min-height</code> sobre o <code>height</code>.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Sem nada escrito, cada linha tem a altura do seu item mais alto, e os itens da linha esticam até ela.</li>
+  <li><code>grid-template-rows</code>, no pai, dá uma altura a cada linha desenhada (grade explícita), de cima para baixo.</li>
+  <li>As linhas que o navegador cria quando sobram itens (grade implícita) seguem o <code>grid-auto-rows</code> (padrão: <code>auto</code>).</li>
+  <li>Altura fixa pode fazer o texto vazar; <code>minmax(60px, auto)</code> dá um mínimo e deixa crescer.</li>
+  <li><code>fr</code> nas linhas só divide altura se o pai tiver altura: <code>grid-template-rows: auto 1fr auto</code> + <code>min-height</code> = rodapé no pé.</li>
+  <li>Nome sem o <strong>s</strong> (<code>grid-template-row</code>), vírgula entre os valores ou valor que não é tamanho: o validador reclama, e o navegador ignora a linha.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
