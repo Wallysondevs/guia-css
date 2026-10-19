@@ -172,6 +172,18 @@ async function main() {
     }, ehRes, idx);
     await pg.evaluate(() => document.fonts && document.fonts.ready);
 
+    // a foto: a janela fica do tamanho do quadro
+    const alt = await pg.evaluate((ehRes, i, altura) => {
+      const q = ehRes ? window.HtmlSim.resultados[i].quadro : window.HtmlSim.caixas[i].quadro;
+      const f = q.frame, d = f.contentDocument;
+      // data-altura: a foto tem a altura do quadro (o 100vh do leitor); sem ela, a do conteúdo
+      const h = altura || q.alturaFixa || Math.min(4000, Math.max(f.offsetHeight, d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0));
+      // trava a altura: sem isso, o ajuste automático do editor encolhia o quadro de volta (até 460 px)
+      // quando o conteúdo usa vh, e a página do guia aparecia embaixo na foto
+      q.alturaFixa = h;
+      f.style.height = h + "px";
+      return h;
+    }, ehRes, idx, o.altura || 0);
     // valores calculados
     const est = await pg.evaluate((ehRes, i, estilos) => {
       const q = ehRes ? window.HtmlSim.resultados[i].quadro : window.HtmlSim.caixas[i].quadro;
@@ -186,18 +198,6 @@ async function main() {
       }) };
     }, ehRes, idx, o.estilos);
 
-    // a foto: a janela fica do tamanho do quadro
-    const alt = await pg.evaluate((ehRes, i, altura) => {
-      const q = ehRes ? window.HtmlSim.resultados[i].quadro : window.HtmlSim.caixas[i].quadro;
-      const f = q.frame, d = f.contentDocument;
-      // data-altura: a foto tem a altura do quadro (o 100vh do leitor); sem ela, a do conteúdo
-      const h = altura || q.alturaFixa || Math.min(4000, Math.max(f.offsetHeight, d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0));
-      // trava a altura: sem isso, o ajuste automático do editor encolhia o quadro de volta (até 460 px)
-      // quando o conteúdo usa vh, e a página do guia aparecia embaixo na foto
-      q.alturaFixa = h;
-      f.style.height = h + "px";
-      return h;
-    }, ehRes, idx, o.altura || 0);
     await pg.setViewport({ width: larg, height: Math.max(40, alt) });
     await new Promise((ok) => setTimeout(ok, 200));
     fs.mkdirSync(PASTA, { recursive: true });
