@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS vw, vh, dvh e svh — unidades do tamanho da tela | Guia CSS</title>
+<meta name="description" content="As unidades da tela para quem nunca escreveu CSS: vw e vh (1% da largura e da altura da janela), a conta de cada uma conferida no quadro do editor com largura fixa, vmin e vmax, o problema do 100vh no celular e as unidades novas dvh, svh e lvh, letra em vw e a acessibilidade, e os erros comuns (100vw que vaza, espaço antes da unidade, unidade trocada).">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Unidades da Tela</span>: vw, vh, dvh</h1>
+
+<p class="intro">Na aula <a href="unidades.html">Unidades</a>, os tamanhos dependiam da letra ou do pai. Agora a referência é a própria <strong>janela</strong> do navegador: "metade da largura da tela", "a altura inteira da tela". É assim que se faz uma capa que ocupa a primeira tela inteira, ou uma foto que acompanha o tamanho do celular. Nesta aula você vai fazer a conta de <code>vw</code> e <code>vh</code>, conhecer as unidades novas (<code>dvh</code>, <code>svh</code>, <code>lvh</code>) que resolvem o problema da barra de endereço do celular e evitar as armadilhas mais comuns.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que é a <em>viewport</em>, a "janela de visualização".</li>
+  <li><code>vw</code> e <code>vh</code>: 1% da largura e 1% da altura da janela, com a conta.</li>
+  <li><code>vmin</code> e <code>vmax</code>.</li>
+  <li>Por que <code>100vh</code> dá problema no celular, e as unidades <code>svh</code>, <code>lvh</code> e <code>dvh</code>.</li>
+  <li>Por que letra só em <code>vw</code> atrapalha quem precisa de zoom.</li>
+  <li>Os erros comuns: <code>100vw</code> que vaza para o lado, espaço antes da unidade e unidade trocada (com as mensagens do validador W3C).</li>
+</ul>
+</div>
+
+<p>Os resultados desta aula são desenhados pelo <strong>seu</strong> navegador, logo abaixo de cada código. Os valores calculados foram conferidos no Chromium, no quadro do editor com a largura fixa indicada em cada caixa; as mensagens de erro são do validador W3C (<code>vnu</code>), rodado na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>), na pasta <code>~/site</code>.</p>
+
+<hr>
+
+<h2>A ideia: a janela da casa</h2>
+<p>Você está dentro de casa, olhando a rua pela janela. A rua é enorme, mas você só vê o pedaço que cabe na janela. Se alguém disser "pinte um quadro com metade da largura da janela", o tamanho do quadro depende da janela: numa janelinha de banheiro, ele é pequeno; numa porta de vidro da sala, é grande.</p>
+<p>No navegador, essa janela se chama <strong>viewport</strong> ("janela de visualização"): a área onde a página aparece, sem as barras e os botões do navegador. Num celular, ela tem uns 375 a 430 pixels de largura; num computador, mais de 1000. As unidades desta aula medem pela viewport.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Unidade</th><th>Nome</th><th>Vale</th></tr>
+<tr><td><code>1vw</code></td><td><em>viewport width</em>, "largura da janela"</td><td>1% da largura da janela</td></tr>
+<tr><td><code>1vh</code></td><td><em>viewport height</em>, "altura da janela"</td><td>1% da altura da janela</td></tr>
+<tr><td><code>1vmin</code></td><td>"mínimo da janela"</td><td>1% do <strong>menor</strong> lado</td></tr>
+<tr><td><code>1vmax</code></td><td>"máximo da janela"</td><td>1% do <strong>maior</strong> lado</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. A janela do editor</h2>
+<p>Dentro das caixas "Experimente", a página do leitor roda num quadro, e a viewport dela é o <strong>próprio quadro</strong>, não a janela do seu navegador. A barra do quadro tem os botões <strong>375</strong> (largura de celular), <strong>768</strong> (tablet) e <strong>cheia</strong>, e mostra a largura que a página enxerga, em pixels. As caixas desta aula começam com uma largura <strong>fixa</strong>, para a conta dar o mesmo resultado na tela de todo mundo.</p>
+
+<h2>2. <code>vw</code>: porcentagem da largura da janela</h2>
+
+<div class="tryhtml" data-largura="400">
+<p class="try-task"><strong>Experimente:</strong> este quadro começa com 400px de largura. A faixa azul tem <code>50vw</code>: 400 × 50 ÷ 100 = <strong>200px</strong>. Clique em <strong>768</strong> e em <strong>cheia</strong> e veja a faixa acompanhar o quadro, sempre com a metade.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="faixa"&gt;50vw&lt;/div&gt;
+&lt;p&gt;A faixa tem a metade da largura da janela.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.faixa {
+  width: 50vw;
+  background-color: lightblue;
+}
+</pre>
+</div>
+
+<dl class="anatomy">
+  <dt>50</dt><dd>O número: quantos "por cento" da janela.</dd>
+  <dt>vw</dt><dd>A unidade: 1vw é 1% da largura da janela. Com a janela de 400px, <code>1vw</code> = 4px, e <code>50vw</code> = 200px.</dd>
+</dl>
+
+<h3><code>vw</code> × <code>%</code></h3>
+<p>Parece o <code>width: 50%</code> da aula anterior, mas a referência é outra:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Metade de quê</th><th>Dentro de uma caixa de 300px, numa janela de 400px</th></tr>
+<tr><td><code>width: 50%</code></td><td>Da largura do <strong>pai</strong></td><td>300 × 50 ÷ 100 = <code>150px</code></td></tr>
+<tr><td><code>width: 50vw</code></td><td>Da largura da <strong>janela</strong>, não importa o pai</td><td>400 × 50 ÷ 100 = <code>200px</code></td></tr>
+</table>
+</div>
+
+<div class="tryhtml" data-largura="400" data-goal="css:.foto{width}=200px,src:width:\s*50vw">
+<p class="try-task"><strong>Missão:</strong> a foto do bolo tem 150px fixos. Faça-a ocupar <strong>metade da largura da janela</strong> com <code>vw</code>. Com o quadro de 400px, quanto ela vai medir? Depois de cumprir, clique em 768 e veja a foto crescer (a missão é conferida com o quadro em 400px).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;img class="foto" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="800" height="600"&gt;
+</pre>
+<pre class="script" data-file="style.css">.foto {
+  width: 150px;
+  height: auto;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.foto {
+  width: 50vw;
+  height: auto;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. <code>vh</code>: porcentagem da altura da janela</h2>
+<p>O <code>vh</code> é a mesma ideia na altura: <code>100vh</code> é a altura inteira da janela. O uso clássico é a <strong>capa</strong> que ocupa a primeira tela inteira do site:</p>
+
+<pre class="file" data-file="capa.html">&lt;style&gt;
+  .capa {
+    min-height: 100vh;
+    background-color: tomato;
+    color: white;
+  }
+&lt;/style&gt;
+&lt;section class="capa"&gt;
+  &lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;/section&gt;
+&lt;p&gt;Role para baixo: o resto do site começa aqui.&lt;/p&gt;
+</pre>
+
+<p>Numa janela de 800px de altura, a capa tem pelo menos 800px (o <code>min-height</code>, "altura mínima", deixa a capa crescer se o conteúdo for maior). O parágrafo só aparece quando o leitor rola.</p>
+
+<div class="warning">
+<strong>O <code>vh</code> no quadro do editor</strong>
+<p>A altura do quadro do editor <strong>acompanha o conteúdo</strong> (até um limite, e depois rola). Então, dentro dele, a "altura da janela" muda conforme a própria página cresce, e o <code>vh</code> não dá um número confiável. No Chromium, uma capa com <code>height: 100vh</code> esticou o quadro até o limite, 460px. Para ver o <code>vh</code> de verdade, abra o resultado numa aba nova com o botão <strong>↗</strong> e mude o tamanho da janela do navegador. Por isso, nesta aula, as missões só conferem <code>vh</code> pelo código.</p>
+</div>
+
+<div class="tryhtml" data-largura="400">
+<p class="try-task"><strong>Experimente:</strong> a capa tem <code>100vh</code> e enche o quadro inteiro; o parágrafo ficou escondido embaixo (role dentro do quadro). Clique em <strong>↗</strong> para abrir numa aba nova: lá, a capa tem a altura da sua janela.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;section class="capa"&gt;
+  &lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;/section&gt;
+&lt;p&gt;Role para baixo: o resto do site começa aqui.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.capa {
+  min-height: 100vh;
+  background-color: tomato;
+  color: white;
+}
+</pre>
+</div>
+
+<h3><code>vmin</code> e <code>vmax</code></h3>
+<p><code>vmin</code> usa o <strong>menor</strong> lado da janela, e <code>vmax</code>, o maior. Num celular em pé (390 × 844), <code>10vmin</code> = 39px (o lado menor é a largura); deitado (844 × 390), continua 39px (agora o menor é a altura). Serve para um quadrado que sempre cabe na tela: <code>width: 80vmin; height: 80vmin;</code>.</p>
+
+<hr>
+
+<h2>4. O problema do celular: <code>svh</code>, <code>lvh</code> e <code>dvh</code></h2>
+<p>No celular, a barra de endereço do navegador <strong>some</strong> quando você rola para baixo e <strong>volta</strong> quando rola para cima. A janela muda de altura o tempo todo. Qual altura o <code>100vh</code> deve usar? Os navegadores escolheram a <strong>maior</strong> (com a barra escondida). Resultado: com a barra visível, uma capa de <code>100vh</code> fica mais alta que a tela, e o que está no pé dela (um botão "Ver cardápio") fica escondido atrás da barra.</p>
+<p>Para resolver, o CSS ganhou três unidades novas:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Unidade</th><th>Nome</th><th>Altura usada</th><th>Quando usar</th></tr>
+<tr><td><code>svh</code></td><td><em>small</em>, "pequena"</td><td>A janela <strong>com</strong> as barras do navegador à mostra: a menor possível</td><td>Garantir que tudo cabe na primeira tela</td></tr>
+<tr><td><code>lvh</code></td><td><em>large</em>, "grande"</td><td>A janela <strong>sem</strong> as barras: a maior possível (o mesmo que o <code>vh</code> antigo)</td><td>Raro; um fundo que nunca deve deixar buraco</td></tr>
+<tr><td><code>dvh</code></td><td><em>dynamic</em>, "dinâmica"</td><td>A altura <strong>de agora</strong>: muda quando a barra aparece ou some</td><td>A capa de tela cheia: <code>min-height: 100dvh</code></td></tr>
+</table>
+</div>
+
+<p>No computador, a janela não tem barra que some, e as quatro unidades dão o mesmo valor: no quadro do editor, <code>10vh</code>, <code>10svh</code>, <code>10lvh</code> e <code>10dvh</code> deram exatamente o mesmo número no Chromium. Existem também <code>svw</code>, <code>lvw</code> e <code>dvw</code>, para a largura, mas quase nunca fazem diferença.</p>
+
+<div class="note">
+<strong>Suporte nos navegadores</strong>
+<p><code>svh</code>, <code>lvh</code> e <code>dvh</code> funcionam no Chrome e no Edge desde a versão 108, no Firefox desde a 101 e no Safari desde a 15.4, todos de 2022 (dados do MDN). Se o site precisa atender aparelhos mais velhos, escreva as duas linhas: o navegador antigo ignora a segunda e fica com a primeira.</p>
+<pre class="file" data-file="style.css">.capa {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>5. Letra em <code>vw</code>: cuidado</h2>
+<p>É tentador: <code>h1 { font-size: 5vw; }</code> e o título cresce e encolhe com a tela. As contas:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Janela</th><th>A conta</th><th><code>font-size</code> do título</th></tr>
+<tr><td>375px (celular)</td><td>375 × 5 ÷ 100</td><td><code>18.75px</code>: quase do tamanho do texto</td></tr>
+<tr><td>768px (tablet)</td><td>768 × 5 ÷ 100</td><td><code>38.4px</code></td></tr>
+<tr><td>1600px (monitor grande)</td><td>1600 × 5 ÷ 100</td><td><code>80px</code>: enorme</td></tr>
+</table>
+</div>
+
+<p>E há um problema pior: a letra em <code>vw</code> depende só da janela, e não da letra que o leitor escolheu nas configurações do navegador. Quem precisa de letra maior fica sem saída (a regra de acessibilidade WCAG pede que o texto possa ser ampliado até o dobro). Por isso, letra sempre com um pé em <code>rem</code>, e com limites. O jeito moderno é a função <code>clamp()</code>, com um mínimo e um máximo em <code>rem</code> (aula <a href="clamp.html">min(), max() e clamp()</a>).</p>
+
+<div class="tryhtml" data-largura="375">
+<p class="try-task"><strong>Experimente:</strong> o título tem <code>5vw</code>. Com o quadro em 375px, ele fica com 18,75px, quase do tamanho do parágrafo. Clique em 768 e em cheia e compare.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Padaria da Ana&lt;/h1&gt;
+&lt;p&gt;Pão quentinho às 7 da manhã.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  font-size: 5vw;
+}
+</pre>
+</div>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Para</th><th>Use</th></tr>
+<tr><td>Capa ou seção que ocupa a primeira tela</td><td><code>min-height: 100dvh</code> (com <code>100vh</code> antes, para navegadores antigos)</td></tr>
+<tr><td>Algo que precisa caber inteiro na tela do celular</td><td><code>svh</code></td></tr>
+<tr><td>Largura proporcional à janela, fora do pai</td><td><code>vw</code></td></tr>
+<tr><td>Largura proporcional ao pai</td><td><code>%</code> (aula <a href="unidades.html">Unidades</a>)</td></tr>
+<tr><td>Tamanho da letra</td><td><code>rem</code>, ou <code>clamp()</code> com limites em <code>rem</code>; nunca só <code>vw</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Espaço antes da unidade e unidade trocada: <code>100 vw</code>, <code>5wv</code></strong>
+<pre class="term" data-cwd="~/site">$ cat style.css
+.capa {
+  min-height: 100dvh;
+  height: 100svh;
+  width: 100 vw;
+}
+h1 {
+  font-size: 5wv;
+}
+$ vnu --css style.css
+"file:/home/ana/site/style.css":4.14-4.15: error: CSS: “width”: Too many values or values are not recognized.
+"file:/home/ana/site/style.css":7.14-7.16: error: CSS: “font-size”: Unknown dimension.</pre>
+<p><strong>O que o leitor vê:</strong> a caixa e o título com os tamanhos de antes, como se as duas linhas não existissem. No F12, no painel <strong>Styles</strong> (Estilos), elas aparecem riscadas, com um ícone de aviso.</p>
+<p><strong>Por quê:</strong> <code>100 vw</code>, com espaço, vira dois valores ("valores demais, ou não reconhecidos"). E <code>wv</code> não é unidade nenhuma: "dimensão desconhecida". Repare que o validador aceitou <code>100dvh</code> e <code>100svh</code> sem reclamar.</p>
+<p><strong>Como consertar:</strong> <code>width: 100vw;</code> e <code>font-size: 5vw;</code>, número e unidade colados.</p>
+</div>
+
+<div class="cenario">
+<strong>O <code>100vw</code> que cria uma rolagem para o lado</strong>
+<p>A Ana fez uma faixa com <code>width: 100vw</code> para ocupar a tela de ponta a ponta, e apareceu uma barra de rolagem <strong>horizontal</strong>: a página "anda" uns pixels para o lado. Há dois motivos:</p>
+<ul>
+  <li>O <code>&lt;body&gt;</code> tem uma margem padrão de 8px. A faixa começa 8px depois da borda da janela e tem a largura inteira da janela: os últimos 8px ficam para fora. Isso acontece em qualquer navegador.</li>
+  <li>Em sistemas em que a barra de rolagem vertical ocupa espaço na tela (comum no Windows, com mouse), o <code>100vw</code> <strong>inclui</strong> a largura dessa barra, e a faixa fica mais larga que o espaço que sobra para a página. No quadro do editor e em muitos celulares, a barra flutua sobre o conteúdo e esse segundo problema não aparece (neste ponto, a descrição é ilustrativa: não deu para conferir no laboratório).</li>
+</ul>
+<p><strong>Como consertar:</strong> para "a largura toda", quase sempre basta um elemento de bloco comum (que já ocupa 100% do pai) e <code>body { margin: 0; }</code>. Use <code>100vw</code> só quando a caixa precisar fugir da largura do pai.</p>
+</div>
+
+<div class="cenario">
+<strong>O botão escondido atrás da barra do celular</strong>
+<p>A capa tem <code>height: 100vh</code> e, no pé dela, um botão "Ver cardápio". No computador, tudo certo. No celular, com a barra de endereço à mostra, o botão fica embaixo da barra, e o leitor precisa rolar para achá-lo. Não há erro de código, e o validador não reclama: é o <code>vh</code> medindo a janela <strong>sem</strong> a barra (seção 4).</p>
+<p><strong>Como consertar:</strong> <code>min-height: 100dvh;</code> (ou <code>100svh</code>), com <code>min-height: 100vh;</code> antes, para navegadores antigos. E prefira <code>min-height</code> a <code>height</code>: se o texto da capa não couber, ela cresce em vez de cortar.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Unidade</th><th>Vale</th><th>Exemplo (janela de 400 × 800)</th></tr>
+<tr><td><code>vw</code></td><td>1% da largura da janela</td><td><code>50vw</code> → <code>200px</code></td></tr>
+<tr><td><code>vh</code></td><td>1% da altura da janela (no celular, com a barra escondida)</td><td><code>50vh</code> → <code>400px</code></td></tr>
+<tr><td><code>vmin</code> / <code>vmax</code></td><td>1% do menor / maior lado</td><td><code>10vmin</code> → <code>40px</code>; <code>10vmax</code> → <code>80px</code></td></tr>
+<tr><td><code>svh</code></td><td>1% da altura com as barras do navegador à mostra</td><td>A menor altura possível</td></tr>
+<tr><td><code>lvh</code></td><td>1% da altura sem as barras</td><td>A maior altura possível</td></tr>
+<tr><td><code>dvh</code></td><td>1% da altura de agora</td><td>Muda quando a barra aparece ou some</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A conta do <code>vw</code></h3>
+<p>Numa janela de 800px de largura, quanto mede <code>25vw</code>? (só o número)</p>
+<div class="ex-code">800 × 25 ÷ 100 = <input data-answer="200|200px" aria-label="resultado">px</div>
+</div>
+
+<div class="exercise">
+<h3>2. A altura inteira</h3>
+<p>Complete para a capa ter pelo menos a altura da tela de agora, inclusive no celular:</p>
+<div class="ex-code">.capa { min-height: 100<input data-answer="dvh" aria-label="unidade">; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. A largura da janela</h3>
+<p>Complete a unidade que vale 1% da largura da janela:</p>
+<div class="ex-code">.faixa { width: 50<input data-answer="vw" aria-label="unidade">; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. Uma caixa de 300px tem um filho com <code>width: 50vw</code>, numa janela de 1000px. Quanto mede o filho?</p>
+<label><input type="radio" name="q4"> 150px</label>
+<label><input type="radio" name="q4"> 500px</label>
+<label><input type="radio" name="q4"> 50px</label>
+<label><input type="radio" name="q4"> 300px</label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">5. Por que a capa com <code>height: 100vh</code> esconde o botão do pé dela no celular?</p>
+<label><input type="radio" name="q5"> Porque o celular não entende <code>vh</code></label>
+<label><input type="radio" name="q5"> Porque falta o <code>;</code></label>
+<label><input type="radio" name="q5"> Porque o <code>vh</code> mede a janela com a barra de endereço escondida, maior que a tela visível</label>
+<label><input type="radio" name="q5"> Porque o <code>vh</code> só funciona em largura</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">6. O que há de errado em <code>h1 { font-size: 5vw; }</code>?</p>
+<label><input type="radio" name="q6"> Nada: é o jeito recomendado</label>
+<label><input type="radio" name="q6"> O validador não aceita <code>vw</code> em <code>font-size</code></label>
+<label><input type="radio" name="q6"> O título fica sempre com 5px</label>
+<label><input type="radio" name="q6"> Fica pequeno no celular, enorme em monitores grandes e ignora a letra que o leitor escolheu</label>
+</div>
+
+<h3>Missão final: a capa da padaria</h3>
+
+<div class="tryhtml" data-largura="600" data-goal="css:.logo{width}=120px,css:.foto{width}=300px,src:min-height:\s*100dvh,nsrc:(^|[^-])height:\s*100vh">
+<p class="try-task"><strong>Missão:</strong> o quadro tem 600px. (1) Troque o <code>height: 100vh</code> da capa por uma <strong>altura mínima</strong> de <code>100dvh</code>, que não esconde nada atrás da barra do celular. (2) O logo deve ter <code>20vw</code> e (3) a foto, metade da largura da janela. Faça as contas com 600px antes de testar. Depois, clique em 375 e em 768 e veja tudo se ajustar.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;section class="capa"&gt;
+  &lt;img class="logo" src="assets/midia/logo-lojinha.svg" alt="Lojinha da Ana" width="400" height="160"&gt;
+  &lt;h1&gt;Bolos feitos no dia&lt;/h1&gt;
+  &lt;img class="foto" src="assets/midia/bolo-800.jpg" alt="Bolo de cenoura com cobertura de chocolate" width="800" height="600"&gt;
+  &lt;p&gt;&lt;a href="#cardapio"&gt;Ver cardápio&lt;/a&gt;&lt;/p&gt;
+&lt;/section&gt;
+&lt;h2 id="cardapio"&gt;Cardápio&lt;/h2&gt;
+</pre>
+<pre class="script" data-file="style.css">.capa {
+  height: 100vh;
+  background-color: lightyellow;
+}
+
+.logo {
+  width: 100px;
+  height: auto;
+}
+
+.foto {
+  width: 250px;
+  height: auto;
+  display: block;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.capa {
+  min-height: 100dvh;
+  background-color: lightyellow;
+}
+
+.logo {
+  width: 20vw;
+  height: auto;
+}
+
+.foto {
+  width: 50vw;
+  height: auto;
+  display: block;
+}
+</pre>
+</div>
+
+<p>As contas: logo 600 × 20 ÷ 100 = 120px; foto 600 × 50 ÷ 100 = 300px. A altura da capa a missão só confere pelo código, porque o quadro do editor muda de altura com o conteúdo (seção 3).</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>A viewport é a janela onde a página aparece. No editor do guia, é o próprio quadro; os botões 375, 768 e cheia mudam a largura dele.</li>
+  <li><code>1vw</code> = 1% da largura da janela; <code>1vh</code> = 1% da altura. <code>vmin</code> e <code>vmax</code> usam o lado menor e o maior.</li>
+  <li><code>%</code> mede pelo pai; <code>vw</code> mede pela janela, não importa o pai.</li>
+  <li>No celular, <code>100vh</code> é a altura sem a barra de endereço, maior que a tela visível. Use <code>svh</code> (com a barra), <code>lvh</code> (sem a barra) ou <code>dvh</code> (a de agora); para capas, <code>min-height: 100dvh</code>.</li>
+  <li>Letra só em <code>vw</code> fica minúscula no celular, enorme no monitor e ignora a escolha do leitor: use <code>rem</code> ou <code>clamp()</code>.</li>
+  <li><code>100vw</code> pode vazar para o lado (margem do <code>body</code>, barra de rolagem). Um bloco comum já ocupa a largura toda.</li>
+  <li>Erros: <code>100 vw</code> dá <code>Too many values or values are not recognized</code>; <code>5wv</code> dá <code>Unknown dimension</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
