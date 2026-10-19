@@ -170,7 +170,7 @@
 <dl class="anatomy">
   <dt>calc(var(--espaco) * 2)</dt><dd>O dobro do espaço: 24px. Mude <code>--espaco</code> e a margem acompanha.</dd>
   <dt>calc(-1 * var(--espaco))</dt><dd>O espaço com sinal trocado: −12px. Uma margem negativa puxa a faixa para a esquerda, por cima do <code>padding</code> do cartão.</dd>
-  <dt>calc(100% + 2 * var(…))</dt><dd>A largura do conteúdo do cartão mais os dois <code>padding</code>s: a faixa vai de uma borda à outra do cartão.</dd>
+  <dt>calc(100% + 2 * var(--espaco))</dt><dd>A largura do conteúdo do cartão mais os dois <code>padding</code>s: a faixa vai de uma borda à outra do cartão.</dd>
 </dl>
 
 <p>E se a variável guarda só um número, é o <code>calc()</code> que dá a unidade: <code>calc(var(--colunas) * 1px)</code>. Escrever <code>var(--colunas)px</code> não funciona.</p>
