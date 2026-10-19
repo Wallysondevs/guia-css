@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS display — block, inline e inline-block | Guia CSS</title>
+<meta name="description" content="A propriedade display para quem nunca escreveu CSS: a diferença entre block, inline e inline-block, quais elementos são de cada tipo, quando mudar (links em bloco, botões, menu na horizontal) e os erros reais: width que não funciona num span, margem de cima ignorada, o espaço entre caixas inline-block e a mensagem do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">display</span></h1>
+
+<p class="intro">Por que um <code>&lt;p&gt;</code> sempre começa numa linha nova e um <code>&lt;strong&gt;</code> fica no meio da frase? Por que o <code>width</code> funciona numa <code>&lt;div&gt;</code> e não num <code>&lt;span&gt;</code>? A resposta é uma só propriedade: <code>display</code> ("exibição"), que diz <strong>como a caixa de um elemento se encaixa na página</strong>. Nesta aula você vai conhecer os três valores básicos, <code>block</code>, <code>inline</code> e <code>inline-block</code>, e trocar um pelo outro quando o padrão do HTML não serve.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>O que é uma caixa <strong>de bloco</strong> (<code>block</code>) e uma caixa <strong>em linha</strong> (<code>inline</code>).</li>
+  <li>O que funciona e o que é ignorado em cada uma: <code>width</code>, <code>height</code>, <code>margin</code>, <code>padding</code>.</li>
+  <li><code>inline-block</code>: no meio da linha, mas com tamanho.</li>
+  <li>Quais elementos são de cada tipo e quando vale mudar.</li>
+  <li>Os outros valores de <code>display</code> e as aulas de cada um.</li>
+  <li>Os erros: o <code>width</code> que não pega, a margem de cima ignorada, o espaço misterioso entre caixas e o validador.</li>
+</ul>
+</div>
+
+<p>Os resultados são desenhados pelo <strong>seu</strong> navegador. A diferença entre elementos de bloco e em linha já apareceu do lado do HTML, na aula <a href="https://wallysondevs.github.io/guia-html/bloco-inline.html">Bloco × Em Linha do Guia HTML</a>; aqui você vai controlá-la pelo CSS.</p>
+
+<hr>
+
+<h2>A ideia: tijolos e palavras</h2>
+<p>Pense numa página como uma parede de tijolos e, nos tijolos, frases escritas.</p>
+<ul>
+  <li>Um <strong>bloco</strong> é um tijolo inteiro: ocupa a fileira toda, de ponta a ponta, e o próximo tijolo vai para a fileira de baixo. Dá para escolher a largura e a altura dele.</li>
+  <li>Um elemento <strong>em linha</strong> é uma palavra dentro da frase: fica ao lado das outras e, se a linha acaba, continua na próxima. Uma palavra não tem "altura" própria: ela tem o tamanho do texto.</li>
+  <li>Um <strong>inline-block</strong> é um adesivo colado no meio da frase: anda junto com o texto, mas tem o seu próprio tamanho.</li>
+</ul>
+
+<hr>
+
+<h2>1. Os três lado a lado</h2>
+<p>As três caixas abaixo têm <strong>o mesmo CSS</strong>: largura de 120px, altura de 40px, margem de 10px, padding de 6px e borda. Só o <code>display</code> muda:</p>
+
+<pre class="file" data-file="tres.html" data-resultado>&lt;style&gt;
+  .caixa {
+    background-color: #fde8e1;
+    border: 2px solid tomato;
+    width: 120px;
+    height: 40px;
+    margin: 10px;
+    padding: 6px;
+  }
+  .bloco  { display: block; }
+  .linha  { display: inline; }
+  .misto  { display: inline-block; }
+&lt;/style&gt;
+&lt;p&gt;Texto antes &lt;span class="caixa bloco"&gt;block&lt;/span&gt; texto depois.&lt;/p&gt;
+&lt;p&gt;Texto antes &lt;span class="caixa linha"&gt;inline&lt;/span&gt; texto depois, numa frase comprida que continua na linha de baixo para você ver o padding.&lt;/p&gt;
+&lt;p&gt;Texto antes &lt;span class="caixa misto"&gt;inline-block&lt;/span&gt; texto depois.&lt;/p&gt;
+</pre>
+
+<p>Repare em cada uma:</p>
+<ul>
+  <li><strong>block</strong>: a caixa quebra a frase em três. "Texto antes" fica numa linha, a caixa em outra, "texto depois" em outra. A largura e a altura valem, e a margem afasta a caixa em todos os lados.</li>
+  <li><strong>inline</strong>: a caixa fica no meio da frase, do tamanho do texto. O <code>width</code> e o <code>height</code> são <strong>ignorados</strong>. A margem dos lados afasta o texto vizinho, mas a de cima e a de baixo não. O padding de cima e de baixo aparece (o fundo e a borda crescem), mas <strong>não empurra</strong> as linhas vizinhas: a borda passa por cima da linha de baixo.</li>
+  <li><strong>inline-block</strong>: a caixa fica no meio da frase, mas com 120×40 e com as margens em todos os lados. A linha fica mais alta para caber a caixa.</li>
+</ul>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th><code>block</code></th><th><code>inline</code></th><th><code>inline-block</code></th></tr>
+<tr><td>Começa numa linha nova?</td><td>Sim</td><td>Não</td><td>Não</td></tr>
+<tr><td>Largura sem <code>width</code></td><td>Toda a largura disponível</td><td>A do conteúdo</td><td>A do conteúdo</td></tr>
+<tr><td><code>width</code> e <code>height</code></td><td>Funcionam</td><td><strong>Ignorados</strong></td><td>Funcionam</td></tr>
+<tr><td><code>margin</code> em cima e embaixo</td><td>Funciona</td><td><strong>Ignorada</strong></td><td>Funciona</td></tr>
+<tr><td><code>padding</code> em cima e embaixo</td><td>Funciona e empurra</td><td>Aparece, mas não empurra</td><td>Funciona e empurra</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>2. O padrão de cada elemento</h2>
+<p>Todo elemento já vem com um <code>display</code>, dado pelo navegador:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th><code>display</code> padrão</th><th>Elementos</th></tr>
+<tr><td><code>block</code></td><td><code>div</code>, <code>p</code>, <code>h1</code>…<code>h6</code>, <code>ul</code>, <code>ol</code>, <code>header</code>, <code>nav</code>, <code>main</code>, <code>section</code>, <code>article</code>, <code>footer</code>, <code>form</code>, <code>blockquote</code></td></tr>
+<tr><td><code>inline</code></td><td><code>span</code>, <code>a</code>, <code>strong</code>, <code>em</code>, <code>code</code>, <code>label</code>, <code>img</code></td></tr>
+<tr><td><code>inline-block</code></td><td><code>button</code>, <code>input</code>, <code>select</code>, <code>textarea</code></td></tr>
+<tr><td><code>list-item</code></td><td><code>li</code> (um bloco com marcador; aula <a href="listas.html">Listas</a>)</td></tr>
+<tr><td><code>table</code>, <code>table-row</code>, <code>table-cell</code></td><td><code>table</code>, <code>tr</code>, <code>td</code>/<code>th</code></td></tr>
+</table>
+</div>
+
+<p>O <code>&lt;img&gt;</code> é um caso especial: é <code>inline</code>, mas aceita <code>width</code> e <code>height</code>, porque o tamanho vem da própria imagem (é um elemento "substituído"). Em outras palavras, ele se comporta como um <code>inline-block</code>.</p>
+
+<p>Para ver o <code>display</code> de qualquer elemento, abra o F12, escolha o elemento na aba <em>Elements</em> (Elementos) e procure <code>display</code> na aba <em>Computed</em> (aula <a href="devtools.html">Inspecionando com o F12</a>).</p>
+
+<div class="note">
+<strong>CSS muda a aparência, não o HTML</strong>
+<p>Um <code>&lt;span&gt;</code> com <code>display: block</code> continua sendo um <code>&lt;span&gt;</code>: as regras do HTML continuam valendo. Um <code>&lt;div&gt;</code> dentro de um <code>&lt;span&gt;</code> continua inválido no validador, mesmo que o CSS transforme os dois em blocos. Escolha o elemento pelo <strong>significado</strong> e o <code>display</code> pela <strong>aparência</strong>.</p>
+</div>
+
+<hr>
+
+<h2>3. Quando mudar: <code>block</code> num link</h2>
+<p>Num menu vertical, a Ana quer que a área clicável de cada link vá de ponta a ponta, não só em cima das letras. O <code>&lt;a&gt;</code> é <code>inline</code>: só a palavra é clicável, e o padding de cima e de baixo não empurra nada. Com <code>display: block</code>, o link vira um tijolo da largura toda:</p>
+
+<div class="tryhtml" data-goal="css:.menu a{display}=block">
+<p class="try-task"><strong>Missão:</strong> passe o mouse nos links: o fundo só aparece atrás das letras, e o padding de cima e de baixo invade os links vizinhos. Faça os links ocuparem a largura toda do menu, cada um com o seu espaço.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul class="menu"&gt;
+  &lt;li&gt;&lt;a href="index.html"&gt;Início&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="sobre.html"&gt;Sobre&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu {
+  list-style: none;
+  padding: 0;
+  width: 200px;
+  border: 1px solid navy;
+}
+
+.menu a {
+  padding: 10px;
+  background-color: #e8ecff;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.menu {
+  list-style: none;
+  padding: 0;
+  width: 200px;
+  border: 1px solid navy;
+}
+
+.menu a {
+  display: block;
+  padding: 10px;
+  background-color: #e8ecff;
+}
+</pre>
+</div>
+
+<p>Com <code>block</code>, cada link ganha a largura dos 200px do menu, o padding empurra os vizinhos e o clique funciona em toda a faixa, o que ajuda no celular, onde o dedo é menos preciso que o mouse.</p>
+
+<hr>
+
+<h2>4. Quando mudar: <code>inline-block</code> num botão e num menu</h2>
+<p>O <code>inline-block</code> serve para coisas que ficam <strong>uma ao lado da outra</strong>, mas precisam de tamanho e espaço: um link com cara de botão, etiquetas, itens de um menu horizontal.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> troque o <code>inline-block</code> do <code>.botao</code> por <code>inline</code> e veja o fundo do botão encostar no parágrafo de cima: o padding continua desenhado, mas não empurra mais nada. Depois troque o dos <code>li</code> por <code>block</code>: o menu volta a ficar em pé.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul class="menu"&gt;
+  &lt;li&gt;&lt;a href="index.html"&gt;Início&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="sobre.html"&gt;Sobre&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;O bolo de cenoura da Ana tem cobertura de chocolate.&lt;/p&gt;
+&lt;a class="botao" href="bolo.html"&gt;Ver a receita&lt;/a&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu {
+  list-style: none;
+  padding: 0;
+}
+
+.menu li {
+  display: inline-block;
+  margin-right: 12px;
+}
+
+.botao {
+  display: inline-block;
+  padding: 12px 20px;
+  background-color: tomato;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+}
+</pre>
+</div>
+
+<div class="tip">
+<strong>Menu na horizontal: o jeito moderno</strong>
+<p>Pôr os <code>li</code> em <code>inline-block</code> foi o jeito clássico de fazer menus horizontais, e ainda funciona. Hoje o mais usado é <code>display: flex</code> no <code>&lt;ul&gt;</code>, que alinha e distribui os itens com muito mais controle e sem o espaço extra da seção <a href="#errado">Quando dá errado</a>. Ele tem um capítulo inteiro, a partir da aula <a href="flexbox.html">Introdução ao Flexbox</a>.</p>
+</div>
+
+<hr>
+
+<h2>5. Os outros valores</h2>
+<p>O <code>display</code> tem mais valores. Cada um é assunto de outra aula:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Valor</th><th>O que faz</th><th>Aula</th></tr>
+<tr><td><code>none</code></td><td>Some com o elemento, como se ele não existisse</td><td><a href="esconder.html">Escondendo</a></td></tr>
+<tr><td><code>flex</code> / <code>inline-flex</code></td><td>Arruma os filhos numa linha ou coluna</td><td><a href="flexbox.html">Flexbox</a></td></tr>
+<tr><td><code>grid</code> / <code>inline-grid</code></td><td>Arruma os filhos numa grade de linhas e colunas</td><td><a href="grid.html">Grid</a></td></tr>
+<tr><td><code>list-item</code></td><td>Bloco com marcador de lista</td><td><a href="listas.html">Listas</a></td></tr>
+<tr><td><code>table</code>, <code>table-cell</code>…</td><td>O comportamento das tabelas</td><td><a href="tabelas.html">Tabelas</a></td></tr>
+</table>
+</div>
+
+<p>Repare no par <code>flex</code> e <code>inline-flex</code>: o <code>display</code> decide duas coisas. Uma é como a caixa se encaixa <strong>lá fora</strong>, entre os vizinhos (bloco ou em linha). A outra é como ela arruma <strong>os filhos de dentro</strong> (texto normal, flex ou grid). O <code>inline-flex</code> é "em linha por fora, flex por dentro".</p>
+
+<hr>
+
+<h2>6. Qual usar</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Situação</th><th>Use</th></tr>
+<tr><td>Link de menu vertical com área clicável larga</td><td><code>display: block</code> no <code>&lt;a&gt;</code></td></tr>
+<tr><td>Link com cara de botão, no meio do texto ou sozinho</td><td><code>display: inline-block</code></td></tr>
+<tr><td>Etiquetas ("vegano", "sem glúten") com padding</td><td><code>display: inline-block</code></td></tr>
+<tr><td>Itens lado a lado, com alinhamento e espaço entre eles</td><td><code>display: flex</code> no pai</td></tr>
+<tr><td>Um <code>&lt;span&gt;</code> que deveria ser um bloco</td><td>Troque o elemento no HTML (um <code>&lt;p&gt;</code>, um <code>&lt;div&gt;</code>) antes de pensar em <code>display</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>O <code>width</code> não funciona no <code>&lt;span&gt;</code></strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .selo {
+    width: 200px;
+    height: 60px;
+    background-color: gold;
+  }
+&lt;/style&gt;
+&lt;p&gt;Bolo de cenoura &lt;span class="selo"&gt;Novo!&lt;/span&gt;&lt;/p&gt;
+</pre>
+<p><strong>O que você vê:</strong> o fundo dourado só cobre a palavra "Novo!". Nada de 200×60.</p>
+<p><strong>Por quê:</strong> o <code>&lt;span&gt;</code> é <code>inline</code>, e uma caixa em linha tem o tamanho do texto: <code>width</code> e <code>height</code> não se aplicam a ela. O validador não reclama: as declarações são válidas, só não valem para esse tipo de caixa. No F12, o Chrome costuma mostrar a declaração esmaecida no painel <em>Styles</em>, com um ícone de informação que explica que ela não tem efeito por causa do <code>display</code>.</p>
+<p><strong>Como consertar:</strong> <code>display: inline-block</code> (continua no meio da frase) ou <code>display: block</code> (vai para uma linha só dele).</p>
+</div>
+
+<div class="cenario">
+<strong>A margem de cima não afasta o link</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .voltar {
+    margin-top: 40px;
+  }
+&lt;/style&gt;
+&lt;p&gt;Fim da receita.&lt;/p&gt;
+&lt;a class="voltar" href="index.html"&gt;Voltar ao início&lt;/a&gt;
+</pre>
+<p><strong>O que você vê:</strong> o link fica logo abaixo do parágrafo, sem os 40px.</p>
+<p><strong>Por quê:</strong> o <code>&lt;a&gt;</code> é <code>inline</code>, e a margem de cima e de baixo de uma caixa em linha não empurra nada.</p>
+<p><strong>Como consertar:</strong> <code>display: inline-block</code> ou <code>block</code> no link; ou ponha a margem num bloco em volta dele (um <code>&lt;p&gt;</code>).</p>
+</div>
+
+<div class="cenario">
+<strong>Duas caixas de 50% não cabem lado a lado</strong>
+<pre class="file" data-file="index.html · erro de propósito" data-resultado>&lt;style&gt;
+  .metade {
+    display: inline-block;
+    width: 50%;
+    background-color: #e8ecff;
+  }
+  .outra { background-color: #fde8e1; }
+&lt;/style&gt;
+&lt;div class="metade"&gt;Ingredientes&lt;/div&gt;
+&lt;div class="metade outra"&gt;Modo de preparo&lt;/div&gt;
+</pre>
+<p><strong>O que você vê:</strong> a segunda caixa cai para a linha de baixo, mesmo que 50% + 50% dê 100%.</p>
+<p><strong>Por quê:</strong> caixas <code>inline-block</code> se comportam como palavras, e a quebra de linha entre as duas <code>&lt;div&gt;</code> no HTML vira um <strong>espaço</strong> entre elas, como o espaço entre duas palavras. 50% + um espaço + 50% passa de 100%.</p>
+<p><strong>Como consertar:</strong> para colunas lado a lado, use <code>display: flex</code> no pai (aula <a href="flexbox.html">Flexbox</a>): ele não tem esse espaço. Truques antigos, como colar as tags sem espaço no HTML, funcionam, mas deixam o código difícil de ler.</p>
+</div>
+
+<div class="cenario">
+<strong>Dois valores que não combinam: <code>inline block</code></strong>
+<pre class="file" data-file="style.css · erro de propósito">.botao {
+  display: inline block;
+}
+</pre>
+<p><strong>O que você vê:</strong> nada muda; o link continua <code>inline</code>.</p>
+<pre class="term" data-cwd="~/site">$ vnu --css style.css
+"file:/home/ana/site/style.css":2.19-2.23: error: CSS: “display”: “block” is not a “display” value.</pre>
+<p><strong>O que significa:</strong> "<code>block</code> não é um valor de <code>display</code>" ali, depois de <code>inline</code>. O nome do valor é uma palavra só, com hífen: <code>inline-block</code>. Sem o hífen, o navegador ignora a declaração inteira. O mesmo acontece com <code>display: hidden</code>, que não existe: o validador diz <code>“hidden” is not a “display” value</code> (para esconder, é <code>none</code>; aula <a href="esconder.html">Escondendo</a>).</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>display: block;</code></td><td>Linha própria, largura toda, aceita <code>width</code>, <code>height</code> e todas as margens</td></tr>
+<tr><td><code>display: inline;</code></td><td>No meio do texto, tamanho do conteúdo; ignora <code>width</code>, <code>height</code> e margens de cima e de baixo</td></tr>
+<tr><td><code>display: inline-block;</code></td><td>No meio do texto, mas com tamanho, margens e padding que empurram</td></tr>
+<tr><td><code>display: none;</code></td><td>Some com o elemento (próxima aula)</td></tr>
+<tr><td><code>display: flex;</code> / <code>grid;</code></td><td>Arruma os filhos (capítulos Flexbox e Grid)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Linha própria</h3>
+<p>Complete o valor que faz o link ocupar uma linha inteira:</p>
+<div class="ex-code">.menu a { display: <input data-answer="block" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. No meio da frase, com tamanho</h3>
+<p>Complete o valor:</p>
+<div class="ex-code">.selo { display: <input data-answer="inline-block" aria-label="valor">; width: 80px; }</div>
+</div>
+
+<div class="exercise">
+<h3>3. O padrão do span</h3>
+<p>Qual é o <code>display</code> padrão de um <code>&lt;span&gt;</code>?</p>
+<div class="ex-code">span { display: <input data-answer="inline" aria-label="valor">; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. A Ana pôs <code>height: 50px</code> num <code>&lt;a&gt;</code>, e nada mudou. Por quê?</p>
+<label><input type="radio" name="q4"> Links não aceitam CSS</label>
+<label><input type="radio" name="q4"> O <code>&lt;a&gt;</code> é <code>inline</code>, e caixas em linha ignoram <code>height</code></label>
+<label><input type="radio" name="q4"> Faltou o <code>!important</code></label>
+<label><input type="radio" name="q4"> O certo é <code>heigth</code></label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. Qual destes elementos é de bloco por padrão?</p>
+<label><input type="radio" name="q5"> <code>&lt;span&gt;</code></label>
+<label><input type="radio" name="q5"> <code>&lt;strong&gt;</code></label>
+<label><input type="radio" name="q5"> <code>&lt;a&gt;</code></label>
+<label><input type="radio" name="q5"> <code>&lt;p&gt;</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. Duas caixas <code>inline-block</code> de 50% caíram uma embaixo da outra. O que está ocupando o espaço?</p>
+<label><input type="radio" name="q6"> O espaço em branco entre as tags no HTML, que vira um espaço de texto</label>
+<label><input type="radio" name="q6"> A margem padrão da <code>&lt;div&gt;</code></label>
+<label><input type="radio" name="q6"> A borda invisível do navegador</label>
+<label><input type="radio" name="q6"> O <code>width</code> não funciona em <code>inline-block</code></label>
+</div>
+
+<h3>Missão final: a receita da Ana</h3>
+
+<div class="tryhtml" data-goal="css:.menu li{display}=inline-block,css:.botao{display}=inline-block,css:.botao{padding-top}=10px,css:.selo{display}=inline-block">
+<p class="try-task"><strong>Missão:</strong> (1) ponha os itens do menu lado a lado com <code>inline-block</code>; (2) faça o link "Ver a receita" virar um botão <code>inline-block</code> com <code>padding: 10px 16px</code>; (3) o selo "Novo!" precisa de 60px de largura, mas o <code>width</code> não funciona: conserte com o <code>display</code> certo, sem tirar o selo do lado do título.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;ul class="menu"&gt;
+  &lt;li&gt;&lt;a href="index.html"&gt;Início&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="receitas.html"&gt;Receitas&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="sobre.html"&gt;Sobre&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;Bolo de cenoura &lt;span class="selo"&gt;Novo!&lt;/span&gt;&lt;/h1&gt;
+&lt;p&gt;Fofinho, com cobertura de chocolate.&lt;/p&gt;
+&lt;a class="botao" href="bolo.html"&gt;Ver a receita&lt;/a&gt;
+</pre>
+<pre class="script" data-file="style.css">.menu {
+  list-style: none;
+  padding: 0;
+}
+
+.menu li {
+  margin-right: 12px;
+}
+
+.selo {
+  width: 60px;
+  font-size: 0.5em;
+  text-align: center;
+  background-color: gold;
+}
+
+.botao {
+  background-color: tomato;
+  color: white;
+  text-decoration: none;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.menu {
+  list-style: none;
+  padding: 0;
+}
+
+.menu li {
+  display: inline-block;
+  margin-right: 12px;
+}
+
+.selo {
+  display: inline-block;
+  width: 60px;
+  font-size: 0.5em;
+  text-align: center;
+  background-color: gold;
+}
+
+.botao {
+  display: inline-block;
+  padding: 10px 16px;
+  background-color: tomato;
+  color: white;
+  text-decoration: none;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>display</code> diz como a caixa se encaixa na página. Todo elemento já tem um padrão: <code>div</code>, <code>p</code>, <code>h1</code> são <code>block</code>; <code>span</code>, <code>a</code>, <code>strong</code> são <code>inline</code>; <code>button</code> e <code>input</code> são <code>inline-block</code>.</li>
+  <li><strong>block</strong>: linha própria, largura toda, aceita <code>width</code>, <code>height</code> e margens.</li>
+  <li><strong>inline</strong>: no meio do texto, tamanho do conteúdo; ignora <code>width</code>, <code>height</code> e as margens de cima e de baixo.</li>
+  <li><strong>inline-block</strong>: no meio do texto, mas com tamanho e espaço de verdade. Bom para botões e etiquetas.</li>
+  <li>O <code>display</code> muda a aparência, não o significado nem as regras do HTML.</li>
+  <li>Erros: <code>width</code> num <code>span</code> e margem de cima num <code>a</code> são ignorados em silêncio; caixas <code>inline-block</code> ganham o espaço do HTML entre elas; <code>inline block</code> sem hífen e <code>hidden</code> não são valores de <code>display</code>.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
