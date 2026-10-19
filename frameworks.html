@@ -70,7 +70,7 @@
 </pre>
 
 <dl class="anatomy">
-  <dt>&lt;link href="https://cdn.jsdelivr.net/…/bootstrap.min.css"&gt;</dt><dd>O CSS inteiro do Bootstrap, minificado (aula <a href="performance.html">CSS Rápido</a>). O <code>integrity</code> é uma "impressão digital" do arquivo: se alguém adulterar o arquivo no servidor, o navegador recusa.</dd>
+  <dt>&lt;link href="…/bootstrap.min.css"&gt;</dt><dd>O CSS inteiro do Bootstrap, minificado (aula <a href="performance.html">CSS Rápido</a>). O <code>integrity</code> é uma "impressão digital" do arquivo: se alguém adulterar o arquivo no servidor, o navegador recusa.</dd>
   <dt>class="card"</dt><dd>Um componente: a caixa com borda fina, cantos arredondados e fundo branco. O <code>card-body</code> dá o espaço interno; <code>card-title</code> e <code>card-text</code>, as margens do título e do texto.</dd>
   <dt>class="btn btn-primary"</dt><dd>Duas classes juntas: <code>btn</code> é a forma de botão (preenchimento, cantos, fonte); <code>btn-primary</code> é a <strong>variação</strong> de cor (o azul principal). Trocar para <code>btn-danger</code> deixa o botão vermelho.</dd>
 </dl>
@@ -236,7 +236,7 @@ $ npx @tailwindcss/cli -i ./src/input.css -o ./src/output.css --watch</pre>
 
 <div class="cenario">
 <strong>O seu CSS perde para o do framework</strong>
-<p>A Ana quer o botão do Bootstrap na cor da lojinha e escreve, no <code>style.css</code> dela, <code>.btn-primary { background-color: #e5533d; }</code>. O botão continua azul. O motivo mais comum: o <code>&lt;link&gt;</code> do framework vem <strong>depois</strong> do dela. Os dois seletores têm a mesma especificidade, e no empate vence o que vem por último (aula <a href="cascata.html">A Cascata</a>). Também acontece de o framework usar um seletor mais específico que o seu (aula <a href="especificidade.html">Especificidade</a>), e aí o F12 mostra a sua declaração <strong>riscada</strong>.</p>
+<p>A Ana quer o botão do Bootstrap na cor da lojinha e escreve, no <code>style.css</code> dela, <code>.btn-primary { background-color: #c0392b; }</code>. O botão continua azul. O motivo mais comum: o <code>&lt;link&gt;</code> do framework vem <strong>depois</strong> do dela. Os dois seletores têm a mesma especificidade, e no empate vence o que vem por último (aula <a href="cascata.html">A Cascata</a>). Também acontece de o framework usar um seletor mais específico que o seu (aula <a href="especificidade.html">Especificidade</a>), e aí o F12 mostra a sua declaração <strong>riscada</strong>.</p>
 <p><strong>Como consertar:</strong> o <code>&lt;link&gt;</code> do framework primeiro e o seu depois; se ainda perder, um seletor tão específico quanto o dele. No Bootstrap 5.3, muitas cores também podem ser trocadas pelas variáveis CSS dele, que começam com <code>--bs-</code>. Evite o <code>!important</code>: ele resolve hoje e cria uma briga amanhã (aula <a href="important.html">!important</a>).</p>
 </div>
 
@@ -251,14 +251,14 @@ $ npx @tailwindcss/cli -i ./src/input.css -o ./src/output.css --watch</pre>
 </div>
 
 <h3>Missão: a cor da Ana tem de vencer</h3>
-<div class="tryhtml" data-goal="css:.btn-primary{background-color}=rgb(229, 83, 61),css:.btn{padding-left}=12px,nsrc:!important,sel:link[href='framework.css']">
-<p class="try-task"><strong>Missão:</strong> o <code>framework.css</code> (uma imitação de framework) pinta o <code>.btn-primary</code> de azul. A Ana escreveu a cor dela no <code>style.css</code>, mas o botão continua azul. Faça a cor da Ana (<code>#e5533d</code>) vencer <strong>sem</strong> <code>!important</code> e sem tirar o framework.</p>
+<div class="tryhtml" data-goal="css:.btn-primary{background-color}=rgb(192, 57, 43),css:.btn{padding-left}=12px,nsrc:!important,sel:link[href='framework.css']">
+<p class="try-task"><strong>Missão:</strong> o <code>framework.css</code> (uma imitação de framework) pinta o <code>.btn-primary</code> de azul. A Ana escreveu a cor dela no <code>style.css</code>, mas o botão continua azul. Faça a cor da Ana (<code>#c0392b</code>) vencer <strong>sem</strong> <code>!important</code> e sem tirar o framework.</p>
 <pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;link rel="stylesheet" href="framework.css"&gt;
 &lt;a href="carrinho.html" class="btn btn-primary"&gt;Comprar&lt;/a&gt;
 </pre>
 <pre class="script" data-file="style.css">.btn-primary {
-  background-color: #e5533d;
+  background-color: #c0392b;
 }
 </pre>
 <pre class="script" data-file="framework.css">.btn {
