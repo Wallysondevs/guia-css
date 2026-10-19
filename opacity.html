@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Transparência — opacity e o alfa das cores | Guia CSS</title>
+<meta name="description" content="Transparência no CSS para quem nunca escreveu CSS: a propriedade opacity de 0 a 1, a diferença entre opacity (o elemento inteiro) e o alfa de uma cor (só aquela cor), opacity 0 que ainda ocupa espaço, filhos que não escapam da transparência do pai, contraste e os erros que nem o validador pega, como 0,5 com vírgula.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Transparência (opacity e alfa)</span></h1>
+
+<p class="intro">Uma foto apagadinha para um produto esgotado, uma faixa escura por cima de uma imagem, um botão desativado: tudo isso é <strong>transparência</strong>. O CSS tem dois jeitos de fazer, e eles parecem iguais até você pôr texto dentro. A propriedade <code>opacity</code> deixa o elemento <strong>inteiro</strong> transparente; o <strong>alfa</strong> de uma cor (<code>rgb(0 0 0 / 60%)</code>) deixa transparente <strong>só aquela cor</strong>. Nesta aula você vê os dois lado a lado e aprende quando usar cada um.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A propriedade <code>opacity</code>, de <code>0</code> (invisível) a <code>1</code> (normal).</li>
+  <li>A diferença entre <code>opacity</code> e o alfa de uma cor, desenhada lado a lado.</li>
+  <li>Que um elemento com <code>opacity: 0</code> continua lá: ocupa espaço e pode ser clicado.</li>
+  <li>Por que um filho não consegue ser "menos transparente" que o pai.</li>
+  <li>As quatro formas de escrever uma cor com alfa.</li>
+  <li>Os erros, inclusive dois que <strong>nem o validador pega</strong>: <code>0,5</code> com vírgula e <code>50</code> sem <code>%</code>.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter feito <a href="cores-rgb.html">rgb()</a>. Os quadros "Resultado" e as caixas "Experimente" são desenhados agora pelo <strong>seu</strong> navegador, com as imagens de exemplo do guia. As mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: o vidro e a película</h2>
+<p>Pense numa vitrine. A <code>opacity</code> é como trocar o vidro inteiro por um vidro fosco: tudo o que está atrás dele <strong>e tudo o que está pintado nele</strong> (o nome da loja, os adesivos) fica igualmente apagado. O alfa de uma cor é como colar uma película escura <strong>só no fundo</strong> do vidro: o fundo fica transparente, mas as letras pintadas por cima continuam firmes.</p>
+
+<hr>
+
+<h2>1. <code>opacity</code>: o elemento inteiro</h2>
+<p>A propriedade <code>opacity</code> ("opacidade", o contrário de transparência) recebe um número de <code>0</code> a <code>1</code>:</p>
+
+<dl class="anatomy">
+  <dt>opacity</dt><dd>A propriedade. Vale para o elemento <strong>inteiro</strong>: o fundo, a borda, o texto, as imagens e tudo o que estiver dentro dele.</dd>
+  <dt>1</dt><dd>Totalmente opaco: o normal, o valor que todo elemento já tem.</dd>
+  <dt>0.5</dt><dd>Meio transparente: metade do que está atrás aparece. Escreva com <strong>ponto</strong>, como no inglês. <code>.5</code> (sem o zero) também vale.</dd>
+  <dt>0</dt><dd>Totalmente transparente: invisível (mas continua lá, veja a seção 3).</dd>
+</dl>
+
+<p>As quatro fotos abaixo são o mesmo arquivo. Da esquerda para a direita: <code>opacity</code> <code>1</code>, <code>0.75</code>, <code>0.5</code> e <code>0.25</code>:</p>
+
+<pre class="file" data-file="fotos.html" data-resultado>&lt;style&gt;
+  .o100 { opacity: 1; }
+  .o75 { opacity: 0.75; }
+  .o50 { opacity: 0.5; }
+  .o25 { opacity: 0.25; }
+&lt;/style&gt;
+&lt;img class="o100" src="assets/midia/bolo-400.jpg" alt="Bolo, opacity 1" width="128" height="96"&gt;
+&lt;img class="o75" src="assets/midia/bolo-400.jpg" alt="Bolo, opacity 0.75" width="128" height="96"&gt;
+&lt;img class="o50" src="assets/midia/bolo-400.jpg" alt="Bolo, opacity 0.5" width="128" height="96"&gt;
+&lt;img class="o25" src="assets/midia/bolo-400.jpg" alt="Bolo, opacity 0.25" width="128" height="96"&gt;
+</pre>
+
+<p>Quanto menor o número, mais a foto "desbota": o fundo branco da página aparece através dela. Com <code>0.25</code>, o bolo vira quase uma marca-d'água.</p>
+
+<h3>Também em porcentagem</h3>
+<p><code>opacity: 50%</code> é o mesmo que <code>opacity: 0.5</code>. Nos dois casos, o navegador guarda o número <code>0.5</code> (é o que aparece no F12, aba <em>Computed</em>).</p>
+<div class="note">
+<strong>Suporte</strong>
+<p>A <code>opacity</code> com número funciona em qualquer navegador. Com <strong>porcentagem</strong>, desde o Chrome e o Edge 78, o Firefox 70 e o Safari 13.1 (2019–2020): todos os atuais. O guia usa o número, que é o mais comum.</p>
+</div>
+
+<div class="tryhtml" data-goal="css:.esgotado{opacity}=0.4">
+<p class="try-task"><strong>Missão:</strong> a torta de limão esgotou. Deixe a foto dela (classe <code>esgotado</code>) com <code>opacity</code> de <code>0.4</code>, para o cliente perceber de longe.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Vitrine da Lojinha&lt;/h1&gt;
+&lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura" width="160" height="120"&gt;
+&lt;img class="esgotado" src="assets/midia/bolo-quadrado-400.jpg" alt="Torta de limão (esgotada)" width="120" height="120"&gt;
+&lt;p&gt;Fotos meio apagadas: produto esgotado.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">h1 {
+  color: hsl(12 73% 45%);
+}
+</pre>
+<pre class="solucao" data-file="style.css">h1 {
+  color: hsl(12 73% 45%);
+}
+
+.esgotado {
+  opacity: 0.4;
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. <code>opacity</code> × alfa da cor: lado a lado</h2>
+<p>Agora a diferença que importa. As duas caixas brancas abaixo estão sobre um fundo laranja e querem ser "meio transparentes". A de cima usa <code>opacity: 0.5</code>; a de baixo usa só um fundo com alfa, <code>rgb(255 255 255 / 50%)</code>:</p>
+
+<pre class="file" data-file="lado-a-lado.html" data-resultado>&lt;style&gt;
+  .cartaz {
+    background-color: hsl(12 73% 45%);
+    padding: 12px;
+  }
+  .caixa {
+    padding: 10px;
+    margin: 8px 0;
+  }
+  .com-opacity {
+    background-color: white;
+    opacity: 0.5;
+  }
+  .com-alfa {
+    background-color: rgb(255 255 255 / 50%);
+  }
+&lt;/style&gt;
+&lt;div class="cartaz"&gt;
+  &lt;p class="caixa com-opacity"&gt;&lt;strong&gt;opacity: 0.5&lt;/strong&gt;: o fundo e o texto ficaram transparentes.&lt;/p&gt;
+  &lt;p class="caixa com-alfa"&gt;&lt;strong&gt;rgb(255 255 255 / 50%)&lt;/strong&gt;: só o fundo; o texto continua firme.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Os dois fundos ficaram iguais, um branco meio laranja. Mas compare o texto: na primeira caixa, ele também desbotou: o preto virou um marrom-avermelhado, misturado com o laranja que está atrás. Na segunda, continua preto e nítido. A regra:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Você quer…</th><th>Use</th><th>Exemplo</th></tr>
+<tr><td>Apagar o elemento inteiro (foto esgotada, botão desativado, um efeito de aparecer/sumir)</td><td><code>opacity</code></td><td><code>opacity: 0.4;</code></td></tr>
+<tr><td>Um fundo transparente com o texto nítido (faixa sobre foto, cartão sobre fundo colorido)</td><td>alfa na cor do fundo</td><td><code>background-color: rgb(0 0 0 / 60%);</code></td></tr>
+<tr><td>Só o texto mais suave</td><td>alfa na cor do texto (com cuidado com o contraste)</td><td><code>color: rgb(0 0 0 / 70%);</code></td></tr>
+<tr><td>Só a borda transparente</td><td>alfa na cor da borda</td><td><code>border-color: rgb(0 0 0 / 20%);</code></td></tr>
+</table>
+</div>
+
+<h3>As quatro formas de escrever uma cor com alfa</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>60% de preto</th><th>Aula</th></tr>
+<tr><td><code>rgb()</code> com barra</td><td><code>rgb(0 0 0 / 60%)</code></td><td><a href="cores-rgb.html">rgb()</a></td></tr>
+<tr><td><code>hsl()</code> com barra</td><td><code>hsl(0 0% 0% / 60%)</code></td><td><a href="cores-hsl.html">hsl()</a></td></tr>
+<tr><td>Hexadecimal de 8 dígitos</td><td><code>#00000099</code></td><td><a href="cores-hex.html">Hexadecimal</a></td></tr>
+<tr><td>Forma antiga</td><td><code>rgba(0, 0, 0, 0.6)</code></td><td><a href="cores-rgb.html">rgb()</a></td></tr>
+</table>
+</div>
+<p>As quatro dão o mesmo valor calculado, <code>rgba(0, 0, 0, 0.6)</code>. E a palavra <code>transparent</code> (aula <a href="cores.html">Cores por Nome</a>) é a cor com alfa zero: <code>rgba(0, 0, 0, 0)</code>.</p>
+
+<hr>
+
+<h2>3. <code>opacity: 0</code> não é "sumir"</h2>
+<p>Um elemento com <code>opacity: 0</code> fica invisível, mas <strong>continua na página</strong>: ocupa o lugar dele e pode até receber cliques. Veja o buraco no meio da lista:</p>
+
+<pre class="file" data-file="invisivel.html" data-resultado>&lt;style&gt;
+  .invisivel { opacity: 0; }
+&lt;/style&gt;
+&lt;p&gt;1. Bolo de cenoura&lt;/p&gt;
+&lt;p class="invisivel"&gt;2. Torta de limão&lt;/p&gt;
+&lt;p&gt;3. Pudim&lt;/p&gt;
+</pre>
+
+<p>O item 2 não aparece, mas o espaço dele ficou ali, entre o 1 e o 3. E o texto continua no HTML: se você selecionar as linhas com o mouse, ele vem junto. Para tirar um elemento de verdade, há outras propriedades (<code>display: none</code>), na aula <a href="esconder.html">Escondendo</a>. A <code>opacity: 0</code> é útil quando o elemento vai <strong>aparecer aos poucos</strong> (aula <a href="transition.html">Transições</a>).</p>
+
+<hr>
+
+<h2>4. O filho não escapa da transparência do pai</h2>
+<p>A <code>opacity</code> do pai é aplicada ao grupo inteiro, já desenhado: o filho pode pedir <code>opacity: 1</code>, mas continua dentro do "vidro fosco" do pai.</p>
+
+<pre class="file" data-file="filho.html" data-resultado>&lt;style&gt;
+  .cartao {
+    opacity: 0.4;
+    border: 2px solid navy;
+    padding: 8px;
+  }
+  .cartao strong {
+    opacity: 1; /* não adianta */
+    color: crimson;
+  }
+&lt;/style&gt;
+&lt;div class="cartao"&gt;
+  &lt;p&gt;Cartão meio apagado com um &lt;strong&gt;aviso importante&lt;/strong&gt; dentro.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<p>O "aviso importante" saiu tão apagado quanto o resto do cartão. Se o fundo do cartão deve ser transparente e o conteúdo, não, a resposta é a mesma da seção 2: use alfa na <strong>cor do fundo</strong>, e não <code>opacity</code>.</p>
+
+<p>E os números se multiplicam: um filho com <code>opacity: 0.5</code> dentro de um pai com <code>0.5</code> aparece com um quarto da força (0,5 × 0,5 = 0,25).</p>
+
+<hr>
+
+<h2>5. Transparência e contraste</h2>
+<p>Toda transparência deixa o fundo "vazar", e isso <strong>reduz o contraste</strong>. Um texto preto com <code>opacity: 0.3</code> vira, na prática, um cinza-claro sobre o branco: bonito no "design", ilegível para muita gente. Use <code>opacity</code> baixa só em coisas que não precisam ser lidas (uma foto de fundo, um produto esgotado que também tem a palavra "esgotado" escrita). A aula <a href="acessibilidade.html">CSS e Acessibilidade</a> mostra como medir.</p>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Experimente:</strong> mude o <code>0.5</code> da <code>opacity</code> e o <code>50%</code> do alfa. Repare que, no primeiro parágrafo, o texto desbota junto; no segundo, não.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartaz"&gt;
+  &lt;p class="um"&gt;Com opacity&lt;/p&gt;
+  &lt;p class="dois"&gt;Com alfa no fundo&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartaz {
+  background-color: navy;
+  padding: 10px;
+}
+
+.um {
+  background-color: white;
+  opacity: 0.5;
+}
+
+.dois {
+  background-color: rgb(255 255 255 / 50%);
+}
+</pre>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>Aqui o "quando dá errado" tem uma pegadinha: dois dos erros mais comuns <strong>passam no validador</strong>. As quatro fotos abaixo queriam ficar meio transparentes (<code>0.5</code>):</p>
+
+<pre class="file" data-file="erros.html · erro de propósito" data-resultado>&lt;style&gt;
+  .a { opacity: 0,5; }
+  .b { opacity: 50; }
+  .c { opacity: 50 %; }
+  .d { opacity: transparent; }
+&lt;/style&gt;
+&lt;img class="a" src="assets/midia/bolo-400.jpg" alt="opacity: 0,5" width="128" height="96"&gt;
+&lt;img class="b" src="assets/midia/bolo-400.jpg" alt="opacity: 50" width="128" height="96"&gt;
+&lt;img class="c" src="assets/midia/bolo-400.jpg" alt="opacity: 50 %" width="128" height="96"&gt;
+&lt;img class="d" src="assets/midia/bolo-400.jpg" alt="opacity: transparent" width="128" height="96"&gt;
+</pre>
+
+<p>As quatro fotos ficaram totalmente opacas: nenhuma transparência funcionou.</p>
+
+<div class="cenario">
+<strong>Nenhuma mensagem: <code>opacity: 0,5;</code> (vírgula no lugar do ponto)</strong>
+<p><strong>O que aconteceu:</strong> no Brasil escrevemos "zero vírgula cinco"; no CSS, como no inglês, o decimal é com <strong>ponto</strong>. O navegador não entende <code>0,5</code> como número e ignora a declaração. E o validador, desta vez, não acusa nada:</p>
+<pre class="term" data-cwd="~/opacity">$ vnu --css virgula.css
+$</pre>
+<p>Nenhuma linha de resposta: para o validador, o arquivo está certo. É um bom lembrete de que o validador não pega tudo. Quando algo não funciona, abra o F12: no painel de estilos, a declaração aparece riscada.</p>
+<p><strong>Como consertar:</strong> <code>opacity: 0.5;</code>, com ponto.</p>
+</div>
+
+<div class="cenario">
+<strong>Nenhuma mensagem: <code>opacity: 50;</code> (pensando em porcentagem)</strong>
+<p><strong>O que aconteceu:</strong> a Ana queria 50% e escreveu só <code>50</code>. Para o CSS, <code>50</code> é um número válido, mas acima de <code>1</code>; o navegador o <strong>corta</strong> em <code>1</code>: totalmente opaco. Não é erro, então nem o navegador nem o validador reclamam:</p>
+<pre class="term" data-cwd="~/opacity">$ cat certos.css
+.a { opacity: 0.5; }
+.b { opacity: .5; }
+.c { opacity: 50%; }
+.d { opacity: 1.5; }
+.e { opacity: 50; }
+$ vnu --css certos.css
+$</pre>
+<p>As cinco linhas passam. No F12, aba <em>Computed</em>, a última aparece como <code>opacity: 1</code>, e esse é o jeito de descobrir.</p>
+<p><strong>Como consertar:</strong> <code>opacity: 0.5;</code> ou <code>opacity: 50%;</code>, com o <code>%</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: Parse Error.</code></strong>
+<p><strong>O que aconteceu:</strong> um espaço entre o número e o <code>%</code>: <code>opacity: 50 %;</code>.</p>
+<pre class="term" data-cwd="~/opacity">$ vnu --css espaco.css
+"file:/home/ana/opacity/espaco.css":2.17-2.17: error: CSS: Parse Error.
+"file:/home/ana/opacity/espaco.css":3.2-4.1: error: CSS: Parse Error.</pre>
+<p>"Erro de leitura" na coluna 17, o <code>%</code> solto. Número e unidade (<code>%</code>, <code>px</code>, <code>rem</code>) andam sempre colados.</p>
+<p><strong>Como consertar:</strong> <code>opacity: 50%;</code>.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “opacity”: “transparent” is not a “opacity” value.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>opacity: transparent;</code>. O <code>transparent</code> é uma <strong>cor</strong>; a <code>opacity</code> quer um número.</p>
+<pre class="term" data-cwd="~/opacity">$ vnu --css palavra.css
+"file:/home/ana/opacity/palavra.css":2.12-2.22: error: CSS: “opacity”: “transparent” is not a “opacity” value.</pre>
+<p><strong>Como consertar:</strong> <code>opacity: 0;</code> para invisível, ou <code>background-color: transparent;</code> se a ideia era um fundo transparente.</p>
+</div>
+
+<div class="cenario">
+<strong>Código antigo: <code>filter: alpha(opacity=50);</code></strong>
+<p><strong>O que aconteceu:</strong> você copiou de um tutorial muito velho. Esse era o jeito do Internet Explorer 8 e anteriores, antes de ele entender <code>opacity</code>. Os navegadores atuais ignoram essa linha (e o validador, curiosamente, não reclama).</p>
+<p><strong>Como consertar:</strong> apague a linha e use <code>opacity: 0.5;</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th><th>Valor calculado</th></tr>
+<tr><td><code>opacity: 1;</code></td><td>Normal, totalmente opaco (o padrão)</td><td><code>1</code></td></tr>
+<tr><td><code>opacity: 0.5;</code> ou <code>.5</code> ou <code>50%</code></td><td>O elemento inteiro meio transparente, com texto e filhos</td><td><code>0.5</code></td></tr>
+<tr><td><code>opacity: 0;</code></td><td>Invisível, mas ocupa espaço e recebe cliques</td><td><code>0</code></td></tr>
+<tr><td><code>opacity: 1.5;</code> / <code>-1</code> / <code>50</code></td><td>Fora de 0 a 1: cortado no limite</td><td><code>1</code> / <code>0</code> / <code>1</code></td></tr>
+<tr><td><code>background-color: rgb(0 0 0 / 60%);</code></td><td>Só o fundo transparente; o texto fica nítido</td><td><code>rgba(0, 0, 0, 0.6)</code></td></tr>
+<tr><td><code>transparent</code></td><td>Uma cor com alfa zero</td><td><code>rgba(0, 0, 0, 0)</code></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Meio transparente</h3>
+<p>Complete com o valor para deixar a imagem meio transparente (use número, com ponto):</p>
+<div class="ex-code">img { opacity: <input data-answer="0.5|.5" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Só o fundo</h3>
+<p>Complete para o fundo ficar preto com 60% de opacidade, sem apagar o texto:</p>
+<div class="ex-code">.faixa { background-color: rgb(0 0 0 / <input data-answer="60%|0.6|.6" aria-label="alfa">); }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. Uma faixa tem <code>background-color: black; opacity: 0.6;</code> e um texto branco dentro. O que acontece com o texto?</p>
+<label><input type="radio" name="q3"> Fica branco e nítido</label>
+<label><input type="radio" name="q3"> Também fica 60% opaco, junto com o fundo</label>
+<label><input type="radio" name="q3"> Some</label>
+<label><input type="radio" name="q3"> Fica preto</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">4. A Ana escreveu <code>opacity: 0,5;</code> e o validador não reclamou. Por que a foto não ficou transparente?</p>
+<label><input type="radio" name="q4"> Porque o validador está quebrado</label>
+<label><input type="radio" name="q4"> Porque <code>opacity</code> não funciona em imagens</label>
+<label><input type="radio" name="q4"> Porque <code>0,5</code> é transparente demais</label>
+<label><input type="radio" name="q4"> Porque o decimal no CSS é com ponto; com vírgula, o navegador ignora a declaração</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. Um parágrafo com <code>opacity: 0</code>…</p>
+<label><input type="radio" name="q5"> fica invisível, mas continua ocupando o espaço dele</label>
+<label><input type="radio" name="q5"> é apagado do HTML</label>
+<label><input type="radio" name="q5"> fica preto</label>
+<label><input type="radio" name="q5"> faz os parágrafos de baixo subirem</label>
+</div>
+
+<h3>Missão final: a faixa do cartaz</h3>
+
+<div class="tryhtml" data-goal="css:.faixa{background-color}=rgba(0, 0, 0, 0.6),css:.faixa{opacity}=1,css:.faixa{color}=rgb(255, 255, 255)">
+<p class="try-task"><strong>Missão:</strong> a faixa escura do cartaz usa <code>opacity</code>, e o texto branco ficou junto meio transparente: um branco rosado, com menos contraste. Deixe o <strong>fundo</strong> da faixa preto com 60% de opacidade usando o alfa da cor, e o texto branco nítido (tire a <code>opacity</code>).</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartaz"&gt;
+  &lt;h1&gt;Lojinha da Ana&lt;/h1&gt;
+  &lt;p class="faixa"&gt;Promoção: bolo de cenoura com 20% de desconto!&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartaz {
+  background-color: hsl(12 73% 45%);
+  padding: 12px;
+}
+
+h1 {
+  color: white;
+}
+
+.faixa {
+  background-color: black;
+  opacity: 0.6;
+  color: white;
+  padding: 8px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartaz {
+  background-color: hsl(12 73% 45%);
+  padding: 12px;
+}
+
+h1 {
+  color: white;
+}
+
+.faixa {
+  background-color: rgb(0 0 0 / 60%);
+  color: white;
+  padding: 8px;
+}
+</pre>
+</div>
+
+<p>O fundo da faixa ficou igual ao de antes (um preto que deixa o laranja aparecer), mas agora o texto está branco de verdade.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li><code>opacity</code> vai de <code>0</code> (invisível) a <code>1</code> (normal) e vale para o elemento <strong>inteiro</strong>: fundo, borda, texto e filhos. Decimal com ponto; <code>50%</code> também vale.</li>
+  <li>O alfa de uma cor (<code>rgb(0 0 0 / 60%)</code>, <code>hsl(… / 60%)</code>, <code>#00000099</code>) deixa transparente <strong>só aquela cor</strong>: é o certo para um fundo transparente com texto nítido.</li>
+  <li><code>opacity: 0</code> esconde, mas o elemento ocupa espaço e recebe cliques.</li>
+  <li>O filho não escapa da <code>opacity</code> do pai; as opacidades se multiplicam.</li>
+  <li>Transparência reduz o contraste: cuidado com texto.</li>
+  <li><code>0,5</code> com vírgula e <code>50</code> sem <code>%</code> passam no validador, mas não funcionam como você queria. <code>50 %</code> e <code>transparent</code> o validador acusa.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
