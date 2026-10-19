@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Aninhado — regras dentro de regras e o seletor &amp; | Guia CSS</title>
+<meta name="description" content="CSS aninhado (nesting) para quem está começando: escrever uma regra dentro da outra, o seletor &amp; para :hover, classes juntas e contexto invertido, @media dentro da regra, a especificidade que cresce, a diferença para o Sass e os erros que somem com regras inteiras.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Aninhado</span></h1>
+
+<p class="intro">O CSS do cartão de receita da Ana começa a se repetir: <code>.receita</code>, <code>.receita h2</code>, <code>.receita p</code>, <code>.receita:hover</code>, <code>.receita img</code>… o mesmo começo em cada linha. Desde o fim de 2023, todos os navegadores entendem <strong>CSS aninhado</strong> (<em>nesting</em>): você escreve as regras do <code>h2</code>, do <code>p</code> e do <code>:hover</code> <strong>dentro</strong> da regra do <code>.receita</code>, e o seletor <code>&amp;</code> quer dizer "este aqui, o de fora".</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>A ideia de aninhar: escrever o "endereço" uma vez só, como numa lista de compras separada por seção.</li>
+  <li>Como uma regra dentro da outra vira um seletor descendente (<code>.receita h2</code>).</li>
+  <li>O seletor <code>&amp;</code>: <code>&amp;:hover</code>, <code>&amp;.destaque</code>, <code>&amp; &gt; p</code> e o contexto invertido (<code>.tema-escuro &amp;</code>).</li>
+  <li><code>@media</code> dentro da regra.</li>
+  <li>Até onde aninhar, e a especificidade que cresce sem você ver.</li>
+  <li>A diferença para o Sass (<code>&amp;__titulo</code> não existe no CSS), e os erros que apagam regras inteiras.</li>
+</ul>
+</div>
+
+<p>Antes, é bom ter visto <a href="combinadores.html">Descendente, Filho e Irmãos</a>, <a href="hover-focus.html">Estados</a> e <a href="especificidade.html">Especificidade</a>. Os resultados são desenhados agora pelo seu navegador, e as mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana (usuária <code>ana</code>, computador <code>notebook</code>).</p>
+
+<hr>
+
+<h2>A ideia: a lista de compras por seção</h2>
+<p>A Ana poderia escrever a lista do mercado assim: "padaria: pão", "padaria: bolo", "padaria: sonho", "hortifrúti: cenoura", "hortifrúti: laranja". Funciona, mas ela repete "padaria" três vezes. Ninguém faz isso: a gente escreve "Padaria" uma vez, como título, e embaixo, recuado, os itens.</p>
+
+<p>O CSS aninhado é a lista por seção. Em vez de repetir <code>.receita</code> no começo de cada seletor, você escreve <code>.receita { … }</code> uma vez e põe as outras regras dentro das chaves dele, recuadas. O navegador "monta" os seletores completos sozinho.</p>
+
+<hr>
+
+<h2>1. A mesma folha de estilo, nos dois jeitos</h2>
+<p>Primeiro, o CSS do cartão escrito do jeito que você já conhece, com cada seletor completo:</p>
+
+<pre class="file" data-file="style.css (sem aninhar)">.receita {
+  border: 2px solid tomato;
+  padding: 16px;
+}
+
+.receita h2 {
+  color: tomato;
+}
+
+.receita p {
+  line-height: 1.6;
+}
+</pre>
+
+<p>Agora o mesmo, aninhado:</p>
+
+<pre class="file" data-file="style.css (aninhado)">.receita {
+  border: 2px solid tomato;
+  padding: 16px;
+
+  h2 {
+    color: tomato;
+  }
+
+  p {
+    line-height: 1.6;
+  }
+}
+</pre>
+
+<p>As duas versões fazem <strong>exatamente</strong> a mesma coisa. Veja a aninhada funcionando (as abas são editáveis):</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="receita"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Massa fofinha, cobertura de chocolate e 50 minutos de forno.&lt;/p&gt;
+&lt;/article&gt;
+&lt;h2&gt;Fora do cartão&lt;/h2&gt;
+</pre>
+<pre class="script" data-file="style.css">.receita {
+  border: 2px solid tomato;
+  padding: 16px;
+
+  h2 {
+    color: tomato;
+  }
+
+  p {
+    line-height: 1.6;
+  }
+}
+</pre>
+</div>
+
+<p>O título de dentro do cartão fica <code>tomato</code>; o "Fora do cartão", não, porque está fora do <code>.receita</code>. É a regra <code>.receita h2</code>, só que escrita dentro.</p>
+
+<dl class="anatomy">
+  <dt>.receita {</dt><dd>A regra de fora, a "mãe". Abre as chaves normalmente.</dd>
+  <dt>border: …; padding: …;</dt><dd>As declarações da própria <code>.receita</code>, como sempre.</dd>
+  <dt>h2 { … }</dt><dd>Uma <strong>regra aninhada</strong>: um seletor e as chaves dele, dentro das chaves da mãe. Vale para os <code>h2</code> que estão <strong>dentro</strong> de um <code>.receita</code>: o navegador lê como <code>.receita h2</code>.</dd>
+  <dt>}</dt><dd>A última chave fecha a mãe. Cada <code>{</code> precisa do seu <code>}</code>: com o recuo de 2 espaços por nível, dá para conferir de olho.</dd>
+</dl>
+
+<div class="tryhtml" data-goal="css:.receita h2{color}=rgb(255, 99, 71),src:\.receita\s*\{[^}]*h2\s*\{,nsrc:\.receita\s+h2">
+<p class="try-task"><strong>Missão:</strong> reescreva a regra <code>.receita h2</code> <strong>dentro</strong> da regra <code>.receita</code>, aninhada. O título tem de continuar <code>tomato</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="receita"&gt;
+  &lt;h2&gt;Torta de limão&lt;/h2&gt;
+  &lt;p&gt;Base crocante e creme azedinho.&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">.receita {
+  border: 2px solid tomato;
+  padding: 16px;
+}
+
+.receita h2 {
+  color: tomato;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.receita {
+  border: 2px solid tomato;
+  padding: 16px;
+
+  h2 {
+    color: tomato;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>2. O seletor &amp;: "este aqui"</h2>
+<p>Sem nada na frente, uma regra aninhada é sempre <strong>descendente</strong> (um espaço entre a mãe e ela). Mas e o <code>.receita:hover</code>, que não é "algo dentro do <code>.receita</code>", e sim o próprio <code>.receita</code> com o mouse em cima? Para isso existe o <code>&amp;</code> (lê-se "e comercial"): ele é <strong>trocado pelo seletor da mãe</strong>.</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .receita {
+    border: 2px solid tomato;
+    padding: 8px 16px;
+    margin-bottom: 8px;
+    font-family: sans-serif;
+
+    &amp;:hover {
+      background-color: lavenderblush;
+    }
+
+    &amp;.destaque {
+      border-width: 6px;
+    }
+
+    .tempo {
+      color: gray;
+    }
+  }
+&lt;/style&gt;
+&lt;article class="receita"&gt;
+  &lt;h3&gt;Bolo de cenoura&lt;/h3&gt;
+  &lt;p class="tempo"&gt;50 minutos&lt;/p&gt;
+&lt;/article&gt;
+&lt;article class="receita destaque"&gt;
+  &lt;h3&gt;Torta de limão (receita da semana)&lt;/h3&gt;
+  &lt;p class="tempo"&gt;40 minutos&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+
+<p>Os dois cartões têm a borda <code>tomato</code> e o tempo em cinza; o segundo, que também tem a classe <code>destaque</code>, ganhou a borda bem mais grossa. Passe o mouse em cima de um cartão: o fundo fica rosado.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrito dentro de <code>.receita { }</code></th><th>O navegador entende</th><th>Quer dizer</th></tr>
+<tr><td><code>h2 { }</code> ou <code>&amp; h2 { }</code></td><td><code>.receita h2</code></td><td>um <code>h2</code> em qualquer lugar dentro do cartão</td></tr>
+<tr><td><code>&gt; p { }</code> ou <code>&amp; &gt; p { }</code></td><td><code>.receita &gt; p</code></td><td>um <code>p</code> que é filho direto</td></tr>
+<tr><td><code>&amp;:hover { }</code></td><td><code>.receita:hover</code></td><td>o próprio cartão, com o mouse em cima</td></tr>
+<tr><td><code>&amp;.destaque { }</code></td><td><code>.receita.destaque</code></td><td>o cartão que tem <strong>também</strong> a classe <code>destaque</code></td></tr>
+<tr><td><code>&amp;::before { }</code></td><td><code>.receita::before</code></td><td>o pseudo-elemento do cartão (aula <a href="before-after.html">::before e ::after</a>)</td></tr>
+<tr><td><code>&amp; + &amp; { }</code></td><td><code>.receita + .receita</code></td><td>um cartão logo depois de outro</td></tr>
+<tr><td><code>.tema-escuro &amp; { }</code></td><td><code>.tema-escuro .receita</code></td><td>o cartão quando está dentro de um <code>.tema-escuro</code> (o <code>&amp;</code> no fim "inverte" o contexto)</td></tr>
+</table>
+</div>
+
+<h3>Com espaço ou sem espaço: <code>&amp;.destaque</code> × <code>&amp; .destaque</code></h3>
+<p>É o mesmo detalhe dos seletores normais. <strong>Sem espaço</strong>, <code>&amp;.destaque</code> é o próprio cartão com as duas classes. <strong>Com espaço</strong> (ou sem o <code>&amp;</code>), <code>&amp; .destaque</code> e <code>.destaque</code> são um elemento <strong>dentro</strong> do cartão com a classe <code>destaque</code>. Para <code>:hover</code>, <code>.classe</code>, <code>[atributo]</code> e <code>::before</code> grudados na mãe, o <code>&amp;</code> é obrigatório.</p>
+
+<div class="tip">
+<p><strong>Escrever o <code>&amp;</code> mesmo quando não precisa?</strong> <code>&amp; h2</code> e <code>h2</code> são iguais. Muita gente escreve o <code>&amp;</code> sempre, para ficar claro que é uma regra aninhada, e porque navegadores de 2023 exigiam o <code>&amp;</code> antes de um nome de elemento (veja a nota de suporte). As duas formas estão certas; o guia usa sem o <code>&amp;</code> quando é descendente.</p>
+</div>
+
+<hr>
+
+<h2>3. @media dentro da regra</h2>
+<p>Uma <a href="media-queries.html">media query</a> também pode ficar dentro da regra. Dentro dela, você escreve só as declarações, sem repetir o seletor:</p>
+
+<pre class="file" data-file="style.css">.receita {
+  padding: 8px;
+
+  @media (min-width: 600px) {
+    padding: 32px;
+  }
+}
+</pre>
+
+<p>É o mesmo que <code>@media (min-width: 600px) { .receita { padding: 32px; } }</code>. A vantagem: tudo o que muda o <code>.receita</code>, em qualquer tamanho de tela, fica junto. Experimente: o quadro do editor é estreito; clique em ↗ para abrir o resultado numa aba nova, larga, e veja o espaço interno crescer e a cor da borda mudar.</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="receita"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;Abra numa aba larga (↗) e compare.&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">.receita {
+  border: 4px solid tomato;
+  padding: 8px;
+
+  @media (min-width: 900px) {
+    border-color: navy;
+    padding: 48px;
+  }
+
+  h2 {
+    margin-top: 0;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>4. Até onde aninhar</h2>
+<p>Dá para aninhar dentro do aninhado, quantos níveis quiser:</p>
+
+<pre class="file" data-file="style.css · fundo demais">.pagina {
+  .conteudo {
+    .receita {
+      .ingredientes {
+        li {
+          color: gray;
+        }
+      }
+    }
+  }
+}
+</pre>
+
+<p>O navegador monta <code>.pagina .conteudo .receita .ingredientes li</code>: cinco partes, uma especificidade alta (quatro classes e um elemento) e uma regra que só funciona se o HTML tiver <strong>exatamente</strong> essa árvore. Mudou o HTML, a regra para de valer. Na prática:</p>
+<ul>
+  <li>aninhe para agrupar o que é de <strong>um mesmo componente</strong> (o cartão, o menu, o formulário);</li>
+  <li>fique em <strong>dois ou três níveis</strong>, no máximo;</li>
+  <li>se o seletor completo, escrito por extenso, fosse comprido demais para você escrever, ele está comprido demais aninhado também.</li>
+</ul>
+
+<h3>A especificidade do &amp;</h3>
+<p>O <code>&amp;</code> vale como um <code>:is()</code> do seletor da mãe (aula <a href="not-is-where.html">:not(), :is() e :where()</a>). Quando a mãe é uma lista com um ID, a regra aninhada herda a força do ID, mesmo para os elementos que só têm a classe:</p>
+
+<pre class="file" data-file="exemplo" data-resultado>&lt;style&gt;
+  .receita, #receita-do-dia {
+    p {
+      color: tomato;
+    }
+  }
+
+  .receita p.tempo {
+    color: navy;
+  }
+&lt;/style&gt;
+&lt;div class="receita"&gt;
+  &lt;p class="tempo"&gt;50 minutos&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<p>O texto ficou <code>tomato</code>, e não <code>navy</code>. A regra aninhada vira <code>:is(.receita, #receita-do-dia) p</code>, que conta como um ID e um elemento (1, 0, 1), e ganha da <code>.receita p.tempo</code> (0, 2, 1), mesmo vindo antes. Por extenso, <code>.receita p, #receita-do-dia p</code>, a parte da classe teria só (0, 1, 1) e perderia. Mais um motivo para não usar ID em estilo.</p>
+
+<hr>
+
+<h2>5. CSS aninhado × Sass</h2>
+<p>Se você já viu Sass (ou SCSS), um pré-processador que transforma um CSS "turbinado" em CSS normal, o aninhamento é parecido, mas há uma diferença que pega muita gente. No Sass, <code>&amp;__titulo</code> <strong>gruda texto</strong> no nome da mãe e vira <code>.receita__titulo</code> (o estilo de nomes da aula <a href="bem.html">BEM</a>). No CSS de verdade, isso não existe: o <code>&amp;</code> é um seletor inteiro, e não um pedaço de texto. Veja em "Quando dá errado".</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th>CSS aninhado</th><th>Sass</th></tr>
+<tr><td>Quem entende</td><td>o navegador, direto</td><td>um programa que gera o <code>.css</code> antes de publicar</td></tr>
+<tr><td><code>&amp;:hover</code>, <code>&amp;.x</code>, <code>.x &amp;</code></td><td>sim</td><td>sim</td></tr>
+<tr><td><code>&amp;__titulo</code>, <code>&amp;-grande</code></td><td><strong>não</strong></td><td>sim (gruda o texto)</td></tr>
+<tr><td><code>@media</code> dentro da regra</td><td>sim</td><td>sim</td></tr>
+<tr><td>Especificidade do <code>&amp;</code></td><td>como <code>:is()</code></td><td>como o seletor escrito por extenso</td></tr>
+</table>
+</div>
+
+<div class="note">
+<p><strong>Suporte:</strong> o CSS aninhado funciona em todos os navegadores atuais desde dezembro de 2023 (o MDN o marca como <em>Baseline: amplamente disponível</em>): Chrome e Edge 120, Firefox 117 e Safari 17.2. Chrome/Edge 112–119 e Safari 16.5–17.1 tinham uma versão mais antiga, que não aceitava uma regra aninhada começando por um nome de elemento (<code>h2 { }</code>); nesses, escreva <code>&amp; h2 { }</code>. Um navegador sem suporte ignora as regras aninhadas e aplica só as declarações da mãe. O validador W3C (<code>vnu</code> 26.10.12) já conhece o aninhamento e não dá erro nas formas certas.</p>
+</div>
+
+<hr>
+
+<h2>6. Formas diferentes de fazer a mesma coisa</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Forma</th><th>Exemplo</th><th>Quando usar</th></tr>
+<tr><td>Seletores por extenso</td><td><code>.receita h2 { }</code></td><td>Regras soltas, CSS curto, ou quando o site precisa funcionar em navegadores de antes de 2024.</td></tr>
+<tr><td>Aninhado, sem <code>&amp;</code></td><td><code>.receita { h2 { } }</code></td><td>Agrupar as partes de um componente.</td></tr>
+<tr><td>Aninhado, com <code>&amp;</code></td><td><code>.receita { &amp; h2 { } &amp;:hover { } }</code></td><td>Obrigatório para estados, classes juntas e pseudo-elementos; opcional (por clareza) nos outros.</td></tr>
+<tr><td>Sass</td><td><code>.receita { &amp;__titulo { } }</code> num <code>.scss</code></td><td>Quando o projeto já usa Sass. Para um site novo e simples, o CSS aninhado dispensa o programa.</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+<p>No CSS aninhado, um erro costuma apagar mais coisa do que uma declaração: pode sumir uma <strong>regra aninhada inteira</strong>, com todas as declarações dela. O resto da folha continua valendo.</p>
+
+<div class="cenario">
+<strong><code>error: CSS: Parse Error.</code> — o <code>&amp;__titulo</code> do Sass</strong>
+<p><strong>O que aconteceu:</strong> a Ana copiou um hábito do Sass:</p>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  .receita {
+    color: navy;
+
+    &amp;__titulo {
+      color: tomato;
+    }
+  }
+&lt;/style&gt;
+&lt;div class="receita"&gt;
+  &lt;h2 class="receita__titulo"&gt;Bolo de cenoura&lt;/h2&gt;
+&lt;/div&gt;
+</pre>
+<p>O título fica azul-marinho (o <code>navy</code> herdado do <code>.receita</code>), e não <code>tomato</code>: o navegador jogou fora a regra <code>&amp;__titulo</code> inteira. Para ele, <code>__titulo</code> grudado no <code>&amp;</code> é um nome de elemento depois de outro seletor, e isso não é permitido. O validador:</p>
+<pre class="term" data-cwd="~/ninho">$ vnu --css bem.css
+"file:/home/ana/ninho/bem.css":4.4-4.4: error: CSS: Parse Error.</pre>
+<p>"Erro de leitura", na linha 4, a do <code>}</code> que fecha a regra quebrada.</p>
+<p><strong>Como consertar:</strong> escreva o nome completo da classe: <code>.receita__titulo { … }</code>, fora ou dentro da mãe (dentro, ele vira descendente: <code>.receita .receita__titulo</code>).</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: Parse Error.</code> — faltou o <code>;</code> antes da regra aninhada</strong>
+<p><strong>O que aconteceu:</strong> a última declaração da mãe ficou sem <code>;</code>, logo antes de uma regra aninhada:</p>
+<pre class="file" data-file="exemplo · erro de propósito" data-resultado>&lt;style&gt;
+  .receita {
+    color: navy
+
+    h2 {
+      color: tomato;
+    }
+
+    p {
+      color: green;
+    }
+  }
+&lt;/style&gt;
+&lt;div class="receita"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;50 minutos&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<p>O título fica <strong>preto</strong>: perdeu o <code>tomato</code> e também o <code>navy</code>. Só o parágrafo ficou verde. Sem o <code>;</code>, o navegador leu <code>color: navy h2 { color: tomato; }</code> como <strong>uma</strong> declaração só, com um valor sem sentido, e jogou tudo fora. A regra do <code>p</code>, que vem depois, sobreviveu.</p>
+<pre class="term" data-cwd="~/ninho">$ vnu --css sem-ponto-virgula.css
+"file:/home/ana/ninho/sem-ponto-virgula.css":6.4-6.4: error: CSS: Parse Error.</pre>
+<p><strong>Como consertar:</strong> <code>color: navy;</code>. O <code>;</code> sempre, até na última declaração: no CSS aninhado, ele separa a declaração da regra que vem embaixo.</p>
+</div>
+
+<div class="cenario">
+<strong>A classe junto não funcionou: faltou o <code>&amp;</code></strong>
+<p><strong>O que aconteceu:</strong> a Ana quis o cartão com a classe <code>destaque</code> e escreveu <code>.receita { .destaque { border-width: 6px; } }</code>. Nada mudou no <code>&lt;article class="receita destaque"&gt;</code>. Sem o <code>&amp;</code>, a regra virou <code>.receita .destaque</code>: "um <code>.destaque</code> <strong>dentro</strong> do cartão". O validador não reclama: o seletor é válido, só não é o que ela queria.</p>
+<p><strong>Como consertar:</strong> <code>&amp;.destaque</code>, sem espaço. O mesmo vale para <code>&amp;:hover</code>: sem o <code>&amp;</code>, <code>:hover { }</code> vira "qualquer coisa dentro do cartão com o mouse em cima".</p>
+</div>
+
+<div class="cenario">
+<strong>Uma chave a mais ou a menos</strong>
+<p><strong>O que aconteceu:</strong> com chaves dentro de chaves, é fácil esquecer de fechar uma. Se falta um <code>}</code>, todas as regras que vêm depois ficam "dentro" da regra aberta, e passam a valer só dentro dela (ou não valem mais). Os sintomas aparecem longe do erro: "o rodapé perdeu o estilo".</p>
+<p><strong>Como consertar:</strong> recuo de 2 espaços por nível, sempre; cada <code>}</code> alinhado com a linha que abriu a chave dele. Os editores de código (como o VS Code) destacam o par da chave em que o cursor está.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Dentro de <code>.a { }</code></th><th>Equivale a</th></tr>
+<tr><td><code>b { }</code> / <code>&amp; b { }</code></td><td><code>.a b</code> (descendente)</td></tr>
+<tr><td><code>&gt; b { }</code> / <code>&amp; &gt; b { }</code></td><td><code>.a &gt; b</code> (filho)</td></tr>
+<tr><td><code>+ b { }</code> / <code>~ b { }</code></td><td><code>.a + b</code> / <code>.a ~ b</code> (irmãos)</td></tr>
+<tr><td><code>&amp;:hover { }</code></td><td><code>.a:hover</code></td></tr>
+<tr><td><code>&amp;.b { }</code></td><td><code>.a.b</code> (as duas classes)</td></tr>
+<tr><td><code>&amp;::before { }</code></td><td><code>.a::before</code></td></tr>
+<tr><td><code>.b &amp; { }</code></td><td><code>.b .a</code> (contexto invertido)</td></tr>
+<tr><td><code>@media (…) { declarações }</code></td><td><code>@media (…) { .a { declarações } }</code></td></tr>
+<tr><td><code>&amp;__b { }</code></td><td>nada: regra inválida, ignorada (é do Sass)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. O mouse em cima</h3>
+<p>Complete a regra aninhada que vale para o próprio <code>.botao</code> com o mouse em cima:</p>
+<div class="ex-code">.botao { <input data-answer="&amp;:hover" aria-label="seletor"> { background-color: navy; } }</div>
+</div>
+
+<div class="exercise">
+<h3>2. Por extenso</h3>
+<p>Dentro de <code>.menu { }</code>, a regra <code>a { }</code> equivale a qual seletor?</p>
+<div class="ex-code"><input data-answer=".menu a" aria-label="seletor"> { … }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">3. Dentro de <code>.cartao { }</code>, qual regra vale para um <code>&lt;div class="cartao novo"&gt;</code>?</p>
+<label><input type="radio" name="q3"> <code>.novo { }</code></label>
+<label><input type="radio" name="q3"> <code>&amp;.novo { }</code></label>
+<label><input type="radio" name="q3"> <code>&amp; .novo { }</code></label>
+<label><input type="radio" name="q3"> <code>&amp;__novo { }</code></label>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">4. A Ana escreveu <code>.receita { color: navy  h2 { color: tomato; } }</code>, sem o <code>;</code> depois de <code>navy</code>. O que acontece?</p>
+<label><input type="radio" name="q4"> Só o <code>navy</code> some; o <code>h2</code> fica <code>tomato</code></label>
+<label><input type="radio" name="q4"> O navegador põe o <code>;</code> sozinho</label>
+<label><input type="radio" name="q4"> O <code>navy</code> e a regra do <code>h2</code> somem juntos</label>
+<label><input type="radio" name="q4"> A página inteira fica sem estilo</label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">5. O que <code>.tema-escuro &amp; { }</code>, escrito dentro de <code>.cartao { }</code>, seleciona?</p>
+<label><input type="radio" name="q5"> Um <code>.cartao</code> que está dentro de um <code>.tema-escuro</code></label>
+<label><input type="radio" name="q5"> Um <code>.tema-escuro</code> que está dentro de um <code>.cartao</code></label>
+<label><input type="radio" name="q5"> Um elemento com as duas classes</label>
+<label><input type="radio" name="q5"> Nada: o <code>&amp;</code> só pode vir no começo</label>
+</div>
+
+<h3>Missão final: o cartão de produto, aninhado</h3>
+
+<div class="tryhtml" data-goal="css:.produto .preco{font-weight}=700,css:.produto.esgotado{opacity}=0.5,src:&amp;:hover\s*\{,src:\.produto\s*\{[\s\S]*@media,nsrc:\.produto\s*\.preco|\.produto\.esgotado|\.produto:hover">
+<p class="try-task"><strong>Missão:</strong> tudo <strong>dentro</strong> da regra <code>.produto</code>: (1) o <code>.preco</code> em negrito (<code>font-weight: bold</code>); (2) o cartão que também tem a classe <code>esgotado</code> com <code>opacity: 0.5</code>; (3) um <code>&amp;:hover</code> que mude a cor da borda; (4) um <code>@media (min-width: 600px)</code> que aumente o <code>padding</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;article class="produto"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p class="preco"&gt;R$ 35,00&lt;/p&gt;
+&lt;/article&gt;
+&lt;article class="produto esgotado"&gt;
+  &lt;h2&gt;Torta de limão&lt;/h2&gt;
+  &lt;p class="preco"&gt;R$ 42,00 (esgotado)&lt;/p&gt;
+&lt;/article&gt;
+</pre>
+<pre class="script" data-file="style.css">.produto {
+  border: 2px solid tomato;
+  border-radius: 8px;
+  padding: 8px 16px;
+  margin-bottom: 12px;
+  font-family: sans-serif;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.produto {
+  border: 2px solid tomato;
+  border-radius: 8px;
+  padding: 8px 16px;
+  margin-bottom: 12px;
+  font-family: sans-serif;
+
+  .preco {
+    font-weight: bold;
+  }
+
+  &amp;.esgotado {
+    opacity: 0.5;
+  }
+
+  &amp;:hover {
+    border-color: navy;
+  }
+
+  @media (min-width: 600px) {
+    padding: 16px 32px;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>CSS aninhado: regras dentro das chaves de outra regra. Escreve-se o começo do seletor uma vez só, e o que é de um componente fica junto.</li>
+  <li>Sem nada na frente, a regra aninhada é descendente: <code>.a { b { } }</code> = <code>.a b</code>. Com <code>&gt;</code>, <code>+</code> ou <code>~</code> na frente, o combinador correspondente.</li>
+  <li><code>&amp;</code> = o seletor da mãe. Obrigatório para grudar: <code>&amp;:hover</code>, <code>&amp;.destaque</code>, <code>&amp;::before</code>. No fim, inverte o contexto: <code>.tema-escuro &amp;</code>.</li>
+  <li><code>@media</code> pode ficar dentro da regra, só com as declarações.</li>
+  <li>Dois ou três níveis, no máximo. O <code>&amp;</code> pesa como <code>:is()</code>: uma mãe com ID deixa as aninhadas fortes.</li>
+  <li><code>&amp;__titulo</code> é do Sass: no CSS, a regra é jogada fora. Um <code>;</code> esquecido antes de uma regra aninhada apaga a declaração e a regra. Baseline desde dezembro de 2023 (Chrome/Edge 120, Firefox 117, Safari 17.2).</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
