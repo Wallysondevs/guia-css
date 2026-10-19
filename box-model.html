@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Modelo de Caixa — conteúdo, padding, border e margin | Guia CSS</title>
+<meta name="description" content="O modelo de caixa do CSS para quem está começando: todo elemento é uma caixa com conteúdo, padding, border e margin; as quatro camadas uma por vez, com desenho; a conta da largura total; o que o fundo pinta; box-sizing: border-box; o modelo no F12 e os erros reais do validador W3C.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">O Modelo de Caixa</span></h1>
+
+<p class="intro">Esta é uma das aulas mais importantes do curso. Para o navegador, <strong>todo elemento é uma caixa</strong> retangular: um título, um parágrafo, uma imagem, até uma palavra dentro de um <code>&lt;span&gt;</code>. E toda caixa é feita de quatro camadas, uma por fora da outra: o <strong>conteúdo</strong>, o <strong>padding</strong>, a <strong>border</strong> e a <strong>margin</strong>. Quem entende essas camadas entende por que uma caixa ficou maior do que devia, por que dois cartões se encostam, por que apareceu uma barra de rolagem. O nome disso em inglês é <em>box model</em>: "modelo de caixa".</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>As quatro camadas da caixa, com um desenho, e o que cada uma faz.</li>
+  <li>Como acrescentar uma camada por vez e ver a caixa crescer.</li>
+  <li>A <strong>conta da largura total</strong>: por que <code>width: 200px</code> dá uma caixa de 250 pixels.</li>
+  <li>Até onde o fundo pinta, e por que a margem é sempre transparente.</li>
+  <li>O <code>box-sizing: border-box</code>, que muda a conta.</li>
+  <li>Como ver o modelo de caixa no F12, e os erros reais do validador W3C.</li>
+</ul>
+</div>
+
+<p>Esta aula apresenta as quatro camadas juntas. Cada uma tem a sua aula depois: <a href="margin.html">Margem</a>, <a href="padding.html">Espaço Interno</a>, <a href="border.html">Bordas</a>, <a href="width-height.html">Largura e Altura</a> e <a href="box-sizing.html">box-sizing</a>. As medidas foram lidas no Chromium, e as mensagens do validador saíram do <strong>validador W3C</strong> (<code>vnu</code>) na máquina fictícia da Ana.</p>
+
+<hr>
+
+<h2>A ideia: o quadro na parede</h2>
+<p>A Ana mandou emoldurar a foto do bolo para pendurar na lojinha. O quadro pronto tem quatro partes, de dentro para fora:</p>
+
+<ol class="passo">
+  <li><strong>A foto</strong>: o que importa. É o <strong>conteúdo</strong>.</li>
+  <li><strong>O passe-partout</strong>: a margem de papel claro entre a foto e a moldura, para a foto "respirar". É o <strong>padding</strong> ("preenchimento", o espaço de dentro).</li>
+  <li><strong>A moldura</strong>: a borda de madeira. É a <strong>border</strong> ("borda").</li>
+  <li><strong>O espaço na parede</strong> até o próximo quadro. Ninguém pinta esse espaço: é a parede que aparece. É a <strong>margin</strong> ("margem", o espaço de fora).</li>
+</ol>
+
+<p>No CSS é igual. O desenho abaixo mostra uma caixa com <code>width: 200px</code> (a largura do conteúdo), <code>padding: 20px</code>, <code>border: 5px</code> e <code>margin: 30px</code>. As cores são as que o F12 do Chrome usa no desenho do modelo de caixa: laranja para a margem, amarelo para a borda, verde para o padding, azul para o conteúdo. Na largura, o desenho está em escala; na altura, não.</p>
+
+<figure>
+<svg viewBox="0 0 496 312" width="496" style="max-width: 100%; height: auto; display: block;" role="img" aria-labelledby="caixa-titulo caixa-desc">
+  <title id="caixa-titulo">As quatro camadas da caixa</title>
+  <desc id="caixa-desc">Quatro retângulos, um dentro do outro. Por fora, a margem, em laranja, com 30 pixels. Dentro dela, a borda, uma faixa amarela de 5 pixels. Dentro da borda, o padding, em verde, com 20 pixels. No centro, o conteúdo, em azul, com 200 pixels de largura. Embaixo, uma régua soma as larguras: 30 mais 5 mais 20 mais 200 mais 20 mais 5 mais 30.</desc>
+  <rect x="0" y="0" width="496" height="230" fill="#f9cc9d"/>
+  <rect x="48" y="40" width="400" height="150" fill="#fddd9b" stroke="#1d1d1b" stroke-width="0.5"/>
+  <rect x="56" y="48" width="384" height="134" fill="#c3d08b"/>
+  <rect x="88" y="80" width="320" height="70" fill="#8cb6c0"/>
+  <text x="8" y="26" font-family="system-ui, sans-serif" font-size="15" fill="#1d1d1b">margin (margem): 30px</text>
+  <text x="64" y="70" font-family="system-ui, sans-serif" font-size="15" fill="#1d1d1b">padding: 20px</text>
+  <text x="248" y="112" text-anchor="middle" font-family="system-ui, sans-serif" font-size="15" fill="#1d1d1b">conteúdo</text>
+  <text x="248" y="134" text-anchor="middle" font-family="system-ui, sans-serif" font-size="15" fill="#1d1d1b">width: 200px</text>
+  <line x1="52" y1="194" x2="52" y2="206" stroke="#1d1d1b" stroke-width="1.5"/>
+  <text x="58" y="218" font-family="system-ui, sans-serif" font-size="15" fill="#1d1d1b">border (borda): 5px</text>
+  <g font-family="system-ui, sans-serif" font-size="13" fill="currentColor" stroke="currentColor">
+    <line x1="0" y1="250" x2="496" y2="250" stroke-width="1"/>
+    <line x1="0" y1="244" x2="0" y2="256"/>
+    <line x1="48" y1="244" x2="48" y2="256"/>
+    <line x1="56" y1="244" x2="56" y2="256"/>
+    <line x1="88" y1="244" x2="88" y2="256"/>
+    <line x1="408" y1="244" x2="408" y2="256"/>
+    <line x1="440" y1="244" x2="440" y2="256"/>
+    <line x1="448" y1="244" x2="448" y2="256"/>
+    <line x1="496" y1="244" x2="496" y2="256"/>
+    <text x="24" y="272" text-anchor="middle" stroke="none">30</text>
+    <text x="52" y="290" text-anchor="middle" stroke="none">5</text>
+    <text x="72" y="272" text-anchor="middle" stroke="none">20</text>
+    <text x="248" y="272" text-anchor="middle" stroke="none">200</text>
+    <text x="424" y="272" text-anchor="middle" stroke="none">20</text>
+    <text x="444" y="290" text-anchor="middle" stroke="none">5</text>
+    <text x="472" y="272" text-anchor="middle" stroke="none">30</text>
+    <text x="248" y="306" text-anchor="middle" stroke="none">caixa visível: 250 · espaço ocupado: 310</text>
+  </g>
+</svg>
+<figcaption>As quatro camadas da caixa, de dentro para fora: conteúdo (azul), padding (verde), border (amarelo) e margin (laranja). Embaixo, a régua da largura.</figcaption>
+</figure>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Camada</th><th>Propriedade</th><th>O que é</th><th>O fundo pinta?</th></tr>
+<tr><td>Conteúdo</td><td><code>width</code>, <code>height</code></td><td>O texto, a imagem, os filhos. A largura e a altura medem esta parte.</td><td>Sim</td></tr>
+<tr><td>Padding</td><td><code>padding</code></td><td>Espaço <strong>de dentro</strong>, entre o conteúdo e a borda</td><td>Sim: o fundo continua por baixo dele</td></tr>
+<tr><td>Border</td><td><code>border</code></td><td>A linha em volta do padding</td><td>Por baixo dela, sim (aparece se a borda for tracejada ou transparente)</td></tr>
+<tr><td>Margin</td><td><code>margin</code></td><td>Espaço <strong>de fora</strong>, entre a borda e as outras caixas</td><td><strong>Não</strong>: é sempre transparente, mostra o fundo do pai</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. Tudo é caixa</h2>
+<p>Você não vê as caixas porque, sem CSS, elas não têm fundo nem borda. Uma linha de CSS revela todas: <code>outline</code> ("contorno", aula <a href="outline.html">Contorno</a>) desenha uma linha em volta de cada caixa sem mudar o tamanho de nada. O <code>*</code> é o seletor universal (aula <a href="seletor-universal.html">Seletor Universal</a>): "todos os elementos".</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;h1&gt;Bolo de cenoura&lt;/h1&gt;
+&lt;p&gt;Leva &lt;strong&gt;três cenouras&lt;/strong&gt; e quatro ovos.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Fácil&lt;/li&gt;
+  &lt;li&gt;50 minutos&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<pre class="script" data-file="style.css">* {
+  outline: 1px solid tomato;
+}
+</pre>
+</div>
+
+<p>Aparecem retângulos vermelhos em volta de tudo: a página inteira, o título, o parágrafo, a lista, cada item e até o <code>&lt;strong&gt;</code>, que é uma caixa pequena só em volta das duas palavras. Repare nos espaços entre os retângulos do título e do parágrafo: são as <strong>margens</strong> que o navegador já põe nesses elementos. Ninguém escreveu essas margens; elas vêm do estilo padrão do navegador.</p>
+
+<div class="tip">
+<strong>Um truque para a vida toda</strong>
+<p>Quando um layout está estranho e você não entende por quê, acrescente <code>* { outline: 1px solid tomato; }</code> por um minuto. Ver as caixas resolve metade dos mistérios. (Use <code>outline</code>, e não <code>border</code>: a borda aumentaria as caixas, como você vai ver agora.)</p>
+</div>
+
+<hr>
+
+<h2>2. Uma camada por vez</h2>
+<p>Agora, a mesma caixa quatro vezes, ganhando uma camada a cada vez. O fundo da página é cinza-claro, e o da caixa, amarelo-claro, para você ver até onde vai cada coisa:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="caixa c1"&gt;Bolo de cenoura&lt;/p&gt;
+&lt;p class="caixa c2"&gt;Bolo de cenoura&lt;/p&gt;
+&lt;p class="caixa c3"&gt;Bolo de cenoura&lt;/p&gt;
+&lt;p class="caixa c4"&gt;Bolo de cenoura&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">body {
+  background-color: lightgray;
+}
+
+.caixa {
+  background-color: lightyellow;
+  width: 200px;
+}
+
+/* 1: só o conteúdo */
+
+.c2 {
+  padding: 20px;
+}
+
+.c3 {
+  padding: 20px;
+  border: 5px solid tomato;
+}
+
+.c4 {
+  padding: 20px;
+  border: 5px solid tomato;
+  margin: 30px;
+}
+</pre>
+</div>
+
+<ol>
+  <li><strong>Só o conteúdo:</strong> uma faixa amarela de 200 pixels de largura e da altura de uma linha (18 pixels, no Chromium). O texto encosta na beirada.</li>
+  <li><strong>+ padding:</strong> o texto se afasta 20 pixels da beirada, dos quatro lados, e o amarelo vai junto: o fundo pinta o padding. A caixa amarela agora tem 240 pixels de largura.</li>
+  <li><strong>+ border:</strong> uma moldura vermelha de 5 pixels, <strong>por fora</strong> do padding. A caixa visível tem agora 250 pixels.</li>
+  <li><strong>+ margin:</strong> a caixa se afasta 30 pixels das outras coisas e da beirada esquerda da página. O espaço da margem mostra o cinza da página: a margem é transparente. O tamanho da caixa visível não muda (continua 250).</li>
+</ol>
+
+<p>Em nenhum momento o <code>width</code> mudou: o F12 mostra <code>width: 200px</code> nas quatro caixas. O que mudou foi o que está <strong>em volta</strong> do conteúdo.</p>
+
+<hr>
+
+<h2>3. A conta da largura total</h2>
+<p>Esta é a conta que todo mundo erra no começo. No CSS, o <code>width</code> é a largura <strong>só do conteúdo</strong>. O padding e a borda são somados <strong>por fora</strong>, dos dois lados:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Parte</th><th>Esquerda</th><th>Meio</th><th>Direita</th><th>Soma</th></tr>
+<tr><td>Conteúdo (<code>width</code>)</td><td></td><td>200</td><td></td><td>200</td></tr>
+<tr><td>+ padding</td><td>20</td><td></td><td>20</td><td>240</td></tr>
+<tr><td>+ border</td><td>5</td><td></td><td>5</td><td><strong>250</strong>: a caixa que você vê</td></tr>
+<tr><td>+ margin</td><td>30</td><td></td><td>30</td><td><strong>310</strong>: o espaço que ela ocupa na página</td></tr>
+</table>
+</div>
+
+<p>Em fórmula:</p>
+<pre class="file" data-file="a conta">caixa visível = width + padding-left + padding-right + border-left + border-right
+              = 200   + 20           + 20            + 5           + 5            = 250
+
+espaço ocupado = caixa visível + margin-left + margin-right
+               = 250           + 30          + 30           = 310
+</pre>
+
+<p>A altura segue a mesma regra, com os lados de cima e de baixo. A caixa 4 da seção 2 tem 18 pixels de conteúdo, mais 20 + 20 de padding, mais 5 + 5 de borda: 68 pixels de altura visível (medido no Chromium).</p>
+
+<div class="tryhtml" data-goal="css:.cartao{width}=250px,css:.cartao{padding-left}=20px,css:.cartao{border-left-width}=5px">
+<p class="try-task"><strong>Missão:</strong> o cartão da receita tem de caber num espaço de exatamente <strong>300 pixels</strong> de largura visível. Ele já tem <code>padding: 20px</code> e <code>border: 5px</code>. Faça a conta e acerte o <code>width</code>.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="cartao"&gt;
+  &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;p&gt;50 minutos · 12 pedaços&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.cartao {
+  background-color: lightyellow;
+  width: 300px;
+  padding: 20px;
+  border: 5px solid tomato;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.cartao {
+  background-color: lightyellow;
+  width: 250px;
+  padding: 20px;
+  border: 5px solid tomato;
+}
+</pre>
+</div>
+
+<p>300 − 20 − 20 − 5 − 5 = 250. Com <code>width: 300px</code>, o cartão tinha 350 pixels visíveis. Na seção 5 você vai ver um jeito de não precisar fazer essa conta.</p>
+
+<hr>
+
+<h2>4. Os quatro lados</h2>
+<p>Padding, borda e margem têm quatro lados: <code>top</code> (em cima), <code>right</code> (direita), <code>bottom</code> (embaixo) e <code>left</code> (esquerda). Você pode dar um valor para todos de uma vez ou para cada lado:</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>padding: 20px;</code></td><td>20 nos quatro lados</td></tr>
+<tr><td><code>padding-top: 20px;</code></td><td>Só em cima (também <code>-right</code>, <code>-bottom</code>, <code>-left</code>)</td></tr>
+<tr><td><code>padding: 10px 20px;</code></td><td>10 em cima e embaixo, 20 nos lados</td></tr>
+<tr><td><code>padding: 10px 20px 30px 40px;</code></td><td>Em cima, direita, embaixo, esquerda: no sentido do relógio, a partir do 12</td></tr>
+</table>
+</div>
+
+<p>A mesma escrita vale para <code>margin</code>. Os detalhes de cada uma estão nas aulas <a href="margin.html">Margem</a>, <a href="padding.html">Espaço Interno</a> e <a href="border.html">Bordas</a>. Na conta da largura, cada lado entra com o seu valor: com <code>padding: 10px 20px</code>, a largura ganha 20 + 20.</p>
+
+<hr>
+
+<h2>5. <code>box-sizing: border-box</code>: outra conta</h2>
+<p>A conta da seção 3 é o comportamento inicial, chamado <code>content-box</code>: o <code>width</code> mede só o conteúdo. Existe outro: com <code>box-sizing: border-box</code>, o <code>width</code> mede a caixa <strong>até a borda</strong>, e o padding e a borda são tirados de dentro dela.</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="caixa conteudo"&gt;content-box&lt;/p&gt;
+&lt;p class="caixa borda"&gt;border-box&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.caixa {
+  background-color: lightyellow;
+  width: 200px;
+  padding: 20px;
+  border: 5px solid tomato;
+}
+
+.conteudo {
+  box-sizing: content-box;
+}
+
+.borda {
+  box-sizing: border-box;
+}
+</pre>
+</div>
+
+<p>As duas têm <code>width: 200px</code>, mas a de cima tem 250 pixels de largura visível, e a de baixo, exatamente 200. Na de baixo, o conteúdo ficou com o que sobrou: 200 − 20 − 20 − 5 − 5 = 150 pixels.</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th></th><th><code>content-box</code> (inicial)</th><th><code>border-box</code></th></tr>
+<tr><td>O <code>width</code> mede</td><td>só o conteúdo</td><td>conteúdo + padding + borda</td></tr>
+<tr><td><code>width: 200px</code> + <code>padding: 20px</code> + <code>border: 5px</code></td><td>caixa de 250</td><td>caixa de 200 (conteúdo de 150)</td></tr>
+<tr><td>Quando usar</td><td>quando você quer controlar o tamanho do conteúdo (raro)</td><td>quase sempre: o tamanho que você escreve é o que você vê</td></tr>
+</table>
+</div>
+
+<p>A maioria dos sites de hoje põe <code>box-sizing: border-box</code> em todos os elementos, logo no começo do CSS. A aula <a href="box-sizing.html">box-sizing: border-box</a> mostra como e por quê. A margem fica de fora nos dois casos: ela nunca entra no <code>width</code>.</p>
+
+<hr>
+
+<h2>6. O modelo de caixa no F12</h2>
+<p>O navegador mostra essas camadas para qualquer elemento. Abra o F12 (aula <a href="devtools.html">Inspecionando com o F12</a>), escolha um elemento na aba <em>Elements</em> ("Elementos") e procure a aba <em>Computed</em> ("Calculado"). No alto dela há um desenho de retângulos, um dentro do outro, como o desta aula: <strong>margin</strong> por fora, depois <strong>border</strong>, <strong>padding</strong> e, no centro, o tamanho do conteúdo (por exemplo, <code>200 × 18</code>). Cada lado mostra o seu número, e um <code>-</code> quando é zero.</p>
+
+<p>Passe o mouse sobre o elemento na aba <em>Elements</em>: a própria página pinta as camadas por cima da caixa, com as mesmas cores (laranja na margem, verde no padding, azul no conteúdo). Com isso você descobre, por exemplo, que o espaço entre dois parágrafos é a margem deles, e não um padding.</p>
+
+<p>(Os nomes exatos das abas mudam um pouco entre o Chrome, o Edge e o Firefox. No Firefox, o desenho fica na aba <em>Layout</em>.)</p>
+
+<hr>
+
+<h2>7. E as caixas em linha?</h2>
+<p>Tudo acima vale para elementos de <strong>bloco</strong> (<code>p</code>, <code>div</code>, <code>h1</code>), que ocupam a linha inteira. Os elementos <strong>em linha</strong> (<code>span</code>, <code>strong</code>, <code>a</code>) também são caixas, mas com um comportamento diferente na vertical:</p>
+
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p&gt;O bolo leva &lt;span class="destaque"&gt;três cenouras&lt;/span&gt; e quatro ovos, e fica pronto em cinquenta minutos de forno médio, pré-aquecido.&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.destaque {
+  background-color: gold;
+  padding: 10px;
+  margin: 20px;
+  border: 2px solid tomato;
+}
+</pre>
+</div>
+
+<ul>
+  <li>Nos <strong>lados</strong>, tudo funciona: o padding, a borda e a margem afastam o texto da frase.</li>
+  <li>Em <strong>cima e embaixo</strong>, o padding e a borda são desenhados, mas <strong>não empurram</strong> as linhas: a caixa amarela invade a linha de cima e a de baixo, por cima do texto. E a margem de cima e de baixo não faz nada.</li>
+</ul>
+
+<p>Para uma caixa em linha que respeite as medidas na vertical, existe o <code>display: inline-block</code>, da aula <a href="display.html">display</a>.</p>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Sem mensagem: a caixa maior que a tela</strong>
+<p><strong>O que aconteceu:</strong> a Ana quis uma faixa da largura toda e escreveu <code>width: 100%;</code> com <code>padding: 20px;</code>. Pela conta da seção 3, a faixa ficou com 100% <strong>mais</strong> 40 pixels: ela passa da beirada direita, e aparece uma barra de rolagem na horizontal.</p>
+<div class="tryhtml">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="faixa"&gt;Promoção: bolo de cenoura com 10% de desconto&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.faixa {
+  background-color: lightblue;
+  width: 100%;
+  padding: 20px;
+}
+</pre>
+</div>
+<p>No Chromium, numa página de 500 pixels, o <code>body</code> tinha 484 de largura (por causa da margem de 8 do navegador), e a faixa ficou com 524: passa 32 pixels da tela.</p>
+<p><strong>Como consertar:</strong> o mais simples é <strong>não</strong> escrever <code>width</code>: um elemento de bloco já ocupa a largura toda, e o padding fica dentro. Ou use <code>box-sizing: border-box</code>.</p>
+</div>
+
+<div class="cenario">
+<strong>Sem mensagem: a borda que aumentou a caixa</strong>
+<p><strong>O que aconteceu:</strong> dois cartões de 50% cada, lado a lado, e a Ana acrescentou <code>border: 1px solid gray</code> para separá-los. Cada um ficou com 50% + 2 pixels: a soma passa de 100%, e os dois não cabem mais lado a lado. A borda entra na conta, mesmo fininha.</p>
+<p><strong>Como consertar:</strong> <code>box-sizing: border-box</code>, ou, só para enxergar a caixa enquanto testa, <code>outline</code>, que não entra na conta.</p>
+</div>
+
+<div class="tryhtml">
+<p class="try-task"><strong>Erro de propósito:</strong> cada regra tem um erro, e nenhuma das quatro caixas ganha o tamanho, o espaço ou a borda que devia. Leia os cenários e conserte.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;p class="caixa um"&gt;um&lt;/p&gt;
+&lt;p class="caixa dois"&gt;dois&lt;/p&gt;
+&lt;p class="caixa tres"&gt;três&lt;/p&gt;
+&lt;p class="caixa quatro"&gt;quatro&lt;/p&gt;
+</pre>
+<pre class="script" data-file="style.css">.um {
+  width: 200;
+}
+
+.dois {
+  padding: -10px;
+}
+
+.tres {
+  margin: 10px 20px 30px 40px 50px;
+}
+
+.quatro {
+  border: 5px solid tomato
+  padding: 20px;
+}
+
+.caixa {
+  background-color: lightyellow;
+}
+</pre>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “width”: only “0” can be a “unit”. You must put a unit after your number.</code></strong>
+<p><strong>O que aconteceu:</strong> <code>width: 200</code>, sem <code>px</code>. Duzentos o quê? Pixels, centímetros, porcentagem? O navegador não adivinha e ignora a declaração: a caixa continua da largura toda.</p>
+<pre class="term" data-cwd="~/caixa">$ vnu --css style.css
+"file:/home/ana/caixa/style.css":2.10-2.12: error: CSS: “width”: only “0” can be a “unit”. You must put a unit after your number.</pre>
+<p><strong>Como consertar:</strong> <code>width: 200px;</code>. Só o zero dispensa a unidade (<code>margin: 0</code>).</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “padding”: “-10px” negative values are not allowed.</code></strong>
+<p><strong>O que aconteceu:</strong> padding negativo. Não existe "espaço de dentro" menor que nada. A declaração é ignorada.</p>
+<pre class="term" data-cwd="~/caixa">$ vnu --css style.css
+"file:/home/ana/caixa/style.css":6.13-6.16: error: CSS: “padding”: “-10px” negative values are not allowed.</pre>
+<p>"Valores negativos não são permitidos." A <strong>margem</strong> aceita valor negativo (puxa a caixa para fora do lugar, aula <a href="margin.html">Margem</a>); o padding e a borda, não.</p>
+<p><strong>Como consertar:</strong> <code>padding: 0;</code> para tirar o espaço, ou um valor positivo.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “margin”: Too many values or values are not recognized.</code></strong>
+<p><strong>O que aconteceu:</strong> cinco valores. Uma caixa tem quatro lados: o <code>margin</code> aceita de um a quatro.</p>
+<pre class="term" data-cwd="~/caixa">$ vnu --css style.css
+"file:/home/ana/caixa/style.css":10.31-10.34: error: CSS: “margin”: Too many values or values are not recognized.</pre>
+<p><strong>Como consertar:</strong> no máximo quatro: em cima, direita, embaixo, esquerda.</p>
+</div>
+
+<div class="cenario">
+<strong><code>error: CSS: “border”: Missing a semicolon before the property name “padding”.</code></strong>
+<p><strong>O que aconteceu:</strong> faltou o <code>;</code> depois de <code>border: 5px solid tomato</code>. As duas linhas viraram uma declaração só, inválida: a caixa fica sem borda <strong>e</strong> sem padding.</p>
+<pre class="term" data-cwd="~/caixa">$ vnu --css style.css
+"file:/home/ana/caixa/style.css":15.3-15.9: error: CSS: “border”: Missing a semicolon before the property name “padding”.</pre>
+<p><strong>Como consertar:</strong> <code>border: 5px solid tomato;</code>.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Termo</th><th>O que é</th></tr>
+<tr><td>Conteúdo</td><td>O texto, a imagem, os filhos; medido por <code>width</code> e <code>height</code></td></tr>
+<tr><td><code>padding</code></td><td>Espaço de dentro, entre o conteúdo e a borda; o fundo pinta; não aceita negativo</td></tr>
+<tr><td><code>border</code></td><td>A linha em volta do padding</td></tr>
+<tr><td><code>margin</code></td><td>Espaço de fora; sempre transparente; aceita negativo</td></tr>
+<tr><td>Largura visível (<code>content-box</code>)</td><td><code>width</code> + padding dos dois lados + borda dos dois lados</td></tr>
+<tr><td>Espaço ocupado</td><td>largura visível + margem dos dois lados</td></tr>
+<tr><td><code>box-sizing: border-box</code></td><td>O <code>width</code> já inclui padding e borda</td></tr>
+<tr><td><code>* { outline: 1px solid tomato; }</code></td><td>Mostra todas as caixas sem mudar os tamanhos</td></tr>
+<tr><td>F12 → <em>Computed</em></td><td>O desenho das camadas com os números de cada lado</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. A largura visível</h3>
+<p><code>width: 300px; padding: 10px; border: 2px solid;</code>, com o <code>box-sizing</code> inicial. Quantos pixels de largura tem a caixa que você vê?</p>
+<div class="ex-code"><input data-answer="324|324px" aria-label="largura"> pixels</div>
+</div>
+
+<div class="exercise">
+<h3>2. O espaço ocupado</h3>
+<p>A mesma caixa, agora com <code>margin: 20px;</code>. Quantos pixels de largura ela ocupa na página?</p>
+<div class="ex-code"><input data-answer="364|364px" aria-label="espaço"> pixels</div>
+</div>
+
+<div class="mc" data-answer="3">
+<p class="mc-q">3. Qual camada é sempre transparente, mostrando o fundo de quem está atrás?</p>
+<label><input type="radio" name="q3"> O padding</label>
+<label><input type="radio" name="q3"> A borda</label>
+<label><input type="radio" name="q3"> A margem</label>
+<label><input type="radio" name="q3"> O conteúdo</label>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. A ordem das camadas, de dentro para fora:</p>
+<label><input type="radio" name="q4"> conteúdo, margin, border, padding</label>
+<label><input type="radio" name="q4"> conteúdo, padding, border, margin</label>
+<label><input type="radio" name="q4"> padding, conteúdo, border, margin</label>
+<label><input type="radio" name="q4"> conteúdo, border, padding, margin</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. Com <code>box-sizing: border-box</code>, <code>width: 200px</code>, <code>padding: 20px</code> e <code>border: 5px</code>, qual é a largura visível?</p>
+<label><input type="radio" name="q5"> 250 pixels</label>
+<label><input type="radio" name="q5"> 240 pixels</label>
+<label><input type="radio" name="q5"> 150 pixels</label>
+<label><input type="radio" name="q5"> 200 pixels</label>
+</div>
+
+<h3>Missão final: o cartão de perfil</h3>
+
+<div class="tryhtml" data-goal="css:.perfil{width}=200px,css:.perfil{padding-top}=16px,css:.perfil{padding-left}=16px,css:.perfil{border-top-width}=4px,css:.perfil{margin-top}=24px,css:.perfil{margin-left}=24px,css:.perfil{background-color}=rgb(255, 255, 224)">
+<p class="try-task"><strong>Missão:</strong> monte o cartão da Ana com as quatro camadas: conteúdo de <strong>200px</strong> de largura, <strong>16px</strong> de padding, borda de <strong>4px</strong> <code>solid</code> <code>tomato</code>, <strong>24px</strong> de margem e fundo <code>lightyellow</code>. Há um erro em cada uma das duas linhas que já estão lá.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="perfil"&gt;
+  &lt;h2&gt;Ana Souza&lt;/h2&gt;
+  &lt;p&gt;Confeiteira. Bolos sob encomenda.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.perfil {
+  width: 200;
+  padding: -16px;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.perfil {
+  background-color: lightyellow;
+  width: 200px;
+  padding: 16px;
+  border: 4px solid tomato;
+  margin: 24px;
+}
+</pre>
+</div>
+
+<p>A caixa visível do cartão tem 200 + 16 + 16 + 4 + 4 = 240 pixels de largura, e ocupa 240 + 24 + 24 = 288 na página. Abra o F12 e confira no desenho da aba <em>Computed</em>.</p>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Todo elemento é uma caixa com quatro camadas, de dentro para fora: <strong>conteúdo</strong>, <strong>padding</strong> (espaço de dentro), <strong>border</strong> (a linha) e <strong>margin</strong> (espaço de fora).</li>
+  <li>O fundo pinta o conteúdo, o padding e o que fica sob a borda; a margem é sempre transparente.</li>
+  <li>No modo inicial (<code>content-box</code>), o <code>width</code> é só do conteúdo: largura visível = <code>width</code> + padding + borda dos dois lados; espaço ocupado = isso + margens.</li>
+  <li>Com <code>box-sizing: border-box</code>, o <code>width</code> já inclui padding e borda. A margem nunca entra.</li>
+  <li><code>* { outline: 1px solid tomato; }</code> e a aba <em>Computed</em> do F12 mostram as caixas.</li>
+  <li>Em elementos em linha, padding e borda de cima e de baixo são desenhados, mas não empurram as linhas.</li>
+  <li>Erros comuns: número sem unidade, padding negativo, valores demais, <code>;</code> esquecido. E, sem mensagem: <code>width: 100%</code> + padding passa da tela.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
