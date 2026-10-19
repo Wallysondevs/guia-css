@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Container Queries — @container e container-type | Guia CSS</title>
+<meta name="description" content="Container queries (@container) para quem está começando: componentes que se adaptam ao espaço onde estão, e não à tela. container-type, @container, nomes de contêiner, as unidades cqi, a diferença para media queries, o suporte dos navegadores e os erros mais comuns.">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem("tema");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar" aria-label="Tópicos"></nav>
+<main class="main">
+<div class="content">
+
+<div class="pager"></div>
+
+<h1>CSS <span class="hl">Container Queries</span></h1>
+
+<p class="intro">Com <a href="media-queries.html">media queries</a>, o CSS pergunta "qual é a largura da <strong>tela</strong>?". Mas um cartão de receita pode aparecer na coluna larga do meio da página <strong>e</strong> na coluna estreita do lado, na mesma tela. Para ele, a pergunta certa é outra: "quanto espaço <strong>eu</strong> tenho aqui?". É isso que as <strong>container queries</strong> ("consultas ao contêiner") fazem: o componente se adapta ao lugar onde foi posto.</p>
+
+<div class="note">
+<strong>Você vai aprender</strong>
+<ul>
+  <li>Por que a media query não resolve o cartão que aparece em dois lugares.</li>
+  <li><code>container-type: inline-size</code>: como transformar um elemento num contêiner.</li>
+  <li><code>@container (min-width: 400px) { … }</code>: a regra que pergunta a largura do contêiner.</li>
+  <li>Dar nome ao contêiner (<code>container-name</code> e o atalho <code>container</code>).</li>
+  <li>As unidades do contêiner (<code>cqi</code>).</li>
+  <li>Os erros mais comuns, e por que o validador W3C do laboratório reclama de um CSS que funciona.</li>
+</ul>
+</div>
+
+<div class="note">
+<strong>Suporte dos navegadores</strong>
+<p>As container queries de tamanho (as desta aula) funcionam no Chrome, Edge, Firefox e Safari desde <strong>fevereiro de 2023</strong> (Chrome 105, Safari 16, Firefox 110). O MDN as marca como "Baseline: amplamente disponível". Navegadores mais antigos ignoram a regra <code>@container</code> inteira: escreva o CSS de fora dela de um jeito que funcione sozinho (o cartão em coluna, por exemplo).</p>
+</div>
+
+<hr>
+
+<h2>A ideia: o móvel e o cômodo</h2>
+<p>Pense numa mesa dobrável. Quem decide se ela fica aberta ou fechada não é o tamanho da <strong>casa</strong>, é o tamanho do <strong>cômodo</strong> onde ela está. Na sala grande, ela abre; no corredor, fica dobrada. A mesma mesa, na mesma casa, de dois jeitos.</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Na casa</th><th>No CSS</th></tr>
+<tr><td>A casa</td><td>A tela (a janela do navegador): é o que a <strong>media query</strong> mede</td></tr>
+<tr><td>O cômodo</td><td>O <strong>contêiner</strong>: o elemento onde o componente está (uma coluna, uma barra lateral)</td></tr>
+<tr><td>A mesa dobrável</td><td>O componente (um cartão) que muda conforme o contêiner: a <strong>container query</strong></td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>1. O problema: o mesmo cartão em dois lugares</h2>
+<p>A página da Ana tem uma coluna principal larga e uma barra lateral de 200 pixels, lado a lado (com <a href="flexbox.html">Flexbox</a>). O mesmo cartão de receita aparece nas duas. O quadro está em 768 pixels, a largura de um tablet (os botões <strong>375</strong>, <strong>768</strong> e <strong>cheia</strong>, na barra do quadro, mudam a largura da janela que a página enxerga). Primeiro, com uma media query:</p>
+
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;main class="principal"&gt;
+    &lt;article class="cartao"&gt;
+      &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura" width="400" height="300"&gt;
+      &lt;div&gt;
+        &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+        &lt;p&gt;Fofinho, com cobertura de chocolate.&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  &lt;/main&gt;
+  &lt;aside class="lateral"&gt;
+    &lt;article class="cartao"&gt;
+      &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura" width="400" height="300"&gt;
+      &lt;div&gt;
+        &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+        &lt;p&gt;Fofinho, com cobertura de chocolate.&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  &lt;/aside&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+  display: flex;
+  gap: 16px;
+}
+
+.principal {
+  flex: 1;
+}
+
+.lateral {
+  width: 200px;
+}
+
+.cartao {
+  border: 2px solid orange;
+  padding: 8px;
+}
+
+.cartao img {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (min-width: 400px) {
+  .cartao {
+    display: flex;
+    gap: 12px;
+  }
+
+  .cartao img {
+    width: 40%;
+  }
+}
+</pre>
+</div>
+
+<p>A media query pergunta pela <strong>tela</strong> (768 pixels, mais que 400), então <strong>os dois</strong> cartões ficam com a foto ao lado do texto. O da coluna principal ficou bom. O da barra lateral ficou espremido: a foto virou uma tira fina e deformada, e o título se quebrou em duas linhas. Clique em <strong>375</strong>: a tela fica estreita e o cartão principal também volta para uma coluna, mesmo tendo espaço. A media query não sabe onde cada cartão está.</p>
+
+<hr>
+
+<h2>2. A solução: <code>container-type</code> e <code>@container</code></h2>
+<p>São dois passos: (1) dizer quem é o <strong>contêiner</strong>; (2) escrever a regra que pergunta a largura <strong>dele</strong>.</p>
+
+<pre class="file" data-file="style.css">.principal,
+.lateral {
+  container-type: inline-size;
+}
+
+@container (min-width: 400px) {
+  .cartao {
+    display: flex;
+    gap: 12px;
+  }
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>container-type</dt><dd>"Tipo de contêiner". Transforma o elemento num contêiner que pode ser consultado.</dd>
+  <dt>inline-size</dt><dd>"Tamanho na linha": a <strong>largura</strong> (no português, que escreve da esquerda para a direita). É o valor de quase sempre: o contêiner passa a responder pela largura dele.</dd>
+  <dt>@container</dt><dd>A regra de consulta, como o <code>@media</code>. O que está dentro das chaves só vale quando a condição for verdadeira.</dd>
+  <dt>(min-width: 400px)</dt><dd>A condição: "o contêiner tem <strong>pelo menos</strong> 400 pixels de largura". Também pode ser <code>max-width</code>.</dd>
+  <dt>.cartao { … }</dt><dd>As regras de dentro valem para os elementos que estão <strong>dentro</strong> de um contêiner que cumpre a condição. Cada cartão olha o contêiner mais próximo dele.</dd>
+</dl>
+
+<p>Veja no mesmo exemplo, com a media query trocada pela container query:</p>
+
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;main class="principal"&gt;
+    &lt;article class="cartao"&gt;
+      &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura" width="400" height="300"&gt;
+      &lt;div&gt;
+        &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+        &lt;p&gt;Fofinho, com cobertura de chocolate.&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  &lt;/main&gt;
+  &lt;aside class="lateral"&gt;
+    &lt;article class="cartao"&gt;
+      &lt;img src="assets/midia/bolo-400.jpg" alt="Bolo de cenoura" width="400" height="300"&gt;
+      &lt;div&gt;
+        &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+        &lt;p&gt;Fofinho, com cobertura de chocolate.&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  &lt;/aside&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+  display: flex;
+  gap: 16px;
+}
+
+.principal {
+  flex: 1;
+  container-type: inline-size;
+}
+
+.lateral {
+  width: 200px;
+  container-type: inline-size;
+}
+
+.cartao {
+  border: 2px solid orange;
+  padding: 8px;
+}
+
+.cartao img {
+  max-width: 100%;
+  height: auto;
+}
+
+@container (min-width: 400px) {
+  .cartao {
+    display: flex;
+    gap: 12px;
+  }
+
+  .cartao img {
+    width: 40%;
+  }
+}
+</pre>
+</div>
+
+<p>Agora cada cartão decide sozinho. Em 768, a coluna principal tem 536 pixels (conferido no Chromium): o cartão de lá fica com a foto ao lado do texto. A barra lateral tem 200: o cartão de lá continua em coluna, com a foto em cima. Clique em <strong>375</strong>: a coluna principal cai para 143 pixels, e o cartão dela também passa para coluna.</p>
+
+<div class="tip">
+<strong>Comece pelo estreito</strong>
+<p>Repare que o CSS de fora do <code>@container</code> desenha o cartão em <strong>coluna</strong> (o jeito que funciona em qualquer espaço), e a consulta só <strong>acrescenta</strong> o lado a lado quando há lugar. É a mesma ideia do <a href="mobile-first.html">mobile first</a>, e é o que um navegador antigo, que não entende <code>@container</code>, vai mostrar.</p>
+</div>
+
+<div class="tryhtml" data-largura="768" data-goal="css:.principal .receita{display}=flex,css:.lateral .receita{display}=block,src:@container">
+<p class="try-task"><strong>Missão:</strong> a mesma receita aparece na coluna principal e na barra lateral. Transforme <code>.principal</code> e <code>.lateral</code> em contêineres (<code>container-type: inline-size</code>) e escreva uma <code>@container</code> que deixe a <code>.receita</code> com <code>display: flex</code> quando o contêiner tiver <strong>pelo menos 400px</strong>. Só a receita da coluna principal deve ficar lado a lado.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;main class="principal"&gt;
+    &lt;div class="receita"&gt;
+      &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Fatia de bolo de cenoura" width="400" height="400"&gt;
+      &lt;p&gt;Receita da semana: bolo de cenoura com cobertura de chocolate.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/main&gt;
+  &lt;aside class="lateral"&gt;
+    &lt;div class="receita"&gt;
+      &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Fatia de bolo de cenoura" width="400" height="400"&gt;
+      &lt;p&gt;Receita da semana: bolo de cenoura com cobertura de chocolate.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/aside&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+  display: flex;
+  gap: 16px;
+}
+
+.principal {
+  flex: 1;
+}
+
+.lateral {
+  width: 200px;
+}
+
+.receita {
+  gap: 12px;
+  background-color: oldlace;
+}
+
+.receita img {
+  width: 150px;
+  max-width: 100%;
+  height: auto;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.pagina {
+  display: flex;
+  gap: 16px;
+}
+
+.principal {
+  flex: 1;
+  container-type: inline-size;
+}
+
+.lateral {
+  width: 200px;
+  container-type: inline-size;
+}
+
+.receita {
+  gap: 12px;
+  background-color: oldlace;
+}
+
+.receita img {
+  width: 150px;
+  max-width: 100%;
+  height: auto;
+}
+
+@container (min-width: 400px) {
+  .receita {
+    display: flex;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>3. Dando nome ao contêiner</h2>
+<p>Sem nome, cada elemento consulta o contêiner <strong>mais próximo</strong> acima dele. Quando há contêineres dentro de contêineres e você quer perguntar a um específico, dê um nome com <code>container-name</code> e use o nome na consulta:</p>
+
+<pre class="file" data-file="style.css">.lateral {
+  container-type: inline-size;
+  container-name: lateral;
+}
+
+@container lateral (max-width: 250px) {
+  .cartao h2 {
+    font-size: 1rem;
+  }
+}
+</pre>
+
+<p>O atalho <code>container</code> junta os dois: primeiro o nome, depois uma barra, depois o tipo.</p>
+
+<pre class="file" data-file="style.css">.lateral {
+  container: lateral / inline-size;
+}
+</pre>
+
+<dl class="anatomy">
+  <dt>lateral</dt><dd>O nome, inventado por você (letras, números e hífen). Não é uma classe: não tem ponto.</dd>
+  <dt>/</dt><dd>Separa o nome do tipo.</dd>
+  <dt>inline-size</dt><dd>O tipo, como em <code>container-type</code>.</dd>
+</dl>
+
+<h3>Outras formas de escrever a condição</h3>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>Verdade quando o contêiner…</th></tr>
+<tr><td><code>(min-width: 400px)</code></td><td>tem 400px ou mais</td></tr>
+<tr><td><code>(max-width: 399px)</code></td><td>tem até 399px</td></tr>
+<tr><td><code>(width &gt;= 400px)</code></td><td>tem 400px ou mais (a escrita "de intervalo", com sinais de comparação)</td></tr>
+<tr><td><code>(300px &lt;= width &lt;= 600px)</code></td><td>tem entre 300 e 600px</td></tr>
+<tr><td><code>(min-width: 25rem)</code></td><td>tem 25rem ou mais (unidades relativas também valem)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>4. As unidades do contêiner: <code>cqi</code></h2>
+<p>Assim como <code>vw</code> é 1% da largura da <strong>janela</strong>, <code>cqi</code> (<em>container query inline</em>) é <strong>1% da largura do contêiner</strong>. Com ela, um tamanho acompanha o espaço do componente. Junte com o <a href="clamp.html"><code>clamp()</code></a> para ter limites:</p>
+
+<div class="tryhtml" data-largura="768">
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="pagina"&gt;
+  &lt;main class="principal"&gt;
+    &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;/main&gt;
+  &lt;aside class="lateral"&gt;
+    &lt;h2&gt;Bolo de cenoura&lt;/h2&gt;
+  &lt;/aside&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.pagina {
+  display: flex;
+  gap: 16px;
+}
+
+.principal {
+  flex: 1;
+  container-type: inline-size;
+  background-color: oldlace;
+}
+
+.lateral {
+  width: 200px;
+  container-type: inline-size;
+  background-color: lavender;
+}
+
+h2 {
+  font-size: clamp(1rem, 5cqi, 2rem);
+}
+</pre>
+</div>
+
+<p>O mesmo título, com a mesma regra, fica com tamanhos diferentes: na coluna principal (536 pixels), <code>5cqi</code> = <strong>26.8px</strong>; na lateral (200 pixels), <code>5cqi</code> = 10px, e o <code>clamp()</code> segura em <strong>16px</strong> (valores conferidos no Chromium).</p>
+
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Unidade</th><th>1 unidade é…</th></tr>
+<tr><td><code>cqi</code></td><td>1% da largura do contêiner (a mais usada)</td></tr>
+<tr><td><code>cqw</code></td><td>1% da largura do contêiner (igual a <code>cqi</code> em português)</td></tr>
+<tr><td><code>cqb</code>, <code>cqh</code></td><td>1% da altura do contêiner (só com <code>container-type: size</code>)</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>5. Media query ou container query?</h2>
+<p>Uma não substitui a outra. As duas convivem no mesmo CSS:</p>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Pergunta</th><th>Use</th><th>Exemplo</th></tr>
+<tr><td>Como fica a <strong>página</strong> numa tela estreita?</td><td><code>@media</code></td><td>O layout geral (uma coluna no celular, duas no computador), o menu, o tamanho da letra base</td></tr>
+<tr><td>Como fica este <strong>componente</strong> no espaço que ele ganhou?</td><td><code>@container</code></td><td>Cartões, listas de produtos, widgets que aparecem em vários lugares</td></tr>
+<tr><td>A pessoa prefere tema escuro, menos movimento, vai imprimir?</td><td><code>@media</code></td><td><code>prefers-color-scheme</code>, <code>prefers-reduced-motion</code>, <code>print</code>: a container query só mede tamanho</td></tr>
+</table>
+</div>
+
+<div class="note">
+<strong>Existe também a consulta de estilo</strong>
+<p>Além do tamanho, o <code>@container</code> pode perguntar o valor de uma <a href="variaveis.html">variável</a> do contêiner: <code>@container style(--tema: escuro) { … }</code>. Ela é mais nova e o suporte ainda é parcial: em outubro de 2026, o caniuse marca o Chrome, o Edge (desde o 111) e o Safari (desde o 18) com suporte parcial, só para variáveis, e o Firefox com suporte completo desde o 151. Para começar, fique com as consultas de tamanho.</p>
+</div>
+
+<hr>
+
+<h2 id="errado">Quando dá errado</h2>
+
+<div class="cenario">
+<strong>Esqueceu o <code>container-type</code>: a regra nunca vale</strong>
+<pre class="file" data-file="style.css">.principal {
+  flex: 1;
+}
+
+@container (min-width: 400px) {
+  .cartao {
+    display: flex;
+  }
+}
+</pre>
+<p><strong>O que você vê:</strong> os dois cartões ficam em coluna, em qualquer largura do quadro (conferido no Chromium: <code>display: block</code> nos dois).</p>
+<p><strong>Por quê:</strong> ninguém foi declarado contêiner. Um <code>@container</code> sem contêiner acima do elemento simplesmente não se aplica, sem nenhum aviso. Diferente da media query, que sempre tem a tela para medir, a container query precisa que você diga <strong>quem</strong> é medido.</p>
+<p><strong>Como consertar:</strong> <code>container-type: inline-size;</code> no elemento <strong>pai</strong> (ou num ancestral) do cartão.</p>
+</div>
+
+<div class="cenario">
+<strong>Estilizar o próprio contêiner dentro da consulta dele</strong>
+<pre class="file" data-file="style.css">.principal {
+  container-type: inline-size;
+}
+
+@container (min-width: 400px) {
+  .principal {
+    background-color: lightyellow;
+  }
+}
+</pre>
+<p><strong>O que você vê:</strong> o fundo da <code>.principal</code> não muda, mesmo com 536 pixels (o fundo calculado continua transparente, <code>rgba(0, 0, 0, 0)</code>).</p>
+<p><strong>Por quê:</strong> a consulta só vale para o que está <strong>dentro</strong> do contêiner. Se o contêiner pudesse mudar a si mesmo pela própria largura, poderia entrar num ciclo sem fim (muda a largura, a regra deixa de valer, volta a largura…).</p>
+<p><strong>Como consertar:</strong> estilize os filhos, ou crie um elemento por dentro (um <code>div</code> que envolve o conteúdo) e mude o fundo dele.</p>
+</div>
+
+<div class="cenario">
+<strong><code>container-type: size</code>: o contêiner perde a altura</strong>
+<pre class="file" data-file="style.css">.principal,
+.lateral {
+  container-type: size;
+}
+</pre>
+<p><strong>O que você vê:</strong> os cartões continuam no lugar, mas o rodapé que vem depois deles ("Lojinha da Ana · Rua das Flores, 12") sobe e fica <strong>em cima</strong> do primeiro cartão. A altura da <code>.principal</code> calculada é <code>0px</code>.</p>
+<p><strong>Por quê:</strong> com <code>size</code>, o contêiner pode ser consultado pela largura <strong>e pela altura</strong>. Para isso, o navegador deixa de calcular a altura pelo conteúdo, e um contêiner sem <code>height</code> fica com altura zero; o conteúdo transborda.</p>
+<p><strong>Como consertar:</strong> use <code>inline-size</code>, que é o que você quer em quase todos os casos. <code>size</code> só com uma altura definida.</p>
+</div>
+
+<div class="cenario">
+<strong>O validador do laboratório reclama de CSS correto</strong>
+<pre class="file" data-file="cq.css">.principal {
+  container-type: inline-size;
+}
+@container (min-width: 400px) {
+  .cartao {
+    display: flex;
+  }
+}
+.lateral {
+  container: lateral / inline-size;
+}
+@container lateral (width &gt;= 300px) {
+  .cartao h2 {
+    font-size: 5cqi;
+  }
+}
+</pre>
+<pre class="term" data-cwd="~/site">$ vnu --css cq.css
+"file:/home/ana/site/cq.css":2.19-2.29: error: CSS: “container-type”: Property “container-type” doesn't exist.
+"file:/home/ana/site/cq.css":4.1-4.10: error: CSS: Unrecognized at-rule “@container”
+"file:/home/ana/site/cq.css":10.24-10.34: error: CSS: “container”: Property “container” doesn't exist.
+"file:/home/ana/site/cq.css":12.1-12.10: error: CSS: Unrecognized at-rule “@container”</pre>
+<p><strong>O que significa:</strong> "a propriedade <code>container-type</code> não existe" e "regra @ não reconhecida: <code>@container</code>". O CSS está certo e funciona nos navegadores: é o validador de CSS do <code>vnu</code> da Ana (versão 26.10.12) que ainda não conhece as container queries. A mesma coisa acontece com a unidade <code>cqi</code> fora de um <code>@container</code> (<code>Unknown dimension</code>, "dimensão desconhecida").</p>
+<p><strong>O que fazer:</strong> nada no CSS. Um validador também tem atraso; quando ele acusar um recurso moderno, confira no MDN se o recurso existe e funciona antes de "consertar" o que não está quebrado. Mas erros de digitação são de verdade: veja abaixo.</p>
+</div>
+
+<div class="cenario">
+<strong>Digitou errado: o navegador ignora em silêncio</strong>
+<pre class="file" data-file="style.css">.principal {
+  container-type: inline;
+}
+
+@container (min-width: 400) {
+  .cartao {
+    display: flex;
+  }
+}
+</pre>
+<p><strong>O que você vê:</strong> nada muda, os cartões ficam em coluna.</p>
+<p><strong>Por quê:</strong> <code>inline</code> não é um valor de <code>container-type</code> (é <code>inline-size</code>), então a declaração é ignorada e não há contêiner. E <code>400</code> sem unidade não é uma largura: a condição nunca é verdadeira. No F12, a declaração errada aparece riscada. Como o validador do laboratório não conhece <code>@container</code>, aqui ele não ajuda: confira os nomes com calma.</p>
+</div>
+
+<hr>
+
+<h2>Referência rápida</h2>
+<div class="table-wrap">
+<table class="ref">
+<tr><th>Escrita</th><th>O que faz</th></tr>
+<tr><td><code>container-type: inline-size;</code></td><td>O elemento vira contêiner, consultado pela largura</td></tr>
+<tr><td><code>container-type: size;</code></td><td>Consultado pela largura e pela altura (precisa de <code>height</code>)</td></tr>
+<tr><td><code>container-type: normal;</code></td><td>O padrão: não é contêiner de tamanho</td></tr>
+<tr><td><code>container-name: lateral;</code></td><td>Dá um nome ao contêiner</td></tr>
+<tr><td><code>container: lateral / inline-size;</code></td><td>Atalho: nome / tipo</td></tr>
+<tr><td><code>@container (min-width: 400px) { … }</code></td><td>Regras que valem quando o contêiner mais próximo tem 400px ou mais</td></tr>
+<tr><td><code>@container lateral (max-width: 250px) { … }</code></td><td>Pergunta ao contêiner com esse nome</td></tr>
+<tr><td><code>5cqi</code></td><td>5% da largura do contêiner</td></tr>
+</table>
+</div>
+
+<hr>
+
+<h2>Exercícios</h2>
+
+<div class="exercise">
+<h3>1. Virar contêiner</h3>
+<p>Complete para a barra lateral ser consultada pela largura:</p>
+<div class="ex-code">.lateral { container-type: <input data-answer="inline-size" aria-label="valor">; }</div>
+</div>
+
+<div class="exercise">
+<h3>2. A regra</h3>
+<p>Complete a regra que pergunta a largura do contêiner:</p>
+<div class="ex-code"><input data-answer="@container" aria-label="regra"> (min-width: 400px) { .cartao { display: flex; } }</div>
+</div>
+
+<div class="exercise">
+<h3>3. O atalho</h3>
+<p>Complete o atalho que dá o nome <code>menu</code> e o tipo <code>inline-size</code>:</p>
+<div class="ex-code">.topo { container: menu <input data-answer="/" aria-label="separador" size="2"> inline-size; }</div>
+</div>
+
+<div class="mc" data-answer="2">
+<p class="mc-q">4. O mesmo cartão aparece numa coluna de 600px e numa de 200px, na mesma tela. Com <code>@media (min-width: 400px)</code> e a tela com 1000px, o que acontece?</p>
+<label><input type="radio" name="q4"> Só o cartão da coluna de 600px muda</label>
+<label><input type="radio" name="q4"> Os dois mudam, porque a media query mede a tela</label>
+<label><input type="radio" name="q4"> Nenhum muda</label>
+<label><input type="radio" name="q4"> Só o da coluna de 200px muda</label>
+</div>
+
+<div class="mc" data-answer="4">
+<p class="mc-q">5. A Ana escreveu um <code>@container</code> que nunca funciona, sem erro nenhum. Qual é a causa mais provável?</p>
+<label><input type="radio" name="q5"> O navegador é novo demais</label>
+<label><input type="radio" name="q5"> Faltou <code>!important</code></label>
+<label><input type="radio" name="q5"> <code>@container</code> só funciona com Grid</label>
+<label><input type="radio" name="q5"> Nenhum ancestral do elemento tem <code>container-type</code></label>
+</div>
+
+<div class="mc" data-answer="1">
+<p class="mc-q">6. O que é <code>10cqi</code>?</p>
+<label><input type="radio" name="q6"> 10% da largura do contêiner</label>
+<label><input type="radio" name="q6"> 10% da largura da tela</label>
+<label><input type="radio" name="q6"> 10 vezes o tamanho da letra</label>
+<label><input type="radio" name="q6"> 10 pixels</label>
+</div>
+
+<h3>Missão final: os produtos da lojinha</h3>
+
+<div class="tryhtml" data-largura="768" data-goal="css:.vitrine .produto{display}=flex,css:.carrinho .produto{display}=block,src:container:\s*loja\s*/\s*inline-size|container-name:\s*loja,src:@container\s+loja\s*\(">
+<p class="try-task"><strong>Missão:</strong> o mesmo produto aparece na vitrine (larga) e no carrinho (estreito). (1) Transforme a <code>.vitrine</code> e o <code>.carrinho</code> em contêineres com o nome <code>loja</code> e o tipo <code>inline-size</code> (pode usar o atalho <code>container</code>). (2) Escreva <code>@container loja (min-width: 350px)</code> deixando o <code>.produto</code> com <code>display: flex</code>. Clique em 375 depois: o produto da vitrine também vai para coluna.</p>
+<pre class="script" data-file="index.html">&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;div class="loja"&gt;
+  &lt;section class="vitrine"&gt;
+    &lt;h2&gt;Vitrine&lt;/h2&gt;
+    &lt;article class="produto"&gt;
+      &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo de cenoura inteiro" width="400" height="400"&gt;
+      &lt;div&gt;
+        &lt;h3&gt;Bolo de cenoura&lt;/h3&gt;
+        &lt;p&gt;R$ 45,00&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  &lt;/section&gt;
+  &lt;section class="carrinho"&gt;
+    &lt;h2&gt;Carrinho&lt;/h2&gt;
+    &lt;article class="produto"&gt;
+      &lt;img src="assets/midia/bolo-quadrado-400.jpg" alt="Bolo de cenoura inteiro" width="400" height="400"&gt;
+      &lt;div&gt;
+        &lt;h3&gt;Bolo de cenoura&lt;/h3&gt;
+        &lt;p&gt;R$ 45,00&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  &lt;/section&gt;
+&lt;/div&gt;
+</pre>
+<pre class="script" data-file="style.css">.loja {
+  display: flex;
+  gap: 16px;
+}
+
+.vitrine {
+  flex: 1;
+}
+
+.carrinho {
+  width: 180px;
+}
+
+.produto {
+  gap: 12px;
+  border: 1px solid silver;
+  padding: 8px;
+}
+
+.produto img {
+  width: 120px;
+  max-width: 100%;
+  height: auto;
+}
+</pre>
+<pre class="solucao" data-file="style.css">.loja {
+  display: flex;
+  gap: 16px;
+}
+
+.vitrine {
+  flex: 1;
+  container: loja / inline-size;
+}
+
+.carrinho {
+  width: 180px;
+  container: loja / inline-size;
+}
+
+.produto {
+  gap: 12px;
+  border: 1px solid silver;
+  padding: 8px;
+}
+
+.produto img {
+  width: 120px;
+  max-width: 100%;
+  height: auto;
+}
+
+@container loja (min-width: 350px) {
+  .produto {
+    display: flex;
+  }
+}
+</pre>
+</div>
+
+<hr>
+
+<h2>Resumo</h2>
+<ul>
+  <li>Media query mede a <strong>tela</strong>; container query mede o <strong>contêiner</strong>, o espaço onde o componente está. O mesmo cartão pode ficar de dois jeitos na mesma tela.</li>
+  <li>Dois passos: <code>container-type: inline-size</code> no pai, e <code>@container (min-width: 400px) { … }</code> com as regras dos filhos.</li>
+  <li>Sem <code>container-type</code> num ancestral, o <code>@container</code> não vale, em silêncio. E a consulta não muda o próprio contêiner, só o que está dentro.</li>
+  <li><code>container-name</code> (ou o atalho <code>container: nome / inline-size</code>) escolhe qual contêiner consultar: <code>@container nome (…)</code>.</li>
+  <li><code>cqi</code> é 1% da largura do contêiner; combina bem com <code>clamp()</code>.</li>
+  <li>Use <code>inline-size</code>; <code>size</code> zera a altura de um contêiner sem <code>height</code>.</li>
+  <li>Funciona nos navegadores desde 2023, mas o validador <code>vnu</code> 26.10.12 ainda acusa <code>@container</code> e <code>container-type</code> como erro: é um erro falso.</li>
+</ul>
+
+<div class="pager"></div>
+
+</div>
+</main>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>
